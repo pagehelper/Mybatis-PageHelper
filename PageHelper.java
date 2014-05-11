@@ -143,6 +143,11 @@ public class PageHelper implements Interceptor {
             countStmt = connection.prepareStatement(countSql);
             BoundSql countBS = new BoundSql(mappedStatement.getConfiguration(), countSql,
                     boundSql.getParameterMappings(), boundSql.getParameterObject());
+			//需要将metaParameters赋值过去..
+            MetaObject countBsObject = SystemMetaObject.forObject(countBS);
+            MetaObject boundSqlObject = SystemMetaObject.forObject(boundSql);
+            countBsObject.setValue("metaParameters",boundSqlObject.getValue("metaParameters"));
+			
             setParameters(countStmt, mappedStatement, countBS, boundSql.getParameterObject());
             rs = countStmt.executeQuery();
             int totalCount = 0;
