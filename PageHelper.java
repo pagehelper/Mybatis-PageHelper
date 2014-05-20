@@ -14,13 +14,12 @@ import java.util.List;
 import java.util.Properties;
 
 
-
 /**
  * Mybatis - 通用分页拦截器v2.0
  *
  * @author liuzh/abel533/isea
- * Created by liuzh on 14-4-15.
- * Update by liuzh on 14-5-20.
+ *         Created by liuzh on 14-4-15.
+ *         Update by liuzh on 14-5-20.
  */
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
@@ -66,9 +65,7 @@ public class PageHelper implements Interceptor {
         }
         if (invocation.getTarget() instanceof Executor) {
             MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
-            //((CachingExecutor) executor).delegate.createCacheKey(ms,parameterObject,rowBounds,boundSql);
-            //CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
-            //分页信息if (localPage.get() != null) {
+            //分页信息
             Page page = localPage.get();
             MetaObject msObject = SystemMetaObject.forObject(ms);
             List<SqlNode> contents = (List<SqlNode>) msObject.getValue("sqlSource.rootSqlNode.contents");
@@ -79,9 +76,9 @@ public class PageHelper implements Interceptor {
             List<ResultMapping> resultMappings = (List<ResultMapping>) msObject.getValue("resultMaps[0].resultMappings");
             msObject.setValue("resultMaps[0].type", int.class);
             msObject.setValue("resultMaps[0].resultMappings", EMPTY_RESULTMAPPING);
-            //查询总数
             Object result = null;
             try {
+                //查询总数
                 result = invocation.proceed();
                 int totalCount = Integer.parseInt(((List) result).get(0).toString());
                 page.setTotal(totalCount);
@@ -91,6 +88,9 @@ public class PageHelper implements Interceptor {
                 //清理count sql
                 contents.remove(0);
                 contents.remove(contents.size() - 1);
+                //恢复类型
+                msObject.setValue("resultMaps[0].type", resultType);
+                msObject.setValue("resultMaps[0].resultMappings", resultMappings);
             }
             //分页sql
             contents.add(0, new TextSqlNode("select * from ( select temp.*, rownum row_id from ( "));
@@ -98,11 +98,8 @@ public class PageHelper implements Interceptor {
             pageSql.append(" ) temp where rownum <= ").append(page.getEndRow());
             pageSql.append(") where row_id > ").append(page.getStartRow());
             contents.add(new TextSqlNode(pageSql.toString()));
-            //恢复类型
-            msObject.setValue("resultMaps[0].type", resultType);
-            msObject.setValue("resultMaps[0].resultMappings", resultMappings);
-            //将执行权交给下一个拦截器
             try {
+                //执行分页查询
                 result = invocation.proceed();
             } finally {
                 //清理分页sql
