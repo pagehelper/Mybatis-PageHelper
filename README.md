@@ -1,6 +1,6 @@
 #PageHelper说明  
 
-###最新版为2.0  
+###最新版为2.1  
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
@@ -12,8 +12,12 @@
 
 分页插件示例：http://my.oschina.net/flags/blog/228700  
 
-##更新日志
-###v2.0：  
+##更新日志   
+###v2.1    
+1. 解决并发异常
+2. 分页sql改为直接拼sql    
+
+###v2.0  
 1. 支持Mybatis缓存，count和分页同时支持（二者同步）  
 2. 修改拦截器签名，拦截Executor，签名如下：    
 	`@Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
