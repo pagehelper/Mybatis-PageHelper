@@ -24,9 +24,9 @@ import java.util.Properties;
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
 
-    public static final ThreadLocal<Page> localPage = new ThreadLocal<Page>();
+    private static final ThreadLocal<Page> localPage = new ThreadLocal<Page>();
 
-    public static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
+    private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
     /**
      * 开始分页
@@ -62,8 +62,7 @@ public class PageHelper implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         if (localPage.get() == null) {
             return invocation.proceed();
-        }
-        if (invocation.getTarget() instanceof Executor) {
+        } else {
             MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
             //分页信息
             Page page = localPage.get();
@@ -111,7 +110,6 @@ public class PageHelper implements Interceptor {
             //返回结果
             return result;
         }
-        return null;
     }
 
     /**
