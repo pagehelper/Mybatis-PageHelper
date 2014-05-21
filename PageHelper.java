@@ -170,9 +170,7 @@ public class PageHelper implements Interceptor {
     }
 
     /**
-     * 只拦截这两种类型的
-     * <br>StatementHandler
-     * <br>ResultSetHandler
+     * 只拦截Executor
      *
      * @param target
      * @return
