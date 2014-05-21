@@ -73,7 +73,7 @@ public class PageHelper implements Interceptor {
             MetaObject msObject = SystemMetaObject.forObject(qs);
             String sql = (String) msObject.getValue("sqlSource.boundSql.sql");
             //求count - 重写sql
-            msObject.setValue("sqlSource.boundSql.sql", getCoundSql(sql));
+            msObject.setValue("sqlSource.boundSql.sql", getCountSql(sql));
 
             //分页信息
             Page page = localPage.get();
@@ -102,7 +102,7 @@ public class PageHelper implements Interceptor {
      * @param sql
      * @return
      */
-    private String getCoundSql(String sql) {
+    private String getCountSql(String sql) {
         return "select count(0) from (" + sql + ")";
     }
 
