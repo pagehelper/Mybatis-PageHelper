@@ -13,53 +13,53 @@
 分页插件示例：http://my.oschina.net/flags/blog/228700  
 
 ###v3.0_beta版本测试代码：
+```java
+@Test
+public void testPageHelperByStartPage() throws Exception {
+    String logip = "";
+    String username = "super";
+    String loginDate = "";
+    String exitDate = null;
+    String logerr = null;
+    //不进行count查询，第三个参数设为false
+    PageHelper.startPage(1, 10, false);
+    //不进行count查询时，返回结果就是List<SysLoginLog>类型
+    List<SysLoginLog> logs = sysLoginLogMapper
+            .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
+    Assert.assertEquals(10, logs.size());
 
-    @Test
-    public void testPageHelperByStartPage() throws Exception {
-        String logip = "";
-        String username = "super";
-        String loginDate = "";
-        String exitDate = null;
-        String logerr = null;
-        //不进行count查询，第三个参数设为false
-        PageHelper.startPage(1, 10, false);
-        //不进行count查询时，返回结果就是List<SysLoginLog>类型
-        List<SysLoginLog> logs = sysLoginLogMapper
-                .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
-        Assert.assertEquals(10, logs.size());
+    //当第三个参数没有或者为true的时候，进行count查询
+    PageHelper.startPage(2, 10);
+    //返回结果默认是List<SysLoginLog>
+    //可以通过强制转换为Page<SysLoginLog>,该对象除了包含返回结果外，还包含了分页信息
+    Page<SysLoginLog> page = (Page<SysLoginLog>) sysLoginLogMapper
+            .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
+    Assert.assertEquals(10, page.getResult().size());
+    //进行count查询，返回结果total>0
+    Assert.assertTrue(page.getTotal() > 0);
+}
 
-        //当第三个参数没有或者为true的时候，进行count查询
-        PageHelper.startPage(2, 10);
-        //返回结果默认是List<SysLoginLog>
-        //可以通过强制转换为Page<SysLoginLog>,该对象除了包含返回结果外，还包含了分页信息
-        Page<SysLoginLog> page = (Page<SysLoginLog>) sysLoginLogMapper
-                .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
-        Assert.assertEquals(10, page.getResult().size());
-        //进行count查询，返回结果total>0
-        Assert.assertTrue(page.getTotal() > 0);
-    }
-
-    @Test
-    public void testPageHelperByRowbounds() throws Exception {
-        String logip = "";
-        String username = "super";
-        String loginDate = "";
-        String exitDate = null;
-        String logerr = null;
-        //使用RowBounds方式，不需要PageHelper.startPage
-        //RowBounds方式默认不进行count查询，返回结果默认为List<SysLoginLog>
-        //可以通过强制转换为Page<SysLoginLog>，在不进行count查询的情况，没必要强转
-        List<SysLoginLog> logs = sysLoginLogMapper
-                .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
-        Assert.assertEquals(10, logs.size());
-        //这里进行了强制转换，实际上并没有必要
-        Page<SysLoginLog> logs2 = (Page<SysLoginLog>) sysLoginLogMapper
-                .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
-        Assert.assertEquals(10, logs2.size());
-    }
-
+@Test
+public void testPageHelperByRowbounds() throws Exception {
+    String logip = "";
+    String username = "super";
+    String loginDate = "";
+    String exitDate = null;
+    String logerr = null;
+    //使用RowBounds方式，不需要PageHelper.startPage
+    //RowBounds方式默认不进行count查询，返回结果默认为List<SysLoginLog>
+    //可以通过强制转换为Page<SysLoginLog>，在不进行count查询的情况，没必要强转
+    List<SysLoginLog> logs = sysLoginLogMapper
+            .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
+    Assert.assertEquals(10, logs.size());
+    //这里进行了强制转换，实际上并没有必要
+    Page<SysLoginLog> logs2 = (Page<SysLoginLog>) sysLoginLogMapper
+            .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
+    Assert.assertEquals(10, logs2.size());
+}
+```
 ###测试的Mapper接口:  
-
+```java
         /**
      * 根据查询条件查询登录日志
      * @param logip
@@ -87,10 +87,10 @@
                                       @Param("exitDate") String exitDate,
                                       @Param("logerr") String logerr,
                                       RowBounds rowBounds);
-
+```
     
 ###测试Mapper接口对应的xml,两个接口方法对应同一个配置:    
-
+```xml
     <select id="findSysLoginLog" resultType="SysLoginLog">
         select * from sys_login_log a
         <if test="username != null and username != ''">
@@ -115,9 +115,11 @@
         </where>
         order by logid desc
     </select>
+```
 ###关于MappedStatement  
-
+```java
     MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
+```
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑
 ##更新日志   
 ###v3.0_beta
@@ -134,8 +136,9 @@
 ###v2.0  
 1. 支持Mybatis缓存，count和分页同时支持（二者同步）  
 2. 修改拦截器签名，拦截Executor，签名如下：    
-	`@Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
-`  
+```java
+@Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
+```
 3. 将Page<E>类移到外面，方便调用  
 
 ###v1.0  
