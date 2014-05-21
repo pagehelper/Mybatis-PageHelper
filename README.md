@@ -123,10 +123,10 @@ public void testPageHelperByRowbounds() throws Exception {
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑
 ##更新日志   
 ###v3.0_beta
-1. 现在支持两种形式的分页，使用PageHelper.startPage方法或者使用RowBounds参数  
-2. PageHelper.startPage方法修改，原先的startPage(int pageNum, int pageSize)默认求count，新增的startPage(int pageNum, int pageSize, boolean count)设置count=false可以不执行count查询  
-3. 移除endPage方法，现在本地变量localPage改为取出后清空本地变量。
-4. 修改Page<E>类，继承ArrayList<E>
+1. 现在支持两种形式的分页，使用```PageHelper.startPage```方法或者使用```RowBounds```参数  
+2. ```PageHelper.startPage```方法修改，原先的```startPage(int pageNum, int pageSize)```默认求count，新增的```startPage(int pageNum, int pageSize, boolean count)```设置count=false可以不执行count查询  
+3. 移除```endPage```方法，现在本地变量```localPage```改为取出后清空本地变量。
+4. 修改```Page<E>```类，继承```ArrayList<E>```
 5. 关于两种形式的调用，请看测试代码   
     
 ###v2.1    
@@ -134,12 +134,10 @@ public void testPageHelperByRowbounds() throws Exception {
 2. 分页sql改为直接拼sql    
 
 ###v2.0  
+
 1. 支持Mybatis缓存，count和分页同时支持（二者同步）  
-2. 修改拦截器签名，拦截Executor，签名如下：    
-```java
-@Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
-```
-3. 将Page<E>类移到外面，方便调用  
+2. 修改拦截器签名，拦截Executor
+3. 将Page<E>类移到外面，方便调用
 
 ###v1.0  
 1. 支持foreach等标签的分页查询
