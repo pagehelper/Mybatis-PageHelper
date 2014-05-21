@@ -21,7 +21,6 @@ import java.util.Properties;
  */
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
-
     private static final ThreadLocal<Page> localPage = new ThreadLocal<Page>();
 
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
@@ -33,67 +32,71 @@ public class PageHelper implements Interceptor {
      * @param pageSize
      */
     public static void startPage(int pageNum, int pageSize) {
-        localPage.set(new Page(pageNum, pageSize));
+        startPage(pageNum, pageSize, true);
     }
 
     /**
-     * 如果开启了分页功能，则关闭分页
-     */
-    public static void endIfPaging() {
-        if (localPage.get() != null) {
-            localPage.remove();
-        }
-    }
-
-    /**
-     * 结束分页并返回结果，该方法必须被调用，否则localPage会一直保存下去，直到下一次startPage
+     * 开始分页
      *
-     * @return
+     * @param pageNum
+     * @param pageSize
      */
-    public static Page endPage() {
-        Page page = localPage.get();
-        localPage.remove();
-        return page;
+    public static void startPage(int pageNum, int pageSize, boolean count) {
+        localPage.set(new Page(pageNum, pageSize, count? Page.SQL_COUNT: Page.NO_SQL_COUNT));
     }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        if (localPage.get() == null) {
+        final Object[] args = invocation.getArgs();
+        RowBounds rowBounds = (RowBounds)args[2];
+        if (localPage.get() == null && rowBounds == RowBounds.DEFAULT) {
             return invocation.proceed();
         } else {
-            final Object[] args = invocation.getArgs();
             MappedStatement ms = (MappedStatement) args[0];
             Object parameterObject = args[1];
             BoundSql boundSql = ms.getBoundSql(parameterObject);
 
+            //分页信息
+            Page page = localPage.get();
+            //移除本地变量
+            localPage.remove();
+
+            if (page == null) {
+                page = new Page(rowBounds);
+            }
             MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
             //将参数中的MappedStatement替换为新的qs，防止并发异常
             args[0] = qs;
-
             MetaObject msObject = SystemMetaObject.forObject(qs);
             String sql = (String) msObject.getValue("sqlSource.boundSql.sql");
-            //求count - 重写sql
-            msObject.setValue("sqlSource.boundSql.sql", getCountSql(sql));
-
-            //分页信息
-            Page page = localPage.get();
-            //查询总数
-            Object result = invocation.proceed();
-            int totalCount = Integer.parseInt(((List) result).get(0).toString());
-            page.setTotal(totalCount);
-            int totalPage = totalCount / page.getPageSize() + ((totalCount % page.getPageSize() == 0) ? 0 : 1);
-            page.setPages(totalPage);
-
-            //分页sql - 重写sql
-            msObject.setValue("sqlSource.boundSql.sql", getPageSql(sql, page));
-            //恢复类型
-            msObject.setValue("resultMaps", ms.getResultMaps());
-            //执行分页查询
-            result = invocation.proceed();
-            //得到处理结果
-            page.setResult((List) result);
-            //返回结果
-            return result;
+            //简单的通过total的值来判断是否进行count查询
+            if (page.getTotal() > Page.NO_SQL_COUNT) {
+                //求count - 重写sql
+                msObject.setValue("sqlSource.boundSql.sql", getCountSql(sql));
+                //查询总数
+                Object result = invocation.proceed();
+                int totalCount = Integer.parseInt(((List) result).get(0).toString());
+                page.setTotal(totalCount);
+                int totalPage = totalCount / page.getPageSize() + ((totalCount % page.getPageSize() == 0) ? 0 : 1);
+                page.setPages(totalPage);
+                //分页sql - 重写sql
+                msObject.setValue("sqlSource.boundSql.sql", getPageSql(sql, page));
+                //恢复类型
+                msObject.setValue("resultMaps", ms.getResultMaps());
+                //执行分页查询
+                result = invocation.proceed();
+                //得到处理结果
+                page.addAll((List) result);
+                //返回结果
+                return page;
+            } else {
+                //分页sql - 重写sql
+                msObject.setValue("sqlSource.boundSql.sql", getPageSql(sql, page));
+                //恢复类型
+                msObject.setValue("resultMaps", ms.getResultMaps());
+                //返回结果
+                return invocation.proceed();
+            }
         }
     }
 
