@@ -125,7 +125,8 @@
 2. PageHelper.startPage方法修改，原先的startPage(int pageNum, int pageSize)默认求count，新增的startPage(int pageNum, int pageSize, boolean count)设置count=false可以不执行count查询  
 3. 移除endPage方法，现在本地变量localPage改为取出后清空本地变量。
 4. 修改Page<E>类，继承ArrayList<E>
-5. 关于两种形式的调用，请看测试代码
+5. 关于两种形式的调用，请看测试代码   
+    
 ###v2.1    
 1. 解决并发异常
 2. 分页sql改为直接拼sql    
