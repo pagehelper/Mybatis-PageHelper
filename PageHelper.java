@@ -127,7 +127,7 @@ public class PageHelper implements Interceptor {
         StringBuilder pageSql = new StringBuilder(200);
         if("mysql".equals(dialect)){
             pageSql.append(sql);
-            pageSql.append(" limit "+page.getPageNum()+","+page.getPageSize());
+            pageSql.append(" limit "+page.getStartRow()+","+page.getPageSize());
         }else if("oracle".equals(dialect)){
             pageSql.append("select * from ( select temp.*, rownum row_id from ( ");
             pageSql.append(sql);
