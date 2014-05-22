@@ -61,7 +61,7 @@ public void testPageHelperByRowbounds() throws Exception {
 @Test
 public void testPageHelperByNamespaceAndRowBounds() throws Exception {
     //没有RowBounds不进行分页
-    List<SysLoginLog> logs = sqlSession.selectList("findSysLoginLog2",null);
+    List<SysLoginLog> logs = sqlSession.selectList("findSysLoginLog2");
     Assert.assertNotEquals(10, logs.size());
     
     //使用RowBounds分页
