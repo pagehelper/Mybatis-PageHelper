@@ -57,6 +57,18 @@ public void testPageHelperByRowbounds() throws Exception {
             .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
     Assert.assertEquals(10, logs2.size());
 }
+
+@Test
+public void testPageHelperByNamespaceAndRowBounds() throws Exception {
+    //没有RowBounds不进行分页
+    List<SysLoginLog> logs = sqlSession.selectList("findSysLoginLog2",null);
+    Assert.assertNotEquals(10, logs.size());
+    
+    //使用RowBounds分页
+    List<SysLoginLog> logs2 = sqlSession
+            .selectList("findSysLoginLog2",null,new RowBounds(0,10));
+    Assert.assertEquals(10, logs2.size());
+}
 ```
 ###测试的Mapper接口:  
 ```java
@@ -114,6 +126,11 @@ public void testPageHelperByRowbounds() throws Exception {
             </if>
         </where>
         order by logid desc
+    </select>
+    
+    <!-- namespace调用的方法 -->
+    <select id="findSysLoginLog2" resultType="SysLoginLog">
+        select * from sys_login_log order by logid desc
     </select>
 ```
 ###关于MappedStatement  
