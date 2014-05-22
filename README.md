@@ -179,4 +179,5 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 1. 支持foreach等标签的分页查询
 2. 提供便捷的使用方式
 
- 
+----------
+###支持作者<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
