@@ -6,13 +6,32 @@
 
 该插件目前只提供了Oracle的版本，具体介绍以及如何支持其他数据库，请看下面的介绍。  
 
-注：如果真的有人写不出Mysql版本的，可以给我提Issues  
+**注**：欢迎各位提供其他数据库版本的分页插件  
 
-分页插件介绍：http://my.oschina.net/flags/blog/228699  
+Mybatis项目：http://mybatis.github.io/mybatis-3/zh/index.html
 
-分页插件示例：http://my.oschina.net/flags/blog/228700  
+Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 
-###v3.0_beta版本测试代码：
+###使用方法
+在Mybatis的配置xml中配置拦截器插件:    
+```xml
+<plugins>
+	<plugin interceptor="PageHelper"></plugin>
+</plugins>
+```   
+这里的PageHelper要使用完整的类路径，需要加上包路径。
+
+
+###不支持的情况   
+
+对于**关联结果查询**，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。
+对于**关联嵌套查询**，使用分页的时候，只会对主SQL进行分页查询，嵌套的查询不会被分页。  
+   
+####**关联结果查询和关联嵌套查询的区别**
+关联结果查询是查询出多个字段的数据，然后将字段拼接到相应的对象中，只会执行一次查询。  
+关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。
+
+###v3.0_beta版本示例：
 ```java
 @Test
 public void testPageHelperByStartPage() throws Exception {
