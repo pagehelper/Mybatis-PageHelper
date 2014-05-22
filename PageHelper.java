@@ -52,7 +52,7 @@ public class PageHelper implements Interceptor {
         if (localPage.get() == null && rowBounds == RowBounds.DEFAULT) {
             return invocation.proceed();
         } else {
-			//忽略RowBounds-否则会进行Mybatis自带的内存分页
+            //忽略RowBounds-否则会进行Mybatis自带的内存分页
             args[2] = RowBounds.DEFAULT;
             MappedStatement ms = (MappedStatement) args[0];
             Object parameterObject = args[1];
