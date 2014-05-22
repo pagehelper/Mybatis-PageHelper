@@ -52,6 +52,8 @@ public class PageHelper implements Interceptor {
         if (localPage.get() == null && rowBounds == RowBounds.DEFAULT) {
             return invocation.proceed();
         } else {
+			//忽略RowBounds-否则会进行Mybatis自带的内存分页
+            args[2] = RowBounds.DEFAULT;
             MappedStatement ms = (MappedStatement) args[0];
             Object parameterObject = args[1];
             BoundSql boundSql = ms.getBoundSql(parameterObject);
@@ -75,7 +77,7 @@ public class PageHelper implements Interceptor {
                 msObject.setValue("sqlSource.boundSql.sql", getCountSql(sql));
                 //查询总数
                 Object result = invocation.proceed();
-                int totalCount = Integer.parseInt(((List) result).get(0).toString());
+                int totalCount = (Integer)((List) result).get(0);
                 page.setTotal(totalCount);
                 int totalPage = totalCount / page.getPageSize() + ((totalCount % page.getPageSize() == 0) ? 0 : 1);
                 page.setPages(totalPage);
