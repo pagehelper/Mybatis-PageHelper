@@ -16,7 +16,9 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 在Mybatis的配置xml中配置拦截器插件:    
 ```xml
 <plugins>
-	<plugin interceptor="PageHelper"></plugin>
+	<plugin interceptor="PageHelper">
+        <property name="dialect" value="mysql"/>
+	</plugin>
 </plugins>
 ```   
 这里的PageHelper要使用完整的类路径，需要加上包路径。

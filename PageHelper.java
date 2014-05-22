@@ -1,3 +1,5 @@
+package com.lujianing.page;
+
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
@@ -6,6 +8,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import javax.xml.bind.PropertyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -24,6 +27,8 @@ public class PageHelper implements Interceptor {
     private static final ThreadLocal<Page> localPage = new ThreadLocal<Page>();
 
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
+
+    private static String dialect = ""; //数据库方言
 
     /**
      * 开始分页
@@ -108,7 +113,7 @@ public class PageHelper implements Interceptor {
      * @return
      */
     private String getCountSql(String sql) {
-        return "select count(0) from (" + sql + ")";
+        return "select count(0) from (" + sql + ") as tmp_count";
     }
 
     /**
@@ -118,11 +123,18 @@ public class PageHelper implements Interceptor {
      * @return
      */
     private String getPageSql(String sql, Page page) {
+
         StringBuilder pageSql = new StringBuilder(200);
-        pageSql.append("select * from ( select temp.*, rownum row_id from ( ");
-        pageSql.append(sql);
-        pageSql.append(" ) temp where rownum <= ").append(page.getEndRow());
-        pageSql.append(") where row_id > ").append(page.getStartRow());
+        if("mysql".equals(dialect)){
+            pageSql.append(sql);
+            pageSql.append(" limit "+page.getPageNum()+","+page.getPageSize());
+        }else if("oracle".equals(dialect)){
+            pageSql.append("select * from ( select temp.*, rownum row_id from ( ");
+            pageSql.append(sql);
+            pageSql.append(" ) temp where rownum <= ").append(page.getEndRow());
+            pageSql.append(") where row_id > ").append(page.getStartRow());
+        }
+
         return pageSql.toString();
     }
 
@@ -189,8 +201,16 @@ public class PageHelper implements Interceptor {
         }
     }
 
-    @Override
-    public void setProperties(Properties properties) {
+    public void setProperties(Properties p) {
+        dialect = p.getProperty("dialect");
+        if (dialect!=null&&dialect.equals("")) {
+            try {
+                throw new PropertyException("dialect property is not found!");
+            } catch (PropertyException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
     }
 }
