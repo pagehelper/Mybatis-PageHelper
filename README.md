@@ -1,6 +1,6 @@
 #PageHelper说明  
 
-###最新版为3.1版  
+###最新版为3.1.0版  
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
@@ -42,7 +42,7 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 关联结果查询是查询出多个字段的数据，然后将字段拼接到相应的对象中，只会执行一次查询。  
 关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。
 
-###v3.1版本示例：
+###v3.1.0版本示例：
 ```java
 @Test
 public void testPageHelperByStartPage() throws Exception {
@@ -176,7 +176,7 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑  
 
 ##更新日志   
-###v3.1  
+###v3.1.0  
 1. 解决了RowBounds分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
 2. 增加对MySql的支持，该支持由[鲁家宁][1]增加。
   
