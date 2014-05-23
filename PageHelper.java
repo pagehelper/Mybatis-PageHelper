@@ -1,5 +1,3 @@
-package com.lujianing.page;
-
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
@@ -123,7 +121,6 @@ public class PageHelper implements Interceptor {
      * @return
      */
     private String getPageSql(String sql, Page page) {
-
         StringBuilder pageSql = new StringBuilder(200);
         if("mysql".equals(dialect)){
             pageSql.append(sql);
@@ -134,17 +131,14 @@ public class PageHelper implements Interceptor {
             pageSql.append(" ) temp where rownum <= ").append(page.getEndRow());
             pageSql.append(") where row_id > ").append(page.getStartRow());
         }
-
         return pageSql.toString();
     }
 
     private class BoundSqlSqlSource implements SqlSource {
         BoundSql boundSql;
-
         public BoundSqlSqlSource(BoundSql boundSql) {
             this.boundSql = boundSql;
         }
-
         public BoundSql getBoundSql(Object parameterObject) {
             return boundSql;
         }
@@ -207,10 +201,8 @@ public class PageHelper implements Interceptor {
             try {
                 throw new PropertyException("dialect property is not found!");
             } catch (PropertyException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-
     }
 }

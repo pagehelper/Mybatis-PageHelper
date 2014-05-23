@@ -4,9 +4,16 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前只提供了Oracle的版本，具体介绍以及如何支持其他数据库，请看下面的介绍。  
+该插件目前支持*Oracle*和*Mysql*。  
 
-**注**：欢迎各位提供其他数据库版本的分页插件  
+**说明**：
+这个分页插件并不想成为一个很复杂的项目，只想用几个（目前两个）简单的类来提供分页的功能，实际上只要数据库有支持的方法，分页不会太难，只要代码简单，对任何人来说修改都是很容易的事情。  
+
+感谢大家的支持，为了方便测试，下一步会添加一个Maven项目，增加一些示例和测试，方便熟悉代码和测试该项目，该项目会独立存在，不会增加到该项目中（*你们不觉得就两个类，进到当前页面就可以方便的点开两个类查看不更好吗？*）。
+
+**注**：
+1. 感谢[鲁家宁][1]增加的对*Mysql*的支持   
+2. 欢迎各位提供其他数据库版本的分页插件  
 
 Mybatis项目：http://mybatis.github.io/mybatis-3/zh/index.html
 
@@ -22,18 +29,19 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 </plugins>
 ```   
 这里的PageHelper要使用完整的类路径，需要加上包路径。
+增加dialect属性，使用时必须指定该属性，可选值为```oracle```和```mysql```,<b>没有默认值，必须指定该属性</b>。
 
 
 ###不支持的情况   
 
-对于**关联结果查询**，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。   
-对于**关联嵌套查询**，使用分页的时候，只会对主SQL进行分页查询，嵌套的查询不会被分页。   
+对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。   
+对于<b>关联嵌套查询</b>，使用分页的时候，只会对主SQL进行分页查询，嵌套的查询不会被分页。   
    
 ####**关联结果查询和关联嵌套查询的区别**
 关联结果查询是查询出多个字段的数据，然后将字段拼接到相应的对象中，只会执行一次查询。  
 关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。
 
-###v3.0版本示例：
+###v3.1版本示例：
 ```java
 @Test
 public void testPageHelperByStartPage() throws Exception {
@@ -93,7 +101,7 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 ```
 ###示例的Mapper接口:  
 ```java
-        /**
+    /**
      * 根据查询条件查询登录日志
      * @param logip
      * @param username
@@ -154,6 +162,10 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
         select * from sys_login_log order by logid desc
     </select>
 ```
+###对于两种分页方式如何选择
+1. 如果你不想在Mapper方法上增加一个带```RowBounds```参数的方法，并且你喜欢用Mapper接口形式调用，你可以使用```PageHelper.startPage```，并且该方法可以控制是否执行count方法。
+2. 实际上在Mapper接口中添加一个带```RowBounds```参数的方法很容易，使用和不带```RowBounds```参数一样的xml就可以。
+3. 如果你喜欢使用```sqlSession.selectList```这种命名空间方式的调用，使用```RowBounds```会更方便。
 ###关于MappedStatement  
 ```java
     MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
@@ -162,6 +174,7 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 ##更新日志   
 ###v3.1  
 1. 解决了RowBounds分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
+2. 增加对MySql的支持，该支持由[鲁家宁][1]增加。
 
 ###v3.0
 1. 现在支持两种形式的分页，使用```PageHelper.startPage```方法或者使用```RowBounds```参数  
@@ -186,3 +199,6 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 
 ----------
 ###支持作者<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
+
+
+  [1]: http://git.oschina.net/lujianing
