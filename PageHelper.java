@@ -13,7 +13,7 @@ import java.util.Properties;
 
 
 /**
- * Mybatis - 通用分页拦截器v3.1.0
+ * Mybatis - 通用分页拦截器v3.1.1
  *
  * @author liuzh/abel533/isea
  *         Created by liuzh on 14-4-15.
@@ -99,8 +99,12 @@ public class PageHelper implements Interceptor {
                 msObject.setValue("sqlSource.boundSql.sql", getPageSql(sql, page));
                 //恢复类型
                 msObject.setValue("resultMaps", ms.getResultMaps());
+                //执行分页查询
+                Object result = invocation.proceed();
+                //得到处理结果
+                page.addAll((List) result);
                 //返回结果
-                return invocation.proceed();
+                return page;
             }
         }
     }
