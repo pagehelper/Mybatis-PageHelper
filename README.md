@@ -180,7 +180,7 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 
 ##更新日志   
 ###v3.1.1  
-1. 统一返回值为```Page<E>```（可以直接按```List```使用）,方面在页面使用EL表达式，如```${page.pageNum}```,```${page.total}```   
+1. 统一返回值为```Page<E>```（可以直接按```List```使用）,方便在页面使用EL表达式，如```${page.pageNum}```,```${page.total}```   
    
 ###v3.1.0  
 1. 解决了```RowBounds```分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
