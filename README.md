@@ -180,10 +180,10 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 
 ##更新日志   
 ###v3.1.1  
-1. 统一返回值为```Page<E>```（可以直接按List使用）,方面在页面使用EL表达式，如```${page.pageNum}```,```${page.total}```   
+1. 统一返回值为```Page<E>```（可以直接按```List```使用）,方面在页面使用EL表达式，如```${page.pageNum}```,```${page.total}```   
    
 ###v3.1.0  
-1. 解决了RowBounds分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
+1. 解决了```RowBounds```分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
 2. 增加对MySql的支持，该支持由[鲁家宁][1]增加。
   
 ###v3.0  
@@ -200,11 +200,11 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 ###v2.0  
 
 1. 支持Mybatis缓存，count和分页同时支持（二者同步）  
-2. 修改拦截器签名，拦截Executor
-3. 将Page<E>类移到外面，方便调用
+2. 修改拦截器签名，拦截```Executor```
+3. 将```Page<E>```类移到外面，方便调用
 
 ###v1.0  
-1. 支持foreach等标签的分页查询
+1. 支持```<foreach>```等标签的分页查询
 2. 提供便捷的使用方式
 
 ----------
