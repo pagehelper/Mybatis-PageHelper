@@ -55,7 +55,7 @@ public void testPageHelperByStartPage() throws Exception {
     //不进行count查询，第三个参数设为false
     PageHelper.startPage(1, 10, false);
     //返回结果是Page<SysLoginLog>     
-    //该对象除了包含返回结果外，还包含了分页信息，还包含了分页信息
+    //该对象除了包含返回结果外，还包含了分页信息，可以直接按List使用
     List<SysLoginLog> logs = sysLoginLogMapper
             .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
     Assert.assertEquals(10, logs.size());
@@ -63,7 +63,7 @@ public void testPageHelperByStartPage() throws Exception {
     //当第三个参数没有或者为true的时候，进行count查询
     PageHelper.startPage(2, 10);
     //返回结果是Page<SysLoginLog>     
-    //该对象除了包含返回结果外，还包含了分页信息，还包含了分页信息
+    //该对象除了包含返回结果外，还包含了分页信息，可以直接按List使用
     Page<SysLoginLog> page = (Page<SysLoginLog>) sysLoginLogMapper
             .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
     Assert.assertEquals(10, page.getResult().size());
@@ -80,8 +80,8 @@ public void testPageHelperByRowbounds() throws Exception {
     String logerr = null;
     //使用RowBounds方式，不需要PageHelper.startPage
     //RowBounds方式默认不进行count查询
-    //返回结果是Page<SysLoginLog>     
-    //该对象除了包含返回结果外，还包含了分页信息，还包含了分页信息
+    //返回结果是Page<SysLoginLog>
+    //该对象除了包含返回结果外，还包含了分页信息，可以直接按List使用
     List<SysLoginLog> logs = sysLoginLogMapper
             .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
     Assert.assertEquals(10, logs.size());
@@ -180,7 +180,7 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 
 ##更新日志   
 ###v3.1.1  
-1. 统一返回值为```Page<E>```,可以直接在页面用EL表达式，如```${page.pageNum}```,```${page.total}```   
+1. 统一返回值为```Page<E>```（可以直接按List使用）,方面在页面使用EL表达式，如```${page.pageNum}```,```${page.total}```   
    
 ###v3.1.0  
 1. 解决了RowBounds分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
