@@ -120,7 +120,8 @@ public void testPageHelperByStartPage() throws Exception {
 ##更新日志   
 
 ###v3.2.0
-1. 增加了对hsqldb的支持，主要目的是为了方法测试使用hsqldb
+1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`
+2. 增加了该项目的一个测试项目[Mybatis-Sample][7]，测试项目数据库使用`Hsqldb`
 
 ###v3.1.2
 1. 解决count sql在oracle中的错误
