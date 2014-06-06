@@ -1,10 +1,10 @@
 #Mybatis分页插件 - PageHelper说明  
 
-###最新版为3.1.2版  
+###最新版为3.2.0 版  
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持<i>Oracle</i>和<i>Mysql</i>。  
+该插件目前支持`Oracle`,`Mysql`,`Hsqldb`。  
 
 **说明**：  
 
@@ -15,7 +15,10 @@
 **注**：   
 
 1. 感谢[鲁家宁][1]增加的对<i>Mysql</i>的支持   
-2. 欢迎各位提供其他数据库版本的分页插件  
+2. 增加对`hsqldb`的支持
+3. 欢迎各位提供其他数据库版本的分页插件  
+
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 
@@ -50,7 +53,7 @@ Mybatis专栏：
 </plugins>
 ```   
 这里的PageHelper要使用完整的类路径，需要加上包路径。
-增加dialect属性，使用时必须指定该属性，可选值为```oracle```和```mysql```,<b>没有默认值，必须指定该属性</b>。
+增加dialect属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`hsqldb`,<b>没有默认值，必须指定该属性</b>。
 
 
 ###不支持的情况   
@@ -63,9 +66,16 @@ Mybatis专栏：
 
 ####**关联结果查询和关联嵌套查询的区别**
 关联结果查询是查询出多个字段的数据，然后将字段拼接到相应的对象中，只会执行一次查询。  
-关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。
+关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。  
 
-###v3.1.2版本示例：
+
+###Mybatis-Sample项目 
+
+这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本的使用方式，需要测试Mybatis分页插件的可以clone该项目，该项目中的PageHelper.java和Page<E>两个类不能保证随时和当前项目同步更新，使用时请注意！
+
+项目地址：[http://git.oschina.net/free/Mybatis-Sample][7]
+
+###v3.2.0 版本示例：
 ```java
 @Test
 public void testPageHelperByStartPage() throws Exception {
@@ -92,102 +102,9 @@ public void testPageHelperByStartPage() throws Exception {
     //进行count查询，返回结果total>0
     Assert.assertTrue(page.getTotal() > 0);
 }
+```  
+因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][7]项目
 
-@Test
-public void testPageHelperByRowbounds() throws Exception {
-    String logip = "";
-    String username = "super";
-    String loginDate = "";
-    String exitDate = null;
-    String logerr = null;
-    //使用RowBounds方式，不需要PageHelper.startPage
-    //RowBounds方式默认不进行count查询
-    //返回结果是Page<SysLoginLog>
-    //该对象除了包含返回结果外，还包含了分页信息，可以直接按List使用
-    List<SysLoginLog> logs = sysLoginLogMapper
-            .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
-    Assert.assertEquals(10, logs.size());
-    //这里进行了强制转换，实际上并没有必要
-    Page<SysLoginLog> logs2 = (Page<SysLoginLog>) sysLoginLogMapper
-            .findSysLoginLog(logip, username, loginDate, exitDate, logerr, new RowBounds(0, 10));
-    Assert.assertEquals(10, logs2.size());
-}
-
-@Test
-public void testPageHelperByNamespaceAndRowBounds() throws Exception {
-    //没有RowBounds不进行分页
-    List<SysLoginLog> logs = sqlSession.selectList("findSysLoginLog2");
-    Assert.assertNotEquals(10, logs.size());
-    
-    //使用RowBounds分页
-    List<SysLoginLog> logs2 = sqlSession
-            .selectList("findSysLoginLog2",null,new RowBounds(0,10));
-    Assert.assertEquals(10, logs2.size());
-}
-```
-###示例的Mapper接口:  
-```java
-    /**
-     * 根据查询条件查询登录日志
-     * @param logip
-     * @param username
-     * @param loginDate
-     * @param exitDate
-     * @return
-     */
-    List<SysLoginLog> findSysLoginLog(@Param("logip") String logip,
-                                      @Param("username") String username,
-                                      @Param("loginDate") String loginDate,
-                                      @Param("exitDate") String exitDate,
-                                      @Param("logerr") String logerr);
-    /**
-     * 根据查询条件查询登录日志
-     * @param logip
-     * @param username
-     * @param loginDate
-     * @param exitDate
-     * @return
-     */
-    List<SysLoginLog> findSysLoginLog(@Param("logip") String logip,
-                                      @Param("username") String username,
-                                      @Param("loginDate") String loginDate,
-                                      @Param("exitDate") String exitDate,
-                                      @Param("logerr") String logerr,
-                                      RowBounds rowBounds);
-```
-    
-###示例Mapper接口对应的xml,两个接口方法对应同一个配置:    
-```xml
-    <select id="findSysLoginLog" resultType="SysLoginLog">
-        select * from sys_login_log a
-        <if test="username != null and username != ''">
-            left join sys_user b on (a.userid = b.username or a.userid = b.userid)
-        </if>
-        <where>
-            <if test="logip!=null and logip != ''">
-                a.logip like '%'||#{logip}||'%'
-            </if>
-            <if test="username != null and username != ''">
-                and (b.username like '%'||#{username}||'%' or b.realname like '%'||#{username}||'%')
-            </if>
-            <if test="loginDate!=null and loginDate!=''">
-                and to_date(substr(a.logindate,0,10),'yyyy-MM-dd') = to_date(#{loginDate},'yyyy-MM-dd')
-            </if>
-            <if test="exitDate!=null and exitDate!=''">
-                and to_date(substr(a.EXITDATE,0,10),'yyyy-MM-dd') = to_date(#{exitDate},'yyyy-MM-dd')
-            </if>
-            <if test="logerr!=null and logerr!=''">
-                and a.logerr like '%'||#{logerr}||'%'
-            </if>
-        </where>
-        order by logid desc
-    </select>
-    
-    <!-- namespace调用的方法 -->
-    <select id="findSysLoginLog2" resultType="SysLoginLog">
-        select * from sys_login_log order by logid desc
-    </select>
-```
 ###对于两种分页方式如何选择   
 
 1. 如果你不想在Mapper方法上增加一个带```RowBounds```参数的方法，并且你喜欢用Mapper接口形式调用，你可以使用```PageHelper.startPage```，并且该方法可以控制是否执行count方法。
@@ -202,6 +119,9 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 
 ##更新日志   
 
+###v3.2.0
+1. 增加了对hsqldb的支持，主要目的是为了方法测试使用hsqldb
+
 ###v3.1.2
 1. 解决count sql在oracle中的错误
 
@@ -210,7 +130,7 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
    
 ###v3.1.0  
 1. 解决了```RowBounds```分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
-2. 增加对MySql的支持，该支持由[鲁家宁][7]增加。
+2. 增加对MySql的支持，该支持由[鲁家宁][9]增加。
   
 ###v3.0  
 1. 现在支持两种形式的分页，使用```PageHelper.startPage```方法或者使用```RowBounds```参数  
@@ -243,4 +163,5 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
   [4]: http://my.oschina.net/flags/blog
   [5]: http://blog.csdn.net/isea533
   [6]: http://my.oschina.net/flags/blog/274000
-  [7]: http://my.oschina.net/lujianing
+  [7]: http://git.oschina.net/free/Mybatis-Sample
+  [9]: http://my.oschina.net/lujianing
