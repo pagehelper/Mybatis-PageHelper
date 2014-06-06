@@ -14,8 +14,8 @@
 
 **注**：   
 
-1. 感谢[鲁家宁][1]增加的对<i>Mysql</i>的支持   
-2. 增加对`hsqldb`的支持
+1. 感谢[鲁家宁][1]增加的对`Mysql`的支持   
+2. 增加对`Hsqldb`的支持，方便测试使用
 3. 欢迎各位提供其他数据库版本的分页插件  
 
 Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
