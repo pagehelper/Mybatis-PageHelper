@@ -1,4 +1,4 @@
-#PageHelper说明  
+#Mybatis分页插件 - PageHelper说明  
 
 ###最新版为3.1.2版  
 
@@ -29,7 +29,7 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 作者博客：  
 
 - [http://my.oschina.net/flags/blog][4]
-- [http://blog.csdn.net/isea533][5]   
+- [http://blog.csdn.net/isea533][5]  
 
 ###使用方法
 在Mybatis的配置xml中配置拦截器插件:    
