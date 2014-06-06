@@ -13,7 +13,7 @@ import java.util.Properties;
 
 
 /**
- * Mybatis - 通用分页拦截器v3.1.2
+ * Mybatis - 通用分页拦截器v3.2.0
  *
  * @author liuzh/abel533/isea533
  *         Created by liuzh on 14-4-15.
