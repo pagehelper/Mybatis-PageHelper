@@ -13,12 +13,11 @@ import java.util.Properties;
 
 
 /**
- * Mybatis - 通用分页拦截器v3.1.1
+ * Mybatis - 通用分页拦截器v3.1.2
  *
- * @author liuzh/abel533/isea
+ * @author liuzh/abel533/isea533
  *         Created by liuzh on 14-4-15.
- *         Update by liuzh on 14-5-20.
- *         Update by liuzh on 14-5-21.
+ * @url http://git.oschina.net/free/Mybatis_PageHelper
  */
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
@@ -115,7 +114,7 @@ public class PageHelper implements Interceptor {
      * @return
      */
     private String getCountSql(String sql) {
-        return "select count(0) from (" + sql + ") as tmp_count";
+        return "select count(0) from (" + sql + ") tmp_count";
     }
 
     /**

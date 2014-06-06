@@ -1,6 +1,6 @@
 #PageHelper说明  
 
-###最新版为3.1.1版  
+###最新版为3.1.2版  
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
@@ -19,13 +19,31 @@
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 
-Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
+Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
 
+两个Mybatis专栏：  
+
+- [Mybatis示例][2]
+- [Mybatis问题集][3]  
+
+作者博客：  
+
+- [http://my.oschina.net/flags/blog][4]
+- [http://blog.csdn.net/isea533][5]
 ###使用方法
 在Mybatis的配置xml中配置拦截器插件:    
 ```xml
+<!-- 
+    plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下:
+    properties?, settings?, 
+    typeAliases?, typeHandlers?, 
+    objectFactory?,objectWrapperFactory?, 
+    plugins?, 
+    environments?, databaseIdProvider?, mappers?
+-->
 <plugins>
-	<plugin interceptor="PageHelper">
+    <!-- packageName为PageHelper类所在包名 -->
+	<plugin interceptor="packageName.PageHelper">
         <property name="dialect" value="mysql"/>
 	</plugin>
 </plugins>
@@ -36,14 +54,17 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 
 ###不支持的情况   
 
-对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。   
-对于<b>关联嵌套查询</b>，使用分页的时候，只会对主SQL进行分页查询，嵌套的查询不会被分页。   
+对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效（<i>Mybatis自带的内存分页也无法对这种情况进行正确的分页</i>）。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。   
+
+对于<b>关联嵌套查询</b>，使用分页的时候，只会对主SQL进行分页查询，嵌套的查询不会被分页。对于嵌套查询不进行分页是正确的，所以这里是<b>支持的</b>。      
    
+相关内容:[Mybatis关联结果查询分页方法][6]  
+
 ####**关联结果查询和关联嵌套查询的区别**
 关联结果查询是查询出多个字段的数据，然后将字段拼接到相应的对象中，只会执行一次查询。  
 关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。
 
-###v3.1.1版本示例：
+###v3.1.2版本示例：
 ```java
 @Test
 public void testPageHelperByStartPage() throws Exception {
@@ -179,12 +200,16 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑  
 
 ##更新日志   
+
+###v3.1.2
+1. 解决count sql在oracle中的错误
+
 ###v3.1.1  
 1. 统一返回值为```Page<E>```（可以直接按```List```使用）,方便在页面使用EL表达式，如```${page.pageNum}```,```${page.total}```   
    
 ###v3.1.0  
 1. 解决了```RowBounds```分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
-2. 增加对MySql的支持，该支持由[鲁家宁][1]增加。
+2. 增加对MySql的支持，该支持由[鲁家宁][7]增加。
   
 ###v3.0  
 1. 现在支持两种形式的分页，使用```PageHelper.startPage```方法或者使用```RowBounds```参数  
@@ -212,3 +237,9 @@ public void testPageHelperByNamespaceAndRowBounds() throws Exception {
 
 
   [1]: http://my.oschina.net/lujianing
+  [2]: http://blog.csdn.net/column/details/mybatis-sample.html
+  [3]: http://blog.csdn.net/column/details/mybatisqa.html
+  [4]: http://my.oschina.net/flags/blog
+  [5]: http://blog.csdn.net/isea533
+  [6]: http://my.oschina.net/flags/blog/274000
+  [7]: http://my.oschina.net/lujianing
