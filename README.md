@@ -21,7 +21,7 @@ Mybatis项目：https://github.com/mybatis/mybatis-3
 
 Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
 
-两个Mybatis专栏：  
+Mybatis专栏：  
 
 - [Mybatis示例][2]
 - [Mybatis问题集][3]  
