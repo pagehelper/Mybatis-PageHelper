@@ -17,23 +17,23 @@
 <br/><br/>
 ##相关链接
 
-- Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
 
-- Mybatis项目：https://github.com/mybatis/mybatis-3
+Mybatis项目：https://github.com/mybatis/mybatis-3
 
-- Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
+Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
 
-- Mybatis专栏： 
+Mybatis专栏： 
 
-    - [Mybatis示例][2]
+- [Mybatis示例][2]
 
-    - [Mybatis问题集][3]  
+- [Mybatis问题集][3]  
 
-- 作者博客：  
+作者博客：  
 
-    - [http://my.oschina.net/flags/blog][4]
+- [http://my.oschina.net/flags/blog][4]
 
-    - [http://blog.csdn.net/isea533][5]  
+- [http://blog.csdn.net/isea533][5]  
 
 <br/><br/>
 ##使用方法  
