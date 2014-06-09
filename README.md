@@ -14,9 +14,7 @@
 
 `offset = (pageNum-1)*pageSize`  
 
-由于这种不同的存在，可能会导致一些意外出现，<b>因而，这里希望各位使用分页插件或想使用分页插件说说自己的想法和建议，哪一种方式更好？是否有必要进行统一，以那个为准</b>？
-
-<b>进入[Issues4][1]进行讨论</b>
+由于这种不同的存在，可能会导致一些意外出现，<b>因而下一步增加一个可配置参数来指定RowBounds参数offset是否作为pageNum使用</b>  
 
 
 ##多数据库支持   
@@ -189,10 +187,6 @@ public void testPageHelperByStartPage() throws Exception {
 1. 支持`<foreach>`等标签的分页查询  
 
 2. 提供便捷的使用方式  
-
-<br/><br/><br/><br/>
-##支持作者  
-支付宝二维码<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
 
 
   [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues/4
