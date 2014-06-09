@@ -195,7 +195,7 @@ public void testPageHelperByStartPage() throws Exception {
 支付宝二维码<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
 
 
-  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues/4%20%E2%80%9CIssues%204%22
+  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues/4
   [2]: http://my.oschina.net/lujianing
   [3]: http://git.oschina.net/free/Mybatis-Sample
   [4]: http://blog.csdn.net/column/details/mybatis-sample.html
