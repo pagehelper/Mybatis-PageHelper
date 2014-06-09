@@ -4,7 +4,7 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`Hsqldb`。  
+该插件目前支持`Oracle`,`Mysql`,`Hsqldb`三种数据库分页。  
 
 **说明**：  
 
@@ -13,8 +13,12 @@
 **注**：   
 
 1. 感谢[鲁家宁][1]增加的对`Mysql`的支持   
-2. 增加对`Hsqldb`的支持，方便测试使用
+
+2. 增加对`Hsqldb`的支持，方便测试使用  
+
 3. 欢迎各位提供其他数据库版本的分页插件  
+
+###相关链接
 
 Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
 
@@ -50,7 +54,8 @@ Mybatis专栏：
 	</plugin>
 </plugins>
 ```   
-这里的`PageHelper`要使用完整的类路径，需要加上包路径。
+这里的`PageHelper`要使用完整的类路径，需要加上包路径。  
+
 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`hsqldb`,<b>没有默认值，必须指定该属性</b>。
 
 
@@ -64,6 +69,7 @@ Mybatis专栏：
 
 ####**关联结果查询和关联嵌套查询的区别**
 关联结果查询是查询出多个字段的数据，然后将字段拼接到相应的对象中，只会执行一次查询。  
+
 关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。  
 
 
@@ -105,9 +111,11 @@ public void testPageHelperByStartPage() throws Exception {
 
 ###对于两种分页方式如何选择   
 
-1. 如果你不想在Mapper方法上增加一个带```RowBounds```参数的方法，并且你喜欢用Mapper接口形式调用，你可以使用```PageHelper.startPage```，并且该方法可以控制是否执行count方法。
-2. 实际上在Mapper接口中添加一个带```RowBounds```参数的方法很容易，使用和不带```RowBounds```参数一样的xml就可以。
-3. 如果你喜欢使用```sqlSession.selectList```这种命名空间方式的调用，使用```RowBounds```会更方便。
+1. 如果你不想在Mapper方法上增加一个带`RowBounds`参数的方法，并且你喜欢用Mapper接口形式调用，你可以使用`PageHelper.startPage`，并且该方法可以控制是否执行count方法。  
+
+2. 实际上在Mapper接口中添加一个带`RowBounds`参数的方法很容易，使用和不带`RowBounds`参数一样的xml就可以。  
+
+3. 如果你喜欢使用`sqlSession.selectList`这种命名空间方式的调用，使用`RowBounds`会更方便。
 
 ###关于MappedStatement  
 ```java
@@ -118,21 +126,25 @@ public void testPageHelperByStartPage() throws Exception {
 ##更新日志   
 
 ###v3.2.0
-1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`
-2. 增加了该项目的一个测试项目[Mybatis-Sample][7]，测试项目数据库使用`Hsqldb`
+1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`  
+
+2. 增加了该项目的一个测试项目[Mybatis-Sample][7]，测试项目数据库使用`Hsqldb`  
+
+3. 增加MIT协议
 
 ###v3.1.2
 1. 解决count sql在`oracle`中的错误
 
 ###v3.1.1  
-1. 统一返回值为```Page<E>```（可以直接按```List```使用）,方便在页面使用EL表达式，如```${page.pageNum}```,```${page.total}```   
+1. 统一返回值为`Page<E>`（可以直接按`List`使用）,方便在页面使用EL表达式，如`${page.pageNum}`,`${page.total}`     
    
 ###v3.1.0  
-1. 解决了```RowBounds```分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复
+1. 解决了`RowBounds`分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复  
+
 2. 增加对MySql的支持，该支持由[鲁家宁][9]增加。
   
 ###v3.0  
-1. 现在支持两种形式的分页，使用```PageHelper.startPage```方法或者使用```RowBounds```参数  
+1. 现在支持两种形式的分页，使用`PageHelper.startPage`方法或者使用```RowBounds```参数  
 2. ```PageHelper.startPage```方法修改，原先的```startPage(int pageNum, int pageSize)```默认求count，新增的```startPage(int pageNum, int pageSize, boolean count)```设置count=false可以不执行count查询  
 3. 移除```endPage```方法，现在本地变量```localPage```改为取出后清空本地变量。
 4. 修改```Page<E>```类，继承```ArrayList<E>```
@@ -145,8 +157,10 @@ public void testPageHelperByStartPage() throws Exception {
 ###v2.0  
 
 1. 支持Mybatis缓存，count和分页同时支持（二者同步）  
-2. 修改拦截器签名，拦截```Executor```
-3. 将```Page<E>```类移到外面，方便调用
+
+2. 修改拦截器签名，拦截`Executor`
+
+3. 将`Page<E>`类移到外面，方便调用
 
 ###v1.0  
 1. 支持```<foreach>```等标签的分页查询
