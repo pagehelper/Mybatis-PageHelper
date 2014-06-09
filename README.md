@@ -1,6 +1,6 @@
 #Mybatis分页插件 - PageHelper说明  
 
-###最新版为3.2.0 版  
+##最新版为3.2.0 版  
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
@@ -14,7 +14,7 @@
 
 3. 欢迎各位提供其他数据库版本的分页插件  
 
-###相关链接
+##相关链接
 
 - Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
 
@@ -34,12 +34,9 @@
 
     - [http://blog.csdn.net/isea533][5]  
 
+##使用方法  
 
-----------
-
-###使用方法  
-
-将本插件中的两个类`Page<E>`和`PageHelper`放到项目中。  
+将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中。  
 
 然后在Mybatis的配置xml中配置拦截器插件:    
 ```xml
@@ -69,15 +66,13 @@
    
 相关内容:[Mybatis关联结果查询分页方法][6]  
 
-###Mybatis-Sample项目 
+##Mybatis-Sample项目 
 
-这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本的使用方式，需要测试Mybatis分页插件的可以clone该项目，该项目中的PageHelper.java和Page<E>两个类不能保证随时和当前项目同步更新，使用时请注意！
+这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本使用方式的测试用例，需要测试Mybatis分页插件的可以clone该项目，该项目中的PageHelper.java和Page<E>两个类不能保证随时和当前项目同步更新，使用时请注意！
 
 项目地址：[http://git.oschina.net/free/Mybatis-Sample][7]
 
-----------
-
-###v3.2.0 版本示例：
+##v3.2.0 版本示例：
 ```java
 @Test
 public void testPageHelperByStartPage() throws Exception {
@@ -120,8 +115,6 @@ public void testPageHelperByStartPage() throws Exception {
     MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
 ```
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑  
-
-----------
 
 ##更新日志   
 
@@ -179,9 +172,9 @@ public void testPageHelperByStartPage() throws Exception {
 
 2. 提供便捷的使用方式  
 
-----------
 
-###支持作者（支付宝二维码）<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
+##支持作者  
+支付宝二维码<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
 
 
   [1]: http://my.oschina.net/lujianing
