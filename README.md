@@ -6,10 +6,6 @@
 
 该插件目前支持`Oracle`,`Mysql`,`Hsqldb`三种数据库分页。  
 
-**说明**：  
-
-这个分页插件并不想成为一个很复杂的项目，只想用两个简单的类来提供分页的功能，实际上只要数据库有支持的方法，分页不会太难，只要代码简单，对任何人来说修改都是很容易的事情。   
-
 **注**：   
 
 1. 感谢[鲁家宁][1]增加的对`Mysql`的支持   
@@ -20,24 +16,32 @@
 
 ###相关链接
 
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
+- Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
 
-Mybatis项目：https://github.com/mybatis/mybatis-3
+- Mybatis项目：https://github.com/mybatis/mybatis-3
 
-Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
+- Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
 
-Mybatis专栏：  
+- Mybatis专栏： 
 
-- [Mybatis示例][2]
-- [Mybatis问题集][3]  
+    - [Mybatis示例][2]
 
-作者博客：  
+    - [Mybatis问题集][3]  
 
-- [http://my.oschina.net/flags/blog][4]
-- [http://blog.csdn.net/isea533][5]  
+- 作者博客：  
 
-###使用方法
-在Mybatis的配置xml中配置拦截器插件:    
+    - [http://my.oschina.net/flags/blog][4]
+
+    - [http://blog.csdn.net/isea533][5]  
+
+
+----------
+
+###使用方法  
+
+将本插件中的两个类`Page<E>`和`PageHelper`放到项目中。  
+
+然后在Mybatis的配置xml中配置拦截器插件:    
 ```xml
 <!-- 
     plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下:
@@ -61,23 +65,17 @@ Mybatis专栏：
 
 ###不支持的情况   
 
-对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效（<i>Mybatis自带的内存分页也无法对这种情况进行正确的分页</i>）。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。   
-
-对于<b>关联嵌套查询</b>，使用分页的时候，只会对主SQL进行分页查询，嵌套的查询不会被分页。对于嵌套查询不进行分页是正确的，所以这里是<b>支持的</b>。      
+对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效（<i>Mybatis自带的内存分页也无法对这种情况进行正确的分页</i>）。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。     
    
 相关内容:[Mybatis关联结果查询分页方法][6]  
-
-####**关联结果查询和关联嵌套查询的区别**
-关联结果查询是查询出多个字段的数据，然后将字段拼接到相应的对象中，只会执行一次查询。  
-
-关联嵌套查询是对每个嵌套的查询单独执行sql，会执行多次查询。  
-
 
 ###Mybatis-Sample项目 
 
 这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本的使用方式，需要测试Mybatis分页插件的可以clone该项目，该项目中的PageHelper.java和Page<E>两个类不能保证随时和当前项目同步更新，使用时请注意！
 
 项目地址：[http://git.oschina.net/free/Mybatis-Sample][7]
+
+----------
 
 ###v3.2.0 版本示例：
 ```java
@@ -123,9 +121,12 @@ public void testPageHelperByStartPage() throws Exception {
 ```
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑  
 
+----------
+
 ##更新日志   
 
 ###v3.2.0
+
 1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`  
 
 2. 增加了该项目的一个测试项目[Mybatis-Sample][7]，测试项目数据库使用`Hsqldb`  
@@ -133,25 +134,35 @@ public void testPageHelperByStartPage() throws Exception {
 3. 增加MIT协议
 
 ###v3.1.2
+
 1. 解决count sql在`oracle`中的错误
 
-###v3.1.1  
+###v3.1.1 
+ 
 1. 统一返回值为`Page<E>`（可以直接按`List`使用）,方便在页面使用EL表达式，如`${page.pageNum}`,`${page.total}`     
    
-###v3.1.0  
+###v3.1.0
+  
 1. 解决了`RowBounds`分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复  
 
-2. 增加对MySql的支持，该支持由[鲁家宁][9]增加。
+2. 增加对MySql的支持，该支持由[鲁家宁][9]增加。  
   
-###v3.0  
-1. 现在支持两种形式的分页，使用`PageHelper.startPage`方法或者使用```RowBounds```参数  
-2. ```PageHelper.startPage```方法修改，原先的```startPage(int pageNum, int pageSize)```默认求count，新增的```startPage(int pageNum, int pageSize, boolean count)```设置count=false可以不执行count查询  
-3. 移除```endPage```方法，现在本地变量```localPage```改为取出后清空本地变量。
-4. 修改```Page<E>```类，继承```ArrayList<E>```
+###v3.0 
+ 
+1. 现在支持两种形式的分页，使用`PageHelper.startPage`方法或者使用`RowBounds`参数   
+
+2. `PageHelper.startPage`方法修改，原先的`startPage(int pageNum, int pageSize)`默认求count，新增的`startPage(int pageNum, int pageSize, boolean count)`设置`count=false`可以不执行count查询  
+
+3. 移除`endPage`方法，现在本地变量`localPage`改为取出后清空本地变量。  
+
+4. 修改`Page<E>`类，继承`ArrayList<E>`  
+
 5. 关于两种形式的调用，请看示例代码   
     
 ###v2.1    
-1. 解决并发异常
+
+1. 解决并发异常  
+
 2. 分页sql改为直接拼sql    
 
 ###v2.0  
@@ -163,10 +174,13 @@ public void testPageHelperByStartPage() throws Exception {
 3. 将`Page<E>`类移到外面，方便调用
 
 ###v1.0  
-1. 支持```<foreach>```等标签的分页查询
-2. 提供便捷的使用方式
+
+1. 支持`<foreach>`等标签的分页查询  
+
+2. 提供便捷的使用方式  
 
 ----------
+
 ###支持作者（支付宝二维码）<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
 
 
