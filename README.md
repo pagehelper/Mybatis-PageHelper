@@ -76,7 +76,7 @@ Mybatis专栏：
 项目地址：[http://git.oschina.net/free/Mybatis-Sample][7]
 
 <br/><br/><br/><br/>
-##v3.2.0 版本示例：
+##分页示例：
 ```java
 @Test
 public void testPageHelperByStartPage() throws Exception {
