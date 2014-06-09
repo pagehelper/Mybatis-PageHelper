@@ -6,9 +6,22 @@
 
 该插件目前支持`Oracle`,`Mysql`,`Hsqldb`三种数据库分页。  
 
-**注**：   
+##关于startPage方法和RowBounds方式
 
-1. 感谢[鲁家宁][1]增加的对`Mysql`的支持   
+这个方法的参数为`pageNum`和`pageSize`，`pageNum`为第几页，`pageSize`为每页数量，在大多数前台框架中，使用这两个参数比较方便。  
+
+但是这种方式和`RowBounds`不一致，如果不了解这种区别就会出错，`RowBounds`中的参数是`offset`和`limit`，`limit`和`pageSize`一样，`offset`和`pageNum`<b>很不一样</b>，`offset`是起始的行号，是从几个开始，而`pageNum`是起始的页码。  
+
+`offset = (pageNum-1)*pageSize`  
+
+由于这种不同的存在，可能会导致一些意外出现，<b>因而，这里希望各位使用分页插件或想使用分页插件说说自己的想法和建议，哪一种方式更好？是否有必要进行统一，以那个为准</b>？
+
+<b>进入[Issues4][1]进行讨论</b>
+
+
+##多数据库支持   
+
+1. 感谢[鲁家宁][2]增加的对`Mysql`的支持   
 
 2. 增加对`Hsqldb`的支持，方便测试使用  
 
@@ -17,7 +30,7 @@
 <br/><br/>
 ##相关链接
 
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][3]
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 
@@ -25,15 +38,15 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 
 Mybatis专栏： 
 
-- [Mybatis示例][2]
+- [Mybatis示例][4]
 
-- [Mybatis问题集][3]  
+- [Mybatis问题集][5]  
 
 作者博客：  
 
-- [http://my.oschina.net/flags/blog][4]
+- [http://my.oschina.net/flags/blog][6]
 
-- [http://blog.csdn.net/isea533][5]  
+- [http://blog.csdn.net/isea533][7]  
 
 <br/><br/>
 ##使用方法  
@@ -66,14 +79,14 @@ Mybatis专栏：
 
 对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效（<i>Mybatis自带的内存分页也无法对这种情况进行正确的分页</i>）。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。     
    
-相关内容:[Mybatis关联结果查询分页方法][6]  
+相关内容:[Mybatis关联结果查询分页方法][8]  
 
 <br/><br/><br/><br/>
 ##Mybatis-Sample项目 
 
 这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本使用方式的测试用例，需要测试Mybatis分页插件的可以clone该项目，该项目中的PageHelper.java和Page<E>两个类不能保证随时和当前项目同步更新，使用时请注意！
 
-项目地址：[http://git.oschina.net/free/Mybatis-Sample][7]
+项目地址：[http://git.oschina.net/free/Mybatis-Sample][9]
 
 <br/><br/><br/><br/>
 ##分页示例：
@@ -104,7 +117,7 @@ public void testPageHelperByStartPage() throws Exception {
     Assert.assertTrue(page.getTotal() > 0);
 }
 ```  
-因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][7]项目
+因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][10]项目
 
 ###对于两种分页方式如何选择   
 
@@ -127,7 +140,7 @@ public void testPageHelperByStartPage() throws Exception {
 
 1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`  
 
-2. 增加了该项目的一个测试项目[Mybatis-Sample][7]，测试项目数据库使用`Hsqldb`  
+2. 增加了该项目的一个测试项目[Mybatis-Sample][11]，测试项目数据库使用`Hsqldb`  
 
 3. 增加MIT协议
 
@@ -143,7 +156,7 @@ public void testPageHelperByStartPage() throws Exception {
   
 1. 解决了`RowBounds`分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复  
 
-2. 增加对MySql的支持，该支持由[鲁家宁][9]增加。  
+2. 增加对MySql的支持，该支持由[鲁家宁][12]增加。  
   
 ###v3.0 
  
@@ -182,11 +195,15 @@ public void testPageHelperByStartPage() throws Exception {
 支付宝二维码<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
 
 
-  [1]: http://my.oschina.net/lujianing
-  [2]: http://blog.csdn.net/column/details/mybatis-sample.html
-  [3]: http://blog.csdn.net/column/details/mybatisqa.html
-  [4]: http://my.oschina.net/flags/blog
-  [5]: http://blog.csdn.net/isea533
-  [6]: http://my.oschina.net/flags/blog/274000
-  [7]: http://git.oschina.net/free/Mybatis-Sample
-  [9]: http://my.oschina.net/lujianing
+  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues/4%20%E2%80%9CIssues%204%22
+  [2]: http://my.oschina.net/lujianing
+  [3]: http://git.oschina.net/free/Mybatis-Sample
+  [4]: http://blog.csdn.net/column/details/mybatis-sample.html
+  [5]: http://blog.csdn.net/column/details/mybatisqa.html
+  [6]: http://my.oschina.net/flags/blog
+  [7]: http://blog.csdn.net/isea533
+  [8]: http://my.oschina.net/flags/blog/274000
+  [9]: http://git.oschina.net/free/Mybatis-Sample
+  [10]: http://git.oschina.net/free/Mybatis-Sample
+  [11]: http://git.oschina.net/free/Mybatis-Sample
+  [12]: http://my.oschina.net/lujianing
