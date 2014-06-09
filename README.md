@@ -14,6 +14,7 @@
 
 3. 欢迎各位提供其他数据库版本的分页插件  
 
+<br/><br/>
 ##相关链接
 
 - Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
@@ -34,6 +35,7 @@
 
     - [http://blog.csdn.net/isea533][5]  
 
+<br/><br/>
 ##使用方法  
 
 将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中。  
@@ -66,12 +68,14 @@
    
 相关内容:[Mybatis关联结果查询分页方法][6]  
 
+<br/><br/><br/><br/>
 ##Mybatis-Sample项目 
 
 这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本使用方式的测试用例，需要测试Mybatis分页插件的可以clone该项目，该项目中的PageHelper.java和Page<E>两个类不能保证随时和当前项目同步更新，使用时请注意！
 
 项目地址：[http://git.oschina.net/free/Mybatis-Sample][7]
 
+<br/><br/><br/><br/>
 ##v3.2.0 版本示例：
 ```java
 @Test
@@ -116,6 +120,7 @@ public void testPageHelperByStartPage() throws Exception {
 ```
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑  
 
+<br/><br/><br/><br/>
 ##更新日志   
 
 ###v3.2.0
@@ -172,7 +177,7 @@ public void testPageHelperByStartPage() throws Exception {
 
 2. 提供便捷的使用方式  
 
-
+<br/><br/><br/><br/>
 ##支持作者  
 支付宝二维码<img src="https://tfsimg.alipay.com/images/mobilecodec/T1mShdXo4fXXXXXXXX" alt="Drawing" width="160px"/>扫码请慎重，谢谢支持！
 
