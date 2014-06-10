@@ -6,17 +6,6 @@
 
 该插件目前支持`Oracle`,`Mysql`,`Hsqldb`三种数据库分页。  
 
-##关于startPage方法和RowBounds方式
-
-这个方法的参数为`pageNum`和`pageSize`，`pageNum`为第几页，`pageSize`为每页数量，在大多数前台框架中，使用这两个参数比较方便。  
-
-但是这种方式和`RowBounds`不一致，如果不了解这种区别就会出错，`RowBounds`中的参数是`offset`和`limit`，`limit`和`pageSize`一样，`offset`和`pageNum`<b>很不一样</b>，`offset`是起始的行号，是从几个开始，而`pageNum`是起始的页码。  
-
-`offset = (pageNum-1)*pageSize`  
-
-由于这种不同的存在，可能会导致一些意外出现，<b>因而下一步增加一个可配置参数来指定RowBounds参数offset是否作为pageNum使用</b>  
-
-
 ##多数据库支持   
 
 1. 感谢[鲁家宁][2]增加的对`Mysql`的支持   
@@ -25,31 +14,19 @@
 
 3. 欢迎各位提供其他数据库版本的分页插件  
 
-<br/><br/>
-##相关链接
-
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][3]
-
-Mybatis项目：https://github.com/mybatis/mybatis-3
-
-Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
-
-Mybatis专栏： 
-
-- [Mybatis示例][4]
-
-- [Mybatis问题集][5]  
-
-作者博客：  
-
-- [http://my.oschina.net/flags/blog][6]
-
-- [http://blog.csdn.net/isea533][7]  
-
-<br/><br/>
 ##使用方法  
 
 将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中。  
+
+或者如果你使用Maven，你可以添加如下依赖：  
+
+```xml
+    <dependency>
+        <groupId>com.github.pagehelper</groupId>
+        <artifactId>pagehelper</artifactId>
+        <version>3.2.1</version>
+    </dependency>
+```
 
 然后在Mybatis的配置xml中配置拦截器插件:    
 ```xml
@@ -62,8 +39,8 @@ Mybatis专栏：
     environments?, databaseIdProvider?, mappers?
 -->
 <plugins>
-    <!-- packageName为PageHelper类所在包名 -->
-	<plugin interceptor="packageName.PageHelper">
+    <!-- com.github.pagehelper为PageHelper类所在包名 -->
+	<plugin interceptor="com.github.pagehelper.PageHelper">
         <property name="dialect" value="mysql"/>
         <!-- 该参数默认为false -->
         <!-- 设置为true时，会将RowBounds第一个参数offset当成pageNum页码使用 -->
@@ -75,14 +52,20 @@ Mybatis专栏：
 	</plugin>
 </plugins>
 ```   
-这里的`PageHelper`要使用完整的类路径，需要加上包路径。  
+这里的`com.github.pagehelper.PageHelper`使用完整的类路径。  
 
-增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`hsqldb`,<b>没有默认值，必须指定该属性</b>。
+其他三个参数说明：
+
+1. 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`hsqldb`,<b>没有默认值，必须指定该属性</b>。  
+
+2. 增加`offsetAsPageNum`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页时，会将`offset`参数当成`pageNum`使用，可以用页码和页面大小两个参数进行分页。  
+
+3. 增加`rowBoundsWithCount`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页会进行count查询。  
 
 
 ###不支持的情况   
 
-对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效（<i>Mybatis自带的内存分页也无法对这种情况进行正确的分页</i>）。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。     
+对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效（<i>Mybatis自带的内存分页也无法对这种情况进行正确的分页</i>）。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。解决这种情况的最简单的方法就是使用关联嵌套查询。  
    
 相关内容:[Mybatis关联结果查询分页方法][8]  
 
@@ -138,7 +121,28 @@ public void testPageHelperByStartPage() throws Exception {
 ```
 这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑  
 
-<br/><br/><br/><br/>
+<br/><br/>
+##相关链接
+
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][3]
+
+Mybatis项目：https://github.com/mybatis/mybatis-3
+
+Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
+
+Mybatis专栏： 
+
+- [Mybatis示例][4]
+
+- [Mybatis问题集][5]  
+
+作者博客：  
+
+- [http://my.oschina.net/flags/blog][6]
+
+- [http://blog.csdn.net/isea533][7]  
+
+<br/><br/>
 ##更新日志   
 
 ###v3.2.1
