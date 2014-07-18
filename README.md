@@ -16,7 +16,7 @@
 
 ##使用方法  
 
-将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中。  
+将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
 
 或者如果你使用Maven，你可以添加如下依赖：  
 
