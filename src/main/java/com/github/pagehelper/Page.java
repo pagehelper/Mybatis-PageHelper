@@ -33,15 +33,20 @@ import java.util.List;
  * Mybatis - 分页对象
  *
  * @author liuzh/abel533/isea533
- * @version 3.2.1
+ * @version 3.2.2
  * @url http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class Page<E> extends ArrayList<E> {
     /**
      * 不进行count查询
      */
-    public static final int NO_SQL_COUNT = -1;
-    public static final int SQL_COUNT = 0;
+    private static final int NO_SQL_COUNT = -1;
+
+    /**
+     * 进行count查询
+     */
+    private static final int SQL_COUNT = 0;
+
     private int pageNum;
     private int pageSize;
     private int startRow;
@@ -53,6 +58,10 @@ public class Page<E> extends ArrayList<E> {
         this(pageNum, pageSize, SQL_COUNT);
     }
 
+    public Page(int pageNum, int pageSize, boolean count) {
+        this(pageNum, pageSize, count ? Page.SQL_COUNT : Page.NO_SQL_COUNT);
+    }
+
     public Page(int pageNum, int pageSize, int total) {
         super(pageSize);
         this.pageNum = pageNum;
@@ -61,6 +70,11 @@ public class Page<E> extends ArrayList<E> {
         this.startRow = pageNum > 0 ? (pageNum - 1) * pageSize : 0;
         this.endRow = pageNum * pageSize;
     }
+
+    public Page(RowBounds rowBounds, boolean count) {
+        this(rowBounds, count ? Page.SQL_COUNT : Page.NO_SQL_COUNT);
+    }
+
 
     public Page(RowBounds rowBounds, int total) {
         super(rowBounds.getLimit());
@@ -121,6 +135,11 @@ public class Page<E> extends ArrayList<E> {
 
     public void setTotal(long total) {
         this.total = total;
+        this.pages = (int) (total / this.pageSize + ((total % this.pageSize == 0) ? 0 : 1));
+    }
+
+    public boolean isCount() {
+        return this.total > NO_SQL_COUNT;
     }
 
     @Override

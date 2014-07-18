@@ -28,7 +28,10 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.apache.ibatis.reflection.factory.ObjectFactory;
+import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
@@ -40,12 +43,30 @@ import java.util.Properties;
  * Mybatis - 通用分页拦截器
  *
  * @author liuzh/abel533/isea533
- * @version 3.2.1
+ * @version 3.2.2
  * @url http://git.oschina.net/free/Mybatis_PageHelper
  */
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
-    private static final ThreadLocal<Page> localPage = new ThreadLocal<Page>();
+    public static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
+    public static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
+    public static final MetaObject NULL_META_OBJECT = MetaObject.forObject(NullObject.class, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
+
+    private static class NullObject {
+    }
+
+    /**
+     * 反射对象，增加对低版本Mybatis的支持
+     * @param object
+     * @return
+     */
+    public static MetaObject forObject(Object object) {
+        return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
+    }
+
+    private static final String BOUND_SQL = "sqlSource.boundSql.sql";
+
+    private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
 
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
@@ -73,14 +94,42 @@ public class PageHelper implements Interceptor {
      * @param pageSize
      */
     public static void startPage(int pageNum, int pageSize, boolean count) {
-        localPage.set(new Page(pageNum, pageSize, count ? Page.SQL_COUNT : Page.NO_SQL_COUNT));
+        LOCAL_PAGE.set(new Page(pageNum, pageSize, count));
     }
 
+    /**
+     * 获取分页参数
+     *
+     * @param rowBounds
+     * @return
+     */
+    private Page getPage(RowBounds rowBounds) {
+        Page page = LOCAL_PAGE.get();
+        //移除本地变量
+        LOCAL_PAGE.remove();
+
+        if (page == null) {
+            if (offsetAsPageNum) {
+                page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
+            } else {
+                page = new Page(rowBounds, rowBoundsWithCount);
+            }
+        }
+        return page;
+    }
+
+    /**
+     * Mybatis拦截器方法
+     *
+     * @param invocation
+     * @return
+     * @throws Throwable
+     */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         final Object[] args = invocation.getArgs();
         RowBounds rowBounds = (RowBounds) args[2];
-        if (localPage.get() == null && rowBounds == RowBounds.DEFAULT) {
+        if (LOCAL_PAGE.get() == null && rowBounds == RowBounds.DEFAULT) {
             return invocation.proceed();
         } else {
             //忽略RowBounds-否则会进行Mybatis自带的内存分页
@@ -90,54 +139,32 @@ public class PageHelper implements Interceptor {
             BoundSql boundSql = ms.getBoundSql(parameterObject);
 
             //分页信息
-            Page page = localPage.get();
-            //移除本地变量
-            localPage.remove();
-
-            if (page == null) {
-                if (offsetAsPageNum) {
-                    page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount ? Page.SQL_COUNT : Page.NO_SQL_COUNT);
-                } else {
-                    page = new Page(rowBounds, rowBoundsWithCount ? Page.SQL_COUNT : Page.NO_SQL_COUNT);
-                }
-            }
+            Page page = getPage(rowBounds);
+            //创建一个新的MappedStatement
             MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
             //将参数中的MappedStatement替换为新的qs，防止并发异常
             args[0] = qs;
-            MetaObject msObject = SystemMetaObject.forObject(qs);
-            String sql = (String) msObject.getValue("sqlSource.boundSql.sql");
+            MetaObject msObject = forObject(qs);
+            String sql = (String) msObject.getValue(BOUND_SQL);
             //简单的通过total的值来判断是否进行count查询
-            if (page.getTotal() > Page.NO_SQL_COUNT) {
+            if (page.isCount()) {
                 //求count - 重写sql
-                msObject.setValue("sqlSource.boundSql.sql", getCountSql(sql));
+                msObject.setValue(BOUND_SQL, getCountSql(sql));
                 //查询总数
                 Object result = invocation.proceed();
-                int totalCount = (Integer) ((List) result).get(0);
-                page.setTotal(totalCount);
-                int totalPage = totalCount / page.getPageSize() + ((totalCount % page.getPageSize() == 0) ? 0 : 1);
-                page.setPages(totalPage);
-                //分页sql - 重写sql
-                msObject.setValue("sqlSource.boundSql.sql", getPageSql(sql, page));
-                //恢复类型
-                msObject.setValue("resultMaps", ms.getResultMaps());
-                //执行分页查询
-                result = invocation.proceed();
-                //得到处理结果
-                page.addAll((List) result);
-                //返回结果
-                return page;
-            } else {
-                //分页sql - 重写sql
-                msObject.setValue("sqlSource.boundSql.sql", getPageSql(sql, page));
-                //恢复类型
-                msObject.setValue("resultMaps", ms.getResultMaps());
-                //执行分页查询
-                Object result = invocation.proceed();
-                //得到处理结果
-                page.addAll((List) result);
-                //返回结果
-                return page;
+                //设置总数
+                page.setTotal((Integer) ((List) result).get(0));
             }
+            //分页sql - 重写sql
+            msObject.setValue(BOUND_SQL, getPageSql(sql, page));
+            //恢复类型
+            msObject.setValue("resultMaps", ms.getResultMaps());
+            //执行分页查询
+            Object result = invocation.proceed();
+            //得到处理结果
+            page.addAll((List) result);
+            //返回结果
+            return page;
         }
     }
 
@@ -195,13 +222,13 @@ public class PageHelper implements Interceptor {
      * @return
      */
     private MappedStatement newMappedStatement(MappedStatement ms, SqlSource newSqlSource) {
-        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + "_分页", newSqlSource, ms.getSqlCommandType());
+        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + "_PageHelper", newSqlSource, ms.getSqlCommandType());
         builder.resource(ms.getResource());
         builder.fetchSize(ms.getFetchSize());
         builder.statementType(ms.getStatementType());
         builder.keyGenerator(ms.getKeyGenerator());
         if (ms.getKeyProperties() != null && ms.getKeyProperties().length != 0) {
-            StringBuffer keyProperties = new StringBuffer();
+            StringBuilder keyProperties = new StringBuilder();
             for (String keyProperty : ms.getKeyProperties()) {
                 keyProperties.append(keyProperty).append(",");
             }
@@ -238,19 +265,24 @@ public class PageHelper implements Interceptor {
         }
     }
 
+    /**
+     * 设置属性值
+     *
+     * @param p
+     */
     public void setProperties(Properties p) {
         dialect = p.getProperty("dialect");
-        if (dialect == null || dialect.equals("")) {
+        if (dialect == null || "".equals(dialect)) {
             throw new RuntimeException("Mybatis分页插件PageHelper无法获取dialect参数!");
         }
         //offset作为PageNum使用
         String offset = p.getProperty("offsetAsPageNum");
-        if (offset != null && offset.toUpperCase().equals("TRUE")) {
+        if (offset != null && "TRUE".equalsIgnoreCase(offset)) {
             offsetAsPageNum = true;
         }
         //RowBounds方式是否做count查询
         String withcount = p.getProperty("rowBoundsWithCount");
-        if (withcount != null && withcount.toUpperCase().equals("TRUE")) {
+        if (withcount != null && "TRUE".equalsIgnoreCase(withcount)) {
             rowBoundsWithCount = true;
         }
     }
