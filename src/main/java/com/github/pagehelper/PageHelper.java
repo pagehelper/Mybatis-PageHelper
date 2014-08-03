@@ -24,6 +24,11 @@
 
 package com.github.pagehelper;
 
+import com.foundationdb.sql.StandardException;
+import com.foundationdb.sql.parser.*;
+import com.foundationdb.sql.unparser.NodeToString;
+import com.google.common.cache.*;
+import com.google.common.cache.CacheBuilder;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
@@ -35,9 +40,13 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Mybatis - 通用分页拦截器
@@ -57,12 +66,35 @@ public class PageHelper implements Interceptor {
 
     /**
      * 反射对象，增加对低版本Mybatis的支持
+     *
      * @param object
      * @return
      */
     public static MetaObject forObject(Object object) {
         return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
     }
+
+    /**
+     * 解析 - 去掉order by 语句
+     */
+    private static class UnParser extends NodeToString {
+        private static final SQLParser PARSER = new SQLParser();
+
+        public String removeOrderBy(String sql) throws StandardException {
+            StatementNode stmt = PARSER.parseStatement(sql);
+            return toString(stmt);
+        }
+
+        @Override
+        protected String orderByList(OrderByList node) throws StandardException {
+            return "";
+        }
+    }
+
+    //SQL反解析
+    private static final UnParser UNPARSER = new UnParser();
+    //SQL缓存
+    private static final Cache<Integer, String> COUNT_CACHE = CacheBuilder.newBuilder().maximumSize(500).expireAfterWrite(30, TimeUnit.MINUTES).build();
 
     private static final String BOUND_SQL = "sqlSource.boundSql.sql";
 
@@ -154,6 +186,9 @@ public class PageHelper implements Interceptor {
                 Object result = invocation.proceed();
                 //设置总数
                 page.setTotal((Integer) ((List) result).get(0));
+                if (page.getTotal() == 0) {
+                    return page;
+                }
             }
             //分页sql - 重写sql
             msObject.setValue(BOUND_SQL, getPageSql(sql, page));
@@ -174,8 +209,21 @@ public class PageHelper implements Interceptor {
      * @param sql
      * @return
      */
-    private String getCountSql(String sql) {
-        return "select count(0) from (" + sql + ") tmp_count";
+    private String getCountSql(final String sql) {
+        try {
+            return COUNT_CACHE.get(sql.hashCode(), new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    if (sql.toUpperCase().contains("ORDER")) {
+                        return "select count(0) from (" + UNPARSER.removeOrderBy(sql) + ") tmp_count";
+                    } else {
+                        return "select count(0) from (" + sql + ") tmp_count";
+                    }
+                }
+            });
+        } catch (Exception e) {
+            return "select count(0) from (" + sql + ") tmp_count";
+        }
     }
 
     /**
