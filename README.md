@@ -6,13 +6,6 @@
 
 该插件目前支持`Oracle`,`Mysql`,`Hsqldb`三种数据库分页。  
 
-##多数据库支持   
-
-1. 感谢[鲁家宁][2]增加的对`Mysql`的支持   
-
-2. 增加对`Hsqldb`的支持，方便测试使用  
-
-3. 欢迎各位提供其他数据库版本的分页插件  
 
 ##使用方法  
 
@@ -62,21 +55,6 @@
 
 3. 增加`rowBoundsWithCount`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页会进行count查询。  
 
-
-###不支持的情况   
-
-对于<b>关联结果查询</b>，使用分页得不到正常的结果，因为只有把数据全部查询出来，才能得到最终的结果，对这个结果进行分页才有效（<i>Mybatis自带的内存分页也无法对这种情况进行正确的分页</i>）。因而如果是这种情况，必然要先全部查询，在对结果处理，这样就体现不出分页的作用了。解决这种情况的最简单的方法就是使用关联嵌套查询。  
-   
-相关内容:[Mybatis关联结果查询分页方法][8]  
-
-<br/>
-##Mybatis-Sample项目 
-
-这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本使用方式的测试用例，需要测试Mybatis分页插件的可以clone该项目。该项目使用了maven配置的该分页插件。
-
-项目地址：[http://git.oschina.net/free/Mybatis-Sample][9]
-
-<br/>
 ##分页示例：
 ```java
 @Test
@@ -105,9 +83,19 @@ public void testPageHelperByStartPage() throws Exception {
     Assert.assertTrue(page.getTotal() > 0);
 }
 ```  
-因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][10]项目
+因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][10]项目  
 
-###对于两种分页方式如何选择   
+
+<br/>
+##Mybatis-Sample项目 
+
+这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本使用方式的测试用例，需要测试Mybatis分页插件的可以clone该项目。该项目使用了maven配置的该分页插件。
+
+项目地址：[http://git.oschina.net/free/Mybatis-Sample][9]
+
+<br/>
+
+##对于两种分页方式如何选择   
 
 1. 如果你不想在Mapper方法上增加一个带`RowBounds`参数的方法，并且你喜欢用Mapper接口形式调用，你可以使用`PageHelper.startPage`，并且该方法可以控制是否执行count方法。  
 
@@ -115,11 +103,6 @@ public void testPageHelperByStartPage() throws Exception {
 
 3. 如果你喜欢使用`sqlSession.selectList`这种命名空间方式的调用，使用`RowBounds`会更方便。
 
-###关于MappedStatement  
-```java
-    MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
-```
-这段代码执行100万次耗时在1.5秒（测试机器：CPU酷睿双核T6600，4G内存）左右，因而不考虑对该对象进行缓存等考虑  
 
 <br/><br/>
 ##相关链接
