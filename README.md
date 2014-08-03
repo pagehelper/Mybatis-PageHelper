@@ -1,6 +1,54 @@
 #Mybatis分页插件 - PageHelper说明  
 <br/>  
-##最新版为3.2.2 版  
+##最新版3.2.3-SNAPSHOT
+
+听取[@hlevel][1]的建议，对性能做了部分优化。  
+
+ 1. 对count查询进行优化处理，目前的处理策略只是简单的把sql中的所有`order by`语句删除了，当然不是直接处理字符串去删除，使用了一个sql解析的类库，由于sql的有无限的变化，因而不保证这个sql解析的类库能够完全处理所有的情况，所以发布了这个SNAPSHOT版本。  
+
+    由于解析sql效率不是很高，解析1W次在2秒左右，所以对此增加了Guava缓存。增加缓存后效率不再是问题。  
+
+ 2. 另外还有一个早该就有的优化就是当count=0的时候，不需要在进行分页查询，这时会返回一个size=0的List。  
+
+**欢迎大家在非正式项目中使用这个版本，如果存在任何问题欢迎各位提出。**  
+
+##3.2.3-SNAPSHOT使用方法  
+
+将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
+
+你还需要下载这两个文件（这两个文件完全独立，不依赖其他）：  
+
+ - Guava:http://search.maven.org/remotecontent?filepath=com/google/guava/guava/17.0/guava-17.0.jar
+
+ - SqlParser：http://search.maven.org/remotecontent?filepath=com/foundationdb/fdb-sql-parser/1.3.0/fdb-sql-parser-1.3.0.jar  
+
+<br>
+如果你使用的maven，需要增加以下三个依赖：  
+```xml  
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+    <version>3.2.3-SNAPSHOT</version>
+</dependency>
+<!--额外增加下面两个依赖-->
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>17.0</version>
+</dependency>
+<dependency>
+    <groupId>com.foundationdb</groupId>
+    <artifactId>fdb-sql-parser</artifactId>
+    <version>1.3.0</version>
+</dependency>
+```  
+
+**注：Mybatis-Sample已经增加WEB测试，详情请点击[这里][2]**  
+
+---------------------
+<br>
+
+##最新稳定版为3.2.2 版  
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
@@ -14,11 +62,11 @@
 或者如果你使用Maven，你可以添加如下依赖：  
 
 ```xml
-    <dependency>
-        <groupId>com.github.pagehelper</groupId>
-        <artifactId>pagehelper</artifactId>
-        <version>3.2.2</version>
-    </dependency>
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+    <version>3.2.2</version>
+</dependency>
 ```
 
 然后在Mybatis的配置xml中配置拦截器插件:    
@@ -83,7 +131,7 @@ public void testPageHelperByStartPage() throws Exception {
     Assert.assertTrue(page.getTotal() > 0);
 }
 ```  
-因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][10]项目  
+因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][3]项目  
 
 
 <br/>
@@ -91,7 +139,7 @@ public void testPageHelperByStartPage() throws Exception {
 
 这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本使用方式的测试用例，需要测试Mybatis分页插件的可以clone该项目。该项目使用了maven配置的该分页插件。
 
-项目地址：[http://git.oschina.net/free/Mybatis-Sample][9]
+项目地址：[http://git.oschina.net/free/Mybatis-Sample][4]
 
 <br/>
 
@@ -107,7 +155,7 @@ public void testPageHelperByStartPage() throws Exception {
 <br/><br/>
 ##相关链接
 
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][3]
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][5]
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 
@@ -115,15 +163,15 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 
 Mybatis专栏： 
 
-- [Mybatis示例][4]
+- [Mybatis示例][6]
 
-- [Mybatis问题集][5]  
+- [Mybatis问题集][7]  
 
 作者博客：  
 
-- [http://my.oschina.net/flags/blog][6]
+- [http://my.oschina.net/flags/blog][8]
 
-- [http://blog.csdn.net/isea533][7]  
+- [http://blog.csdn.net/isea533][9]  
 
 <br/><br/>
 ##更新日志   
@@ -146,7 +194,7 @@ Mybatis专栏：
 
 1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`  
 
-2. 增加了该项目的一个测试项目[Mybatis-Sample][11]，测试项目数据库使用`Hsqldb`  
+2. 增加了该项目的一个测试项目[Mybatis-Sample][10]，测试项目数据库使用`Hsqldb`  
 
 3. 增加MIT协议
 
@@ -162,7 +210,7 @@ Mybatis专栏：
   
 1. 解决了`RowBounds`分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复  
 
-2. 增加对MySql的支持，该支持由[鲁家宁][12]增加。  
+2. 增加对MySql的支持，该支持由[鲁家宁][11]增加。  
   
 ###v3.0 
  
@@ -197,15 +245,14 @@ Mybatis专栏：
 2. 提供便捷的使用方式  
 
 
-  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues/4
-  [2]: http://my.oschina.net/lujianing
+  [1]: http://my.oschina.net/hlevel
+  [2]: http://git.oschina.net/free/Mybatis-Sample
   [3]: http://git.oschina.net/free/Mybatis-Sample
-  [4]: http://blog.csdn.net/column/details/mybatis-sample.html
-  [5]: http://blog.csdn.net/column/details/mybatisqa.html
-  [6]: http://my.oschina.net/flags/blog
-  [7]: http://blog.csdn.net/isea533
-  [8]: http://my.oschina.net/flags/blog/274000
-  [9]: http://git.oschina.net/free/Mybatis-Sample
+  [4]: http://git.oschina.net/free/Mybatis-Sample
+  [5]: http://git.oschina.net/free/Mybatis-Sample
+  [6]: http://blog.csdn.net/column/details/mybatis-sample.html
+  [7]: http://blog.csdn.net/column/details/mybatisqa.html
+  [8]: http://my.oschina.net/flags/blog
+  [9]: http://blog.csdn.net/isea533
   [10]: http://git.oschina.net/free/Mybatis-Sample
-  [11]: http://git.oschina.net/free/Mybatis-Sample
-  [12]: http://my.oschina.net/lujianing
+  [11]: http://my.oschina.net/lujianing
