@@ -93,7 +93,7 @@
               </execution>
             </executions>
           </plugin>
-          <!-- GPG -->
+          <!-- GPG mvn clean deploy -P release -Dgpg.passphrase=YourPassphase-->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
