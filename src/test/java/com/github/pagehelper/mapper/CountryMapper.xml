@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.github.pagehelper.mapper.CountryMapper">
+  <select id="selectAll" resultType="Country">
+    select * from country
+  </select>
+
+  <select id="selectAllOrderby" resultType="com.github.pagehelper.model.Country">
+      select * from country order by countrycode desc
+  </select>
+
+  <select id="selectAllOrderByParams" resultType="com.github.pagehelper.model.Country">
+    select * from country order by ${order1} desc,${order2} asc
+  </select>
+</mapper>

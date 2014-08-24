@@ -25,9 +25,11 @@
 package com.github.pagehelper;
 
 import com.foundationdb.sql.StandardException;
-import com.foundationdb.sql.parser.*;
+import com.foundationdb.sql.parser.OrderByList;
+import com.foundationdb.sql.parser.SQLParser;
+import com.foundationdb.sql.parser.StatementNode;
 import com.foundationdb.sql.unparser.NodeToString;
-import com.google.common.cache.*;
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
@@ -40,12 +42,10 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -87,6 +87,13 @@ public class PageHelper implements Interceptor {
 
         @Override
         protected String orderByList(OrderByList node) throws StandardException {
+            //order by中如果包含参数就原样返回
+            // 这里建议order by使用${param}这样的参数
+            // 这种形式的order by可以正确的被过滤掉，并且支持大部分的数据库
+            String sql = nodeList(node);
+            if (sql.indexOf('$') > -1) {
+                return "ORDER BY " + sql.replaceAll("\\$\\d+", "?");
+            }
             return "";
         }
     }
