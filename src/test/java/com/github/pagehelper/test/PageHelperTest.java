@@ -22,7 +22,7 @@ public class PageHelperTest {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         try {
             List<Country> list = sqlSession.selectList("selectAll");
-            assertEquals(239, list.size());
+            assertEquals(183, list.size());
         } finally {
             sqlSession.close();
         }
@@ -41,14 +41,14 @@ public class PageHelperTest {
             List<Country> list = countryMapper.selectAll();
             PageInfo page = new PageInfo(list);
             assertEquals(10, list.size());
-            assertEquals(239, page.getTotal());
+            assertEquals(183, page.getTotal());
 
 
             //获取第2页，10条内容，显式查询总数count
             PageHelper.startPage(2, 10, true);
             list = countryMapper.selectAll();
             assertEquals(10, list.size());
-            Assert.assertEquals(239, ((Page) list).getTotal());
+            Assert.assertEquals(183, ((Page) list).getTotal());
 
 
             //获取第2页，10条内容，不查询总数count
@@ -62,7 +62,7 @@ public class PageHelperTest {
             PageHelper.startPage(3, 20);
             list = countryMapper.selectAll();
             assertEquals(20, list.size());
-            assertEquals(239, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -111,7 +111,7 @@ public class PageHelperTest {
             PageHelper.startPage(1, 20);
             list = countryMapper.selectAll(new RowBounds(60, 20));
             assertEquals(20, list.size());
-            assertEquals(239, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
             assertEquals(20, list.get(list.size() - 1).getId());
@@ -136,13 +136,13 @@ public class PageHelperTest {
             PageHelper.startPage(1, 10);
             List<Country> list = sqlSession.selectList("selectAll");
             assertEquals(10, list.size());
-            assertEquals(239, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
 
             //获取第2页，10条内容，显式查询总数count
             PageHelper.startPage(2, 10, true);
             list = sqlSession.selectList("selectAll");
             assertEquals(10, list.size());
-            assertEquals(239, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
 
             //获取第2页，10条内容，不查询总数count
             PageHelper.startPage(2, 10, false);
@@ -154,7 +154,7 @@ public class PageHelperTest {
             PageHelper.startPage(3, 20);
             list = sqlSession.selectList("selectAll");
             assertEquals(20, list.size());
-            assertEquals(239, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -202,7 +202,7 @@ public class PageHelperTest {
             PageHelper.startPage(1, 20);
             list = sqlSession.selectList("selectAll", null, new RowBounds(0, 10));
             assertEquals(20, list.size());
-            assertEquals(239, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
             assertEquals(20, list.get(list.size() - 1).getId());
