@@ -115,6 +115,8 @@ public class PageHelper implements Interceptor {
     private static boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
     private static boolean rowBoundsWithCount = false;
+    //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
+    private static boolean pageSizeZero = false;
 
     /**
      * 开始分页
@@ -179,6 +181,15 @@ public class PageHelper implements Interceptor {
 
             //分页信息
             Page page = getPage(rowBounds);
+            //pageSizeZero的判断
+            if (pageSizeZero && page.getPageSize() == 0) {
+                //执行正常（不分页）查询
+                Object result = invocation.proceed();
+                //得到处理结果
+                page.addAll((List) result);
+                //返回结果仍然为Page类型 - 便于后面对接收类型的统一处理
+                return page;
+            }
             //创建一个新的MappedStatement
             MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
             //将参数中的MappedStatement替换为新的qs，防止并发异常
@@ -197,14 +208,17 @@ public class PageHelper implements Interceptor {
                     return page;
                 }
             }
-            //分页sql - 重写sql
-            msObject.setValue(BOUND_SQL, getPageSql(sql, page));
-            //恢复类型
-            msObject.setValue("resultMaps", ms.getResultMaps());
-            //执行分页查询
-            Object result = invocation.proceed();
-            //得到处理结果
-            page.addAll((List) result);
+            //pageSize>0的时候不执行分页查询，相当于可能只返回了一个count
+            if (page.getPageSize() > 0) {
+                //分页sql - 重写sql
+                msObject.setValue(BOUND_SQL, getPageSql(sql, page));
+                //恢复类型
+                msObject.setValue("resultMaps", ms.getResultMaps());
+                //执行分页查询
+                Object result = invocation.proceed();
+                //得到处理结果
+                page.addAll((List) result);
+            }
             //返回结果
             return page;
         }
@@ -243,8 +257,9 @@ public class PageHelper implements Interceptor {
     private String getPageSql(String sql, Page page) {
         StringBuilder pageSql = new StringBuilder(200);
         if ("mysql".equals(dialect)) {
+            pageSql.append("select * from (");
             pageSql.append(sql);
-            pageSql.append(" limit " + page.getStartRow() + "," + page.getPageSize());
+            pageSql.append(") as tmp_page limit " + page.getStartRow() + "," + page.getPageSize());
         } else if ("hsqldb".equals(dialect)) {
             pageSql.append(sql);
             pageSql.append(" LIMIT " + page.getPageSize() + " OFFSET " + page.getStartRow());
@@ -339,6 +354,11 @@ public class PageHelper implements Interceptor {
         String withcount = p.getProperty("rowBoundsWithCount");
         if (withcount != null && "TRUE".equalsIgnoreCase(withcount)) {
             rowBoundsWithCount = true;
+        }
+        //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
+        String sizeZero = p.getProperty("pageSizeZero");
+        if (sizeZero != null && "TRUE".equalsIgnoreCase(sizeZero)) {
+            pageSizeZero = true;
         }
     }
 }
