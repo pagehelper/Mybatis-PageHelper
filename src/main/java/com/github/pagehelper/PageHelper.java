@@ -208,7 +208,7 @@ public class PageHelper implements Interceptor {
                     return page;
                 }
             }
-            //pageSize>0的时候不执行分页查询，相当于可能只返回了一个count
+            //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
             if (page.getPageSize() > 0) {
                 //分页sql - 重写sql
                 msObject.setValue(BOUND_SQL, getPageSql(sql, page));
