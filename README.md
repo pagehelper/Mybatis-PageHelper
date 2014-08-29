@@ -1,6 +1,11 @@
 #Mybatis分页插件 - PageHelper说明  
 <br/>  
-##最新版3.2.3-SNAPSHOT
+
+#重大项目改动
+
+为了便于本项目的统一管理和发布，本项目会和github上面同步，项目会改为Maven管理的结构。有关的基本测试内容都在本项目中，Mybatis-Sample项目只会保留Web方面的测试。  
+
+#最新测试版3.3.0-SNAPSHOT
 
 听取[@hlevel][1]的建议，对性能做了部分优化。  
 
@@ -12,7 +17,7 @@
 
 **欢迎大家在非正式项目中使用这个版本，如果存在任何问题欢迎各位提出。**  
 
-##3.2.3-SNAPSHOT使用方法  
+##3.3.0-SNAPSHOT使用方法  
 
 将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
 
@@ -28,7 +33,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.2.3-SNAPSHOT</version>
+    <version>3.3.0-SNAPSHOT</version>
 </dependency>
 <!--额外增加下面两个依赖-->
 <dependency>
@@ -43,12 +48,11 @@
 </dependency>
 ```  
 
-**注：Mybatis-Sample已经增加WEB测试，详情请点击[这里][2]**  
 
 ---------------------
 <br>
 
-##最新稳定版为3.2.2 版  
+#最新稳定版为3.2.3 版  
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
@@ -57,7 +61,7 @@
 
 ##使用方法  
 
-将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
+将本插件中的`com.github.pagehelper`包下面的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
 
 或者如果你使用Maven，你可以添加如下依赖：  
 
@@ -65,7 +69,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.2.2</version>
+    <version>3.2.3</version>
 </dependency>
 ```
 
@@ -90,6 +94,9 @@
         <!-- 该参数默认为false -->
         <!-- 设置为true时，使用RowBounds分页会进行count查询 -->
         <property name="rowBoundsWithCount" value="true"/>
+        <!-- 设置为true时，如果pageSize=0或者RowBounds.limit = 0就会查询出全部的结果 -->
+        <!-- （相当于没有执行分页查询，但是返回结果仍然是Page类型）-->
+        <property name="pageSizeZero" value="true"/>
 	</plugin>
 </plugins>
 ```   
@@ -102,6 +109,9 @@
 2. 增加`offsetAsPageNum`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页时，会将`offset`参数当成`pageNum`使用，可以用页码和页面大小两个参数进行分页。  
 
 3. 增加`rowBoundsWithCount`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页会进行count查询。  
+
+4. 增加`pageSizeZero`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，如果`pageSize=0`或者`RowBounds.limit = 0`就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是`Page`类型）。  
+
 
 ##分页示例：
 ```java
@@ -175,6 +185,21 @@ Mybatis专栏：
 
 <br/><br/>
 ##更新日志   
+
+###v3.2.3  
+
+1. 解决`mysql`带有`for update`时分页错误的问题。  
+
+2. 当`pageSize`（或`RowBounds`的`limit`）`<=0` 时不再进行分页查询，只会进行count查询（RowBounds需要配置进行count查询），相当于用分页查询来做count查询了。  
+
+3. 增加了`pageSizeZero`参数，当`pageSizeZero=true`时，如果`pageSize=0`（或`RowBounds.limit`=0），就会查询全部的结果。这个参数对于那些在特殊情况下要查询全部结果的人有用。配置该参数后会与上面第二条冲突，解决方法就是如果只想查询count，就设置`pageSize<0`（如 `-1`），只要不等于0（或者不配置pageSizeZero）就不会出现全部查询的情况。  
+
+####v3.2.3 其他
+
+1. 这个版本没有包含count查询时自动去除`order by`的功能，这个功能将会添加到3.3.0版本中。  
+
+2. 为了便于本项目的统一管理和发布，本项目会和github上面同步，项目会改为Maven管理的结构。  
+
 
 ###v3.2.2
 
