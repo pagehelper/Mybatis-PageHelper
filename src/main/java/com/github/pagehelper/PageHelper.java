@@ -187,6 +187,10 @@ public class PageHelper implements Interceptor {
                 Object result = invocation.proceed();
                 //得到处理结果
                 page.addAll((List) result);
+                //这种情况相当于pageSize=total
+                page.setPageSize(page.size());
+                //仍然要设置total
+                page.setTotal(page.size());
                 //返回结果仍然为Page类型 - 便于后面对接收类型的统一处理
                 return page;
             }

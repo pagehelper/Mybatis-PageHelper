@@ -63,7 +63,7 @@ public class Page<E> extends ArrayList<E> {
     }
 
     public Page(int pageNum, int pageSize, int total) {
-        super(pageSize);
+        super(pageSize > -1 ? pageSize : 0);
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.total = total;
@@ -77,7 +77,7 @@ public class Page<E> extends ArrayList<E> {
 
 
     public Page(RowBounds rowBounds, int total) {
-        super(rowBounds.getLimit());
+        super(rowBounds.getLimit() > -1 ? rowBounds.getLimit() : 0);
         this.pageSize = rowBounds.getLimit();
         this.startRow = rowBounds.getOffset();
         //RowBounds方式默认不求count总数，如果想求count,可以修改这里为SQL_COUNT
@@ -135,7 +135,11 @@ public class Page<E> extends ArrayList<E> {
 
     public void setTotal(long total) {
         this.total = total;
-        this.pages = (int) (total / this.pageSize + ((total % this.pageSize == 0) ? 0 : 1));
+        if (this.pageSize > 0) {
+            this.pages = (int) (total / this.pageSize + ((total % this.pageSize == 0) ? 0 : 1));
+        } else {
+            this.pages = (int) total;
+        }
     }
 
     public boolean isCount() {
