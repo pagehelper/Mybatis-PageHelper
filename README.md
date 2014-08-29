@@ -19,7 +19,7 @@
 
 ##3.3.0-SNAPSHOT使用方法  
 
-将本插件中的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
+将本插件中的`com.github.pagehelper`包下面的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
 
 你还需要下载这两个文件（这两个文件完全独立，不依赖其他）：  
 
