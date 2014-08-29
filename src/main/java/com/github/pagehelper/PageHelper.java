@@ -148,6 +148,10 @@ public class PageHelper implements Interceptor {
                 Object result = invocation.proceed();
                 //得到处理结果
                 page.addAll((List) result);
+                //这种情况相当于pageSize=total
+                page.setPageSize(page.size());
+                //仍然要设置total
+                page.setTotal(page.size());
                 //返回结果仍然为Page类型 - 便于后面对接收类型的统一处理
                 return page;
             }
@@ -165,8 +169,11 @@ public class PageHelper implements Interceptor {
                 Object result = invocation.proceed();
                 //设置总数
                 page.setTotal((Integer) ((List) result).get(0));
+                if (page.getTotal() == 0) {
+                    return page;
+                }
             }
-            //pageSize>0的时候不执行分页查询，相当于可能只返回了一个count
+            //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
             if (page.getPageSize() > 0) {
                 //分页sql - 重写sql
                 msObject.setValue(BOUND_SQL, getPageSql(sql, page));
