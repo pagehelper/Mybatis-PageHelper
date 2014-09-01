@@ -64,11 +64,14 @@ public class Page<E> extends ArrayList<E> {
 
     public Page(int pageNum, int pageSize, int total) {
         super(pageSize > -1 ? pageSize : 0);
+        //分页合理化，针对不合理的页码自动处理
+        if (pageNum < 0) {
+            pageNum = 1;
+        }
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.total = total;
-        this.startRow = pageNum > 0 ? (pageNum - 1) * pageSize : 0;
-        this.endRow = pageNum * pageSize;
+        calculateStartAndEndRow();
     }
 
     public Page(RowBounds rowBounds, boolean count) {
@@ -93,16 +96,8 @@ public class Page<E> extends ArrayList<E> {
         return pages;
     }
 
-    public void setPages(int pages) {
-        this.pages = pages;
-    }
-
     public int getEndRow() {
         return endRow;
-    }
-
-    public void setEndRow(int endRow) {
-        this.endRow = endRow;
     }
 
     public int getPageNum() {
@@ -110,7 +105,8 @@ public class Page<E> extends ArrayList<E> {
     }
 
     public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
+        //分页合理化，针对不合理的页码自动处理
+        this.pageNum = pageNum < 0 ? 1 : pageNum;
     }
 
     public int getPageSize() {
@@ -125,21 +121,30 @@ public class Page<E> extends ArrayList<E> {
         return startRow;
     }
 
-    public void setStartRow(int startRow) {
-        this.startRow = startRow;
-    }
-
     public long getTotal() {
         return total;
     }
 
     public void setTotal(long total) {
         this.total = total;
-        if (this.pageSize > 0) {
-            this.pages = (int) (total / this.pageSize + ((total % this.pageSize == 0) ? 0 : 1));
+        if (pageSize > 0) {
+            pages = (int) (total / pageSize + ((total % pageSize == 0) ? 0 : 1));
         } else {
-            this.pages = (int) total;
+            pages = (int) total;
         }
+        //分页合理化，针对不合理的页码自动处理
+        if (pageNum > pages) {
+            pageNum = pages;
+            calculateStartAndEndRow();
+        }
+    }
+
+    /**
+     * 计算起止行号
+     */
+    private void calculateStartAndEndRow() {
+        this.startRow = this.pageNum > 0 ? (this.pageNum - 1) * this.pageSize : 0;
+        this.endRow = this.pageNum * this.pageSize;
     }
 
     public boolean isCount() {
