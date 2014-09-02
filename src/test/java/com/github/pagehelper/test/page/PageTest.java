@@ -45,7 +45,7 @@ public class PageTest {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             //获取第20页，2条内容
-            //分页插件会自动改为查询第一页
+            //分页插件会自动改为查询最后一页
             PageHelper.startPage(20, 2);
             List<Country> list = countryMapper.selectAll();
             PageInfo page = new PageInfo(list);

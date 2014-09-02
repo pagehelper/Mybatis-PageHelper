@@ -65,7 +65,7 @@ public class Page<E> extends ArrayList<E> {
     public Page(int pageNum, int pageSize, int total) {
         super(pageSize > -1 ? pageSize : 0);
         //分页合理化，针对不合理的页码自动处理
-        if (pageNum < 0) {
+        if (pageNum <= 0) {
             pageNum = 1;
         }
         this.pageNum = pageNum;
@@ -106,7 +106,7 @@ public class Page<E> extends ArrayList<E> {
 
     public void setPageNum(int pageNum) {
         //分页合理化，针对不合理的页码自动处理
-        this.pageNum = pageNum < 0 ? 1 : pageNum;
+        this.pageNum = pageNum <= 0 ? 1 : pageNum;
     }
 
     public int getPageSize() {
