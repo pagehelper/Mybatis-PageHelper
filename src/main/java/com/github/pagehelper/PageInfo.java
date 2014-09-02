@@ -51,11 +51,24 @@ public class PageInfo<T> {
     //是否有下一页
     private boolean hasNextPage = false;
     //导航页码数
-    private int navigatePages = 8;
+    private int navigatePages;
     //所有导航页号
     private int[] navigatepageNums;
 
+    /**
+     * 包装Page对象
+     * @param list
+     */
     public PageInfo(List<T> list) {
+        this(list, 8);
+    }
+
+    /**
+     * 包装Page对象
+     * @param list page结果
+     * @param navigatePages 页码数量
+     */
+    public PageInfo(List<T> list, int navigatePages) {
         if (list instanceof Page) {
             Page page = (Page) list;
             this.pageNum = page.getPageNum();
@@ -69,6 +82,7 @@ public class PageInfo<T> {
             this.startRow = page.getStartRow() + 1;
             //计算实际的endRow（最后一页的时候特殊）
             this.endRow = this.startRow - 1 + this.size;
+            this.navigatePages = navigatePages;
             //计算导航页
             calcNavigatepageNums();
             //计算前后页，第一页，最后一页
