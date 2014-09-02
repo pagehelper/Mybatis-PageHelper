@@ -4,13 +4,13 @@ import java.util.List;
 
 /**
  * 对Page<E>结果进行包装
- *
+ * <p/>
  * 新增分页的多项属性，主要参考:http://bbs.csdn.net/topics/360010907
  *
- * @author liuzh
- *
+ * @author liuzh/abel533/isea533
  * @version 3.3.0
  * @since 3.2.2
+ * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class PageInfo<T> {
     //当前页

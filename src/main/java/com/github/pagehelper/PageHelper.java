@@ -29,8 +29,7 @@ import com.foundationdb.sql.parser.OrderByList;
 import com.foundationdb.sql.parser.SQLParser;
 import com.foundationdb.sql.parser.StatementNode;
 import com.foundationdb.sql.unparser.NodeToString;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
@@ -45,70 +44,31 @@ import org.apache.ibatis.session.RowBounds;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Mybatis - 通用分页拦截器
  *
  * @author liuzh/abel533/isea533
  * @version 3.3.0
- * @url http://git.oschina.net/free/Mybatis_PageHelper
+ * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
     public static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     public static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
-    public static final MetaObject NULL_META_OBJECT = MetaObject.forObject(NullObject.class, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
-
-    private static class NullObject {
-    }
-
-    /**
-     * 反射对象，增加对低版本Mybatis的支持
-     *
-     * @param object
-     * @return
-     */
-    public static MetaObject forObject(Object object) {
-        return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
-    }
-
-    /**
-     * 解析 - 去掉order by 语句
-     */
-    private static class UnParser extends NodeToString {
-        private static final SQLParser PARSER = new SQLParser();
-
-        public String removeOrderBy(String sql) throws StandardException {
-            StatementNode stmt = PARSER.parseStatement(sql);
-            return toString(stmt);
-        }
-
-        @Override
-        protected String orderByList(OrderByList node) throws StandardException {
-            //order by中如果包含参数就原样返回
-            // 这里建议order by使用${param}这样的参数
-            // 这种形式的order by可以正确的被过滤掉，并且支持大部分的数据库
-            String sql = nodeList(node);
-            if (sql.indexOf('$') > -1) {
-                return "ORDER BY " + sql.replaceAll("\\$\\d+", "?");
-            }
-            return "";
-        }
-    }
-
     //SQL反解析
     private static final UnParser UNPARSER = new UnParser();
-    //SQL缓存
-    private static final Cache<Integer, String> COUNT_CACHE = CacheBuilder.newBuilder().maximumSize(500).expireAfterWrite(30, TimeUnit.MINUTES).build();
-
-    private static final String BOUND_SQL = "sqlSource.boundSql.sql";
-
+    //分页的id后缀
+    private static final String SUFFIX_PAGE = "_PageHelper";
+    //count查询的id后缀
+    private static final String SUFFIX_COUNT = SUFFIX_PAGE + "_Count";
+    //第一个分页参数
+    private static final String PAGEPARAMETER_FIRST = "First" + SUFFIX_PAGE;
+    //第二个分页参数
+    private static final String PAGEPARAMETER_SECOND = "Second" + SUFFIX_PAGE;
+    private static final String BOUND_SQL = "boundSql.sql";
     private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
-
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
-
     //数据库方言
     private static String dialect = "";
     //RowBounds参数offset作为PageNum使用 - 默认不使用
@@ -119,10 +79,20 @@ public class PageHelper implements Interceptor {
     private static boolean pageSizeZero = false;
 
     /**
+     * 反射对象，增加对低版本Mybatis的支持
+     *
+     * @param object 反射对象
+     * @return
+     */
+    public static MetaObject forObject(Object object) {
+        return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
+    }
+
+    /**
      * 开始分页
      *
-     * @param pageNum
-     * @param pageSize
+     * @param pageNum  页码
+     * @param pageSize 每页显示数量
      */
     public static void startPage(int pageNum, int pageSize) {
         startPage(pageNum, pageSize, true);
@@ -131,8 +101,9 @@ public class PageHelper implements Interceptor {
     /**
      * 开始分页
      *
-     * @param pageNum
-     * @param pageSize
+     * @param pageNum   页码
+     * @param pageSize  每页显示数量
+     * @param count     是否进行count查询
      */
     public static void startPage(int pageNum, int pageSize, boolean count) {
         LOCAL_PAGE.set(new Page(pageNum, pageSize, count));
@@ -141,8 +112,8 @@ public class PageHelper implements Interceptor {
     /**
      * 获取分页参数
      *
-     * @param rowBounds
-     * @return
+     * @param rowBounds RowBounds参数
+     * @return 返回Page对象
      */
     private Page getPage(RowBounds rowBounds) {
         Page page = LOCAL_PAGE.get();
@@ -162,9 +133,9 @@ public class PageHelper implements Interceptor {
     /**
      * Mybatis拦截器方法
      *
-     * @param invocation
-     * @return
-     * @throws Throwable
+     * @param invocation    拦截器入参
+     * @return 返回执行结果
+     * @throws Throwable 抛出异常
      */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -177,8 +148,6 @@ public class PageHelper implements Interceptor {
             args[2] = RowBounds.DEFAULT;
             MappedStatement ms = (MappedStatement) args[0];
             Object parameterObject = args[1];
-            BoundSql boundSql = ms.getBoundSql(parameterObject);
-
             //分页信息
             Page page = getPage(rowBounds);
             //pageSizeZero的判断
@@ -194,16 +163,11 @@ public class PageHelper implements Interceptor {
                 //返回结果仍然为Page类型 - 便于后面对接收类型的统一处理
                 return page;
             }
-            //创建一个新的MappedStatement
-            MappedStatement qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql));
-            //将参数中的MappedStatement替换为新的qs，防止并发异常
-            args[0] = qs;
-            MetaObject msObject = forObject(qs);
-            String sql = (String) msObject.getValue(BOUND_SQL);
             //简单的通过total的值来判断是否进行count查询
             if (page.isCount()) {
-                //求count - 重写sql
-                msObject.setValue(BOUND_SQL, getCountSql(sql));
+                BoundSql boundSql = ms.getBoundSql(parameterObject);
+                //将参数中的MappedStatement替换为新的qs
+                args[0] = getMappedStatement(ms, boundSql, SUFFIX_COUNT);
                 //查询总数
                 Object result = invocation.proceed();
                 //设置总数
@@ -214,10 +178,11 @@ public class PageHelper implements Interceptor {
             }
             //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
             if (page.getPageSize() > 0) {
-                //分页sql - 重写sql
-                msObject.setValue(BOUND_SQL, getPageSql(sql, page));
-                //恢复类型
-                msObject.setValue("resultMaps", ms.getResultMaps());
+                BoundSql boundSql = ms.getBoundSql(parameterObject);
+                //将参数中的MappedStatement替换为新的qs
+                args[0] = getMappedStatement(ms, boundSql, SUFFIX_PAGE);
+                //判断parameterObject，然后赋值
+                args[1] = setPageParameter(parameterObject, boundSql, page);
                 //执行分页查询
                 Object result = invocation.proceed();
                 //得到处理结果
@@ -231,72 +196,134 @@ public class PageHelper implements Interceptor {
     /**
      * 获取总数sql - 如果要支持其他数据库，修改这里就可以
      *
-     * @param sql
-     * @return
+     * @param sql   原查询sql
+     * @return 返回count查询sql
      */
     private String getCountSql(final String sql) {
         try {
-            return COUNT_CACHE.get(sql.hashCode(), new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    if (sql.toUpperCase().contains("ORDER")) {
-                        return "select count(0) from (" + UNPARSER.removeOrderBy(sql) + ") tmp_count";
-                    } else {
-                        return "select count(0) from (" + sql + ") tmp_count";
-                    }
-                }
-            });
+            if (sql.toUpperCase().contains("ORDER")) {
+                return "select count(0) from (" + UNPARSER.removeOrderBy(sql) + ") tmp_count";
+            }
         } catch (Exception e) {
-            return "select count(0) from (" + sql + ") tmp_count";
+            //ignore
         }
+        return "select count(0) from (" + sql + ") tmp_count";
     }
 
     /**
      * 获取分页sql - 如果要支持其他数据库，修改这里就可以
      *
-     * @param sql
-     * @param page
-     * @return
+     * @param sql   原查询sql
+     * @return 返回分页sql
      */
-    private String getPageSql(String sql, Page page) {
+    private String getPageSql(String sql) {
         StringBuilder pageSql = new StringBuilder(200);
         if ("mysql".equals(dialect)) {
             pageSql.append("select * from (");
             pageSql.append(sql);
-            pageSql.append(") as tmp_page limit " + page.getStartRow() + "," + page.getPageSize());
+            pageSql.append(") as tmp_page limit ?,?");
         } else if ("hsqldb".equals(dialect)) {
             pageSql.append(sql);
-            pageSql.append(" LIMIT " + page.getPageSize() + " OFFSET " + page.getStartRow());
+            pageSql.append(" LIMIT ? OFFSET ?");
         } else if ("oracle".equals(dialect)) {
             pageSql.append("select * from ( select temp.*, rownum row_id from ( ");
             pageSql.append(sql);
-            pageSql.append(" ) temp where rownum <= ").append(page.getEndRow());
-            pageSql.append(") where row_id > ").append(page.getStartRow());
+            pageSql.append(" ) temp where rownum <= ? ) where row_id > ?");
         }
         return pageSql.toString();
     }
 
-    private class BoundSqlSqlSource implements SqlSource {
-        BoundSql boundSql;
-
-        public BoundSqlSqlSource(BoundSql boundSql) {
-            this.boundSql = boundSql;
+    /**
+     * 处理参数对象，添加分页参数值
+     *
+     * @param parameterObject   参数对象
+     * @param page  分页信息
+     * @return 返回带有分页信息的参数对象
+     */
+    private MapperMethod.ParamMap setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+        MapperMethod.ParamMap<Object> paramMap = null;
+        if (parameterObject == null) {
+            paramMap = new MapperMethod.ParamMap<Object>();
+        } else if (parameterObject instanceof MapperMethod.ParamMap) {
+            paramMap = (MapperMethod.ParamMap) parameterObject;
+        } else {
+            paramMap = new MapperMethod.ParamMap<Object>();
+            if (boundSql.getParameterMappings() != null && boundSql.getParameterMappings().size() > 0) {
+                for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
+                    if (!parameterMapping.getProperty().equals(PAGEPARAMETER_FIRST)
+                            && !parameterMapping.getProperty().equals(PAGEPARAMETER_SECOND)) {
+                        paramMap.put(parameterMapping.getProperty(), parameterObject);
+                    }
+                }
+            }
         }
-
-        public BoundSql getBoundSql(Object parameterObject) {
-            return boundSql;
+        if ("mysql".equals(dialect)) {
+            paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
+            paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
+        } else if ("hsqldb".equals(dialect)) {
+            paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
+            paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+        } else if ("oracle".equals(dialect)) {
+            paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
+            paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
         }
+        return paramMap;
     }
 
     /**
-     * 由于MappedStatement是一个全局共享的对象，因而需要复制一个对象来进行操作，防止并发访问导致错误
+     * 获取ms - 在这里对新建的ms做了缓存，第一次新增，后面都会使用缓存值
+     *
+     * @param ms
+     * @param boundSql
+     * @param suffix
+     * @return
+     */
+    private MappedStatement getMappedStatement(MappedStatement ms, BoundSql boundSql, String suffix) {
+        MappedStatement qs = null;
+        try {
+            qs = ms.getConfiguration().getMappedStatement(ms.getId() + suffix);
+        } catch (Exception e) {
+            //ignore
+        }
+        if (qs == null) {
+            //创建一个新的MappedStatement
+            qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql), suffix);
+            try {
+                ms.getConfiguration().addMappedStatement(qs);
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        return qs;
+    }
+
+    /**
+     * 新建count查询和分页查询的MappedStatement
      *
      * @param ms
      * @param newSqlSource
+     * @param suffix
      * @return
      */
-    private MappedStatement newMappedStatement(MappedStatement ms, SqlSource newSqlSource) {
-        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + "_PageHelper", newSqlSource, ms.getSqlCommandType());
+    private MappedStatement newMappedStatement(MappedStatement ms, BoundSqlSqlSource newSqlSource, String suffix) {
+        String id = ms.getId() + suffix;
+        //这里用的等号
+        if (suffix == SUFFIX_PAGE) {
+            //改为分页sql
+            MetaObject msObject = forObject(newSqlSource);
+            msObject.setValue(BOUND_SQL, getPageSql((String) msObject.getValue(BOUND_SQL)));
+            //添加参数映射
+            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+            newParameterMappings.addAll(newSqlSource.getBoundSql().getParameterMappings());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
+            msObject.setValue("boundSql.parameterMappings", newParameterMappings);
+        } else {
+            //改为count sql
+            MetaObject msObject = forObject(newSqlSource);
+            msObject.setValue(BOUND_SQL, getCountSql((String) msObject.getValue(BOUND_SQL)));
+        }
+        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), id, newSqlSource, ms.getSqlCommandType());
         builder.resource(ms.getResource());
         builder.fetchSize(ms.getFetchSize());
         builder.statementType(ms.getStatementType());
@@ -311,11 +338,15 @@ public class PageHelper implements Interceptor {
         }
         builder.timeout(ms.getTimeout());
         builder.parameterMap(ms.getParameterMap());
-        //由于resultMaps第一次需要返回int类型的结果，所以这里需要生成一个resultMap - 防止并发错误
-        List<ResultMap> resultMaps = new ArrayList<ResultMap>();
-        ResultMap resultMap = new ResultMap.Builder(ms.getConfiguration(), ms.getId(), int.class, EMPTY_RESULTMAPPING).build();
-        resultMaps.add(resultMap);
-        builder.resultMaps(resultMaps);
+        if (suffix == SUFFIX_PAGE) {
+            builder.resultMaps(ms.getResultMaps());
+        } else {
+            //count查询返回值int
+            List<ResultMap> resultMaps = new ArrayList<ResultMap>();
+            ResultMap resultMap = new ResultMap.Builder(ms.getConfiguration(), id, int.class, EMPTY_RESULTMAPPING).build();
+            resultMaps.add(resultMap);
+            builder.resultMaps(resultMaps);
+        }
         builder.resultSetType(ms.getResultSetType());
         builder.cache(ms.getCache());
         builder.flushCacheRequired(ms.isFlushCacheRequired());
@@ -342,7 +373,7 @@ public class PageHelper implements Interceptor {
     /**
      * 设置属性值
      *
-     * @param p
+     * @param p 属性值
      */
     public void setProperties(Properties p) {
         dialect = p.getProperty("dialect");
@@ -363,6 +394,46 @@ public class PageHelper implements Interceptor {
         String sizeZero = p.getProperty("pageSizeZero");
         if (sizeZero != null && "TRUE".equalsIgnoreCase(sizeZero)) {
             pageSizeZero = true;
+        }
+    }
+
+    /**
+     * 解析 - 去掉order by 语句
+     */
+    private static class UnParser extends NodeToString {
+        private static final SQLParser PARSER = new SQLParser();
+
+        public String removeOrderBy(String sql) throws StandardException {
+            StatementNode stmt = PARSER.parseStatement(sql);
+            return toString(stmt);
+        }
+
+        @Override
+        protected String orderByList(OrderByList node) throws StandardException {
+            //order by中如果包含参数就原样返回
+            // 这里建议order by使用${param}这样的参数
+            // 这种形式的order by可以正确的被过滤掉，并且支持大部分的数据库
+            String sql = nodeList(node);
+            if (sql.indexOf('$') > -1) {
+                return "ORDER BY " + sql.replaceAll("\\$\\d+", "?");
+            }
+            return "";
+        }
+    }
+
+    private class BoundSqlSqlSource implements SqlSource {
+        BoundSql boundSql;
+
+        public BoundSqlSqlSource(BoundSql boundSql) {
+            this.boundSql = boundSql;
+        }
+
+        public BoundSql getBoundSql(Object parameterObject) {
+            return boundSql;
+        }
+
+        public BoundSql getBoundSql() {
+            return boundSql;
         }
     }
 }

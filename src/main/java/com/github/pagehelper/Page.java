@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author liuzh/abel533/isea533
  * @version 3.3.0
- * @url http://git.oschina.net/free/Mybatis_PageHelper
+ *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class Page<E> extends ArrayList<E> {
     /**
