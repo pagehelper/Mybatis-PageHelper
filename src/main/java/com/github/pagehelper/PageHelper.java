@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  * Mybatis - 通用分页拦截器
  *
  * @author liuzh/abel533/isea533
- * @version 3.2.2
+ * @version 3.3.0
  * @url http://git.oschina.net/free/Mybatis_PageHelper
  */
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))

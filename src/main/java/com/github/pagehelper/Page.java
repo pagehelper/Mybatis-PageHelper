@@ -33,7 +33,7 @@ import java.util.List;
  * Mybatis - 分页对象
  *
  * @author liuzh/abel533/isea533
- * @version 3.2.2
+ * @version 3.3.0
  * @url http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class Page<E> extends ArrayList<E> {

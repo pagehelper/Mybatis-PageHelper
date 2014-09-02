@@ -2,11 +2,9 @@ package com.github.pagehelper.test;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisHelper;
-import junit.framework.Assert;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -39,16 +37,15 @@ public class PageHelperTest {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectAll();
-            PageInfo page = new PageInfo(list);
             assertEquals(10, list.size());
-            assertEquals(183, page.getTotal());
+            assertEquals(183, ((Page) list).getTotal());
 
 
             //获取第2页，10条内容，显式查询总数count
             PageHelper.startPage(2, 10, true);
             list = countryMapper.selectAll();
             assertEquals(10, list.size());
-            Assert.assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
 
 
             //获取第2页，10条内容，不查询总数count
