@@ -7,39 +7,41 @@
 
 #最新测试版3.3.0-SNAPSHOT
 
-听取[@hlevel][1]的建议，对性能做了部分优化。  
+听取[@hlevel][1]的建议和[@da老虎](http://my.oschina.net/u/2006157)的建议，对分页插件性能做了优化。  
 
- 1. 对count查询进行优化处理，目前的处理策略只是简单的把sql中的所有`order by`语句删除了，当然不是直接处理字符串去删除，使用了一个sql解析的类库，由于sql的有无限的变化，因而不保证这个sql解析的类库能够完全处理所有的情况，所以发布了这个SNAPSHOT版本。  
+##3.3.0-SNAPSHOT版本的改进内容
 
-    由于解析sql效率不是很高，解析1W次在2秒左右，所以对此增加了Guava缓存。增加缓存后效率不再是问题。  
+ 1. 对`MappedStatement`对象进行缓存，包括count查询的`MappedStatement`以及分页查询的`MappedStatement`，分页查询改为预编译查询。
 
- 2. 另外还有一个早该就有的优化就是当count=0的时候，不需要在进行分页查询，这时会返回一个size=0的List。  
+ 2. 对count查询进行优化处理，目前的处理策略只是简单的把sql中的所有`order by`语句删除了，当然不是直接处理字符串去删除，使用了一个sql解析的类库，由于sql的有无限的变化，因而不保证这个sql解析的类库能够完全处理所有的情况，无法处理的情况仍然会保留order by进行查询。  
 
-**欢迎大家在非正式项目中使用这个版本，如果存在任何问题欢迎各位提出。**  
+ 3. 增强的PageInfo类，PageInfo类包含了分页几乎所有需要用到的属性值。方便通过一个PageInfo类来达到分页目的，减少对分页逻辑的过多投入。  
+
+ 4. 分页合理化，自动处理pageNum的异常情况。例如当pageNum<=0时，会设置pageNum=1，然后查询第一页。当pageNum>pages(总页数)时，自动将pageNum=pages，查询最后一页。  
+
+ 5. 特殊的pageSize值，当pageSize<0时不再进行分页查询，只进行count查询。当pageSize=0时，通过配置参数`pageSizeZero`可以查询全部结果。（该功能已经添加到3.2.3版本）
+
+**欢迎大家尝试这个版本，如果存在任何问题欢迎各位提出。**  
 
 ##3.3.0-SNAPSHOT使用方法  
 
 将本插件中的`com.github.pagehelper`包下面的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
 
-你还需要下载这两个文件（这两个文件完全独立，不依赖其他）：  
+如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
- - Guava:http://search.maven.org/remotecontent?filepath=com/google/guava/guava/17.0/guava-17.0.jar
+https://oss.sonatype.org/#nexus-search;quick~pagehelper  
+
+由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
 
  - SqlParser：http://search.maven.org/remotecontent?filepath=com/foundationdb/fdb-sql-parser/1.3.0/fdb-sql-parser-1.3.0.jar  
 
 <br>
-如果你使用的maven，需要增加以下三个依赖：  
+如果你使用的maven，你可以添加如下依赖：  
 ```xml  
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
     <version>3.3.0-SNAPSHOT</version>
-</dependency>
-<!--额外增加下面两个依赖-->
-<dependency>
-    <groupId>com.google.guava</groupId>
-    <artifactId>guava</artifactId>
-    <version>17.0</version>
 </dependency>
 <dependency>
     <groupId>com.foundationdb</groupId>
@@ -61,7 +63,11 @@
 
 ##使用方法  
 
-将本插件中的`com.github.pagehelper`包下面的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
+将本插件中的`com.github.pagehelper`包下面的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。    
+
+如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）：  
+
+http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.github.pagehelper%22%20AND%20a%3A%22pagehelper%22  
 
 或者如果你使用Maven，你可以添加如下依赖：  
 
