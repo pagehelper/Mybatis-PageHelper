@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author liuzh
@@ -53,14 +53,14 @@ public class PageSizeZeroTest {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             //pageSize=0的时候查询全部结果
-            List<Country> list = countryMapper.selectAll(new RowBounds(1,0));
+            List<Country> list = countryMapper.selectAll(new RowBounds(1, 0));
             PageInfo page = new PageInfo(list);
             assertEquals(183, list.size());
             assertEquals(183, page.getTotal());
 
             //pageSize=0的时候查询全部结果
             PageHelper.startPage(10, 0);
-            list = countryMapper.selectAll(new RowBounds(1000,0));
+            list = countryMapper.selectAll(new RowBounds(1000, 0));
             page = new PageInfo(list);
             assertEquals(183, list.size());
             assertEquals(183, page.getTotal());

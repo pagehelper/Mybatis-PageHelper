@@ -5,14 +5,13 @@ import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisRowBoundsHelper;
-import junit.framework.Assert;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class RowBoundsTest {
 
@@ -42,7 +41,7 @@ public class RowBoundsTest {
             //获取第10页，10条内容，显式查询总数count
             list = countryMapper.selectAll(new RowBounds(10, 10));
             assertEquals(10, list.size());
-            Assert.assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(91, list.get(0).getId());
             assertEquals(100, list.get(list.size() - 1).getId());

@@ -8,6 +8,14 @@
     select * from country
   </select>
 
+  <select id="selectGreterThanId" resultType="Country">
+    select * from country where id &gt;#{id}
+  </select>
+
+  <select id="selectGreterThanIdAndNotEquelContryname" resultType="Country">
+    select * from country where id &gt;#{id} and countryname &lt;&gt; #{countryname}
+  </select>
+
   <select id="selectAllOrderby" resultType="com.github.pagehelper.model.Country">
       select * from country order by countrycode desc
   </select>

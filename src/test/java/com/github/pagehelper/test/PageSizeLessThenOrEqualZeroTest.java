@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class PageSizeLessThenOrEqualZeroTest {
 

@@ -33,7 +33,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class PageTest {
     /**
@@ -50,7 +50,7 @@ public class PageTest {
             List<Country> list = countryMapper.selectAll();
             PageInfo page = new PageInfo(list);
             assertEquals(1, list.size());
-            assertEquals(6, page.getStartRow());
+            assertEquals(7, page.getStartRow());
             assertEquals(4, page.getPageNum());
             assertEquals(7, page.getTotal());
 
@@ -60,7 +60,7 @@ public class PageTest {
             list = countryMapper.selectAll();
             page = new PageInfo(list);
             assertEquals(2, list.size());
-            assertEquals(0, page.getStartRow());
+            assertEquals(1, page.getStartRow());
             assertEquals(1, page.getPageNum());
             assertEquals(7, page.getTotal());
         } finally {

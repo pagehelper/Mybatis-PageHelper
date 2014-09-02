@@ -10,6 +10,10 @@ public interface CountryMapper {
 
     List<Country> selectAll();
 
+    List<Country> selectGreterThanId(@Param("id") int id);
+
+    List<Country> selectGreterThanIdAndNotEquelContryname(@Param("id") int id, @Param("countryname") String countryname);
+
     List<Country> selectAll(RowBounds rowBounds);
 
     List<Country> selectAllOrderby();
