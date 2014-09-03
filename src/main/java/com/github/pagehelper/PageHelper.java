@@ -50,7 +50,7 @@ import java.util.Properties;
  *
  * @author liuzh/abel533/isea533
  * @version 3.3.0
- * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
+ *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
@@ -72,10 +72,12 @@ public class PageHelper implements Interceptor {
      */
     private static class UnParser extends NodeToString {
         private static final SQLParser PARSER = new SQLParser();
+
         public String removeOrderBy(String sql) throws StandardException {
             StatementNode stmt = PARSER.parseStatement(sql);
             return toString(stmt);
         }
+
         @Override
         protected String orderByList(OrderByList node) throws StandardException {
             //order by中如果包含参数就原样返回
@@ -119,8 +121,8 @@ public class PageHelper implements Interceptor {
     /**
      * 开始分页
      *
-     * @param pageNum   页码
-     * @param pageSize  每页显示数量
+     * @param pageNum  页码
+     * @param pageSize 每页显示数量
      */
     public static void startPage(int pageNum, int pageSize) {
         startPage(pageNum, pageSize, true);
@@ -129,9 +131,9 @@ public class PageHelper implements Interceptor {
     /**
      * 开始分页
      *
-     * @param pageNum   页码
-     * @param pageSize  每页显示数量
-     * @param count     是否进行count查询
+     * @param pageNum  页码
+     * @param pageSize 每页显示数量
+     * @param count    是否进行count查询
      */
     public static void startPage(int pageNum, int pageSize, boolean count) {
         LOCAL_PAGE.set(new Page(pageNum, pageSize, count));
@@ -161,8 +163,8 @@ public class PageHelper implements Interceptor {
     /**
      * Mybatis拦截器方法
      *
-     * @param invocation    拦截器入参
-     * @return  返回执行结果
+     * @param invocation 拦截器入参
+     * @return 返回执行结果
      * @throws Throwable 抛出异常
      */
     @Override
@@ -184,6 +186,8 @@ public class PageHelper implements Interceptor {
                 Object result = invocation.proceed();
                 //得到处理结果
                 page.addAll((List) result);
+                //相当于查询第一页
+                page.setPageNum(1);
                 //这种情况相当于pageSize=total
                 page.setPageSize(page.size());
                 //仍然要设置total
@@ -195,7 +199,7 @@ public class PageHelper implements Interceptor {
             if (page.isCount()) {
                 BoundSql boundSql = ms.getBoundSql(parameterObject);
                 //将参数中的MappedStatement替换为新的qs
-                args[0] = getMappedStatement(ms,boundSql,SUFFIX_COUNT);
+                args[0] = getMappedStatement(ms, boundSql, SUFFIX_COUNT);
                 //查询总数
                 Object result = invocation.proceed();
                 //设置总数
@@ -208,7 +212,7 @@ public class PageHelper implements Interceptor {
             if (page.getPageSize() > 0) {
                 BoundSql boundSql = ms.getBoundSql(parameterObject);
                 //将参数中的MappedStatement替换为新的qs
-                args[0] = getMappedStatement(ms,boundSql,SUFFIX_PAGE);
+                args[0] = getMappedStatement(ms, boundSql, SUFFIX_PAGE);
                 //判断parameterObject，然后赋值
                 args[1] = setPageParameter(parameterObject, boundSql, page);
                 //执行分页查询
@@ -224,8 +228,8 @@ public class PageHelper implements Interceptor {
     /**
      * 获取总数sql - 如果要支持其他数据库，修改这里就可以
      *
-     * @param sql   原查询sql
-     * @return      返回count查询sql
+     * @param sql 原查询sql
+     * @return 返回count查询sql
      */
     private String getCountSql(final String sql) {
         try {
@@ -241,8 +245,8 @@ public class PageHelper implements Interceptor {
     /**
      * 获取分页sql - 如果要支持其他数据库，修改这里就可以
      *
-     * @param sql   原查询sql
-     * @return      返回分页sql
+     * @param sql 原查询sql
+     * @return 返回分页sql
      */
     private String getPageSql(String sql) {
         StringBuilder pageSql = new StringBuilder(200);
@@ -264,16 +268,16 @@ public class PageHelper implements Interceptor {
     /**
      * 处理参数对象，添加分页参数值
      *
-     * @param parameterObject   参数对象
-     * @param page  分页信息
-     * @return  返回带有分页信息的参数对象
+     * @param parameterObject 参数对象
+     * @param page            分页信息
+     * @return 返回带有分页信息的参数对象
      */
     private MapperMethod.ParamMap setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
         MapperMethod.ParamMap<Object> paramMap = null;
         if (parameterObject == null) {
             paramMap = new MapperMethod.ParamMap<Object>();
         } else if (parameterObject instanceof MapperMethod.ParamMap) {
-            paramMap = (MapperMethod.ParamMap)parameterObject;
+            paramMap = (MapperMethod.ParamMap) parameterObject;
         } else {
             paramMap = new MapperMethod.ParamMap<Object>();
             if (boundSql.getParameterMappings() != null && boundSql.getParameterMappings().size() > 0) {
@@ -300,12 +304,13 @@ public class PageHelper implements Interceptor {
 
     /**
      * 获取ms - 在这里对新建的ms做了缓存，第一次新增，后面都会使用缓存值
+     *
      * @param ms
      * @param boundSql
      * @param suffix
      * @return
      */
-    private MappedStatement getMappedStatement(MappedStatement ms, BoundSql boundSql, String suffix){
+    private MappedStatement getMappedStatement(MappedStatement ms, BoundSql boundSql, String suffix) {
         MappedStatement qs = null;
         try {
             qs = ms.getConfiguration().getMappedStatement(ms.getId() + suffix);
@@ -342,6 +347,7 @@ public class PageHelper implements Interceptor {
 
     /**
      * 新建count查询和分页查询的MappedStatement
+     *
      * @param ms
      * @param newSqlSource
      * @param suffix
@@ -357,9 +363,9 @@ public class PageHelper implements Interceptor {
             //添加参数映射
             List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
             newParameterMappings.addAll(newSqlSource.getBoundSql().getParameterMappings());
-            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(),PAGEPARAMETER_FIRST,Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
             newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
-            msObject.setValue("boundSql.parameterMappings",newParameterMappings);
+            msObject.setValue("boundSql.parameterMappings", newParameterMappings);
         } else {
             //改为count sql
             MetaObject msObject = forObject(newSqlSource);

@@ -130,7 +130,7 @@ public class Page<E> extends ArrayList<E> {
         if (pageSize > 0) {
             pages = (int) (total / pageSize + ((total % pageSize == 0) ? 0 : 1));
         } else {
-            pages = (int) total;
+            pages = 0;
         }
         //分页合理化，针对不合理的页码自动处理
         if (pageNum > pages) {

@@ -154,6 +154,10 @@ public class PageInfo<T> {
         hasNextPage = pageNum < pages;
     }
 
+    public void setPageNum(int pageNum) {
+        this.pageNum = pageNum;
+    }
+
     public int getPageNum() {
         return pageNum;
     }
