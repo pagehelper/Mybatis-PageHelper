@@ -25,6 +25,7 @@
 package com.github.pagehelper;
 
 import com.foundationdb.sql.StandardException;
+import com.foundationdb.sql.parser.FromBaseTable;
 import com.foundationdb.sql.parser.OrderByList;
 import com.foundationdb.sql.parser.SQLParser;
 import com.foundationdb.sql.parser.StatementNode;
@@ -75,7 +76,11 @@ public class PageHelper implements Interceptor {
 
         public String removeOrderBy(String sql) throws StandardException {
             StatementNode stmt = PARSER.parseStatement(sql);
-            return toString(stmt);
+            String result = toString(stmt);
+            if (result.indexOf('$') > -1) {
+                result = result.replaceAll("\\$\\d+", "?");
+            }
+            return result;
         }
 
         @Override
@@ -85,9 +90,23 @@ public class PageHelper implements Interceptor {
             // 这种形式的order by可以正确的被过滤掉，并且支持大部分的数据库
             String sql = nodeList(node);
             if (sql.indexOf('$') > -1) {
-                return "ORDER BY " + sql.replaceAll("\\$\\d+", "?");
+                return sql;
             }
             return "";
+        }
+
+        @Override
+        protected String fromBaseTable(FromBaseTable node) throws StandardException {
+            String tn = toString(node.getOrigTableName());
+            String n = node.getCorrelationName();
+            if (n == null) {
+                return tn;
+            } else if (dialect.equals("oracle")) {
+                //Oracle表不支持AS
+                return tn + " " + n;
+            } else {
+                return tn + " AS " + n;
+            }
         }
     }
 

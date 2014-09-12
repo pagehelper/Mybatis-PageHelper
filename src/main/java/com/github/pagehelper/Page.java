@@ -144,7 +144,7 @@ public class Page<E> extends ArrayList<E> {
      */
     private void calculateStartAndEndRow() {
         this.startRow = this.pageNum > 0 ? (this.pageNum - 1) * this.pageSize : 0;
-        this.endRow = this.pageNum * this.pageSize;
+        this.endRow = this.startRow + this.pageSize;
     }
 
     public boolean isCount() {

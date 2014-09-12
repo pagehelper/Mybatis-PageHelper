@@ -13,7 +13,7 @@
   </select>
 
   <select id="selectGreterThanIdAndNotEquelContryname" resultType="Country">
-    select * from country where id &gt;#{id} and countryname &lt;&gt; #{countryname}
+    select a.* from country a left join country b on a.id = b.id where a.id &gt;#{id} and b.countryname &lt;&gt; #{countryname} order by a.id
   </select>
 
   <select id="selectAllOrderby" resultType="com.github.pagehelper.model.Country">
