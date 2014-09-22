@@ -42,9 +42,7 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Mybatis - 通用分页拦截器
@@ -291,12 +289,12 @@ public class PageHelper implements Interceptor {
      * @param page            分页信息
      * @return 返回带有分页信息的参数对象
      */
-    private MapperMethod.ParamMap setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-        MapperMethod.ParamMap<Object> paramMap = null;
+    private Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+        Map paramMap = null;
         if (parameterObject == null) {
-            paramMap = new MapperMethod.ParamMap<Object>();
-        } else if (parameterObject instanceof MapperMethod.ParamMap) {
-            paramMap = (MapperMethod.ParamMap) parameterObject;
+            paramMap = new HashMap();
+        } else if (parameterObject instanceof Map) {
+            paramMap = (Map) parameterObject;
         } else {
             paramMap = new MapperMethod.ParamMap<Object>();
             if (boundSql.getParameterMappings() != null && boundSql.getParameterMappings().size() > 0) {
