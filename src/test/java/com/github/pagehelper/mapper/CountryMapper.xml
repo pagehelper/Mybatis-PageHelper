@@ -38,4 +38,33 @@
       #{par}
     </foreach>
   </select>
+  <select id="selectIf" resultType="com.github.pagehelper.model.Country">
+    select * from country
+    <if test="id!=null">
+      where id &gt; #{id}
+    </if>
+  </select>
+  <select id="selectIf2" resultType="com.github.pagehelper.model.Country">
+    select * from country where id &gt; #{id1}
+    <if test="id2!=null">
+      and id &gt; #{id2}
+    </if>
+  </select>
+  <select id="selectIf2List" resultType="com.github.pagehelper.model.Country">
+    select * from country
+    <where>
+      <if test="id1!=null and id1.size>0">
+        id not in
+        <foreach collection="id1" item="id" open="(" close=")" separator=",">
+          #{id}
+        </foreach>
+      </if>
+      <if test="id2!=null and id2.size>0">
+        and id not in
+        <foreach collection="id2" item="id" open="(" close=")" separator=",">
+          #{id}
+        </foreach>
+      </if>
+    </where>
+  </select>
 </mapper>

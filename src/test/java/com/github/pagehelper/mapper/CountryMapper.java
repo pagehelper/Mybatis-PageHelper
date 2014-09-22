@@ -26,4 +26,9 @@ public interface CountryMapper {
     List<Country> selectAllOrderByMap(Map orders);
     List<Country> selectAllOrderByList(List<Integer> params);
     List<Country> selectAllOrderByArray(Integer[] params);
+
+    //测试动态sql,where/if
+    List<Country> selectIf(@Param("id") Integer id);
+    List<Country> selectIf2(@Param("id1") Integer id1,@Param("id2") Integer id2);
+    List<Country> selectIf2List(@Param("id1") List<Integer> id1,@Param("id2") List<Integer> id2);
 }
