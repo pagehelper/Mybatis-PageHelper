@@ -23,4 +23,19 @@
   <select id="selectAllOrderByParams" resultType="com.github.pagehelper.model.Country">
     select * from country order by ${order1} desc,${order2} asc
   </select>
+  <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.Country">
+    select * from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2}
+  </select>
+  <select id="selectAllOrderByList" resultType="com.github.pagehelper.model.Country">
+    select * from country where id not in
+    <foreach collection="list" item="par" separator="," open="(" close=")">
+      #{par}
+    </foreach>
+  </select>
+  <select id="selectAllOrderByArray" resultType="com.github.pagehelper.model.Country">
+    select * from country where id not in
+    <foreach collection="array" item="par" separator="," open="(" close=")">
+      #{par}
+    </foreach>
+  </select>
 </mapper>
