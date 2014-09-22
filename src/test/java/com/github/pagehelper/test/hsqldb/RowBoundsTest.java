@@ -1,4 +1,4 @@
-package com.github.pagehelper.test;
+package com.github.pagehelper.test.hsqldb;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;

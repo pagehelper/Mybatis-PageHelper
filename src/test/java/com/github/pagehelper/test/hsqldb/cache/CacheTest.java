@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.test.cache;
+package com.github.pagehelper.test.hsqldb.cache;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.mapper.CountryMapper;

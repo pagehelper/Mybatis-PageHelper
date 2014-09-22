@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.test.page;
+package com.github.pagehelper.test.hsqldb.page;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.test.page;
+package com.github.pagehelper.test.hsqldb.page;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -46,7 +46,7 @@ public class MybatisPageHelper {
     static {
         try {
             //创建SqlSessionFactory
-            Reader reader = Resources.getResourceAsReader("page/mybatis-config-page.xml");
+            Reader reader = Resources.getResourceAsReader("hsqldb/page/mybatis-config-page.xml");
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             reader.close();
             //创建数据库
@@ -54,7 +54,7 @@ public class MybatisPageHelper {
             try {
                 session = sqlSessionFactory.openSession();
                 Connection conn = session.getConnection();
-                reader = Resources.getResourceAsReader("page/CreateDB_page.sql");
+                reader = Resources.getResourceAsReader("hsqldb/page/CreateDB_page.sql");
                 ScriptRunner runner = new ScriptRunner(conn);
                 runner.setLogWriter(null);
                 runner.runScript(reader);

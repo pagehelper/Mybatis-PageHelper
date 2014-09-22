@@ -22,7 +22,7 @@ public class MybatisHelper {
     static {
         try {
             //创建SqlSessionFactory
-            Reader reader = Resources.getResourceAsReader("mybatis-config.xml");
+            Reader reader = Resources.getResourceAsReader("hsqldb/mybatis-config.xml");
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             reader.close();
             //创建数据库
