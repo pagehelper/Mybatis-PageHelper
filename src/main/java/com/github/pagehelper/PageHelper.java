@@ -272,7 +272,7 @@ public class PageHelper implements Interceptor {
     }
 
     /**
-     * 获取count后置sql
+     *
      * @return
      */
     private String getCountSqlAfter(){

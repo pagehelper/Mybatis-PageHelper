@@ -67,4 +67,17 @@
       </if>
     </where>
   </select>
+  <select id="selectChoose" resultType="com.github.pagehelper.model.Country">
+    select * from country
+    <where>
+      <choose>
+        <when test="id1!=null">
+          id &lt;&gt; #{id1}
+        </when>
+        <otherwise>
+          and id &lt;&gt; #{id2}
+        </otherwise>
+      </choose>
+    </where>
+  </select>
 </mapper>
