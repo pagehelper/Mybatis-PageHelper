@@ -31,6 +31,7 @@ import com.foundationdb.sql.parser.SQLParser;
 import com.foundationdb.sql.parser.StatementNode;
 import com.foundationdb.sql.unparser.NodeToString;
 import org.apache.ibatis.binding.MapperMethod;
+import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
@@ -39,6 +40,8 @@ import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
+import org.apache.ibatis.scripting.xmltags.*;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
@@ -121,6 +124,7 @@ public class PageHelper implements Interceptor {
     private static final String PAGEPARAMETER_SECOND = "Second" + SUFFIX_PAGE;
 
     private static final String BOUND_SQL = "boundSql.sql";
+    private static final String SQL_NODES = "sqlSource.rootSqlNode.contents";
 
     private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
 
@@ -251,12 +255,28 @@ public class PageHelper implements Interceptor {
     private String getCountSql(final String sql) {
         try {
             if (sql.toUpperCase().contains("ORDER")) {
-                return "select count(0) from (" + UNPARSER.removeOrderBy(sql) + ") tmp_count";
+                return getCountSqlBefore() + UNPARSER.removeOrderBy(sql) + getCountSqlAfter();
             }
         } catch (Exception e) {
             //ignore
         }
-        return "select count(0) from (" + sql + ") tmp_count";
+        return getCountSqlBefore() + sql + getCountSqlAfter();
+    }
+
+    /**
+     * 获取count前置sql
+     * @return
+     */
+    private String getCountSqlBefore(){
+        return "select count(0) from (";
+    }
+
+    /**
+     * 获取count后置sql
+     * @return
+     */
+    private String getCountSqlAfter(){
+        return ") tmp_count";
     }
 
     /**
@@ -266,20 +286,37 @@ public class PageHelper implements Interceptor {
      * @return 返回分页sql
      */
     private String getPageSql(String sql) {
-        StringBuilder pageSql = new StringBuilder(200);
+        return getPageSqlBefore() + sql + getPageSqlAfter();
+    }
+
+    /**
+     * 获取分页前置sql
+     *
+     * @return
+     */
+    private String getPageSqlBefore(){
         if ("mysql".equals(dialect)) {
-            pageSql.append("select * from (");
-            pageSql.append(sql);
-            pageSql.append(") as tmp_page limit ?,?");
-        } else if ("hsqldb".equals(dialect)) {
-            pageSql.append(sql);
-            pageSql.append(" LIMIT ? OFFSET ?");
+            return "select * from (";
         } else if ("oracle".equals(dialect)) {
-            pageSql.append("select * from ( select temp.*, rownum row_id from ( ");
-            pageSql.append(sql);
-            pageSql.append(" ) temp where rownum <= ? ) where row_id > ?");
+            return "select * from ( select temp.*, rownum row_id from ( ";
+        } else/* if ("hsqldb".equals(dialect)) */{
+            return "";
         }
-        return pageSql.toString();
+    }
+
+    /**
+     * 获取分页后置sql
+     *
+     * @return
+     */
+    private String getPageSqlAfter(){
+        if ("mysql".equals(dialect)) {
+            return ") as tmp_page limit ?,?";
+        } else if ("oracle".equals(dialect)) {
+            return " ) temp where rownum <= ? ) where row_id > ?";
+        } else/* if ("hsqldb".equals(dialect)) */{
+            return " LIMIT ? OFFSET ?";
+        }
     }
 
     /**
@@ -336,7 +373,7 @@ public class PageHelper implements Interceptor {
         }
         if (qs == null) {
             //创建一个新的MappedStatement
-            qs = newMappedStatement(ms, new BoundSqlSqlSource(boundSql), suffix);
+            qs = newMappedStatement(ms, getNewSqlSource(ms,new BoundSqlSqlSource(boundSql),suffix), suffix);
             try {
                 ms.getConfiguration().addMappedStatement(qs);
             } catch (Exception e) {
@@ -346,6 +383,9 @@ public class PageHelper implements Interceptor {
         return qs;
     }
 
+    /**
+     * 自定义简单SqlSource
+     */
     private class BoundSqlSqlSource implements SqlSource {
         BoundSql boundSql;
 
@@ -363,6 +403,40 @@ public class PageHelper implements Interceptor {
     }
 
     /**
+     * 自定义动态SqlSource
+     */
+    public class MyDynamicSqlSource implements SqlSource {
+        private Configuration configuration;
+        private SqlNode rootSqlNode;
+
+        public MyDynamicSqlSource(Configuration configuration, SqlNode rootSqlNode) {
+            this.configuration = configuration;
+            this.rootSqlNode = rootSqlNode;
+        }
+
+        public BoundSql getBoundSql(Object parameterObject) {
+            DynamicContext context = new DynamicContext(configuration, parameterObject);
+            rootSqlNode.apply(context);
+            SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
+            Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+            SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
+            BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
+            for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {
+                boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());
+            }
+            //添加参数映射
+            MetaObject boundSqlObject = forObject(boundSql);
+            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+            newParameterMappings.addAll(boundSql.getParameterMappings());
+            newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
+            boundSqlObject.setValue("parameterMappings", newParameterMappings);
+
+            return boundSql;
+        }
+    }
+
+    /**
      * 新建count查询和分页查询的MappedStatement
      *
      * @param ms
@@ -370,24 +444,8 @@ public class PageHelper implements Interceptor {
      * @param suffix
      * @return
      */
-    private MappedStatement newMappedStatement(MappedStatement ms, BoundSqlSqlSource newSqlSource, String suffix) {
+    private MappedStatement newMappedStatement(MappedStatement ms, SqlSource newSqlSource, String suffix) {
         String id = ms.getId() + suffix;
-        //这里用的等号
-        if (suffix == SUFFIX_PAGE) {
-            //改为分页sql
-            MetaObject msObject = forObject(newSqlSource);
-            msObject.setValue(BOUND_SQL, getPageSql((String) msObject.getValue(BOUND_SQL)));
-            //添加参数映射
-            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-            newParameterMappings.addAll(newSqlSource.getBoundSql().getParameterMappings());
-            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
-            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
-            msObject.setValue("boundSql.parameterMappings", newParameterMappings);
-        } else {
-            //改为count sql
-            MetaObject msObject = forObject(newSqlSource);
-            msObject.setValue(BOUND_SQL, getCountSql((String) msObject.getValue(BOUND_SQL)));
-        }
         MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), id, newSqlSource, ms.getSqlCommandType());
         builder.resource(ms.getResource());
         builder.fetchSize(ms.getFetchSize());
@@ -418,6 +476,55 @@ public class PageHelper implements Interceptor {
         builder.useCache(ms.isUseCache());
 
         return builder.build();
+    }
+
+    /**
+     * 获取新的sqlSource
+     *
+     * @param ms
+     * @param newSqlSource
+     * @param suffix
+     * @return
+     */
+    private SqlSource getNewSqlSource(MappedStatement ms, BoundSqlSqlSource newSqlSource, String suffix){
+        SqlSource sqlSource = ms.getSqlSource();
+        //从XMLLanguageDriver.java和XMLScriptBuilder.java可以看出只有两种SqlSource
+        if (sqlSource instanceof DynamicSqlSource) {
+            MetaObject msObject = forObject(ms);
+            List<SqlNode> contents = (List<SqlNode>) msObject.getValue(SQL_NODES);
+            List<SqlNode> newSqlNodes = new ArrayList<SqlNode>(contents.size() + 2);
+            //这里用的等号
+            if (suffix == SUFFIX_PAGE) {
+                newSqlNodes.add(new TextSqlNode(getPageSqlBefore()));
+                newSqlNodes.addAll(contents);
+                newSqlNodes.add(new TextSqlNode(getPageSqlAfter()));
+                return new MyDynamicSqlSource(ms.getConfiguration(),new MixedSqlNode(newSqlNodes));
+            } else {
+                newSqlNodes.add(new TextSqlNode(getCountSqlBefore()));
+                newSqlNodes.addAll(contents);
+                newSqlNodes.add(new TextSqlNode(getCountSqlAfter()));
+                return new DynamicSqlSource(ms.getConfiguration(),new MixedSqlNode(newSqlNodes));
+            }
+        } else {
+            //RawSqlSource
+            //这里用的等号
+            if (suffix == SUFFIX_PAGE) {
+                //改为分页sql
+                MetaObject sqlObject = forObject(newSqlSource);
+                sqlObject.setValue(BOUND_SQL, getPageSql((String) sqlObject.getValue(BOUND_SQL)));
+                //添加参数映射
+                List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+                newParameterMappings.addAll(newSqlSource.getBoundSql().getParameterMappings());
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
+                sqlObject.setValue("boundSql.parameterMappings", newParameterMappings);
+            } else {
+                //改为count sql
+                MetaObject sqlObject = forObject(newSqlSource);
+                sqlObject.setValue(BOUND_SQL, getCountSql((String) sqlObject.getValue(BOUND_SQL)));
+            }
+            return newSqlSource;
+        }
     }
 
     /**
