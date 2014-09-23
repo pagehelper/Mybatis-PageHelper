@@ -5,6 +5,10 @@
 
 为了便于本项目的统一管理和发布，本项目会和github上面同步，项目会改为Maven管理的结构。有关的基本测试内容都在本项目中，Mybatis-Sample项目只会保留Web方面的测试。  
 
+由于`PageHelper`类太大，整体结构看起来乱了，所以3.3.0版本会分拆为几个独立的类，对于直接复制3个代码文件的，以后再多复制几个即可，不会很麻烦。  
+
+由于测试类过多，会对测试类进行更合理的分组。并且会逐步增加mysql和oracle的测试。
+
 #最新测试版3.3.0-SNAPSHOT
 
 听取[@hlevel][1]的建议和[@da老虎](http://my.oschina.net/u/2006157)的建议，对分页插件性能做了优化。  
@@ -103,6 +107,10 @@ http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.github.pagehelper%22%20AN
         <!-- 设置为true时，如果pageSize=0或者RowBounds.limit = 0就会查询出全部的结果 -->
         <!-- （相当于没有执行分页查询，但是返回结果仍然是Page类型）-->
         <property name="pageSizeZero" value="true"/>
+        <!-- 分页参数合理化，默认true启用 -->
+        <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->
+        <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
+        <property name="reasonable" value="true"/>
 	</plugin>
 </plugins>
 ```   
@@ -118,6 +126,7 @@ http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.github.pagehelper%22%20AN
 
 4. 增加`pageSizeZero`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，如果`pageSize=0`或者`RowBounds.limit = 0`就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是`Page`类型）。  
 
+5. 增加`pageSizeZero`属性，默认值为`true`，使用默认值时不需要增加该配置，需要设为`false`时，需要配置该参数。具体作用请看上面配置文件中的注释内容。  
 
 ##分页示例：
 ```java
