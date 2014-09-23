@@ -42,6 +42,7 @@
   <plugins>
     <plugin interceptor="com.github.pagehelper.PageHelper">
       <property name="dialect" value="hsqldb"/>
+      <property name="reasonable" value="true"/>
     </plugin>
   </plugins>
 

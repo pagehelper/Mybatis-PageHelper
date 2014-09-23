@@ -143,7 +143,7 @@ public class PageInfoTest {
 
 
             //获取第4页，50条内容，默认查询总数count
-            PageHelper.startPage(14, 50);
+            PageHelper.startPage(4, 50);
             list = countryMapper.selectAll();
             page = new PageInfo(list);
             assertEquals(4, page.getPageNum());
