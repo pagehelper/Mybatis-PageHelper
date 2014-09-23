@@ -57,6 +57,7 @@ public class PageInfo<T> {
 
     /**
      * 包装Page对象
+     *
      * @param list
      */
     public PageInfo(List<T> list) {
@@ -65,7 +66,8 @@ public class PageInfo<T> {
 
     /**
      * 包装Page对象
-     * @param list page结果
+     *
+     * @param list          page结果
      * @param navigatePages 页码数量
      */
     public PageInfo(List<T> list, int navigatePages) {
@@ -79,9 +81,14 @@ public class PageInfo<T> {
             this.list = page;
             this.size = page.size();
             //由于结果是>startRow的，所以实际的需要+1
-            this.startRow = page.getStartRow() + 1;
-            //计算实际的endRow（最后一页的时候特殊）
-            this.endRow = this.startRow - 1 + this.size;
+            if (this.size == 0) {
+                this.startRow = 0;
+                this.endRow = 0;
+            } else {
+                this.startRow = page.getStartRow() + 1;
+                //计算实际的endRow（最后一页的时候特殊）
+                this.endRow = this.startRow - 1 + this.size;
+            }
             this.navigatePages = navigatePages;
             //计算导航页
             calcNavigatepageNums();

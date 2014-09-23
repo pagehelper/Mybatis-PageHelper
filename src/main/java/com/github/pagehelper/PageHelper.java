@@ -138,6 +138,17 @@ public class PageHelper implements Interceptor {
     private static boolean rowBoundsWithCount = false;
     //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
     private static boolean pageSizeZero = false;
+    //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
+    private static boolean reasonable = false;
+
+    /**
+     * 分页合理化
+     *
+     * @return
+     */
+    public static boolean isReasonable() {
+        return reasonable;
+    }
 
     /**
      * 开始分页
@@ -230,7 +241,9 @@ public class PageHelper implements Interceptor {
                 }
             }
             //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
-            if (page.getPageSize() > 0) {
+            if (page.getPageSize() > 0 &&
+                    ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
+                            ||rowBounds != RowBounds.DEFAULT)) {
                 BoundSql boundSql = ms.getBoundSql(parameterObject);
                 //将参数中的MappedStatement替换为新的qs
                 args[0] = getMappedStatement(ms, boundSql, SUFFIX_PAGE);
@@ -265,17 +278,19 @@ public class PageHelper implements Interceptor {
 
     /**
      * 获取count前置sql
+     *
      * @return
      */
-    private String getCountSqlBefore(){
+    private String getCountSqlBefore() {
         return "select count(0) from (";
     }
 
     /**
+     * 获取count后置sql
      *
      * @return
      */
-    private String getCountSqlAfter(){
+    private String getCountSqlAfter() {
         return ") tmp_count";
     }
 
@@ -294,12 +309,12 @@ public class PageHelper implements Interceptor {
      *
      * @return
      */
-    private String getPageSqlBefore(){
+    private String getPageSqlBefore() {
         if ("mysql".equals(dialect)) {
             return "select * from (";
         } else if ("oracle".equals(dialect)) {
             return "select * from ( select temp.*, rownum row_id from ( ";
-        } else/* if ("hsqldb".equals(dialect)) */{
+        } else/* if ("hsqldb".equals(dialect)) */ {
             return "";
         }
     }
@@ -309,12 +324,12 @@ public class PageHelper implements Interceptor {
      *
      * @return
      */
-    private String getPageSqlAfter(){
+    private String getPageSqlAfter() {
         if ("mysql".equals(dialect)) {
             return ") as tmp_page limit ?,?";
         } else if ("oracle".equals(dialect)) {
             return " ) temp where rownum <= ? ) where row_id > ?";
-        } else/* if ("hsqldb".equals(dialect)) */{
+        } else/* if ("hsqldb".equals(dialect)) */ {
             return " LIMIT ? OFFSET ?";
         }
     }
@@ -373,7 +388,7 @@ public class PageHelper implements Interceptor {
         }
         if (qs == null) {
             //创建一个新的MappedStatement
-            qs = newMappedStatement(ms, getNewSqlSource(ms,new BoundSqlSqlSource(boundSql),suffix), suffix);
+            qs = newMappedStatement(ms, getNewSqlSource(ms, new BoundSqlSqlSource(boundSql), suffix), suffix);
             try {
                 ms.getConfiguration().addMappedStatement(qs);
             } catch (Exception e) {
@@ -486,7 +501,7 @@ public class PageHelper implements Interceptor {
      * @param suffix
      * @return
      */
-    private SqlSource getNewSqlSource(MappedStatement ms, BoundSqlSqlSource newSqlSource, String suffix){
+    private SqlSource getNewSqlSource(MappedStatement ms, BoundSqlSqlSource newSqlSource, String suffix) {
         SqlSource sqlSource = ms.getSqlSource();
         //从XMLLanguageDriver.java和XMLScriptBuilder.java可以看出只有两种SqlSource
         if (sqlSource instanceof DynamicSqlSource) {
@@ -498,12 +513,12 @@ public class PageHelper implements Interceptor {
                 newSqlNodes.add(new TextSqlNode(getPageSqlBefore()));
                 newSqlNodes.addAll(contents);
                 newSqlNodes.add(new TextSqlNode(getPageSqlAfter()));
-                return new MyDynamicSqlSource(ms.getConfiguration(),new MixedSqlNode(newSqlNodes));
+                return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes));
             } else {
                 newSqlNodes.add(new TextSqlNode(getCountSqlBefore()));
                 newSqlNodes.addAll(contents);
                 newSqlNodes.add(new TextSqlNode(getCountSqlAfter()));
-                return new DynamicSqlSource(ms.getConfiguration(),new MixedSqlNode(newSqlNodes));
+                return new DynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes));
             }
         } else {
             //RawSqlSource
@@ -566,6 +581,11 @@ public class PageHelper implements Interceptor {
         String sizeZero = p.getProperty("pageSizeZero");
         if (sizeZero != null && "TRUE".equalsIgnoreCase(sizeZero)) {
             pageSizeZero = true;
+        }
+        //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
+        String strReasonable = p.getProperty("reasonable");
+        if (strReasonable != null && "TRUE".equalsIgnoreCase(strReasonable)) {
+            reasonable = true;
         }
     }
 }
