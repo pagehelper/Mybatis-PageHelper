@@ -332,6 +332,7 @@ public class PageHelper implements Interceptor {
     private String getCountSql(final String sql) {
         try {
             if (sql.toUpperCase().contains("ORDER")) {
+                //TODO 动态sql没有走这个方法，需要修改动态sql的方式
                 return getCountSqlBefore() + UNPARSER.removeOrderBy(sql) + getCountSqlAfter();
             }
         } catch (Exception e) {
