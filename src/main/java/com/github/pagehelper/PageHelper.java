@@ -101,7 +101,7 @@ public class PageHelper implements Interceptor {
             String n = node.getCorrelationName();
             if (n == null) {
                 return tn;
-            } else if (dialect.equals("oracle")) {
+            } else if (dialect == Dialect.oracle) {
                 //Oracle表不支持AS
                 return tn + " " + n;
             } else {
@@ -129,8 +129,13 @@ public class PageHelper implements Interceptor {
 
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
+    //数据库方言 - 使用枚举限制数据库类型
+    enum Dialect {
+        mysql, oracle, hsqldb
+    }
+
     //数据库方言
-    private static String dialect = "";
+    private static Dialect dialect;
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     private static boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
@@ -139,6 +144,66 @@ public class PageHelper implements Interceptor {
     private static boolean pageSizeZero = false;
     //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
     private static boolean reasonable = false;
+
+    /**
+     * 设置数据库方言
+     *
+     * @param dialect
+     */
+    public static void setDialect(String dialect) {
+        if (dialect == null || "".equals(dialect)) {
+            throw new IllegalArgumentException("Mybatis分页插件无法获取dialect参数!");
+        }
+        try {
+            PageHelper.dialect = Dialect.valueOf(dialect);
+        } catch (IllegalArgumentException e) {
+            String dialects = null;
+            for (Dialect d : Dialect.values()) {
+                if (dialects == null) {
+                    dialects = d.toString();
+                } else {
+                    dialects += "," + d;
+                }
+            }
+            throw new IllegalArgumentException("Mybatis分页插件dialect参数值错误，可选值为[" + dialects + "]");
+        }
+    }
+
+    /**
+     * 设置RowBounds参数offset作为PageNum使用 - 默认不使用
+     *
+     * @param offsetAsPageNum
+     */
+    public static void setOffsetAsPageNum(String offsetAsPageNum) {
+        PageHelper.offsetAsPageNum = Boolean.parseBoolean(offsetAsPageNum);
+    }
+
+    /**
+     * 设置RowBounds是否进行count查询 - 默认不查询
+     *
+     * @param rowBoundsWithCount
+     */
+    public static void setRowBoundsWithCount(String rowBoundsWithCount) {
+        PageHelper.rowBoundsWithCount = Boolean.parseBoolean(rowBoundsWithCount);
+    }
+
+    /**
+     * 设置为true的时候，如果pagesize值为0（或RowBounds的limit=0），就不执行分页
+     *
+     * @param pageSizeZero
+     */
+    public static void setPageSizeZero(String pageSizeZero) {
+        PageHelper.pageSizeZero = Boolean.parseBoolean(pageSizeZero);
+    }
+
+    /**
+     * 设置分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
+     *
+     * @param reasonable
+     */
+    public static void setReasonable(String reasonable) {
+        PageHelper.reasonable = Boolean.parseBoolean(reasonable);
+    }
 
     /**
      * 分页合理化
@@ -309,12 +374,14 @@ public class PageHelper implements Interceptor {
      * @return
      */
     private String getPageSqlBefore() {
-        if ("mysql".equals(dialect)) {
-            return "select * from (";
-        } else if ("oracle".equals(dialect)) {
-            return "select * from ( select temp.*, rownum row_id from ( ";
-        } else/* if ("hsqldb".equals(dialect)) */ {
-            return "";
+        switch (dialect) {
+            case mysql:
+                return "select * from (";
+            case oracle:
+                return "select * from ( select temp.*, rownum row_id from ( ";
+            case hsqldb:
+            default:
+                return "";
         }
     }
 
@@ -324,12 +391,14 @@ public class PageHelper implements Interceptor {
      * @return
      */
     private String getPageSqlAfter() {
-        if ("mysql".equals(dialect)) {
-            return ") as tmp_page limit ?,?";
-        } else if ("oracle".equals(dialect)) {
-            return " ) temp where rownum <= ? ) where row_id > ?";
-        } else/* if ("hsqldb".equals(dialect)) */ {
-            return " LIMIT ? OFFSET ?";
+        switch (dialect) {
+            case mysql:
+                return ") as tmp_page limit ?,?";
+            case oracle:
+                return " ) temp where rownum <= ? ) where row_id > ?";
+            case hsqldb:
+            default:
+                return " LIMIT ? OFFSET ?";
         }
     }
 
@@ -357,15 +426,17 @@ public class PageHelper implements Interceptor {
                 }
             }
         }
-        if ("mysql".equals(dialect)) {
-            paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
-            paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
-        } else if ("hsqldb".equals(dialect)) {
-            paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
-            paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
-        } else if ("oracle".equals(dialect)) {
-            paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
-            paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+        switch (dialect) {
+            case mysql:
+                paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
+                paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
+            case oracle:
+                paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
+                paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+            case hsqldb:
+            default:
+                paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
+                paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
         }
         return paramMap;
     }
@@ -562,29 +633,20 @@ public class PageHelper implements Interceptor {
      * @param p 属性值
      */
     public void setProperties(Properties p) {
-        dialect = p.getProperty("dialect");
-        if (dialect == null || "".equals(dialect)) {
-            throw new RuntimeException("Mybatis分页插件PageHelper无法获取dialect参数!");
-        }
+        //数据库方言
+        String dialect = p.getProperty("dialect");
+        setDialect(dialect);
         //offset作为PageNum使用
-        String offset = p.getProperty("offsetAsPageNum");
-        if (offset != null && "TRUE".equalsIgnoreCase(offset)) {
-            offsetAsPageNum = true;
-        }
+        String offsetAsPageNum = p.getProperty("offsetAsPageNum");
+        setOffsetAsPageNum(offsetAsPageNum);
         //RowBounds方式是否做count查询
-        String withcount = p.getProperty("rowBoundsWithCount");
-        if (withcount != null && "TRUE".equalsIgnoreCase(withcount)) {
-            rowBoundsWithCount = true;
-        }
+        String rowBoundsWithCount = p.getProperty("rowBoundsWithCount");
+        setRowBoundsWithCount(rowBoundsWithCount);
         //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
-        String sizeZero = p.getProperty("pageSizeZero");
-        if (sizeZero != null && "TRUE".equalsIgnoreCase(sizeZero)) {
-            pageSizeZero = true;
-        }
+        String pageSizeZero = p.getProperty("pageSizeZero");
+        setPageSizeZero(pageSizeZero);
         //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
-        String strReasonable = p.getProperty("reasonable");
-        if (strReasonable != null && "TRUE".equalsIgnoreCase(strReasonable)) {
-            reasonable = true;
-        }
+        String reasonable = p.getProperty("reasonable");
+        setReasonable(reasonable);
     }
 }
