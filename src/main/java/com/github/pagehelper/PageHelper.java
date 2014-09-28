@@ -30,7 +30,6 @@ import com.foundationdb.sql.parser.OrderByList;
 import com.foundationdb.sql.parser.SQLParser;
 import com.foundationdb.sql.parser.StatementNode;
 import com.foundationdb.sql.unparser.NodeToString;
-import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.*;
@@ -243,7 +242,7 @@ public class PageHelper implements Interceptor {
             //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
             if (page.getPageSize() > 0 &&
                     ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
-                            ||rowBounds != RowBounds.DEFAULT)) {
+                            || rowBounds != RowBounds.DEFAULT)) {
                 BoundSql boundSql = ms.getBoundSql(parameterObject);
                 //将参数中的MappedStatement替换为新的qs
                 args[0] = getMappedStatement(ms, boundSql, SUFFIX_PAGE);
@@ -348,7 +347,7 @@ public class PageHelper implements Interceptor {
         } else if (parameterObject instanceof Map) {
             paramMap = (Map) parameterObject;
         } else {
-            paramMap = new MapperMethod.ParamMap<Object>();
+            paramMap = new HashMap();
             if (boundSql.getParameterMappings() != null && boundSql.getParameterMappings().size() > 0) {
                 for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
                     if (!parameterMapping.getProperty().equals(PAGEPARAMETER_FIRST)
