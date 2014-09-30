@@ -68,7 +68,7 @@ public class TestDynamicIfOrder {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             list = countryMapper.selectIf2ListAndOrder(new ArrayList<Integer>(0), null, "countryname");
-            assertEquals(1, list.get(0).getId());
+            assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page) list).getTotal());
         } finally {
