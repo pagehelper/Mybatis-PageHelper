@@ -27,15 +27,16 @@
 
 ##3.3.0-SNAPSHOT使用方法  
 
-将本插件中的`com.github.pagehelper`包下面的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。  
+将本插件中的`com.github.pagehelper`包下面的三个类`Page.java`,`PageHelper.java`个`SqlUtil`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。使用这种方式时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
 https://oss.sonatype.org/#nexus-search;quick~pagehelper  
 
-由于使用了sql解析工具，你还需要下载（如果不下载也不影响使用，但是不会对sql进行order by处理）这个文件（这个文件完全独立，不依赖其他）：  
+由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
 
  - SqlParser：http://search.maven.org/remotecontent?filepath=com/foundationdb/fdb-sql-parser/1.3.0/fdb-sql-parser-1.3.0.jar  
+
 
 <br>
 如果你使用的maven，你可以添加如下依赖：  
