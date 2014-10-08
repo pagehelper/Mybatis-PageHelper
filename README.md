@@ -33,7 +33,7 @@
 
 https://oss.sonatype.org/#nexus-search;quick~pagehelper  
 
-由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
+由于使用了sql解析工具，你还需要下载（如果不下载也不影响使用，但是不会对sql进行order by处理）这个文件（这个文件完全独立，不依赖其他）：  
 
  - SqlParser：http://search.maven.org/remotecontent?filepath=com/foundationdb/fdb-sql-parser/1.3.0/fdb-sql-parser-1.3.0.jar  
 
@@ -45,6 +45,7 @@ https://oss.sonatype.org/#nexus-search;quick~pagehelper
     <artifactId>pagehelper</artifactId>
     <version>3.3.0-SNAPSHOT</version>
 </dependency>
+<!--可选依赖，如果使用就会处理order by，如果不使用就不会处理order by-->
 <dependency>
     <groupId>com.foundationdb</groupId>
     <artifactId>fdb-sql-parser</artifactId>
