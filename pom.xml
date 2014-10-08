@@ -46,6 +46,8 @@
       <groupId>com.foundationdb</groupId>
       <artifactId>fdb-sql-parser</artifactId>
       <version>1.3.0</version>
+      <scope>compile</scope>
+      <optional>true</optional>
     </dependency>
 
     <!-- test -->
