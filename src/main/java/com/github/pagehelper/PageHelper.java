@@ -74,13 +74,17 @@ public class PageHelper implements Interceptor {
     private static class UnParser extends NodeToString {
         private static final SQLParser PARSER = new SQLParser();
 
-        public String removeOrderBy(String sql) throws StandardException {
-            StatementNode stmt = PARSER.parseStatement(sql);
-            String result = toString(stmt);
-            if (result.indexOf('$') > -1) {
-                result = result.replaceAll("\\$\\d+", "?");
+        public String removeOrderBy(String sql) {
+            try {
+                StatementNode stmt = PARSER.parseStatement(sql);
+                String result = toString(stmt);
+                if (result.indexOf('$') > -1) {
+                    result = result.replaceAll("\\$\\d+", "?");
+                }
+                return result;
+            } catch (Exception e) {
+                return sql;
             }
-            return result;
         }
 
         @Override
@@ -330,13 +334,8 @@ public class PageHelper implements Interceptor {
      * @return 返回count查询sql
      */
     private String getCountSql(final String sql) {
-        try {
-            if (sql.toUpperCase().contains("ORDER")) {
-                //TODO 动态sql没有走这个方法，需要修改动态sql的方式
-                return getCountSqlBefore() + UNPARSER.removeOrderBy(sql) + getCountSqlAfter();
-            }
-        } catch (Exception e) {
-            //ignore
+        if (sql.toUpperCase().contains("ORDER")) {
+            return getCountSqlBefore() + UNPARSER.removeOrderBy(sql) + getCountSqlAfter();
         }
         return getCountSqlBefore() + sql + getCountSqlAfter();
     }
@@ -494,10 +493,13 @@ public class PageHelper implements Interceptor {
     public class MyDynamicSqlSource implements SqlSource {
         private Configuration configuration;
         private SqlNode rootSqlNode;
+        /**用于区分动态的count查询或分页查询*/
+        private Boolean count;
 
-        public MyDynamicSqlSource(Configuration configuration, SqlNode rootSqlNode) {
+        public MyDynamicSqlSource(Configuration configuration, SqlNode rootSqlNode,Boolean count) {
             this.configuration = configuration;
             this.rootSqlNode = rootSqlNode;
+            this.count = count;
         }
 
         public BoundSql getBoundSql(Object parameterObject) {
@@ -510,14 +512,18 @@ public class PageHelper implements Interceptor {
             for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {
                 boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());
             }
-            //添加参数映射
-            MetaObject boundSqlObject = forObject(boundSql);
-            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-            newParameterMappings.addAll(boundSql.getParameterMappings());
-            newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
-            newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
-            boundSqlObject.setValue("parameterMappings", newParameterMappings);
-
+            if (count) {
+                MetaObject boundSqlObject = forObject(boundSql);
+                boundSqlObject.setValue("sql", UNPARSER.removeOrderBy(boundSql.getSql()));
+            } else {
+                //添加参数映射
+                MetaObject boundSqlObject = forObject(boundSql);
+                List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+                newParameterMappings.addAll(boundSql.getParameterMappings());
+                newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
+                newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
+                boundSqlObject.setValue("parameterMappings", newParameterMappings);
+            }
             return boundSql;
         }
     }
@@ -584,12 +590,12 @@ public class PageHelper implements Interceptor {
                 newSqlNodes.add(new TextSqlNode(getPageSqlBefore()));
                 newSqlNodes.addAll(contents);
                 newSqlNodes.add(new TextSqlNode(getPageSqlAfter()));
-                return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes));
+                return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes), false);
             } else {
                 newSqlNodes.add(new TextSqlNode(getCountSqlBefore()));
                 newSqlNodes.addAll(contents);
                 newSqlNodes.add(new TextSqlNode(getCountSqlAfter()));
-                return new DynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes));
+                return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes), true);
             }
         } else {
             //RawSqlSource
