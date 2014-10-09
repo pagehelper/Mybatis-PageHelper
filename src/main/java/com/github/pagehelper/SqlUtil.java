@@ -284,9 +284,11 @@ public class SqlUtil {
                 case mysql:
                     paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
                     paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
+                    break;
                 case oracle:
                     paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
                     paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+                    break;
                 case hsqldb:
                 default:
                     paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
