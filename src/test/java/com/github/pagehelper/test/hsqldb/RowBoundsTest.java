@@ -4,7 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
-import com.github.pagehelper.util.MybatisRowBoundsHelper;
+import com.github.pagehelper.test.hsqldb.util.MybatisRowBoundsHelper;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;

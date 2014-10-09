@@ -1,4 +1,4 @@
-package com.github.pagehelper.util;
+package com.github.pagehelper.test.hsqldb.util;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;

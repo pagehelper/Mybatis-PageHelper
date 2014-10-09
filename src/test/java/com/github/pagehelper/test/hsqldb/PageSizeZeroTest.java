@@ -4,7 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
-import com.github.pagehelper.util.MybatisPageSizeZeroHelper;
+import com.github.pagehelper.test.hsqldb.util.MybatisPageSizeZeroHelper;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;

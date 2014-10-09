@@ -56,6 +56,15 @@ public class PageHelper implements Interceptor {
     private static boolean reasonable = false;
 
     /**
+     * 设置数据库方言
+     *
+     * @param dialect
+     */
+    public static void setDialect(String dialect) {
+        SQLUTIL = new SqlUtil(dialect);
+    }
+
+    /**
      * 设置RowBounds参数offset作为PageNum使用 - 默认不使用
      *
      * @param offsetAsPageNum
@@ -232,7 +241,7 @@ public class PageHelper implements Interceptor {
     public void setProperties(Properties p) {
         //数据库方言
         String dialect = p.getProperty("dialect");
-        SQLUTIL = new SqlUtil(dialect);
+        setDialect(dialect);
         //offset作为PageNum使用
         String offsetAsPageNum = p.getProperty("offsetAsPageNum");
         setOffsetAsPageNum(offsetAsPageNum);

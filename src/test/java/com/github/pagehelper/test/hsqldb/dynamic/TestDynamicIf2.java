@@ -28,7 +28,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
-import com.github.pagehelper.util.DynamicHelper;
+import com.github.pagehelper.test.hsqldb.util.DynamicHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
