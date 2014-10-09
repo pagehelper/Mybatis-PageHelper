@@ -34,7 +34,7 @@ public class OraclePageHelperTest {
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Oracle> list = oracleMapper.selectAll();
+            List<Oracle> list = oracleMapper.selectAllByOrder("aaa100");
             assertEquals(10, list.size());
             assertEquals(1255, ((Page) list).getTotal());
 

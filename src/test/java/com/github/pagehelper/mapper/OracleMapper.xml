@@ -13,4 +13,11 @@
       select * from aa10 aa
       <include refid="order"/>
     </select>
+
+    <select id="selectAllByOrder" resultType="Oracle">
+      select * from aa10 aa
+      <if test="order!=null and order!=''">
+        order by ${order} desc
+      </if>
+    </select>
 </mapper>
