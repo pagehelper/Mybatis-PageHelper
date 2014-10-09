@@ -5,7 +5,12 @@
 
 <mapper namespace="com.github.pagehelper.mapper.OracleMapper">
 
+  <sql id="order">
+    order by aaa100 desc
+  </sql>
+  
     <select id="selectAll" resultType="Oracle">
-      select * from aa10
+      select * from aa10 aa
+      <include refid="order"/>
     </select>
 </mapper>

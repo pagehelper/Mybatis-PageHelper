@@ -25,10 +25,7 @@
 package com.github.pagehelper;
 
 import com.foundationdb.sql.StandardException;
-import com.foundationdb.sql.parser.FromBaseTable;
-import com.foundationdb.sql.parser.OrderByList;
-import com.foundationdb.sql.parser.SQLParser;
-import com.foundationdb.sql.parser.StatementNode;
+import com.foundationdb.sql.parser.*;
 import com.foundationdb.sql.unparser.NodeToString;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.mapping.*;
@@ -378,6 +375,28 @@ public class SqlUtil {
                 return sql;
             }
             return "";
+        }
+
+        @Override
+        protected String fromSubquery(FromSubquery node) throws StandardException {
+            StringBuilder str = new StringBuilder(toString(node.getSubquery()));
+            if (node.getOrderByList() != null) {
+                str.append(' ');
+                str.append(toString(node.getOrderByList()));
+            }
+            str.insert(0, '(');
+            str.append(") ");
+            if (dialect != Dialect.oracle) {
+                //Oracle表不支持AS
+                str.append("AS ");
+            }
+            str.append(node.getCorrelationName());
+            if (node.getResultColumns() != null) {
+                str.append('(');
+                str.append(toString(node.getResultColumns()));
+                str.append(')');
+            }
+            return str.toString();
         }
 
         @Override
