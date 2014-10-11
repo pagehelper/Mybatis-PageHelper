@@ -40,7 +40,8 @@
   </select>
   <select id="selectIf" resultType="com.github.pagehelper.model.Country">
     select * from country
-    <if test="id!=null">
+    <if test="@Ognl@isNotNull(id)">
+    <!--<if test="id!=null">-->
       where id &gt; #{id}
     </if>
   </select>

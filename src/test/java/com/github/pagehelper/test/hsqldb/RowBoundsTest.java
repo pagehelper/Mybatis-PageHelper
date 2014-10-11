@@ -1,6 +1,7 @@
 package com.github.pagehelper.test.hsqldb;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
@@ -9,7 +10,9 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -95,6 +98,82 @@ public class RowBoundsTest {
             //判断查询结果的位置是否正确
             assertEquals(101, list.get(0).getId());
             assertEquals(120, list.get(list.size() - 1).getId());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testNamespaceWithRowBounds2() {
+        SqlSession sqlSession = MybatisRowBoundsHelper.getSqlSession();
+        try {
+            //获取从0开始，10条内容
+            List<Country> list = sqlSession.selectList("selectIf", null, new RowBounds(1, 10));
+            assertEquals(10, list.size());
+            assertEquals(183, ((Page) list).getTotal());
+            //判断查询结果的位置是否正确
+            assertEquals(1, list.get(0).getId());
+            assertEquals(10, list.get(list.size() - 1).getId());
+
+            Map map = new HashMap();
+            map.put("id", 10);
+            //获取从10开始，10条内容
+            list = sqlSession.selectList("selectIf", map, new RowBounds(10, 10));
+            assertEquals(10, list.size());
+            assertEquals(183, ((Page) list).getTotal());
+            //判断查询结果的位置是否正确
+            assertEquals(101, list.get(0).getId());
+            assertEquals(110, list.get(list.size() - 1).getId());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    class IdBean{
+        private Integer id;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+    }
+
+    @Test
+    public void testNamespaceWithRowBounds3() {
+        SqlSession sqlSession = MybatisRowBoundsHelper.getSqlSession();
+        try {
+            //获取从0开始，10条内容
+            PageHelper.startPage(1, 10);
+            List<Country> list = sqlSession.selectList("selectIf", null);
+            assertEquals(10, list.size());
+            assertEquals(183, ((Page) list).getTotal());
+            //判断查询结果的位置是否正确
+            assertEquals(1, list.get(0).getId());
+            assertEquals(10, list.get(list.size() - 1).getId());
+
+            Map map = new HashMap();
+            map.put("id", 10);
+            //获取从10开始，10条内容
+            PageHelper.startPage(10, 10);
+            list = sqlSession.selectList("selectIf", map);
+            assertEquals(10, list.size());
+            assertEquals(173, ((Page) list).getTotal());
+            //判断查询结果的位置是否正确
+            assertEquals(101, list.get(0).getId());
+            assertEquals(110, list.get(list.size() - 1).getId());
+
+            IdBean country = new IdBean();
+            //获取从10开始，10条内容
+            PageHelper.startPage(10, 10);
+            list = sqlSession.selectList("selectIf", country);
+            assertEquals(10, list.size());
+            assertEquals(183, ((Page) list).getTotal());
+            //判断查询结果的位置是否正确
+            assertEquals(91, list.get(0).getId());
+            assertEquals(100, list.get(list.size() - 1).getId());
         } finally {
             sqlSession.close();
         }
