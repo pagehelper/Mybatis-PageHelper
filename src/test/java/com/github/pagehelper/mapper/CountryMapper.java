@@ -2,12 +2,18 @@ package com.github.pagehelper.mapper;
 
 import com.github.pagehelper.model.Country;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 import java.util.Map;
 
 public interface CountryMapper {
+
+    @Select("select * from country order by ${order}")
+    List<Country> selectByOrder(@Param("order") String order);
+
+    List<Country> selectByOrder2(@Param("order") String order);
 
     List<Country> selectAll();
 
