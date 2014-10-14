@@ -1,11 +1,10 @@
-#Mybatis分页插件 - PageHelper说明  
-<br/>  
+#Mybatis分页插件 - PageHelper说明   
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
 该插件目前支持`Oracle`,`Mysql`,`Hsqldb`,`PostgreSQL`四种数据库分页。  
 
-#最新稳定版为3.2.3 版
+##最新稳定版为3.2.3 版
   
 3.2.3版本使用方法请切换到3.2.3版标签查看
 
@@ -13,9 +12,7 @@
 
 #最新测试版3.3.0-SNAPSHOT
 
-听取[@hlevel][1]的建议和[@da老虎](http://my.oschina.net/u/2006157)的建议，对分页插件性能做了优化。  
-
-##3.3.0-SNAPSHOT版本的改进内容
+##3.3.0-SNAPSHOT改进内容
 
  1. 对`MappedStatement`对象进行缓存，包括count查询的`MappedStatement`以及分页查询的`MappedStatement`，分页查询改为预编译查询。
 
@@ -29,13 +26,13 @@
 
  6. 增加对`PostgreSQL`支持。
 
-##3.3.0-SNAPSHOT使用方法  
+##使用方法  
 
-将本插件中的`com.github.pagehelper`包下面的三个类`Page.java`,`PageHelper.java`个`SqlUtil`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。使用这种方式时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
+将本插件中的`com.github.pagehelper`包下面的三个类`Page.java`,`PageHelper.java`和`SqlUtil`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
-https://oss.sonatype.org/#nexus-search;quick~pagehelper  
+ - https://oss.sonatype.org/#nexus-search;quick~pagehelper  
 
 由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
 
