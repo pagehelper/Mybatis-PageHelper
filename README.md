@@ -1,11 +1,15 @@
 #Mybatis分页插件 - PageHelper说明  
 <br/>  
 
-#重大项目改动
+如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-为了便于本项目的统一管理和发布，本项目会和github上面同步，项目会改为Maven管理的结构。有关的基本测试内容都在本项目中，Mybatis-Sample项目只会保留Web方面的测试。  
+该插件目前支持`Oracle`,`Mysql`,`Hsqldb`,`PostgreSQL`四种数据库分页。  
 
-由于测试类过多，会对测试类进行更合理的分组。并且会逐步增加mysql和oracle的测试。
+#最新稳定版为3.2.3 版
+  
+3.2.3版本使用方法请切换到3.2.3版标签查看
+
+地址：http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/  
 
 #最新测试版3.3.0-SNAPSHOT
 
@@ -23,7 +27,7 @@
 
  5. 特殊的pageSize值，当pageSize<0时不再进行分页查询，只进行count查询。当pageSize=0时，通过配置参数`pageSizeZero`可以查询全部结果。（该功能已经添加到3.2.3版本）
 
-**欢迎大家尝试这个版本，如果存在任何问题欢迎各位提出。**  
+ 6. 增加对`PostgreSQL`支持。
 
 ##3.3.0-SNAPSHOT使用方法  
 
@@ -36,7 +40,6 @@ https://oss.sonatype.org/#nexus-search;quick~pagehelper
 由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
 
  - SqlParser：http://search.maven.org/remotecontent?filepath=com/foundationdb/fdb-sql-parser/1.3.0/fdb-sql-parser-1.3.0.jar  
-
 
 <br>
 如果你使用的maven，你可以添加如下依赖：  
@@ -53,35 +56,6 @@ https://oss.sonatype.org/#nexus-search;quick~pagehelper
     <version>1.3.0</version>
 </dependency>
 ```  
-
-
----------------------
-<br>
-
-#最新稳定版为3.2.3 版  
-
-如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
-
-该插件目前支持`Oracle`,`Mysql`,`Hsqldb`,`PostgreSQL`四种数据库分页。  
-
-
-##使用方法  
-
-将本插件中的`com.github.pagehelper`包下面的两个类`Page.java`和`PageHelper.java`放到项目中，如果需要使用`PageInfo.java`，也可以放到项目中。    
-
-如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）：  
-
-http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.github.pagehelper%22%20AND%20a%3A%22pagehelper%22  
-
-或者如果你使用Maven，你可以添加如下依赖：  
-
-```xml
-<dependency>
-    <groupId>com.github.pagehelper</groupId>
-    <artifactId>pagehelper</artifactId>
-    <version>3.2.3</version>
-</dependency>
-```
 
 然后在Mybatis的配置xml中配置拦截器插件:    
 ```xml
@@ -156,13 +130,14 @@ public void testPageHelperByStartPage() throws Exception {
     Assert.assertTrue(page.getTotal() > 0);
 }
 ```  
-因为新增了一个Mybatis-Sample项目，所以这里的示例只是简短的一部分，需要更丰富的示例，请查看[Mybatis-Sample][3]项目  
+本项目中包含大量测试，您可以通过查看测试代码了解使用方法。
 
+测试代码地址：http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/test/java/com/github/pagehelper/test
 
 <br/>
 ##Mybatis-Sample项目 
 
-这个项目是一个分页插件的测试项目，使用Maven构建，该项目目前提供了4种基本使用方式的测试用例，需要测试Mybatis分页插件的可以clone该项目。该项目使用了maven配置的该分页插件。
+这个项目是一个分页插件的WEB测试项目，使用Maven构建，只包含一个简单的例子和简单的页面分页效果。
 
 项目地址：[http://git.oschina.net/free/Mybatis-Sample][4]
 
@@ -176,6 +151,9 @@ public void testPageHelperByStartPage() throws Exception {
 
 3. 如果你喜欢使用`sqlSession.selectList`这种命名空间方式的调用，使用`RowBounds`会更方便。
 
+##`PageHelper.startPage`方法重要提示
+
+只有紧跟在`PageHelper.startPage`方法后的<b>第一个</b>Mybatis<b>查询</b>方法会被分页。
 
 <br/><br/>
 ##相关链接
