@@ -1,4 +1,4 @@
-﻿drop table country if exists;
+drop table country if exists;
 
 create table country (
   id integer,

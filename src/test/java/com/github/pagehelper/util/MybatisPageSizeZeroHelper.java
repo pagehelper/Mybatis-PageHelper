@@ -31,7 +31,7 @@ public class MybatisPageSizeZeroHelper {
                 try {
                     session = sqlSessionFactory.openSession();
                     Connection conn = session.getConnection();
-                    reader = Resources.getResourceAsReader("CreateDB.sql");
+                    reader = Resources.getResourceAsReader(TestUtil.getXmlPath() + "/" + TestUtil.getXmlPath() + ".sql");
                     ScriptRunner runner = new ScriptRunner(conn);
                     runner.setLogWriter(null);
                     runner.runScript(reader);
