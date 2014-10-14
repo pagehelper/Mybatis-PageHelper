@@ -120,7 +120,7 @@ public class RowBoundsTest {
             //获取从10开始，10条内容
             list = sqlSession.selectList("selectIf", map, new RowBounds(10, 10));
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(173, ((Page) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(101, list.get(0).getId());
             assertEquals(110, list.get(list.size() - 1).getId());

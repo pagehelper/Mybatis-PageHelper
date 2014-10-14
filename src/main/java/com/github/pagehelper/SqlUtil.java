@@ -47,7 +47,7 @@ import java.util.Map;
  *
  * @author liuzh/abel533/isea533
  * @since 3.3.0
- *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
+ * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class SqlUtil {
     private static final String BOUND_SQL = "boundSql.sql";
@@ -80,7 +80,7 @@ public class SqlUtil {
 
     //数据库方言 - 使用枚举限制数据库类型
     private enum Dialect {
-        mysql, oracle, hsqldb
+        mysql, oracle, hsqldb, postgresql
     }
 
     /**
@@ -127,7 +127,7 @@ public class SqlUtil {
      * @param boundSql
      * @return
      */
-    public MappedStatement getCountMappedStatement(MappedStatement ms, BoundSql boundSql){
+    public MappedStatement getCountMappedStatement(MappedStatement ms, BoundSql boundSql) {
         return getMappedStatement(ms, boundSql, SUFFIX_COUNT);
     }
 
@@ -138,7 +138,7 @@ public class SqlUtil {
      * @param boundSql
      * @return
      */
-    public MappedStatement getPageMappedStatement(MappedStatement ms, BoundSql boundSql){
+    public MappedStatement getPageMappedStatement(MappedStatement ms, BoundSql boundSql) {
         return getMappedStatement(ms, boundSql, SUFFIX_PAGE);
     }
 
@@ -233,9 +233,10 @@ public class SqlUtil {
         public String getPageSqlBefore() {
             switch (dialect) {
                 case mysql:
+                case postgresql:
                     return "select * from (";
                 case oracle:
-                    return "select * from ( select temp.*, rownum row_id from ( ";
+                    return "select * from ( select tmp_page.*, rownum row_id from ( ";
                 case hsqldb:
                 default:
                     return "";
@@ -251,11 +252,13 @@ public class SqlUtil {
             switch (dialect) {
                 case mysql:
                     return ") as tmp_page limit ?,?";
+                case postgresql:
+                    return ") as tmp_page limit ? offset ?";
                 case oracle:
-                    return " ) temp where rownum <= ? ) where row_id > ?";
+                    return " ) tmp_page where rownum <= ? ) where row_id > ?";
                 case hsqldb:
                 default:
-                    return " LIMIT ? OFFSET ?";
+                    return " limit ? offset ?";
             }
         }
 
@@ -287,6 +290,7 @@ public class SqlUtil {
                     paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
                     break;
                 case hsqldb:
+                case postgresql:
                 default:
                     paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
                     paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
@@ -439,10 +443,12 @@ public class SqlUtil {
     private class MyDynamicSqlSource implements SqlSource {
         private Configuration configuration;
         private SqlNode rootSqlNode;
-        /**用于区分动态的count查询或分页查询*/
+        /**
+         * 用于区分动态的count查询或分页查询
+         */
         private Boolean count;
 
-        public MyDynamicSqlSource(Configuration configuration, SqlNode rootSqlNode,Boolean count) {
+        public MyDynamicSqlSource(Configuration configuration, SqlNode rootSqlNode, Boolean count) {
             this.configuration = configuration;
             this.rootSqlNode = rootSqlNode;
             this.count = count;

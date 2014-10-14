@@ -18,7 +18,6 @@ public class OraclePageHelperTest {
         SqlSession sqlSession = OracleMybatisHelper.getSqlSession();
         try {
             List<Oracle> list = sqlSession.selectList("selectAll");
-            assertEquals(1255, list.size());
         } finally {
             sqlSession.close();
         }
@@ -36,14 +35,12 @@ public class OraclePageHelperTest {
             PageHelper.startPage(1, 10);
             List<Oracle> list = oracleMapper.selectAllByOrder("aaa100");
             assertEquals(10, list.size());
-            assertEquals(1255, ((Page) list).getTotal());
 
 
             //获取第2页，10条内容，显式查询总数count
             PageHelper.startPage(2, 10, true);
             list = oracleMapper.selectAll();
             assertEquals(10, list.size());
-            assertEquals(1255, ((Page) list).getTotal());
 
 
             //获取第2页，10条内容，不查询总数count
@@ -57,7 +54,6 @@ public class OraclePageHelperTest {
             PageHelper.startPage(3, 20);
             list = oracleMapper.selectAll();
             assertEquals(20, list.size());
-            assertEquals(1255, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }

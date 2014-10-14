@@ -62,7 +62,7 @@ https://oss.sonatype.org/#nexus-search;quick~pagehelper
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`Hsqldb`三种数据库分页。  
+该插件目前支持`Oracle`,`Mysql`,`Hsqldb`,`PostgreSQL`四种数据库分页。  
 
 
 ##使用方法  
@@ -107,7 +107,7 @@ http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.github.pagehelper%22%20AN
         <!-- 设置为true时，如果pageSize=0或者RowBounds.limit = 0就会查询出全部的结果 -->
         <!-- （相当于没有执行分页查询，但是返回结果仍然是Page类型）-->
         <property name="pageSizeZero" value="true"/>
-        <!-- 分页参数合理化，默认false禁用 -->
+        <!-- 3.3.0版本可用 - 分页参数合理化，默认false禁用 -->
         <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->
         <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
         <property name="reasonable" value="true"/>
@@ -116,9 +116,9 @@ http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.github.pagehelper%22%20AN
 ```   
 这里的`com.github.pagehelper.PageHelper`使用完整的类路径。  
 
-其他三个参数说明：
+其他五个参数说明：
 
-1. 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`hsqldb`,<b>没有默认值，必须指定该属性</b>。  
+1. 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`hsqldb`,`postgresql`,<b>没有默认值，必须指定该属性</b>。  
 
 2. 增加`offsetAsPageNum`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页时，会将`offset`参数当成`pageNum`使用，可以用页码和页面大小两个参数进行分页。  
 
