@@ -34,10 +34,7 @@ import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
-import org.apache.ibatis.scripting.xmltags.DynamicContext;
-import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
-import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
-import org.apache.ibatis.scripting.xmltags.SqlNode;
+import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.ArrayList;
@@ -53,7 +50,6 @@ import java.util.Map;
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class SqlUtil {
-    private static final String SQL_NODES = "sqlSource.rootSqlNode.contents";
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
     //分页的id后缀
@@ -555,8 +551,16 @@ public class SqlUtil {
         //如果是动态sql
         if (sqlSource instanceof DynamicSqlSource) {
             MetaObject msObject = forObject(ms);
-            List<SqlNode> contents = (List<SqlNode>) msObject.getValue(SQL_NODES);
-            return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(contents), suffix == SUFFIX_COUNT);
+            SqlNode sqlNode = (SqlNode) msObject.getValue("sqlSource.rootSqlNode");
+            MixedSqlNode mixedSqlNode = null;
+            if (sqlNode instanceof MixedSqlNode) {
+                mixedSqlNode = (MixedSqlNode) sqlNode;
+            } else {
+                List<SqlNode> contents = new ArrayList<SqlNode>(1);
+                contents.add(sqlNode);
+                mixedSqlNode = new MixedSqlNode(contents);
+            }
+            return new MyDynamicSqlSource(ms.getConfiguration(), mixedSqlNode, suffix == SUFFIX_COUNT);
         }
         //如果是静态分页sql
         else if (suffix == SUFFIX_PAGE) {
