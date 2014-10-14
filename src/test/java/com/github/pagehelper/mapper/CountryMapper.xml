@@ -45,6 +45,12 @@
       where id &gt; #{id}
     </if>
   </select>
+  <select id="selectIf3" parameterType="Country" resultType="com.github.pagehelper.model.Country">
+    select * from country
+    <if test="id > 0">
+      where id &gt; #{id}
+    </if>
+  </select>
   <select id="selectIf2" resultType="com.github.pagehelper.model.Country">
     select * from country where id &gt; #{id1}
     <if test="id2!=null">

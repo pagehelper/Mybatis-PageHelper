@@ -34,7 +34,10 @@ import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
-import org.apache.ibatis.scripting.xmltags.*;
+import org.apache.ibatis.scripting.xmltags.DynamicContext;
+import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
+import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
+import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.ArrayList;
@@ -50,7 +53,6 @@ import java.util.Map;
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class SqlUtil {
-    private static final String BOUND_SQL = "boundSql.sql";
     private static final String SQL_NODES = "sqlSource.rootSqlNode.contents";
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
@@ -143,44 +145,60 @@ public class SqlUtil {
     }
 
     private Parser newOrderByParser(Dialect dialect) {
-        try {
-            Class.forName("com.foundationdb.sql.unparser.NodeToString");
-            return new UnParser(dialect);
-        } catch (Exception e) {
-            return new SimpleParser(dialect);
-        }
+        return SimpleParser.newParser(dialect);
     }
 
     /**
      * 处理SQL
      */
     private interface Parser {
-        String removeOrderBy(String sql);
+        void initNoOrderBy(Dialect dialect);
 
         String getCountSql(String sql);
 
-        String getCountSqlBefore();
-
-        String getCountSqlAfter();
-
         String getPageSql(String sql);
-
-        String getPageSqlBefore();
-
-        String getPageSqlAfter();
 
         Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page);
     }
 
-    private static class SimpleParser implements Parser {
-        private Dialect dialect;
+    private static abstract class SimpleParser implements Parser {
+        protected NoOrderByParser noOrderByParser;
 
-        private SimpleParser(Dialect dialect) {
-            this.dialect = dialect;
+        public static Parser newParser(Dialect dialect) {
+            Parser parser = null;
+            switch (dialect) {
+                case mysql:
+                    parser = new MysqlParser();
+                    break;
+                case oracle:
+                    parser = new OracleParser();
+                    break;
+                case hsqldb:
+                    parser = new HsqldbParser();
+                    break;
+                case postgresql:
+                default:
+                    parser = new PostgreSQLParser();
+            }
+            if (parser != null) {
+                parser.initNoOrderBy(dialect);
+            }
+            return parser;
         }
 
-        @Override
+        public void initNoOrderBy(Dialect dialect) {
+            try {
+                Class.forName("com.foundationdb.sql.unparser.NodeToString");
+                noOrderByParser = new NoOrderByParser(dialect);
+            } catch (Exception e) {
+
+            }
+        }
+
         public String removeOrderBy(String sql) {
+            if (noOrderByParser != null) {
+                return noOrderByParser.removeOrderBy(sql);
+            }
             return sql;
         }
 
@@ -191,28 +209,15 @@ public class SqlUtil {
          * @return 返回count查询sql
          */
         public String getCountSql(final String sql) {
+            StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
+            stringBuilder.append("select count(0) from (");
             if (sql.toUpperCase().contains("ORDER")) {
-                return getCountSqlBefore() + removeOrderBy(sql) + getCountSqlAfter();
+                stringBuilder.append(removeOrderBy(sql));
+            } else {
+                stringBuilder.append(sql);
             }
-            return getCountSqlBefore() + sql + getCountSqlAfter();
-        }
-
-        /**
-         * 获取count前置sql
-         *
-         * @return
-         */
-        public String getCountSqlBefore() {
-            return "select count(0) from (";
-        }
-
-        /**
-         * 获取count后置sql
-         *
-         * @return
-         */
-        public String getCountSqlAfter() {
-            return ") tmp_count";
+            stringBuilder.append(") tmp_count");
+            return stringBuilder.toString();
         }
 
         /**
@@ -221,46 +226,7 @@ public class SqlUtil {
          * @param sql 原查询sql
          * @return 返回分页sql
          */
-        public String getPageSql(String sql) {
-            return getPageSqlBefore() + sql + getPageSqlAfter();
-        }
-
-        /**
-         * 获取分页前置sql
-         *
-         * @return
-         */
-        public String getPageSqlBefore() {
-            switch (dialect) {
-                case mysql:
-                case postgresql:
-                    return "select * from (";
-                case oracle:
-                    return "select * from ( select tmp_page.*, rownum row_id from ( ";
-                case hsqldb:
-                default:
-                    return "";
-            }
-        }
-
-        /**
-         * 获取分页后置sql
-         *
-         * @return
-         */
-        public String getPageSqlAfter() {
-            switch (dialect) {
-                case mysql:
-                    return ") as tmp_page limit ?,?";
-                case postgresql:
-                    return ") as tmp_page limit ? offset ?";
-                case oracle:
-                    return " ) tmp_page where rownum <= ? ) where row_id > ?";
-                case hsqldb:
-                default:
-                    return " limit ? offset ?";
-            }
-        }
+        public abstract String getPageSql(String sql);
 
         @Override
         public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
@@ -271,30 +237,101 @@ public class SqlUtil {
                 paramMap = (Map) parameterObject;
             } else {
                 paramMap = new HashMap();
+                //这里以及下面使用的地方，主要解决一个参数时的问题，例如使用一个参数Country使用id属性时，不这样处理会导致id=Country
+                MetaObject metaObject = forObject(parameterObject);
                 if (boundSql.getParameterMappings() != null && boundSql.getParameterMappings().size() > 0) {
                     for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
-                        if (!parameterMapping.getProperty().equals(PAGEPARAMETER_FIRST)
-                                && !parameterMapping.getProperty().equals(PAGEPARAMETER_SECOND)) {
-                            paramMap.put(parameterMapping.getProperty(), parameterObject);
+                        String name = parameterMapping.getProperty();
+                        if (!name.equals(PAGEPARAMETER_FIRST)
+                                && !name.equals(PAGEPARAMETER_SECOND)) {
+                            if (parameterMapping.getJavaType().isAssignableFrom(parameterObject.getClass())) {
+                                paramMap.put(name, parameterObject);
+                            } else {
+                                paramMap.put(name, metaObject.getValue(name));
+                            }
                         }
                     }
                 }
             }
-            switch (dialect) {
-                case mysql:
-                    paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
-                    paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
-                    break;
-                case oracle:
-                    paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
-                    paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
-                    break;
-                case hsqldb:
-                case postgresql:
-                default:
-                    paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
-                    paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
-            }
+            return paramMap;
+        }
+    }
+
+    //Mysql
+    private static class MysqlParser extends SimpleParser {
+        @Override
+        public String getPageSql(String sql) {
+            StringBuilder sqlBuilder = new StringBuilder(sql.length() + 40);
+            sqlBuilder.append("select * from (");
+            sqlBuilder.append(sql);
+            sqlBuilder.append(") as tmp_page limit ?,?");
+            return sqlBuilder.toString();
+        }
+
+        @Override
+        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+            paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
+            paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
+            return paramMap;
+        }
+    }
+
+    //Oracle
+    private static class OracleParser extends SimpleParser {
+        @Override
+        public String getPageSql(String sql) {
+            StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
+            sqlBuilder.append("select * from ( select tmp_page.*, rownum row_id from ( ");
+            sqlBuilder.append(sql);
+            sqlBuilder.append(" ) tmp_page where rownum <= ? ) where row_id > ?");
+            return sqlBuilder.toString();
+        }
+
+        @Override
+        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+            paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
+            paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+            return paramMap;
+        }
+    }
+
+    //Oracle
+    private static class HsqldbParser extends SimpleParser {
+        @Override
+        public String getPageSql(String sql) {
+            StringBuilder sqlBuilder = new StringBuilder(sql.length() + 20);
+            sqlBuilder.append(sql);
+            sqlBuilder.append(" limit ? offset ?");
+            return sqlBuilder.toString();
+        }
+
+        @Override
+        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+            paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
+            paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+            return paramMap;
+        }
+    }
+
+    //PostgreSQL
+    private static class PostgreSQLParser extends SimpleParser {
+        @Override
+        public String getPageSql(String sql) {
+            StringBuilder sqlBuilder = new StringBuilder(sql.length() + 50);
+            sqlBuilder.append("select * from (");
+            sqlBuilder.append(sql);
+            sqlBuilder.append(") as tmp_page limit ? offset ?");
+            return sqlBuilder.toString();
+        }
+
+        @Override
+        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+            paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
+            paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
             return paramMap;
         }
     }
@@ -302,56 +339,15 @@ public class SqlUtil {
     /**
      * 解析 - 去掉order by 语句
      */
-    private static class UnParser extends NodeToString implements Parser {
+    private static class NoOrderByParser extends NodeToString {
         private SQLParser PARSER = new SQLParser();
-        private Parser simple;
         private Dialect dialect;
         private Map<String, String> CACHE = new HashMap<String, String>();
 
-        private UnParser(Dialect dialect) {
+        private NoOrderByParser(Dialect dialect) {
             this.dialect = dialect;
-            this.simple = new SimpleParser(dialect);
         }
 
-        @Override
-        public String getCountSql(String sql) {
-            if (sql.toUpperCase().contains("ORDER")) {
-                return getCountSqlBefore() + removeOrderBy(sql) + getCountSqlAfter();
-            }
-            return getCountSqlBefore() + sql + getCountSqlAfter();
-        }
-
-        @Override
-        public String getCountSqlBefore() {
-            return simple.getCountSqlBefore();
-        }
-
-        @Override
-        public String getCountSqlAfter() {
-            return simple.getCountSqlAfter();
-        }
-
-        @Override
-        public String getPageSql(String sql) {
-            return simple.getPageSql(sql);
-        }
-
-        @Override
-        public String getPageSqlBefore() {
-            return simple.getPageSqlBefore();
-        }
-
-        @Override
-        public String getPageSqlAfter() {
-            return simple.getPageSqlAfter();
-        }
-
-        @Override
-        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-            return simple.setPageParameter(parameterObject, boundSql, page);
-        }
-
-        @Override
         public String removeOrderBy(String sql) {
             try {
                 if (CACHE.get(sql) != null) {
@@ -461,22 +457,17 @@ public class SqlUtil {
             Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
             SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
             BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
+            //设置条件参数
             for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {
                 boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());
             }
+            BoundSqlSqlSource boundSqlSqlSource = new BoundSqlSqlSource(boundSql);
             if (count) {
-                MetaObject boundSqlObject = forObject(boundSql);
-                boundSqlObject.setValue("sql", SQLPARSER.removeOrderBy(boundSql.getSql()));
+                boundSqlSqlSource = getCountSqlSource(boundSqlSqlSource);
             } else {
-                //添加参数映射
-                MetaObject boundSqlObject = forObject(boundSql);
-                List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-                newParameterMappings.addAll(boundSql.getParameterMappings());
-                newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
-                newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
-                boundSqlObject.setValue("parameterMappings", newParameterMappings);
+                boundSqlSqlSource = getPageSqlSource(configuration, boundSqlSqlSource);
             }
-            return boundSql;
+            return boundSqlSqlSource.getBoundSql();
         }
     }
 
@@ -561,41 +552,54 @@ public class SqlUtil {
     private SqlSource getNewSqlSource(MappedStatement ms, BoundSqlSqlSource newSqlSource, String suffix) {
         SqlSource sqlSource = ms.getSqlSource();
         //从XMLLanguageDriver.java和XMLScriptBuilder.java可以看出只有两种SqlSource
+        //如果是动态sql
         if (sqlSource instanceof DynamicSqlSource) {
             MetaObject msObject = forObject(ms);
             List<SqlNode> contents = (List<SqlNode>) msObject.getValue(SQL_NODES);
-            List<SqlNode> newSqlNodes = new ArrayList<SqlNode>(contents.size() + 2);
-            //这里用的等号
-            if (suffix == SUFFIX_PAGE) {
-                newSqlNodes.add(new TextSqlNode(SQLPARSER.getPageSqlBefore()));
-                newSqlNodes.addAll(contents);
-                newSqlNodes.add(new TextSqlNode(SQLPARSER.getPageSqlAfter()));
-                return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes), false);
-            } else {
-                newSqlNodes.add(new TextSqlNode(SQLPARSER.getCountSqlBefore()));
-                newSqlNodes.addAll(contents);
-                newSqlNodes.add(new TextSqlNode(SQLPARSER.getCountSqlAfter()));
-                return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(newSqlNodes), true);
-            }
-        } else {
-            //RawSqlSource
-            //这里用的等号
-            if (suffix == SUFFIX_PAGE) {
-                //改为分页sql
-                MetaObject sqlObject = forObject(newSqlSource);
-                sqlObject.setValue(BOUND_SQL, SQLPARSER.getPageSql((String) sqlObject.getValue(BOUND_SQL)));
-                //添加参数映射
-                List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-                newParameterMappings.addAll(newSqlSource.getBoundSql().getParameterMappings());
-                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
-                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
-                sqlObject.setValue("boundSql.parameterMappings", newParameterMappings);
-            } else {
-                //改为count sql
-                MetaObject sqlObject = forObject(newSqlSource);
-                sqlObject.setValue(BOUND_SQL, SQLPARSER.getCountSql((String) sqlObject.getValue(BOUND_SQL)));
-            }
-            return newSqlSource;
+            return new MyDynamicSqlSource(ms.getConfiguration(), new MixedSqlNode(contents), suffix == SUFFIX_COUNT);
         }
+        //如果是静态分页sql
+        else if (suffix == SUFFIX_PAGE) {
+            //改为分页sql
+            return getPageSqlSource(ms.getConfiguration(), newSqlSource);
+        }
+        //如果是静态count-sql
+        else {
+            return getCountSqlSource(newSqlSource);
+        }
+    }
+
+    /**
+     * 获取分页的sqlSource
+     *
+     * @param configuration
+     * @param newSqlSource
+     * @return
+     */
+    private BoundSqlSqlSource getPageSqlSource(Configuration configuration, BoundSqlSqlSource newSqlSource) {
+        String sql = newSqlSource.getBoundSql().getSql();
+        //改为分页sql
+        MetaObject sqlObject = forObject(newSqlSource);
+        sqlObject.setValue("boundSql.sql", SQLPARSER.getPageSql(sql));
+        //添加参数映射
+        List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+        newParameterMappings.addAll(newSqlSource.getBoundSql().getParameterMappings());
+        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
+        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
+        sqlObject.setValue("boundSql.parameterMappings", newParameterMappings);
+        return newSqlSource;
+    }
+
+    /**
+     * 获取count的sqlSource
+     *
+     * @param newSqlSource
+     * @return
+     */
+    private BoundSqlSqlSource getCountSqlSource(BoundSqlSqlSource newSqlSource) {
+        String sql = newSqlSource.getBoundSql().getSql();
+        MetaObject sqlObject = forObject(newSqlSource);
+        sqlObject.setValue("boundSql.sql", SQLPARSER.getCountSql(sql));
+        return newSqlSource;
     }
 }

@@ -32,7 +32,9 @@ import com.github.pagehelper.test.hsqldb.util.DynamicHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -59,6 +61,30 @@ public class TestDynamicIf {
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page) list).getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    /**
+     * 单个POJO参数情况特殊
+     */
+    @Test
+    public void testMapper() {
+        SqlSession sqlSession = DynamicHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            Map map = new HashMap();
+
+            Country country = new Country();
+            country.setId(1);
+            map.put("country", country);
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 10);
+            List<Country> list = countryMapper.selectIf3(country);
+            assertEquals(2, list.get(0).getId());
+            assertEquals(10, list.size());
+            assertEquals(182, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }
