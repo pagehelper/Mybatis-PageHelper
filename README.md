@@ -28,7 +28,7 @@
 
 ##使用方法  
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][3]|[点击进入github包][4]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][3] | [点击进入github包][4]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
