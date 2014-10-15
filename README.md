@@ -8,7 +8,7 @@
   
 3.2.3版本使用方法请切换到3.2.3版标签查看
 
-地址：http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/  
+地址：[点击进入gitosc-3.2.3目录][1] | [点击进入github-3.2.3目录][2] 
 
 #最新测试版3.3.0-SNAPSHOT
 
@@ -28,7 +28,7 @@
 
 ##使用方法  
 
-将本插件中的`com.github.pagehelper`包（[点击进入][1]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][3]|[点击进入github包][4]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
@@ -136,7 +136,7 @@ public void testPageHelperByStartPage() throws Exception {
 
 这个项目是一个分页插件的WEB测试项目，使用Maven构建，只包含一个简单的例子和简单的页面分页效果。
 
-项目地址：[http://git.oschina.net/free/Mybatis-Sample][2]
+项目地址：[http://git.oschina.net/free/Mybatis-Sample][5]
 
 <br/>
 
@@ -155,7 +155,7 @@ public void testPageHelperByStartPage() throws Exception {
 <br/><br/>
 ##相关链接
 
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][3]
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][6]
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 
@@ -163,15 +163,15 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 
 Mybatis专栏： 
 
-- [Mybatis示例][4]
+- [Mybatis示例][7]
 
-- [Mybatis问题集][5]  
+- [Mybatis问题集][8]  
 
 作者博客：  
 
-- [http://my.oschina.net/flags/blog][6]
+- [http://my.oschina.net/flags/blog][9]
 
-- [http://blog.csdn.net/isea533][7]  
+- [http://blog.csdn.net/isea533][10]  
 
 <br/><br/>
 ##更新日志   
@@ -207,7 +207,7 @@ Mybatis专栏：
 
 1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`  
 
-2. 增加了该项目的一个测试项目[Mybatis-Sample][8]，测试项目数据库使用`Hsqldb`  
+2. 增加了该项目的一个测试项目[Mybatis-Sample][11]，测试项目数据库使用`Hsqldb`  
 
 3. 增加MIT协议
 
@@ -223,7 +223,7 @@ Mybatis专栏：
   
 1. 解决了`RowBounds`分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复  
 
-2. 增加对MySql的支持，该支持由[鲁家宁][9]增加。  
+2. 增加对MySql的支持，该支持由[鲁家宁][12]增加。  
   
 ###v3.0 
  
@@ -258,12 +258,15 @@ Mybatis专栏：
 2. 提供便捷的使用方式  
 
 
-  [1]: Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
-  [2]: http://git.oschina.net/free/Mybatis-Sample
-  [3]: http://git.oschina.net/free/Mybatis-Sample
-  [4]: http://blog.csdn.net/column/details/mybatis-sample.html
-  [5]: http://blog.csdn.net/column/details/mybatisqa.html
-  [6]: http://my.oschina.net/flags/blog
-  [7]: http://blog.csdn.net/isea533
-  [8]: http://git.oschina.net/free/Mybatis-Sample
-  [9]: http://my.oschina.net/lujianing
+  [1]:http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/
+  [2]:https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/
+  [3]: http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
+  [4]:https://github.com/pagehelper/Mybatis-PageHelper/tree/master/src/main/java/com/github/pagehelper
+  [5]: http://git.oschina.net/free/Mybatis-Sample
+  [6]: http://git.oschina.net/free/Mybatis-Sample
+  [7]: http://blog.csdn.net/column/details/mybatis-sample.html
+  [8]: http://blog.csdn.net/column/details/mybatisqa.html
+  [9]: http://my.oschina.net/flags/blog
+  [10]: http://blog.csdn.net/isea533
+  [11]: http://git.oschina.net/free/Mybatis-Sample
+  [12]: http://my.oschina.net/lujianing
