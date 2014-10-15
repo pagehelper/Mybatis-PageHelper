@@ -258,7 +258,7 @@ Mybatis专栏：
 2. 提供便捷的使用方式  
 
 
-  [1]: http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
+  [1]: Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
   [2]: http://git.oschina.net/free/Mybatis-Sample
   [3]: http://git.oschina.net/free/Mybatis-Sample
   [4]: http://blog.csdn.net/column/details/mybatis-sample.html
