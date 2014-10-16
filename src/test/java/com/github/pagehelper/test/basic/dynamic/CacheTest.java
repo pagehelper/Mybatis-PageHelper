@@ -75,7 +75,6 @@ public class CacheTest {
         private CacheThread() {
         }
 
-        @Override
         public void run() {
             SqlSession sqlSession = MybatisHelper.getSqlSession();
             System.out.println(Thread.currentThread().getId() + "开始运行...");
