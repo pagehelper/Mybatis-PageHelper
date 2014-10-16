@@ -12,6 +12,7 @@ import java.util.List;
  * @since 3.2.2
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class PageInfo<T> {
     //当前页
     private int pageNum;

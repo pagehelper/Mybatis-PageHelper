@@ -41,9 +41,10 @@ import java.util.Properties;
  * @version 3.3.0
  *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
+@SuppressWarnings({"rawtypes","unchecked"})
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
-    private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
+	private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
     //sql工具类
     private static SqlUtil SQLUTIL;
     //RowBounds参数offset作为PageNum使用 - 默认不使用
@@ -158,8 +159,7 @@ public class PageHelper implements Interceptor {
      * @return 返回执行结果
      * @throws Throwable 抛出异常
      */
-    @Override
-    public Object intercept(Invocation invocation) throws Throwable {
+	public Object intercept(Invocation invocation) throws Throwable {
         final Object[] args = invocation.getArgs();
         RowBounds rowBounds = (RowBounds) args[2];
         if (LOCAL_PAGE.get() == null && rowBounds == RowBounds.DEFAULT) {
@@ -224,7 +224,6 @@ public class PageHelper implements Interceptor {
      * @param target
      * @return
      */
-    @Override
     public Object plugin(Object target) {
         if (target instanceof Executor) {
             return Plugin.wrap(target, this);

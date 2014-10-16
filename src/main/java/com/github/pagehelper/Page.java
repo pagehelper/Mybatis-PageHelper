@@ -37,6 +37,8 @@ import java.util.List;
  *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class Page<E> extends ArrayList<E> {
+    private static final long serialVersionUID = 1L;
+
     /**
      * 不进行count查询
      */

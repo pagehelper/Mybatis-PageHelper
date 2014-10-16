@@ -49,6 +49,7 @@ import java.util.Map;
  * @since 3.3.0
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SqlUtil {
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
@@ -224,7 +225,6 @@ public class SqlUtil {
          */
         public abstract String getPageSql(String sql);
 
-        @Override
         public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
             Map paramMap = null;
             if (parameterObject == null) {
