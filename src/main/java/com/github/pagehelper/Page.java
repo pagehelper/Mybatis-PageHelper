@@ -39,6 +39,12 @@ import java.util.List;
 public class Page<E> extends ArrayList<E> {
     private static final long serialVersionUID = 1L;
 
+    private static boolean reasonable = false;
+
+    public static void setReasonable(String reasonable) {
+        Page.reasonable = Boolean.parseBoolean(reasonable);
+    }
+
     /**
      * 不进行count查询
      */
@@ -67,7 +73,7 @@ public class Page<E> extends ArrayList<E> {
     public Page(int pageNum, int pageSize, int total) {
         super(pageSize > -1 ? pageSize : 0);
         //分页合理化，针对不合理的页码自动处理
-        if (PageHelper.isReasonable() && pageNum <= 0) {
+        if (reasonable && pageNum <= 0) {
             pageNum = 1;
         }
         this.pageNum = pageNum;
@@ -108,7 +114,7 @@ public class Page<E> extends ArrayList<E> {
 
     public void setPageNum(int pageNum) {
         //分页合理化，针对不合理的页码自动处理
-        this.pageNum = (PageHelper.isReasonable() && pageNum <= 0) ? 1 : pageNum;
+        this.pageNum = (reasonable && pageNum <= 0) ? 1 : pageNum;
     }
 
     public int getPageSize() {
@@ -135,7 +141,7 @@ public class Page<E> extends ArrayList<E> {
             pages = 0;
         }
         //分页合理化，针对不合理的页码自动处理
-        if (PageHelper.isReasonable() && pageNum > pages) {
+        if (reasonable && pageNum > pages) {
             pageNum = pages;
             calculateStartAndEndRow();
         }

@@ -46,69 +46,13 @@ import java.util.Properties;
 public class PageHelper implements Interceptor {
 	private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
     //sql工具类
-    private static SqlUtil SQLUTIL;
+    private SqlUtil SQLUTIL;
     //RowBounds参数offset作为PageNum使用 - 默认不使用
-    private static boolean offsetAsPageNum = false;
+    private boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
-    private static boolean rowBoundsWithCount = false;
+    private boolean rowBoundsWithCount = false;
     //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
-    private static boolean pageSizeZero = false;
-    //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
-    private static boolean reasonable = false;
-
-    /**
-     * 设置数据库方言
-     *
-     * @param dialect
-     */
-    public static void setDialect(String dialect) {
-        SQLUTIL = new SqlUtil(dialect);
-    }
-
-    /**
-     * 设置RowBounds参数offset作为PageNum使用 - 默认不使用
-     *
-     * @param offsetAsPageNum
-     */
-    public static void setOffsetAsPageNum(String offsetAsPageNum) {
-        PageHelper.offsetAsPageNum = Boolean.parseBoolean(offsetAsPageNum);
-    }
-
-    /**
-     * 设置RowBounds是否进行count查询 - 默认不查询
-     *
-     * @param rowBoundsWithCount
-     */
-    public static void setRowBoundsWithCount(String rowBoundsWithCount) {
-        PageHelper.rowBoundsWithCount = Boolean.parseBoolean(rowBoundsWithCount);
-    }
-
-    /**
-     * 设置为true的时候，如果pagesize值为0（或RowBounds的limit=0），就不执行分页
-     *
-     * @param pageSizeZero
-     */
-    public static void setPageSizeZero(String pageSizeZero) {
-        PageHelper.pageSizeZero = Boolean.parseBoolean(pageSizeZero);
-    }
-
-    /**
-     * 分页合理化
-     *
-     * @return
-     */
-    public static boolean isReasonable() {
-        return reasonable;
-    }
-
-    /**
-     * 设置分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
-     *
-     * @param reasonable
-     */
-    public static void setReasonable(String reasonable) {
-        PageHelper.reasonable = Boolean.parseBoolean(reasonable);
-    }
+    private boolean pageSizeZero = false;
 
     /**
      * 开始分页
@@ -240,18 +184,18 @@ public class PageHelper implements Interceptor {
     public void setProperties(Properties p) {
         //数据库方言
         String dialect = p.getProperty("dialect");
-        setDialect(dialect);
+        SQLUTIL = new SqlUtil(dialect);
         //offset作为PageNum使用
         String offsetAsPageNum = p.getProperty("offsetAsPageNum");
-        setOffsetAsPageNum(offsetAsPageNum);
+        this.offsetAsPageNum = Boolean.parseBoolean(offsetAsPageNum);
         //RowBounds方式是否做count查询
         String rowBoundsWithCount = p.getProperty("rowBoundsWithCount");
-        setRowBoundsWithCount(rowBoundsWithCount);
+        this.rowBoundsWithCount = Boolean.parseBoolean(rowBoundsWithCount);
         //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
         String pageSizeZero = p.getProperty("pageSizeZero");
-        setPageSizeZero(pageSizeZero);
+        this.pageSizeZero = Boolean.parseBoolean(pageSizeZero);
         //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
         String reasonable = p.getProperty("reasonable");
-        setReasonable(reasonable);
+        Page.setReasonable(reasonable);
     }
 }
