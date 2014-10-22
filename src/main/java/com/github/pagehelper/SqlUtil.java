@@ -53,7 +53,7 @@ import java.util.Map;
  * @since 3.3.0
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SqlUtil {
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
@@ -208,6 +208,9 @@ public class SqlUtil {
          * @return 返回count查询sql
          */
         public String getCountSql(final String sql) {
+            if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
+                throw new RuntimeException("分页插件不支持包含for update的sql");
+            }
             StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
             stringBuilder.append("select count(0) from (");
             if (sql.toUpperCase().contains("ORDER")) {
@@ -334,7 +337,7 @@ public class SqlUtil {
         }
     }
 
-    private interface RemoveOrderBy{
+    private interface RemoveOrderBy {
         String removeOrderBy(String sql);
     }
 
@@ -642,9 +645,25 @@ public class SqlUtil {
         return newSqlSource;
     }
 
+    /**
+     * 测试[控制台输出]count和分页sql
+     *
+     * @param dialet 数据库类型
+     * @param originalSql 原sql
+     */
+    public static void testSql(String dialet, String originalSql) {
+        SqlUtil sqlUtil = new SqlUtil(dialet);
+        String countSql = sqlUtil.SQLPARSER.getCountSql(originalSql);
+        System.out.println(countSql);
+        String pageSql = sqlUtil.SQLPARSER.getPageSql(originalSql);
+        System.out.println(pageSql);
+    }
+
     public static void main(String[] args) {
-        SqlUtil sqlUtil = new SqlUtil("mysql");
-        String sql = sqlUtil.SQLPARSER.getCountSql("Select * from `order` o where abc = ?");
-        System.out.println(sql);
+        String originalSql = "Select * from `order` o where abc = ? order by id desc , name asc";
+        testSql("mysql", originalSql);
+        testSql("hsqldb", originalSql);
+        testSql("oracle", originalSql);
+        testSql("postgresql", originalSql);
     }
 }
