@@ -158,6 +158,38 @@ database = hsqldb
 
 5. 增加`reasonable`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。具体作用请看上面配置文件中的注释内容。  
 
+###3. Spring配置方法  
+
+首先Spring中配置`org.mybatis.spring.SqlSessionFactoryBean`时可以配置`configLocation`属性指向上面的`mybatis-config.xml`文件。  
+
+如果你想直接在Spring中配置分页插件，如果使用了`plugins`属性，可以像下面这样配置：  
+
+```xml
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+  <property name="dataSource" ref="dataSource"/>
+  <property name="mapperLocations">
+    <array>
+      <value>classpath:mapper/*.xml</value>
+    </array>
+  </property>
+  <property name="typeAliasesPackage" value="com.isea533.ssm.model"/>
+  <property name="plugins">
+    <array>
+      <bean class="com.github.pagehelper.PageHelper">
+        <property name="properties">
+          <value>
+            dialect=hsqldb
+            reasonable=true
+          </value>
+        </property>
+      </bean>
+    </array>
+  </property>
+</bean>
+```   
+
+属性配置按照上面的方式配置，每个配置独立一行即可。
+
 ##分页示例：  
 
 ```java
