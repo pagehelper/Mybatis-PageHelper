@@ -24,9 +24,6 @@
 
 package com.github.pagehelper;
 
-import com.foundationdb.sql.StandardException;
-import com.foundationdb.sql.parser.*;
-import com.foundationdb.sql.unparser.NodeToString;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -193,12 +190,7 @@ public class SqlUtil {
         public void initNoOrderBy(Dialect dialect) {
             try {
                 Class.forName("net.sf.jsqlparser.statement.select.Select");
-                removeOrderBy = new NoOrderByParser2();
-                return;
-            } catch (Exception e) {}
-            try {
-                Class.forName("com.foundationdb.sql.unparser.NodeToString");
-                removeOrderBy = new NoOrderByParser(dialect);
+                removeOrderBy = new NoOrderByParser();
             } catch (Exception e) {}
         }
 
@@ -349,7 +341,7 @@ public class SqlUtil {
     /**
      * 一个更好的sql解析工具
      */
-    public static class NoOrderByParser2 implements RemoveOrderBy {
+    public static class NoOrderByParser implements RemoveOrderBy {
         private Map<String, String> CACHE = new HashMap<String, String>();
 
         public String removeOrderBy(String sql) {
@@ -450,85 +442,6 @@ public class SqlUtil {
                 }
             }
             return false;
-        }
-    }
-
-    /**
-     * 解析 - 去掉order by 语句
-     */
-    private static class NoOrderByParser extends NodeToString implements RemoveOrderBy {
-        private SQLParser PARSER = new SQLParser();
-        private Dialect dialect;
-        private Map<String, String> CACHE = new HashMap<String, String>();
-
-        private NoOrderByParser(Dialect dialect) {
-            this.dialect = dialect;
-        }
-
-        public String removeOrderBy(String sql) {
-            try {
-                if (CACHE.get(sql) != null) {
-                    return CACHE.get(sql);
-                }
-                StatementNode stmt = PARSER.parseStatement(sql);
-                stmt.treePrint();
-                String result = toString(stmt);
-                if (result.indexOf('$') > -1) {
-                    result = result.replaceAll("\\$\\d+", "?");
-                }
-                CACHE.put(sql, result);
-                return result;
-            } catch (Exception e) {
-                return sql;
-            }
-        }
-
-        @Override
-        protected String orderByList(OrderByList node) throws StandardException {
-            //order by中如果包含参数就原样返回
-            // 这里建议order by使用${param}这样的参数
-            // 这种形式的order by可以正确的被过滤掉，并且支持大部分的数据库
-            String sql = nodeList(node);
-            if (sql.indexOf('$') > -1) {
-                return sql;
-            }
-            return "";
-        }
-
-        @Override
-        protected String fromSubquery(FromSubquery node) throws StandardException {
-            StringBuilder str = new StringBuilder(toString(node.getSubquery()));
-            if (node.getOrderByList() != null) {
-                str.append(' ');
-                str.append(toString(node.getOrderByList()));
-            }
-            str.insert(0, '(');
-            str.append(") ");
-            if (dialect != Dialect.oracle) {
-                //Oracle表不支持AS
-                str.append("AS ");
-            }
-            str.append(node.getCorrelationName());
-            if (node.getResultColumns() != null) {
-                str.append('(');
-                str.append(toString(node.getResultColumns()));
-                str.append(')');
-            }
-            return str.toString();
-        }
-
-        @Override
-        protected String fromBaseTable(FromBaseTable node) throws StandardException {
-            String tn = toString(node.getOrigTableName());
-            String n = node.getCorrelationName();
-            if (n == null) {
-                return tn;
-            } else if (dialect == Dialect.oracle) {
-                //Oracle表不支持AS
-                return tn + " " + n;
-            } else {
-                return tn + " AS " + n;
-            }
         }
     }
 
