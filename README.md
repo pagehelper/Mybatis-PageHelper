@@ -293,8 +293,9 @@ Mybatis专栏：
 
 - [http://blog.csdn.net/isea533][11]  
 
-作者QQ： 120807756
-作者邮箱： abel533@gmail.com
+作者QQ： 120807756  
+
+作者邮箱： abel533@gmail.com  
 
 <br/><br/>
 ##更新日志   
