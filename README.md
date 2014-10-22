@@ -181,13 +181,19 @@ public void testPageHelperByStartPage() throws Exception {
 
 3. 如果你喜欢使用`sqlSession.selectList`这种命名空间方式的调用，使用`RowBounds`会更方便。
 
+<br/>
+
 ##`PageHelper.startPage`方法重要提示
 
 只有紧跟在`PageHelper.startPage`方法后的<b>第一个</b>Mybatis<b>查询</b>方法会被分页。
 
+<br/>
+
 ##分页插件不支持带有`for update`语句的分页
 
 对于带有`for update`的sql，会抛出运行时异常，对于这样的sql建议手动分页，毕竟这样的sql需要重视。
+
+<br/>
 
 ##`SqlUtil.testSql`测试sql方法  
 
