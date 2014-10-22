@@ -12,6 +12,36 @@
 
 #最新测试版3.3.0-SNAPSHOT
 
+##重要提示
+
+###`fdb-sql-parser`换为`jsqlparser`  
+
+为了去掉count查询中的order by语句，最早使用了`fdb-sql-parser`，由于效果不好，现在已经替换成`jsqlparser`，`jsqlparser`比`fdb-sql-parser`更通用，而且体积更小，对原sql改动更少。替换后，下面的有关说明都会改为`jsqlparser`，如果你使用了最新的测试版分页，你需要下载`jsqlparser`。  
+
+###分页插件多数据库测试  
+
+为了更方便的测试不同的数据库，在`src/test/resources`目录下增加了不同数据库的mybatis配置文件，通过修改`test.properties`中的配置可以让测试使用不同的配置进行测试。  
+
+`test.properties`内容：  
+
+```properties
+#首先需要在本机配置对应的数据库
+
+#想要测试那个数据库，这里就写那个数据库
+#这个值和test/resources中的数据库对应的文件夹名字相同
+#目前可选为:
+#hsqldb
+#mysql
+#oracle
+#postgresql
+database = hsqldb
+```  
+各种数据库对应的sql文件都在对应的目录中。
+
+###代码中明确不支持带有`for update`语句的分页
+
+对于带有`for update`的sql，会抛出运行时异常，对于这样的sql建议手动分页，毕竟这样的sql需要重视。
+
 ##3.3.0-SNAPSHOT改进内容
 
  1. 对`MappedStatement`对象进行缓存，包括count查询的`MappedStatement`以及分页查询的`MappedStatement`，分页查询改为预编译查询。
@@ -28,7 +58,7 @@
 
 ##使用方法  
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][3] | [点击进入github包][4]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`fdb-sql-parser-1.3.0.jar`，运行时可选。  
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][3] | [点击进入github包][4]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`jsqlparser-0.9.1.jar`，运行时可选。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
@@ -36,7 +66,9 @@
 
 由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
 
- - SqlParser：http://search.maven.org/remotecontent?filepath=com/foundationdb/fdb-sql-parser/1.3.0/fdb-sql-parser-1.3.0.jar  
+ - SqlParser.jar：http://search.maven.org/remotecontent?filepath=com/github/jsqlparser/jsqlparser/0.9.1/jsqlparser-0.9.1.jar
+ 
+ - SqlParser - github地址：https://github.com/JSQLParser/JSqlParser  
 
 <br>
 如果你使用的maven，你可以添加如下依赖：  
@@ -46,11 +78,12 @@
     <artifactId>pagehelper</artifactId>
     <version>3.3.0-SNAPSHOT</version>
 </dependency>
-<!--可选依赖，如果使用就会处理order by，如果不使用就不会处理order by-->
+ <!--可选依赖jsqlparser，用于解析sql去除order by-->
 <dependency>
-    <groupId>com.foundationdb</groupId>
-    <artifactId>fdb-sql-parser</artifactId>
-    <version>1.3.0</version>
+    <groupId>com.github.jsqlparser</groupId>
+    <artifactId>jsqlparser</artifactId>
+    <version>0.9.1</version>
+    <optional>true</optional>
 </dependency>
 ```  
 
@@ -151,6 +184,40 @@ public void testPageHelperByStartPage() throws Exception {
 ##`PageHelper.startPage`方法重要提示
 
 只有紧跟在`PageHelper.startPage`方法后的<b>第一个</b>Mybatis<b>查询</b>方法会被分页。
+
+##分页插件不支持带有`for update`语句的分页
+
+对于带有`for update`的sql，会抛出运行时异常，对于这样的sql建议手动分页，毕竟这样的sql需要重视。
+
+##`SqlUtil.testSql`测试sql方法  
+
+为了便于测试sql语句方面的问题，提供了`SqlUtil.testSql`方法，使用方法如下：  
+
+```java
+String originalSql = "Select * from `order` o where abc = ? order by id desc , name asc";
+SqlUtil.testSql("mysql", originalSql);
+SqlUtil.testSql("hsqldb", originalSql);
+SqlUtil.testSql("oracle", originalSql);
+SqlUtil.testSql("postgresql", originalSql);
+```  
+
+执行后输出： 
+
+```sql   
+select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count
+select * from (Select * from `order` o where abc = ? order by id desc , name asc) as tmp_page limit ?,?  
+
+select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count
+Select * from `order` o where abc = ? order by id desc , name asc limit ? offset ?  
+
+select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count  
+select * from ( select tmp_page.*, rownum row_id from (  
+  Select * from `order` o where abc = ? order by id desc , name asc 
+) tmp_page where rownum <= ? ) where row_id > ?  
+
+select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count
+select * from (Select * from `order` o where abc = ? order by id desc , name asc) as tmp_page limit ? offset ?
+```  
 
 <br/><br/>
 ##相关链接

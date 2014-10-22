@@ -661,9 +661,9 @@ public class SqlUtil {
 
     public static void main(String[] args) {
         String originalSql = "Select * from `order` o where abc = ? order by id desc , name asc";
-        testSql("mysql", originalSql);
-        testSql("hsqldb", originalSql);
-        testSql("oracle", originalSql);
-        testSql("postgresql", originalSql);
+        SqlUtil.testSql("mysql", originalSql);
+        SqlUtil.testSql("hsqldb", originalSql);
+        SqlUtil.testSql("oracle", originalSql);
+        SqlUtil.testSql("postgresql", originalSql);
     }
 }
