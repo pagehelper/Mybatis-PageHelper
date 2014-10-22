@@ -381,7 +381,7 @@ Mybatis专栏：
 2. 提供便捷的使用方式  
 
 
-  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues
+  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=
   [2]:http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/
   [3]:https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/
   [4]: http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
