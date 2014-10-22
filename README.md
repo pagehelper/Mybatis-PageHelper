@@ -87,7 +87,8 @@ database = hsqldb
 </dependency>
 ```  
 
-然后在Mybatis的配置xml中配置拦截器插件:    
+###在Mybatis配置xml中配置拦截器插件:    
+
 ```xml
 <!-- 
     plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下:
