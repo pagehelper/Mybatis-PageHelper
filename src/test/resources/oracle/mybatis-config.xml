@@ -29,14 +29,14 @@
 			<dataSource type="UNPOOLED">
 				<property name="driver" value="oracle.jdbc.driver.OracleDriver" />
 				<property name="url" value=" jdbc:oracle:thin:@//localhost:1521/orcl" />
-				<property name="username" value="pagehelper" />
-        <property name="password" value="pagehelper" />
+				<property name="username" value="scott" />
+        <property name="password" value="tiger" />
 			</dataSource>
 		</environment>
 	</environments>
 
 	<mappers>
-		<mapper resource="com/github/pagehelper/mapper/OracleMapper.xml" />
+		<mapper resource="com/github/pagehelper/mapper/CountryMapper.xml" />
 	</mappers>
 
 </configuration>
