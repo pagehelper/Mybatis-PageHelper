@@ -4,11 +4,13 @@
 
 该插件目前支持`Oracle`,`Mysql`,`Hsqldb`,`PostgreSQL`四种数据库分页。  
 
+[点击提交BUG][1]
+
 ##最新稳定版为3.2.3 版
   
 3.2.3版本使用方法请切换到3.2.3版标签查看
 
-地址：[点击进入gitosc-3.2.3目录][1] | [点击进入github-3.2.3目录][2] 
+地址：[点击进入gitosc-3.2.3目录][2] | [点击进入github-3.2.3目录][3] 
 
 #最新测试版3.3.0-SNAPSHOT
 
@@ -58,7 +60,9 @@ database = hsqldb
 
 ##使用方法  
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][3] | [点击进入github包][4]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`jsqlparser-0.9.1.jar`，运行时可选。  
+###1. 引入分页代码或Jar包或使用Maven  
+
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`jsqlparser-0.9.1.jar`，运行时可选。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
@@ -71,7 +75,9 @@ database = hsqldb
  - SqlParser - github地址：https://github.com/JSQLParser/JSqlParser  
 
 <br>
+
 如果你使用的maven，你可以添加如下依赖：  
+
 ```xml  
 <dependency>
     <groupId>com.github.pagehelper</groupId>
@@ -87,7 +93,25 @@ database = hsqldb
 </dependency>
 ```  
 
-###在Mybatis配置xml中配置拦截器插件:    
+使用maven中央库中的快照版时，需要在pom.xml中添加如下配置：  
+
+```xml
+<repositories>
+    <repository>
+          <id>sonatype-nexus-snapshots</id>
+          <name>Sonatype Nexus Snapshots</name>
+          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+          <releases>
+                <enabled>false</enabled>
+          </releases>
+          <snapshots>
+                <enabled>true</enabled>
+          </snapshots>
+    </repository>
+</repositories>
+```
+
+###2. 在Mybatis配置xml中配置拦截器插件:    
 
 ```xml
 <!-- 
@@ -119,6 +143,7 @@ database = hsqldb
 	</plugin>
 </plugins>
 ```   
+
 这里的`com.github.pagehelper.PageHelper`使用完整的类路径。  
 
 其他五个参数说明：
@@ -133,35 +158,54 @@ database = hsqldb
 
 5. 增加`reasonable`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。具体作用请看上面配置文件中的注释内容。  
 
-##分页示例：
-```java
-@Test
-public void testPageHelperByStartPage() throws Exception {
-    String logip = "";
-    String username = "super";
-    String loginDate = "";
-    String exitDate = null;
-    String logerr = null;
-    //不进行count查询，第三个参数设为false
-    PageHelper.startPage(1, 10, false);
-    //返回结果是Page<SysLoginLog>     
-    //该对象除了包含返回结果外，还包含了分页信息，可以直接按List使用
-    List<SysLoginLog> logs = sysLoginLogMapper
-            .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
-    Assert.assertEquals(10, logs.size());
+##分页示例：  
 
-    //当第三个参数没有或者为true的时候，进行count查询
-    PageHelper.startPage(2, 10);
-    //返回结果是Page<SysLoginLog>     
-    //该对象除了包含返回结果外，还包含了分页信息，可以直接按List使用
-    Page<SysLoginLog> page = (Page<SysLoginLog>) sysLoginLogMapper
-            .findSysLoginLog(logip, username, loginDate, exitDate, logerr);
-    Assert.assertEquals(10, page.getResult().size());
-    //进行count查询，返回结果total>0
-    Assert.assertTrue(page.getTotal() > 0);
+```java
+SqlSession sqlSession = MybatisHelper.getSqlSession();
+CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+try {
+    //获取第1页，10条内容，默认查询总数count
+    PageHelper.startPage(1, 10);
+    List<Country> list = countryMapper.selectIf(1);
+    assertEquals(2, list.get(0).getId());
+    assertEquals(10, list.size());
+    assertEquals(182, ((Page) list).getTotal());
+
+    //获取第1页，10条内容，默认查询总数count
+    PageHelper.startPage(1, 10);
+    list = countryMapper.selectIf(null);
+    assertEquals(1, list.get(0).getId());
+    assertEquals(10, list.size());
+    assertEquals(183, ((Page) list).getTotal());
+} finally {
+    sqlSession.close();
 }
 ```  
-本项目中包含大量测试，您可以通过查看测试代码了解使用方法。
+
+使用`PageInfo`的用法：  
+
+```java
+//获取第1页，10条内容，默认查询总数count
+PageHelper.startPage(1, 10);
+List<Country> list = countryMapper.selectAll();
+//用PageInfo对结果进行包装
+PageInfo page = new PageInfo(list);
+//测试PageInfo全部属性
+assertEquals(1, page.getPageNum());
+assertEquals(10, page.getPageSize());
+assertEquals(1, page.getStartRow());
+assertEquals(10, page.getEndRow());
+assertEquals(183, page.getTotal());
+assertEquals(19, page.getPages());
+assertEquals(1, page.getFirstPage());
+assertEquals(8, page.getLastPage());
+assertEquals(true, page.isFirstPage());
+assertEquals(false, page.isLastPage());
+assertEquals(false, page.isHasPreviousPage());
+assertEquals(true, page.isHasNextPage());
+```
+
+本项目中包含大量测试，您可以通过查看测试代码了解使用方法。  
 
 测试代码地址：http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/test/java/com/github/pagehelper/test
 
@@ -170,7 +214,7 @@ public void testPageHelperByStartPage() throws Exception {
 
 这个项目是一个分页插件的WEB测试项目，使用Maven构建，只包含一个简单的例子和简单的页面分页效果。
 
-项目地址：[http://git.oschina.net/free/Mybatis-Sample][5]
+项目地址：[http://git.oschina.net/free/Mybatis-Sample][6]
 
 <br/>
 
@@ -229,7 +273,9 @@ select * from (Select * from `order` o where abc = ? order by id desc , name asc
 <br/><br/>
 ##相关链接
 
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][6]
+对应于Github的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
+
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 
@@ -237,15 +283,18 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 
 Mybatis专栏： 
 
-- [Mybatis示例][7]
+- [Mybatis示例][8]
 
-- [Mybatis问题集][8]  
+- [Mybatis问题集][9]  
 
 作者博客：  
 
-- [http://my.oschina.net/flags/blog][9]
+- [http://my.oschina.net/flags/blog][10]
 
-- [http://blog.csdn.net/isea533][10]  
+- [http://blog.csdn.net/isea533][11]  
+
+作者QQ： 120807756
+作者邮箱： abel533@gmail.com
 
 <br/><br/>
 ##更新日志   
@@ -281,7 +330,7 @@ Mybatis专栏：
 
 1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`  
 
-2. 增加了该项目的一个测试项目[Mybatis-Sample][11]，测试项目数据库使用`Hsqldb`  
+2. 增加了该项目的一个测试项目[Mybatis-Sample][12]，测试项目数据库使用`Hsqldb`  
 
 3. 增加MIT协议
 
@@ -297,7 +346,7 @@ Mybatis专栏：
   
 1. 解决了`RowBounds`分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复  
 
-2. 增加对MySql的支持，该支持由[鲁家宁][12]增加。  
+2. 增加对MySql的支持，该支持由[鲁家宁][13]增加。  
   
 ###v3.0 
  
@@ -332,15 +381,16 @@ Mybatis专栏：
 2. 提供便捷的使用方式  
 
 
-  [1]:http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/
-  [2]:https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/
-  [3]: http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
-  [4]:https://github.com/pagehelper/Mybatis-PageHelper/tree/master/src/main/java/com/github/pagehelper
-  [5]: http://git.oschina.net/free/Mybatis-Sample
+  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues
+  [2]:http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/
+  [3]:https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/
+  [4]: http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
+  [5]:https://github.com/pagehelper/Mybatis-PageHelper/tree/master/src/main/java/com/github/pagehelper
   [6]: http://git.oschina.net/free/Mybatis-Sample
-  [7]: http://blog.csdn.net/column/details/mybatis-sample.html
-  [8]: http://blog.csdn.net/column/details/mybatisqa.html
-  [9]: http://my.oschina.net/flags/blog
-  [10]: http://blog.csdn.net/isea533
-  [11]: http://git.oschina.net/free/Mybatis-Sample
-  [12]: http://my.oschina.net/lujianing
+  [7]: http://git.oschina.net/free/Mybatis-Sample
+  [8]: http://blog.csdn.net/column/details/mybatis-sample.html
+  [9]: http://blog.csdn.net/column/details/mybatisqa.html
+  [10]: http://my.oschina.net/flags/blog
+  [11]: http://blog.csdn.net/isea533
+  [12]: http://git.oschina.net/free/Mybatis-Sample
+  [13]: http://my.oschina.net/lujianing
