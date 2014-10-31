@@ -116,6 +116,11 @@
     union
     select * from country where id &lt;=10 order by id
   </select>
+  <select id="selectUnion" resultType="com.github.pagehelper.model.Country" databaseId="oracle">
+    select * from country where id &gt;180
+    union
+    select * from country where id &lt;=10
+  </select>
   <select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
     select a.id,b.countryname,a.countrycode from country a
     left join country b on a.id = b.id
