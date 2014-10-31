@@ -65,6 +65,7 @@ public class SqlParser implements SqlUtil.Parser {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (JSQLParserException e) {
             //无法解析的直接返回原sql
+            CACHE.put(sql, sql);
             return sql;
         }
         Select select = (Select) stmt;

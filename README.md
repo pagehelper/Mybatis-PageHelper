@@ -48,21 +48,21 @@ database = hsqldb
 
  1. 对`MappedStatement`对象进行缓存，包括count查询的`MappedStatement`以及分页查询的`MappedStatement`，分页查询改为预编译查询。
 
- 2. 对count查询进行优化处理，目前的处理策略只是简单的把sql中的所有`order by`语句删除了，当然不是直接处理字符串去删除，使用了一个sql解析的类库，由于sql的有无限的变化，因而不保证这个sql解析的类库能够完全处理所有的情况，无法处理的情况仍然会保留order by进行查询。  
+ 2. 独立的`SqlUtil``类，由于原来的PageHelper`太复杂，因此将拦截器外的其他代码独立到`SqlUtil`中，方便查看代码和维护。SqlUtil中增加`Parser`接口，提供一个抽象的`SimpleParser`实现，不同数据库的分页代码通过继承`SimpleParser`实现。
 
- 3. 增强的PageInfo类，PageInfo类包含了分页几乎所有需要用到的属性值。方便通过一个PageInfo类来达到分页目的，减少对分页逻辑的过多投入。  
+ 3. 特殊的`Parser`实现类`SqlParser`类，这是一个独立的java类，主要提供了更高性能的count查询sql，可以根据sql自动改为`count(*)`查询，自动去除不需要的`order by`语句，如果需要使用该类，只要把该类放到`SqlUtil`类相同的包下即可，同时需要引入Jar包`jsqlparser-0.9.1.jar`。
+
+ 4. 增强的`PageInfo`类，`PageInfo`类包含了分页几乎所有需要用到的属性值。通过一个`PageInfo`类可以轻易的进行分页，减少对分页逻辑的过多投入。  
 
  4. 分页合理化，自动处理pageNum的异常情况。例如当pageNum<=0时，会设置pageNum=1，然后查询第一页。当pageNum>pages(总页数)时，自动将pageNum=pages，查询最后一页。  
 
- 5. 特殊的pageSize值，当pageSize<0时不再进行分页查询，只进行count查询。当pageSize=0时，通过配置参数`pageSizeZero`可以查询全部结果。（该功能已经添加到3.2.3版本）
-
- 6. 增加对`PostgreSQL`支持。
+ 5. 增加对`PostgreSQL`支持。
 
 ##使用方法  
 
 ###1. 引入分页代码或Jar包或使用Maven  
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`，也可以放到项目中。使用这种方式（直接引入代码）时编译必须使用`jsqlparser-0.9.1.jar`，运行时可选。  
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
@@ -272,6 +272,15 @@ assertEquals(true, page.isHasNextPage());
 
 <br/>
 
+##分页插件不支持关联结果查询
+
+原因以及解决版本可以看这里：
+>http://my.oschina.net/flags/blog/274000 
+
+分支插件不支持关联结果查询，但是支持关联嵌套查询。只会对主sql进行分页，嵌套的sql不会被分页。  
+
+<br/>
+
 ##`SqlUtil.testSql`测试sql方法  
 
 为了便于测试sql语句方面的问题，提供了`SqlUtil.testSql`方法，使用方法如下：  
@@ -301,6 +310,8 @@ select * from ( select tmp_page.*, rownum row_id from (
 select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count
 select * from (Select * from `order` o where abc = ? order by id desc , name asc) as tmp_page limit ? offset ?
 ```  
+
+<b>注:</b>使用`SqlParser`和不使用`SqlParser`的count查询sql很不一样。`SqlParser`可以更智能将原sql改为count查询，并且去除order by。
 
 <br/><br/>
 ##相关链接
