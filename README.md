@@ -48,11 +48,11 @@ database = hsqldb
 
  1. 对`MappedStatement`对象进行缓存，包括count查询的`MappedStatement`以及分页查询的`MappedStatement`，分页查询改为预编译查询。
 
- 2. 独立的`SqlUtil`类，由于原来的`PageHelper`太复杂，因此将拦截器外的其他代码独立到`SqlUtil`中，方便查看代码和维护。SqlUtil中增加`Parser`接口，提供一个抽象的`SimpleParser`实现，不同数据库的分页代码通过继承`SimpleParser`实现。
+ 2. 独立的`SqlUtil`类，由于原来的`PageHelper`太复杂，因此将拦截器外的其他代码独立到`SqlUtil`中，方便查看代码和维护。`SqlUtil`中增加`Parser`接口，提供一个抽象的`SimpleParser`实现，不同数据库的分页代码通过继承`SimpleParser`实现。
 
  3. 特殊的`Parser`实现类`SqlParser`类，这是一个独立的java类，主要提供了更高性能的count查询sql，可以根据sql自动改为`count(*)`查询，自动去除不需要的`order by`语句，如果需要使用该类，只要把该类放到`SqlUtil`类相同的包下即可，同时需要引入Jar包`jsqlparser-0.9.1.jar`。
 
- 4. 增强的`PageInfo`类，`PageInfo`类包含了分页几乎所有需要用到的属性值。通过一个`PageInfo`类可以轻易的进行分页，减少对分页逻辑的过多投入。  
+ 4. 增强的`PageInfo`类，`PageInfo`类包含了分页几乎所有需要用到的属性值，减少了对分页逻辑的过多投入。  
 
  4. 分页合理化，自动处理pageNum的异常情况。例如当pageNum<=0时，会设置pageNum=1，然后查询第一页。当pageNum>pages(总页数)时，自动将pageNum=pages，查询最后一页。  
 
@@ -62,7 +62,7 @@ database = hsqldb
 
 ###1. 引入分页代码或Jar包或使用Maven  
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
