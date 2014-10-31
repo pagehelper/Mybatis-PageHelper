@@ -24,10 +24,6 @@
 
 package com.github.pagehelper;
 
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.reflection.MetaObject;
@@ -56,7 +52,6 @@ import java.util.Map;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SqlUtil {
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
-
     //分页的id后缀
     private static final String SUFFIX_PAGE = "_PageHelper";
     //count查询的id后缀
@@ -82,7 +77,7 @@ public class SqlUtil {
     private static SqlUtil.Parser SQLPARSER;
 
     //数据库方言 - 使用枚举限制数据库类型
-    private enum Dialect {
+    public enum Dialect {
         mysql, oracle, hsqldb, postgresql
     }
 
@@ -97,7 +92,15 @@ public class SqlUtil {
         }
         try {
             Dialect dialect = Dialect.valueOf(strDialect);
-            SQLPARSER = newOrderByParser(dialect);
+            String sqlParserClass = this.getClass().getPackage().getName() + ".SqlParser";
+            try {
+                SQLPARSER = (Parser) Class.forName(sqlParserClass).getConstructor(Dialect.class).newInstance(dialect);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (SQLPARSER == null) {
+                SQLPARSER = SimpleParser.newParser(dialect);
+            }
         } catch (IllegalArgumentException e) {
             String dialects = null;
             for (Dialect d : Dialect.values()) {
@@ -145,15 +148,11 @@ public class SqlUtil {
         return getMappedStatement(ms, boundSql, SUFFIX_PAGE);
     }
 
-    private Parser newOrderByParser(Dialect dialect) {
-        return SimpleParser.newParser(dialect);
-    }
-
     /**
      * 处理SQL
      */
-    private interface Parser {
-        void initNoOrderBy(Dialect dialect);
+    public static interface Parser {
+        void isSupportedSql(String sql);
 
         String getCountSql(String sql);
 
@@ -162,9 +161,7 @@ public class SqlUtil {
         Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page);
     }
 
-    private static abstract class SimpleParser implements Parser {
-        protected RemoveOrderBy removeOrderBy;
-
+    public static abstract class SimpleParser implements Parser {
         public static Parser newParser(Dialect dialect) {
             Parser parser = null;
             switch (dialect) {
@@ -181,24 +178,13 @@ public class SqlUtil {
                 default:
                     parser = new PostgreSQLParser();
             }
-            if (parser != null) {
-                parser.initNoOrderBy(dialect);
-            }
             return parser;
         }
 
-        public void initNoOrderBy(Dialect dialect) {
-            try {
-                Class.forName("net.sf.jsqlparser.statement.select.Select");
-                removeOrderBy = new NoOrderByParser();
-            } catch (Exception e) {}
-        }
-
-        public String removeOrderBy(String sql) {
-            if (removeOrderBy != null) {
-                return removeOrderBy.removeOrderBy(sql);
+        public void isSupportedSql(String sql) {
+            if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
+                throw new RuntimeException("分页插件不支持包含for update的sql");
             }
-            return sql;
         }
 
         /**
@@ -208,16 +194,10 @@ public class SqlUtil {
          * @return 返回count查询sql
          */
         public String getCountSql(final String sql) {
-            if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
-                throw new RuntimeException("分页插件不支持包含for update的sql");
-            }
+            isSupportedSql(sql);
             StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
-            stringBuilder.append("select count(0) from (");
-            if (sql.toUpperCase().contains("ORDER")) {
-                stringBuilder.append(removeOrderBy(sql));
-            } else {
-                stringBuilder.append(sql);
-            }
+            stringBuilder.append("select count(*) from (");
+            stringBuilder.append(sql);
             stringBuilder.append(") tmp_count");
             return stringBuilder.toString();
         }
@@ -334,117 +314,6 @@ public class SqlUtil {
             paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
             paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
             return paramMap;
-        }
-    }
-
-    private interface RemoveOrderBy {
-        String removeOrderBy(String sql);
-    }
-
-    /**
-     * 一个更好的sql解析工具
-     */
-    public static class NoOrderByParser implements RemoveOrderBy {
-        private Map<String, String> CACHE = new HashMap<String, String>();
-
-        public String removeOrderBy(String sql) {
-            if (CACHE.get(sql) != null) {
-                return CACHE.get(sql);
-            }
-            Statement stmt = null;
-            try {
-                stmt = CCJSqlParserUtil.parse(sql);
-            } catch (JSQLParserException e) {
-                //无法解析的直接返回原sql
-                return sql;
-            }
-            Select select = (Select) stmt;
-            SelectBody selectBody = select.getSelectBody();
-            processSelectBody(selectBody);
-            String result = select.toString();
-            CACHE.put(sql, result);
-            return result;
-        }
-
-        public void processSelectBody(SelectBody selectBody) {
-            if (selectBody instanceof PlainSelect) {
-                processPlainSelect((PlainSelect) selectBody);
-            } else if (selectBody instanceof WithItem) {
-                WithItem withItem = (WithItem) selectBody;
-                if (withItem.getSelectBody() != null) {
-                    processSelectBody(withItem.getSelectBody());
-                }
-            } else {
-                SetOperationList operationList = (SetOperationList) selectBody;
-                if (operationList.getPlainSelects() != null && operationList.getPlainSelects().size() > 0) {
-                    List<PlainSelect> plainSelects = operationList.getPlainSelects();
-                    for (PlainSelect plainSelect : plainSelects) {
-                        processPlainSelect(plainSelect);
-                    }
-                }
-                if (!orderByHashParameters(operationList.getOrderByElements())) {
-                    operationList.setOrderByElements(null);
-                }
-            }
-        }
-
-        public void processPlainSelect(PlainSelect plainSelect) {
-            if (!orderByHashParameters(plainSelect.getOrderByElements())) {
-                plainSelect.setOrderByElements(null);
-            }
-            if (plainSelect.getFromItem() != null) {
-                processFromItem(plainSelect.getFromItem());
-            }
-            if (plainSelect.getJoins() != null && plainSelect.getJoins().size() > 0) {
-                List<Join> joins = plainSelect.getJoins();
-                for (Join join : joins) {
-                    if (join.getRightItem() != null) {
-                        processFromItem(join.getRightItem());
-                    }
-                }
-            }
-        }
-
-        public void processFromItem(FromItem fromItem) {
-            if (fromItem instanceof SubJoin) {
-                SubJoin subJoin = (SubJoin) fromItem;
-                if (subJoin.getJoin() != null) {
-                    if (subJoin.getJoin().getRightItem() != null) {
-                        processFromItem(subJoin.getJoin().getRightItem());
-                    }
-                }
-                if (subJoin.getLeft() != null) {
-                    processFromItem(subJoin.getLeft());
-                }
-            } else if (fromItem instanceof SubSelect) {
-                SubSelect subSelect = (SubSelect) fromItem;
-                if (subSelect.getSelectBody() != null) {
-                    processSelectBody(subSelect.getSelectBody());
-                }
-            } else if (fromItem instanceof ValuesList) {
-
-            } else if (fromItem instanceof LateralSubSelect) {
-                LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
-                if (lateralSubSelect.getSubSelect() != null) {
-                    SubSelect subSelect = (SubSelect) (lateralSubSelect.getSubSelect());
-                    if (subSelect.getSelectBody() != null) {
-                        processSelectBody(subSelect.getSelectBody());
-                    }
-                }
-            }
-            //Table时不用处理
-        }
-
-        public boolean orderByHashParameters(List<OrderByElement> orderByElements) {
-            if (orderByElements == null) {
-                return false;
-            }
-            for (OrderByElement orderByElement : orderByElements) {
-                if (orderByElement.toString().toUpperCase().contains("?")) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 
@@ -648,7 +517,7 @@ public class SqlUtil {
     /**
      * 测试[控制台输出]count和分页sql
      *
-     * @param dialet 数据库类型
+     * @param dialet      数据库类型
      * @param originalSql 原sql
      */
     public static void testSql(String dialet, String originalSql) {
