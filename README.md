@@ -84,7 +84,6 @@ database = hsqldb
     <artifactId>pagehelper</artifactId>
     <version>3.3.0-SNAPSHOT</version>
 </dependency>
- <!--可选依赖jsqlparser，用于解析sql去除order by-->
 <dependency>
     <groupId>com.github.jsqlparser</groupId>
     <artifactId>jsqlparser</artifactId>
