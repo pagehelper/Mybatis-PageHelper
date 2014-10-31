@@ -1,6 +1,7 @@
 package com.github.pagehelper;
 
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -19,11 +20,15 @@ import java.util.Map;
  */
 public class SqlParser implements SqlUtil.Parser {
     private static final List<SelectItem> COUNT_ITEM;
+    private static final Alias TABLE_ALIAS;
     private SqlUtil.Parser simpleParser;
 
     static {
         COUNT_ITEM = new ArrayList<SelectItem>();
         COUNT_ITEM.add(new SelectExpressionItem(new Column("count(*)")));
+
+        TABLE_ALIAS = new Alias("table_count");
+        TABLE_ALIAS.setUseAs(false);
     }
 
     public SqlParser(SqlUtil.Dialect dialect) {
@@ -88,6 +93,7 @@ public class SqlParser implements SqlUtil.Parser {
             PlainSelect plainSelect = new PlainSelect();
             SubSelect subSelect = new SubSelect();
             subSelect.setSelectBody(selectBody);
+            subSelect.setAlias(TABLE_ALIAS);
             plainSelect.setFromItem(subSelect);
             plainSelect.setSelectItems(COUNT_ITEM);
             select.setSelectBody(plainSelect);
