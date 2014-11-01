@@ -157,11 +157,39 @@ database = hsqldb
 
 5. 增加`reasonable`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。具体作用请看上面配置文件中的注释内容。  
 
+###3. 如何选择配置这些参数
+
+单独看每个参数的说明可能是一件让人不爽的事情，这里列举一些可能会用到某些参数的情况。
+
+首先`dialect`属性是必须的，不需要解释。其他的参数一般情况下我们都不必去管，如果想了解何时使用合适，你可以参考以下场景：
+
+####场景一
+
+如果你仍然在用类似ibatis式的命名空间调用方式，你也许会用到`rowBoundsWithCount`，分页插件对`RowBounds`支持和Mybatis默认的方式是一致，默认情况下不会进行count查询，如果你想在分页查询时进行count查询，以及使用更强大的`PageInfo`类，你需要设置该参数为`true`。
+
+####场景二
+
+如果你仍然在用类似ibatis式的命名空间调用方式，你觉得RowBounds中的两个参数`offset,limit`不如`pageNum,pageSize`容易理解，你可以使用`offsetAsPageNum`参数，将该参数设置为`true`后，`offset`会当成`pageNum`使用，`limit`和`pageSize`含义相同。
+
+####场景三
+
+如果觉得某个地方使用分页后，你仍然想通过控制参数查询全部的结果，你可以配置`pageSizeZero`为`true`，配置后，如可以通过设置`pageSize=0`或者`RowBounds.limit = 0`就会查询出全部的结果。
+
+####场景四
+
+如果你分页插件使用于类似分页查看列表式的数据，如新闻列表，软件列表，你希望用户输入的页数不在合法范围（第一页到最后一页之外）时能够正确的响应到正确的结果页面，那么你可以配置`reasonable`为`true`，这时如果`pageNum<1`会查询第一页，如果`pageNum>总页数`会查询最后一页。
+
 ###3. Spring配置方法  
 
-首先Spring中配置`org.mybatis.spring.SqlSessionFactoryBean`时可以配置`configLocation`属性指向上面的`mybatis-config.xml`文件。  
+首先需要在Spring中配置`org.mybatis.spring.SqlSessionFactoryBean`。然后配置配置Mybatis的具体配置有两种方式，一种是用mybatis默认的xml配置，另一种就是完全使用spring的属性配置方式。
 
-如果你想直接在Spring中配置分页插件，如果使用了`plugins`属性，可以像下面这样配置：  
+####1.mybatis默认的xml配置
+
+配置`configLocation`属性指向上面的`mybatis-config.xml`文件。有关分页插件的配置都在`mybatis-config.xml`，具体配置内容参考上面的`mybatis-config.xml`。  
+
+####2.使用spring的属性配置方式
+
+使用spring的属性配置方式，可以使用`plugins`属性像下面这样配置：    
 
 ```xml
 <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -251,6 +279,17 @@ assertEquals(true, page.isHasNextPage());
 
 ##对于两种分页方式如何选择   
 
+两种方式指的是如下代码所示的两种：  
+
+```java
+//第一种，命名空间方式的调用
+List<Country> list = sqlSession.selectList("selectIf", null, new RowBounds(1, 10));
+
+//第二种，Mapper接口方式的调用，推荐这种使用方式。
+PageHelper.startPage(1, 10);
+List<Country> list = countryMapper.selectIf(1);
+```
+
 1. 如果你不想在Mapper方法上增加一个带`RowBounds`参数的方法，并且你喜欢用Mapper接口形式调用，你可以使用`PageHelper.startPage`，并且该方法可以控制是否执行count方法。  
 
 2. 实际上在Mapper接口中添加一个带`RowBounds`参数的方法很容易，使用和不带`RowBounds`参数一样的xml就可以。  
@@ -261,7 +300,7 @@ assertEquals(true, page.isHasNextPage());
 
 ##`PageHelper.startPage`方法重要提示
 
-只有紧跟在`PageHelper.startPage`方法后的<b>第一个</b>Mybatis<b>查询</b>方法会被分页。
+只有紧跟在`PageHelper.startPage`方法后的<b>第一个</b>Mybatis的<b>查询（Select方法）</b>方法会被分页。
 
 <br/>
 
