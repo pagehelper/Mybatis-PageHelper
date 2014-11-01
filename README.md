@@ -273,7 +273,7 @@ assertEquals(true, page.isHasNextPage());
 
 ##分页插件不支持关联结果查询
 
-原因以及解决版本可以看这里：
+原因以及解决方法可以看这里：
 >http://my.oschina.net/flags/blog/274000 
 
 分支插件不支持关联结果查询，但是支持关联嵌套查询。只会对主sql进行分页，嵌套的sql不会被分页。  
@@ -287,35 +287,38 @@ assertEquals(true, page.isHasNextPage());
 ```java
 String originalSql = "Select * from `order` o where abc = ? order by id desc , name asc";
 SqlUtil.testSql("mysql", originalSql);
-SqlUtil.testSql("hsqldb", originalSql);
 SqlUtil.testSql("oracle", originalSql);
-SqlUtil.testSql("postgresql", originalSql);
 ```  
 
 执行后输出： 
 
 ```sql   
-select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count
-select * from (Select * from `order` o where abc = ? order by id desc , name asc) as tmp_page limit ?,?  
+SELECT count(*) FROM sys_user o WHERE abc = ?
+select * from (Select * from sys_user o where abc = ? order by id desc , name asc) as tmp_page limit ?,?
 
-select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count
-Select * from `order` o where abc = ? order by id desc , name asc limit ? offset ?  
-
-select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count  
-select * from ( select tmp_page.*, rownum row_id from (  
-  Select * from `order` o where abc = ? order by id desc , name asc 
-) tmp_page where rownum <= ? ) where row_id > ?  
-
-select count(0) from (SELECT * FROM `order` o WHERE abc = ?) tmp_count
-select * from (Select * from `order` o where abc = ? order by id desc , name asc) as tmp_page limit ? offset ?
+SELECT count(*) FROM sys_user o WHERE abc = ?
+select * from ( select tmp_page.*, rownum row_id from ( Select * from sys_user o where abc = ? order by id desc , name asc ) tmp_page where rownum <= ? ) where row_id > ?
 ```  
 
-<b>注:</b>使用`SqlParser`和不使用`SqlParser`的count查询sql很不一样。`SqlParser`可以更智能将原sql改为count查询，并且去除order by。
+使用`SqlParser`和不使用`SqlParser`的count查询sql很不一样。`SqlParser`可以更智能将原sql改为count查询，并且去除order by。
+
+例如不使用`SqlParser`时，和上面相同原sql的输出：
+
+```sql
+select count(*) from (Select * from sys_user o where abc = ? order by id desc , name asc) tmp_count
+select * from (Select * from sys_user o where abc = ? order by id desc , name asc) as tmp_page limit ?,?
+
+select count(*) from (Select * from sys_user o where abc = ? order by id desc , name asc) tmp_count
+select * from ( select tmp_page.*, rownum row_id from ( Select * from sys_user o where abc = ? order by id desc , name asc ) tmp_page where rownum <= ? ) where row_id > ?
+```
+
 
 <br/><br/>
 ##相关链接
 
-对应于Github的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
+对应于oschub的项目地址：http://git.oschina.net/free/Mybatis_PageHelper
+
+对应于github的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
 
 Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
 

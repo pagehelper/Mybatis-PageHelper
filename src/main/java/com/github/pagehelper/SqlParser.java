@@ -9,9 +9,9 @@ import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.mapping.BoundSql;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * sql解析类，使用该类时，必须引入jsqlparser-x.x.x.jar
@@ -30,6 +30,9 @@ public class SqlParser implements SqlUtil.Parser {
         TABLE_ALIAS = new Alias("table_count");
         TABLE_ALIAS.setUseAs(false);
     }
+
+    //缓存已经修改过的sql
+    private Map<String, String> CACHE = new ConcurrentHashMap<String, String>();
 
     public SqlParser(SqlUtil.Dialect dialect) {
         simpleParser = SqlUtil.SimpleParser.newParser(dialect);
@@ -52,9 +55,6 @@ public class SqlParser implements SqlUtil.Parser {
     public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
         return simpleParser.setPageParameter(parameterObject, boundSql, page);
     }
-
-    //缓存已经修改过的sql
-    private Map<String, String> CACHE = new HashMap<String, String>();
 
     public String parse(String sql) {
         if (CACHE.get(sql) != null) {
@@ -214,38 +214,5 @@ public class SqlParser implements SqlUtil.Parser {
             }
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        SqlParser sqlParser = new SqlParser(SqlUtil.Dialect.hsqldb);
-        System.out.println(sqlParser.parse("with " +
-                "cr as " +
-                "( " +
-                "    select CountryRegionCode from person.CountryRegion where Name like 'C%' order by name" +
-                ") " +
-                " " +
-                "select * from person.StateProvince where CountryRegionCode in (select * from cr)"));
-
-        System.out.println(sqlParser.parse("with cr as " +
-                " (select aaz093 from aa10 where aaa100 like 'AAB05%' order by aaz093 desc) " +
-                "select count(1) from aa10 where aaz093 in (select * from cr)"));
-
-
-        System.out.println(sqlParser.parse("select a.aac001,a.aac030,b.aaa103 " +
-                "  from ac02 a " +
-                "  left join aa10 b " +
-                "    on b.aaa100 = 'AAC031' " +
-                "   and b.aaa102 = a.aac031 " +
-                "   order by a.aac001"));
-
-        System.out.println(sqlParser.parse("select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
-                "union " +
-                "select * from aa10 where aaa100 = 'AAC031'"));
-
-        System.out.println(sqlParser.parse("select * from (select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
-                "union " +
-                "select * from aa10 where aaa100 = 'AAC031')"));
-//        System.out.println(sqlParser.parse(""));
-
     }
 }

@@ -74,7 +74,7 @@ public class SqlUtil {
         return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
     }
 
-    private static SqlUtil.Parser SQLPARSER;
+    private SqlUtil.Parser sqlParser;
 
     //数据库方言 - 使用枚举限制数据库类型
     public enum Dialect {
@@ -94,12 +94,12 @@ public class SqlUtil {
             Dialect dialect = Dialect.valueOf(strDialect);
             String sqlParserClass = this.getClass().getPackage().getName() + ".SqlParser";
             try {
-                SQLPARSER = (Parser) Class.forName(sqlParserClass).getConstructor(Dialect.class).newInstance(dialect);
+                sqlParser = (Parser) Class.forName(sqlParserClass).getConstructor(Dialect.class).newInstance(dialect);
             } catch (Exception e) {
-                e.printStackTrace();
+                //找不到时，不用处理
             }
-            if (SQLPARSER == null) {
-                SQLPARSER = SimpleParser.newParser(dialect);
+            if (sqlParser == null) {
+                sqlParser = SimpleParser.newParser(dialect);
             }
         } catch (IllegalArgumentException e) {
             String dialects = null;
@@ -123,7 +123,7 @@ public class SqlUtil {
      * @return
      */
     public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-        return SQLPARSER.setPageParameter(parameterObject, boundSql, page);
+        return sqlParser.setPageParameter(parameterObject, boundSql, page);
     }
 
     /**
@@ -491,7 +491,7 @@ public class SqlUtil {
         String sql = newSqlSource.getBoundSql().getSql();
         //改为分页sql
         MetaObject sqlObject = forObject(newSqlSource);
-        sqlObject.setValue("boundSql.sql", SQLPARSER.getPageSql(sql));
+        sqlObject.setValue("boundSql.sql", sqlParser.getPageSql(sql));
         //添加参数映射
         List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
         newParameterMappings.addAll(newSqlSource.getBoundSql().getParameterMappings());
@@ -510,7 +510,7 @@ public class SqlUtil {
     private BoundSqlSqlSource getCountSqlSource(BoundSqlSqlSource newSqlSource) {
         String sql = newSqlSource.getBoundSql().getSql();
         MetaObject sqlObject = forObject(newSqlSource);
-        sqlObject.setValue("boundSql.sql", SQLPARSER.getCountSql(sql));
+        sqlObject.setValue("boundSql.sql", sqlParser.getCountSql(sql));
         return newSqlSource;
     }
 
@@ -522,17 +522,9 @@ public class SqlUtil {
      */
     public static void testSql(String dialet, String originalSql) {
         SqlUtil sqlUtil = new SqlUtil(dialet);
-        String countSql = sqlUtil.SQLPARSER.getCountSql(originalSql);
+        String countSql = sqlUtil.sqlParser.getCountSql(originalSql);
         System.out.println(countSql);
-        String pageSql = sqlUtil.SQLPARSER.getPageSql(originalSql);
+        String pageSql = sqlUtil.sqlParser.getPageSql(originalSql);
         System.out.println(pageSql);
-    }
-
-    public static void main(String[] args) {
-        String originalSql = "Select * from `order` o where abc = ? order by id desc , name asc";
-        SqlUtil.testSql("mysql", originalSql);
-        SqlUtil.testSql("hsqldb", originalSql);
-        SqlUtil.testSql("oracle", originalSql);
-        SqlUtil.testSql("postgresql", originalSql);
     }
 }
