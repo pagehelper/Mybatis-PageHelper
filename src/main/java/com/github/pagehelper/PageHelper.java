@@ -41,10 +41,10 @@ import java.util.Properties;
  * @version 3.3.0
  *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
-	private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
+    private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
     //sql工具类
     private SqlUtil SQLUTIL;
     //RowBounds参数offset作为PageNum使用 - 默认不使用
@@ -103,7 +103,7 @@ public class PageHelper implements Interceptor {
      * @return 返回执行结果
      * @throws Throwable 抛出异常
      */
-	public Object intercept(Invocation invocation) throws Throwable {
+    public Object intercept(Invocation invocation) throws Throwable {
         final Object[] args = invocation.getArgs();
         RowBounds rowBounds = (RowBounds) args[2];
         if (LOCAL_PAGE.get() == null && rowBounds == RowBounds.DEFAULT) {
@@ -132,7 +132,11 @@ public class PageHelper implements Interceptor {
             }
             //简单的通过total的值来判断是否进行count查询
             if (page.isCount()) {
-                BoundSql boundSql = ms.getBoundSql(parameterObject);
+                BoundSql boundSql = null;
+                //只有静态sql需要获取boundSql
+                if (!SQLUTIL.isDynamic(ms)) {
+                    boundSql = ms.getBoundSql(parameterObject);
+                }
                 //将参数中的MappedStatement替换为新的qs
                 args[0] = SQLUTIL.getCountMappedStatement(ms, boundSql);
                 //查询总数
@@ -147,9 +151,17 @@ public class PageHelper implements Interceptor {
             if (page.getPageSize() > 0 &&
                     ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
                             || rowBounds != RowBounds.DEFAULT)) {
-                BoundSql boundSql = ms.getBoundSql(parameterObject);
+                BoundSql boundSql = null;
+                //只有静态sql需要获取boundSql
+                if (!SQLUTIL.isDynamic(ms)) {
+                    boundSql = ms.getBoundSql(parameterObject);
+                }
                 //将参数中的MappedStatement替换为新的qs
                 args[0] = SQLUTIL.getPageMappedStatement(ms, boundSql);
+                //动态sql时，boundSql在这儿通过新的ms获取
+                if (boundSql == null) {
+                    boundSql = ((MappedStatement) args[0]).getBoundSql(parameterObject);
+                }
                 //判断parameterObject，然后赋值
                 args[1] = SQLUTIL.setPageParameter(parameterObject, boundSql, page);
                 //执行分页查询

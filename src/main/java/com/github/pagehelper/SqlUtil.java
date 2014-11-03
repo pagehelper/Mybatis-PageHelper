@@ -447,6 +447,16 @@ public class SqlUtil {
     }
 
     /**
+     * 判断当前执行的是否为动态sql
+     *
+     * @param ms
+     * @return
+     */
+    public boolean isDynamic(MappedStatement ms) {
+        return ms.getSqlSource() instanceof DynamicSqlSource;
+    }
+
+    /**
      * 获取新的sqlSource
      *
      * @param ms
@@ -455,10 +465,9 @@ public class SqlUtil {
      * @return
      */
     private SqlSource getNewSqlSource(MappedStatement ms, BoundSqlSqlSource newSqlSource, String suffix) {
-        SqlSource sqlSource = ms.getSqlSource();
         //从XMLLanguageDriver.java和XMLScriptBuilder.java可以看出只有两种SqlSource
         //如果是动态sql
-        if (sqlSource instanceof DynamicSqlSource) {
+        if (isDynamic(ms)) {
             MetaObject msObject = forObject(ms);
             SqlNode sqlNode = (SqlNode) msObject.getValue("sqlSource.rootSqlNode");
             MixedSqlNode mixedSqlNode = null;
