@@ -44,7 +44,9 @@
 
 ###1. 引入分页代码或Jar包或使用Maven  
 
-####(1). 将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
+####1). 引入分页代码
+
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
 
 代码文件说明：  
   
@@ -58,7 +60,9 @@
  
  - `SqlUtil`\[必须\]：分页插件工具类，分页插件逻辑类，分页插件的主要实现方法都在这个类中。  
   
-####(2). 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
+####2). 引入Jar包  
+
+如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
  - https://oss.sonatype.org/#nexus-search;quick~pagehelper  
 
@@ -70,7 +74,9 @@
 
 <br>
 
-####(3). 如果你使用的maven，你可以添加如下依赖：  
+####3). 使用maven  
+  
+添加如下依赖：  
 
 ```xml  
 <dependency>
@@ -82,7 +88,6 @@
     <groupId>com.github.jsqlparser</groupId>
     <artifactId>jsqlparser</artifactId>
     <version>0.9.1</version>
-    <optional>true</optional>
 </dependency>
 ```  
 

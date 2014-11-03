@@ -94,6 +94,8 @@ public class SqlUtil {
             Dialect dialect = Dialect.valueOf(strDialect);
             String sqlParserClass = this.getClass().getPackage().getName() + ".SqlParser";
             try {
+                //使用SqlParser必须引入jsqlparser-x.x.x.jar
+                Class.forName("net.sf.jsqlparser.statement.select.Select");
                 sqlParser = (Parser) Class.forName(sqlParserClass).getConstructor(Dialect.class).newInstance(dialect);
             } catch (Exception e) {
                 //找不到时，不用处理
