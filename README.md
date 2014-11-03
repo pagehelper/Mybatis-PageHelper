@@ -21,35 +21,10 @@
 
 #最新测试版3.3.0-SNAPSHOT
 
-##重要提示
-
-###`fdb-sql-parser`换为`jsqlparser`  
+##重要提示：`fdb-sql-parser`换为`jsqlparser`  
 
 为了去掉count查询中的order by语句，最早使用了`fdb-sql-parser`，由于效果不好，现在已经替换成`jsqlparser`，`jsqlparser`比`fdb-sql-parser`更通用，而且体积更小，对原sql改动更少。替换后，下面的有关说明都会改为`jsqlparser`，如果你使用了最新的测试版分页，你需要下载`jsqlparser`。  
 
-###分页插件多数据库测试  
-
-为了更方便的测试不同的数据库，在`src/test/resources`目录下增加了不同数据库的mybatis配置文件，通过修改`test.properties`中的配置可以让测试使用不同的配置进行测试。  
-
-`test.properties`内容：  
-
-```properties
-#首先需要在本机配置对应的数据库
-
-#想要测试那个数据库，这里就写那个数据库
-#这个值和test/resources中的数据库对应的文件夹名字相同
-#目前可选为:
-#hsqldb
-#mysql
-#oracle
-#postgresql
-database = hsqldb
-```  
-各种数据库对应的sql文件都在对应的目录中。
-
-###代码中明确不支持带有`for update`语句的分页
-
-对于带有`for update`的sql，会抛出运行时异常，对于这样的sql建议手动分页，毕竟这样的sql需要重视。
 
 ##3.3.0-SNAPSHOT改进内容
 
@@ -69,9 +44,21 @@ database = hsqldb
 
 ###1. 引入分页代码或Jar包或使用Maven  
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
+####(1). 将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
 
-如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
+代码文件说明：  
+  
+ - `Page<E>`\[必须\]：分页参数类，该类继承`ArrayList`，虽然分页查询返回的结果实际类型是`Page<E>`,但是可以完全不出现所有的代码中，可以直接当成`List`使用。返回值不建议使用`Page`，建议仍然用`List`。如果需要用到分页信息，使用下面的`PageInfo`类对List进行包装即可。  
+ 
+ - `PageHelper`\[必须\]：分页插件拦截器类，对Mybatis的拦截在这个类中实现。
+ 
+ - `PageInfo`\[可选\]：`Page<E>`的包装类，包含了全面的分页属性信息。  
+ 
+ - `SqlParser`\[可选\]：提供高效的count查询sql。主要是智能替换原sql语句为count(*)，去除不带参数的order by语句。需要`jsqlparser-0.9.1.jar`支持。  
+ 
+ - `SqlUtil`\[必须\]：分页插件工具类，分页插件逻辑类，分页插件的主要实现方法都在这个类中。  
+  
+####(2). 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
  - https://oss.sonatype.org/#nexus-search;quick~pagehelper  
 
@@ -83,7 +70,7 @@ database = hsqldb
 
 <br>
 
-如果你使用的maven，你可以添加如下依赖：  
+####(3). 如果你使用的maven，你可以添加如下依赖：  
 
 ```xml  
 <dependency>
@@ -358,6 +345,25 @@ select count(*) from (Select * from sys_user o where abc = ? order by id desc , 
 select * from ( select tmp_page.*, rownum row_id from ( Select * from sys_user o where abc = ? order by id desc , name asc ) tmp_page where rownum <= ? ) where row_id > ?
 ```
 
+##分页插件多数据库测试  
+
+为了更方便的测试不同的数据库，在`src/test/resources`目录下增加了不同数据库的mybatis配置文件，通过修改`test.properties`中的配置可以让测试使用不同的配置进行测试。  
+
+`test.properties`内容：  
+
+```properties
+#首先需要在本机配置对应的数据库
+
+#想要测试那个数据库，这里就写那个数据库
+#这个值和test/resources中的数据库对应的文件夹名字相同
+#目前可选为:
+#hsqldb
+#mysql
+#oracle
+#postgresql
+database = hsqldb
+```  
+各种数据库对应的sql文件都在对应的目录中。
 
 <br/><br/>
 ##相关链接
