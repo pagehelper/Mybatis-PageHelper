@@ -316,7 +316,7 @@ List<Country> list = countryMapper.selectIf(1);
 为了便于测试sql语句方面的问题，提供了`SqlUtil.testSql`方法，使用方法如下：  
 
 ```java
-String originalSql = "Select * from `order` o where abc = ? order by id desc , name asc";
+String originalSql = "Select * from sys_user o where abc = ? order by id desc , name asc";
 SqlUtil.testSql("mysql", originalSql);
 SqlUtil.testSql("oracle", originalSql);
 ```  
