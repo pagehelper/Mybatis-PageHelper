@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author liuzh
  */
+@SuppressWarnings("rawtypes")
 public class SqlParser implements SqlUtil.Parser {
     private static final List<SelectItem> COUNT_ITEM;
     private static final Alias TABLE_ALIAS;
@@ -52,7 +53,7 @@ public class SqlParser implements SqlUtil.Parser {
         return simpleParser.getPageSql(sql);
     }
 
-    public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+	public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
         return simpleParser.setPageParameter(parameterObject, boundSql, page);
     }
 
