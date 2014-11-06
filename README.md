@@ -4,13 +4,13 @@
 
 该插件目前支持`Oracle`,`Mysql`,`Hsqldb`,`PostgreSQL`四种数据库分页。  
 
-[点击提交BUG][1]
+[点击提交BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
 ##最新稳定版为3.2.3 版
   
 3.2.3版本使用方法请切换到3.2.3版标签查看
 
-地址：[点击进入gitosc-3.2.3目录][2] | [点击进入github-3.2.3目录][3] 
+地址：[点击进入gitosc-3.2.3目录](http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/) | [点击进入github-3.2.3目录](https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/) 
 
 #最新测试版3.3.0-SNAPSHOT
 
@@ -39,7 +39,7 @@
 
 ####1). 引入分页代码
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包][4] | [点击进入github包][5]）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包](https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/) | [点击进入github包](https://github.com/pagehelper/Mybatis-PageHelper/tree/master/src/main/java/com/github/pagehelper)）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
 
 代码文件说明：  
   
@@ -265,7 +265,7 @@ assertEquals(true, page.isHasNextPage());
 
 这个项目是一个分页插件的WEB测试项目，使用Maven构建，只包含一个简单的例子和简单的页面分页效果。
 
-项目地址：[http://git.oschina.net/free/Mybatis-Sample][6]
+项目地址：[http://git.oschina.net/free/Mybatis-Sample](http://git.oschina.net/free/Mybatis-Sample)
 
 <br/>
 
@@ -370,7 +370,7 @@ database = hsqldb
 
 对应于github的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
 
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample][7]
+Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample](http://git.oschina.net/free/Mybatis-Sample)
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 
@@ -378,15 +378,15 @@ Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html
 
 Mybatis专栏： 
 
-- [Mybatis示例][8]
+- [Mybatis示例](http://blog.csdn.net/column/details/mybatis-sample.html)
 
-- [Mybatis问题集][9]  
+- [Mybatis问题集](http://blog.csdn.net/column/details/mybatisqa.html)  
 
 作者博客：  
 
-- [http://my.oschina.net/flags/blog][10]
+- http://my.oschina.net/flags/blog
 
-- [http://blog.csdn.net/isea533][11]  
+- http://blog.csdn.net/isea533   
 
 作者QQ： 120807756  
 
@@ -428,7 +428,7 @@ Mybatis专栏：
 
 1. 增加了对`Hsqldb`的支持，主要目的是为了方便测试使用`Hsqldb`  
 
-2. 增加了该项目的一个测试项目[Mybatis-Sample][12]，测试项目数据库使用`Hsqldb`  
+2. 增加了该项目的一个测试项目[Mybatis-Sample](http://git.oschina.net/free/Mybatis-Sample)，测试项目数据库使用`Hsqldb`  
 
 3. 增加MIT协议
 
@@ -444,7 +444,7 @@ Mybatis专栏：
   
 1. 解决了`RowBounds`分页的严重BUG，原先会在物理分页基础上进行内存分页导致严重错误，已修复  
 
-2. 增加对MySql的支持，该支持由[鲁家宁][13]增加。  
+2. 增加对MySql的支持，该支持由[鲁家宁](http://my.oschina.net/lujianing)增加。  
   
 ###v3.0 
  
@@ -478,17 +478,3 @@ Mybatis专栏：
 
 2. 提供便捷的使用方式  
 
-
-  [1]: http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=
-  [2]:http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/
-  [3]:https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/
-  [4]: http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper
-  [5]:https://github.com/pagehelper/Mybatis-PageHelper/tree/master/src/main/java/com/github/pagehelper
-  [6]: http://git.oschina.net/free/Mybatis-Sample
-  [7]: http://git.oschina.net/free/Mybatis-Sample
-  [8]: http://blog.csdn.net/column/details/mybatis-sample.html
-  [9]: http://blog.csdn.net/column/details/mybatisqa.html
-  [10]: http://my.oschina.net/flags/blog
-  [11]: http://blog.csdn.net/isea533
-  [12]: http://git.oschina.net/free/Mybatis-Sample
-  [13]: http://my.oschina.net/lujianing
