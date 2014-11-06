@@ -203,7 +203,7 @@ List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1
 
 分页插件检测到使用了RowBounds参数时，就会对该查询进行<b>物理分页</b>。
 
-关于这种方式的调用，有两个特殊的参数是针对`RowBounds`的，你可以参看上面的<a class="anchor" href="#场景一">场景一</a>和<a class="anchor" href="#场景二">场景二</a>
+关于这种方式的调用，有两个特殊的参数是针对`RowBounds`的，你可以参看上面的<a href="#场景一">场景一</a>和<a href="#场景二">场景二</a>
 
 <b>注：</b>不只有命名空间方式可以用RowBounds，使用接口的时候也可以增加RowBounds参数，例如：  
 
