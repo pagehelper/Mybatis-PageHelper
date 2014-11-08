@@ -61,6 +61,10 @@ public class Page<E> extends ArrayList<E> {
     private int endRow;
     private long total;
     private int pages;
+    
+    public Page(){
+    	super();
+    }
 
     public Page(int pageNum, int pageSize) {
         this(pageNum, pageSize, SQL_COUNT);
