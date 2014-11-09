@@ -174,6 +174,10 @@ public class PageInfo<T> {
         return pageSize;
     }
 
+    public int getSize() {
+        return size;
+    }
+
     public int getStartRow() {
         return startRow;
     }

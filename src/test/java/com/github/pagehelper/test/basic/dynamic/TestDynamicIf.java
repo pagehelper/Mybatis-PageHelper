@@ -44,7 +44,7 @@ public class TestDynamicIf {
      * 使用Mapper接口调用时，使用PageHelper.startPage效果更好，不需要添加Mapper接口参数
      */
     @Test
-    public void testMapperWithStartPage() {
+    public void testCountCache() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
@@ -61,6 +61,31 @@ public class TestDynamicIf {
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page) list).getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
+    /**
+     * 使用Mapper接口调用时，使用PageHelper.startPage效果更好，不需要添加Mapper接口参数
+     */
+    @Test
+    public void testCountCache2() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 10);
+            List<Country> list = countryMapper.selectIf(1);
+            assertEquals(2, list.get(0).getId());
+            assertEquals(10, list.size());
+            assertEquals(182, ((Page) list).getTotal());
+
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(2, 10);
+            list = countryMapper.selectIf(1);
+            assertEquals(12, list.get(0).getId());
+            assertEquals(10, list.size());
+            assertEquals(182, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }
