@@ -19,7 +19,7 @@
 
 ####1). 引入分页代码
 
-将本插件中的`com.github.pagehelper`包（[点击进入gitosc包](https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/) | [点击进入github包](https://github.com/pagehelper/Mybatis-PageHelper/tree/master/src/main/java/com/github/pagehelper)）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。  
+将本插件中的`com.github.pagehelper`包（[点击进入gitosc包](http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/main/java/com/github/pagehelper) | [点击进入github包](https://github.com/pagehelper/Mybatis-PageHelper/tree/master/src/main/java/com/github/pagehelper)）下面的三个类`Page`,`PageHelper`和`SqlUtil`放到项目中，如果需要使用`PageInfo`（强大的分页包装类），也可以放到项目中。如果想使用更高效的`count`查询，你也可以将`SqlParser`放到`SqlUtil`相同的包下，使用`SqlParser`时必须使用`jsqlparser-0.9.1.jar`。
   
 ####2). 引入Jar包  
 
