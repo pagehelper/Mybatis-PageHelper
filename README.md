@@ -6,7 +6,7 @@
 
 [点击提交BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
-嫌这页文档太乱？[点击这里查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
+##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
 ##最新稳定版为3.2.3 版
   
@@ -220,7 +220,7 @@
 
 ###5. 如何在代码中使用  
 
-阅读前后请注意看[重要提示](Important.md)  
+阅读前后请注意看<a href="#重要提示">重要提示</a>
 
 首先该分页插件支持以下两种调用方式：  
 
