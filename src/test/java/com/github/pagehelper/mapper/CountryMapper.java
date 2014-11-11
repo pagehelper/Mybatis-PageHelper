@@ -48,4 +48,9 @@ public interface CountryMapper {
     List<Country> selectLeftjoin();
 
     List<Country> selectWith();
+
+    //select column中包含参数时
+    List<Country> selectColumns(@Param("columns") String... columns);
+
+    List<Country> selectMULId(int mul);
 }

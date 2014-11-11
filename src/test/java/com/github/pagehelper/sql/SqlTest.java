@@ -44,6 +44,31 @@ public class SqlTest {
     }
 
     @Test
+    public void testSelectParameter() throws JSQLParserException {
+        String originalSql = "Select a,b,? as c,? d from sys_user o where abc = ? order by id desc , name asc";
+        SqlUtil.testSql("mysql", originalSql);
+        SqlUtil.testSql("hsqldb", originalSql);
+        SqlUtil.testSql("oracle", originalSql);
+        SqlUtil.testSql("postgresql", originalSql);
+    }
+
+    @Test
+    public void testSelectParameter2() throws JSQLParserException {
+        String originalSql = "with " +
+                "cr as " +
+                "( " +
+                "    select CountryRegionCode,? name,? as id from person.CountryRegion where Name like 'C%' order by " +
+                "name" +
+                ") " +
+                " " +
+                "select ? name,? as code from person.StateProvince where CountryRegionCode in (select * from cr)";
+        SqlUtil.testSql("mysql", originalSql);
+        SqlUtil.testSql("hsqldb", originalSql);
+        SqlUtil.testSql("oracle", originalSql);
+        SqlUtil.testSql("postgresql", originalSql);
+    }
+
+    @Test
     public void testSqlParser() throws JSQLParserException {
         SqlParser sqlParser = new SqlParser(SqlUtil.Dialect.hsqldb);
         System.out.println(sqlParser.parse("with " +

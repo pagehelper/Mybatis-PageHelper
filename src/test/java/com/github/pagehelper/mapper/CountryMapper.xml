@@ -129,4 +129,22 @@
   <select id="selectWith" resultType="com.github.pagehelper.model.Country">
     with rs as (select id from country where id>150) select * from country where id in (select * from rs)
   </select>
+
+  <!--select column中包含参数时-->
+  <select id="selectColumns" resultType="com.github.pagehelper.model.Country">
+    select
+    <if test="columns==null or columns.length == 0">
+      *
+    </if>
+    <if test="columns!=null and columns.length > 0">
+      <foreach collection="columns" item="column" separator=",">
+        ${column}
+      </foreach>
+    </if>
+    from country order by id
+  </select>
+  <select id="selectMULId" resultType="com.github.pagehelper.model.Country">
+    select id * #{mul} as id,countryname,countrycode from country order by id
+  </select>
+
 </mapper>
