@@ -89,7 +89,9 @@ public class SqlParser implements SqlUtil.Parser {
      */
     public void sqlToCount(Select select) {
         SelectBody selectBody = select.getSelectBody();
-        if (selectBody instanceof PlainSelect) {
+        //select中包含参数时在else中处理
+        if (selectBody instanceof PlainSelect &&
+                !selectItemsHashParameters(((PlainSelect) selectBody).getSelectItems())) {
             ((PlainSelect) selectBody).setSelectItems(COUNT_ITEM);
         } else {
             PlainSelect plainSelect = new PlainSelect();
@@ -210,7 +212,24 @@ public class SqlParser implements SqlUtil.Parser {
             return false;
         }
         for (OrderByElement orderByElement : orderByElements) {
-            if (orderByElement.toString().toUpperCase().contains("?")) {
+            if (orderByElement.toString().contains("?")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * 判断selectItems是否包含参数，有参数的不能去
+     *
+     * @param selectItems
+     * @return
+     */
+    public boolean selectItemsHashParameters(List<SelectItem> selectItems) {
+        if (selectItems == null) {
+            return false;
+        }
+        for (SelectItem selectItem : selectItems) {
+            if (selectItem.toString().contains("?")) {
                 return true;
             }
         }
