@@ -147,4 +147,8 @@
     select id * #{mul} as id,countryname,countrycode from country order by id
   </select>
 
+  <select id="selectGroupBy" resultType="com.github.pagehelper.model.Country">
+    select countryname,countrycode,count(id) id from country group by countryname,countrycode
+  </select>
+
 </mapper>
