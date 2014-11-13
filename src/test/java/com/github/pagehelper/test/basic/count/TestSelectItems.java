@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.test.basic.selectitems;
+package com.github.pagehelper.test.basic.count;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;

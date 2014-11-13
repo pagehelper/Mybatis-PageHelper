@@ -53,4 +53,7 @@ public interface CountryMapper {
     List<Country> selectColumns(@Param("columns") String... columns);
 
     List<Country> selectMULId(int mul);
+
+    //group by时
+    List<Country> selectGroupBy();
 }

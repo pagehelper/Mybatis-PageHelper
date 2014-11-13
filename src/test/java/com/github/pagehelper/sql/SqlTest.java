@@ -100,4 +100,10 @@ public class SqlTest {
                 "select * from aa10 where aaa100 = 'AAC031')"));
 //        System.out.println(sqlParser.parse(""));
     }
+
+    @Test
+    public void testSqlParser2() throws JSQLParserException {
+        SqlParser sqlParser = new SqlParser(SqlUtil.Dialect.hsqldb);
+        System.out.println(sqlParser.parse("select countryname,count(id) from country group by countryname"));
+    }
 }
