@@ -214,11 +214,11 @@ public class PageInfo<T> {
         return lastPage;
     }
 
-    public boolean isFirstPage() {
+    public boolean isIsFirstPage() {
         return isFirstPage;
     }
 
-    public boolean isLastPage() {
+    public boolean isIsLastPage() {
         return isLastPage;
     }
 
