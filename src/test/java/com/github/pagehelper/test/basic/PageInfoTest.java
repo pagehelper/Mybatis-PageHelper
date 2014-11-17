@@ -34,8 +34,8 @@ public class PageInfoTest {
             assertEquals(19, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(8, page.getLastPage());
-            assertEquals(true, page.isFirstPage());
-            assertEquals(false, page.isLastPage());
+            assertEquals(true, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
             assertEquals(false, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
 
@@ -52,8 +52,8 @@ public class PageInfoTest {
             assertEquals(19, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(8, page.getLastPage());
-            assertEquals(false, page.isFirstPage());
-            assertEquals(false, page.isLastPage());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
             assertEquals(true, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
 
@@ -70,8 +70,8 @@ public class PageInfoTest {
             assertEquals(19, page.getPages());
             assertEquals(12, page.getFirstPage());
             assertEquals(19, page.getLastPage());
-            assertEquals(false, page.isFirstPage());
-            assertEquals(true, page.isLastPage());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(true, page.isIsLastPage());
             assertEquals(true, page.isHasPreviousPage());
             assertEquals(false, page.isHasNextPage());
 
@@ -101,8 +101,8 @@ public class PageInfoTest {
             assertEquals(4, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(4, page.getLastPage());
-            assertEquals(true, page.isFirstPage());
-            assertEquals(false, page.isLastPage());
+            assertEquals(true, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
             assertEquals(false, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
 
@@ -119,8 +119,8 @@ public class PageInfoTest {
             assertEquals(4, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(4, page.getLastPage());
-            assertEquals(false, page.isFirstPage());
-            assertEquals(false, page.isLastPage());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
             assertEquals(true, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
 
@@ -136,8 +136,8 @@ public class PageInfoTest {
             assertEquals(4, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(4, page.getLastPage());
-            assertEquals(false, page.isFirstPage());
-            assertEquals(false, page.isLastPage());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
             assertEquals(true, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
 
@@ -154,8 +154,8 @@ public class PageInfoTest {
             assertEquals(4, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(4, page.getLastPage());
-            assertEquals(false, page.isFirstPage());
-            assertEquals(true, page.isLastPage());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(true, page.isIsLastPage());
             assertEquals(true, page.isHasPreviousPage());
             assertEquals(false, page.isHasNextPage());
 
@@ -185,8 +185,8 @@ public class PageInfoTest {
             assertEquals(19, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(19, page.getLastPage());
-            assertEquals(true, page.isFirstPage());
-            assertEquals(false, page.isLastPage());
+            assertEquals(true, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
             assertEquals(false, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
 
@@ -202,8 +202,8 @@ public class PageInfoTest {
             assertEquals(4, page.getPages());
             assertEquals(1, page.getFirstPage());
             assertEquals(2, page.getLastPage());
-            assertEquals(false, page.isFirstPage());
-            assertEquals(false, page.isLastPage());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
             assertEquals(true, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
         } finally {
