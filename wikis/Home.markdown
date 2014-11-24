@@ -50,4 +50,4 @@ Mybatis专栏：
 
 作者邮箱： abel533@gmail.com  
 
-推荐一个Mybatis的QQ群： 146127540  
+Mybatis工具群： 211286137 (Mybatis相关工具插件等等)
