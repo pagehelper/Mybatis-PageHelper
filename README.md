@@ -2,26 +2,15 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`Hsqldb`,`PostgreSQL`四种数据库分页。  
+该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`六种数据库分页。  
 
 [点击提交BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
-##最新稳定版为3.2.3 版
-  
-3.2.3版本使用方法请切换到3.2.3版标签查看
+##最新稳定版为3.3.0
 
-地址：[点击进入gitosc-3.2.3目录](http://git.oschina.net/free/Mybatis_PageHelper/tree/v3.2.3/) | [点击进入github-3.2.3目录](https://github.com/pagehelper/Mybatis-PageHelper/tree/v3.2.3/) 
-
-#最新测试版3.3.0-SNAPSHOT
-
-##重要提示：`fdb-sql-parser`换为`jsqlparser`  
-
-为了去掉count查询中的order by语句，最早使用了`fdb-sql-parser`，由于效果不好，现在已经替换成`jsqlparser`，`jsqlparser`比`fdb-sql-parser`更通用，而且体积更小，对原sql改动更少。替换后，下面的有关说明都会改为`jsqlparser`，如果你使用了最新的测试版分页，你需要下载`jsqlparser`。  
-
-
-##3.3.0-SNAPSHOT改进内容
+##3.3.0改进内容
 
  1. 对`MappedStatement`对象进行缓存，包括count查询的`MappedStatement`以及分页查询的`MappedStatement`，分页查询改为预编译查询。
 
@@ -33,7 +22,7 @@
 
  4. 分页合理化，自动处理pageNum的异常情况。例如当pageNum<=0时，会设置pageNum=1，然后查询第一页。当pageNum>pages(总页数)时，自动将pageNum=pages，查询最后一页。  
 
- 5. 增加对`PostgreSQL`支持。
+ 5. 增加对`PostgreSQL`,`MariaDB`,`SQLite`支持。其中,`MariaDB`,`SQLite`和`Mysql`分页一样。
 
 <br>
 <br>
@@ -148,7 +137,7 @@
 
 其他五个参数说明：
 
-1. 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`hsqldb`,`postgresql`,<b>没有默认值，必须指定该属性</b>。  
+1. 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,<b>没有默认值，必须指定该属性</b>。  
 
 2. 增加`offsetAsPageNum`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页时，会将`offset`参数当成`pageNum`使用，可以用页码和页面大小两个参数进行分页。  
 
