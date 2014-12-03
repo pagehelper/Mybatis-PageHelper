@@ -73,7 +73,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.3.0</version>
 </dependency>
 <dependency>
     <groupId>com.github.jsqlparser</groupId>
@@ -81,24 +81,6 @@
     <version>0.9.1</version>
 </dependency>
 ```  
-
-使用maven中央库中的快照版时，需要在pom.xml中添加如下配置：  
-
-```xml
-<repositories>
-    <repository>
-          <id>sonatype-nexus-snapshots</id>
-          <name>Sonatype Nexus Snapshots</name>
-          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-          <releases>
-                <enabled>false</enabled>
-          </releases>
-          <snapshots>
-                <enabled>true</enabled>
-          </snapshots>
-    </repository>
-</repositories>
-```
 
 ###2. 在Mybatis配置xml中配置拦截器插件:    
 
