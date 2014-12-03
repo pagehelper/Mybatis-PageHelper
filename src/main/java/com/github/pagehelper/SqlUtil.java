@@ -78,7 +78,7 @@ public class SqlUtil {
 
     //数据库方言 - 使用枚举限制数据库类型
     public enum Dialect {
-        mysql, oracle, hsqldb, postgresql
+        mysql, mariadb, oracle, hsqldb, postgresql
     }
 
     /**
@@ -168,6 +168,7 @@ public class SqlUtil {
             Parser parser = null;
             switch (dialect) {
                 case mysql:
+                case mariadb:
                     parser = new MysqlParser();
                     break;
                 case oracle:
@@ -244,10 +245,9 @@ public class SqlUtil {
     private static class MysqlParser extends SimpleParser {
         @Override
         public String getPageSql(String sql) {
-            StringBuilder sqlBuilder = new StringBuilder(sql.length() + 40);
-            sqlBuilder.append("select * from (");
+            StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
             sqlBuilder.append(sql);
-            sqlBuilder.append(") as tmp_page limit ?,?");
+            sqlBuilder.append(" limit ?,?");
             return sqlBuilder.toString();
         }
 
