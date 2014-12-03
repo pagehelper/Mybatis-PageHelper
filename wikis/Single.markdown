@@ -73,7 +73,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.3.0</version>
 </dependency>
 <dependency>
     <groupId>com.github.jsqlparser</groupId>
@@ -82,7 +82,7 @@
 </dependency>
 ```  
 
-使用maven中央库中的快照版时，需要在pom.xml中添加如下配置：  
+当使用maven中央库中的快照版时，需要在pom.xml中添加如下配置：  
 
 ```xml
 <repositories>
