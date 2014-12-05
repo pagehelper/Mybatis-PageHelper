@@ -39,29 +39,25 @@ import java.util.List;
 public class Page<E> extends ArrayList<E> {
     private static final long serialVersionUID = 1L;
 
-    private static boolean reasonable = false;
-
-    public static void setReasonable(String reasonable) {
-        Page.reasonable = Boolean.parseBoolean(reasonable);
-    }
-
-    /**
-     * 不进行count查询
-     */
+    /**不进行count查询*/
     private static final int NO_SQL_COUNT = -1;
-
-    /**
-     * 进行count查询
-     */
+    /**进行count查询*/
     private static final int SQL_COUNT = 0;
-
+    /**页码，从1开始*/
     private int pageNum;
+    /**页面大小*/
     private int pageSize;
+    /**起始行*/
     private int startRow;
+    /**末行*/
     private int endRow;
+    /**总数*/
     private long total;
+    /**总页数*/
     private int pages;
-    
+    /**分页合理化*/
+    private boolean reasonable;
+
     public Page(){
     	super();
     }
@@ -76,10 +72,6 @@ public class Page<E> extends ArrayList<E> {
 
     public Page(int pageNum, int pageSize, int total) {
         super(pageSize > -1 ? pageSize : 0);
-        //分页合理化，针对不合理的页码自动处理
-        if (reasonable && pageNum <= 0) {
-            pageNum = 1;
-        }
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.total = total;
@@ -148,6 +140,14 @@ public class Page<E> extends ArrayList<E> {
         if (reasonable && pageNum > pages) {
             pageNum = pages;
             calculateStartAndEndRow();
+        }
+    }
+
+    public void setReasonable(boolean reasonable) {
+        this.reasonable = reasonable;
+        //分页合理化，针对不合理的页码自动处理
+        if (this.reasonable && this.pageNum <= 0) {
+            this.pageNum = 1;
         }
     }
 

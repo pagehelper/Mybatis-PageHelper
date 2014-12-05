@@ -53,7 +53,8 @@ public class PageHelper implements Interceptor {
     private boolean rowBoundsWithCount = false;
     //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
     private boolean pageSizeZero = false;
-
+    //分页合理化
+    private boolean reasonable = false;
     /**
      * 开始分页
      *
@@ -85,7 +86,6 @@ public class PageHelper implements Interceptor {
         Page page = LOCAL_PAGE.get();
         //移除本地变量
         LOCAL_PAGE.remove();
-
         if (page == null) {
             if (offsetAsPageNum) {
                 page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
@@ -93,6 +93,8 @@ public class PageHelper implements Interceptor {
                 page = new Page(rowBounds, rowBoundsWithCount);
             }
         }
+        //分页合理化
+        page.setReasonable(reasonable);
         return page;
     }
 
@@ -208,6 +210,6 @@ public class PageHelper implements Interceptor {
         this.pageSizeZero = Boolean.parseBoolean(pageSizeZero);
         //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
         String reasonable = p.getProperty("reasonable");
-        Page.setReasonable(reasonable);
+        this.reasonable = Boolean.parseBoolean(reasonable);
     }
 }
