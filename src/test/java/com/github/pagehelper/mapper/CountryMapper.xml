@@ -107,6 +107,9 @@
       </choose>
     </where>
   </select>
+  <select id="selectLike" resultType="com.github.pagehelper.model.Country">
+    select * from country where countryname like concat('%',#{contryname},'%')
+  </select>
   <select id="selectByOrder2" resultType="com.github.pagehelper.model.Country">
     select * from country order by ${order}
   </select>
