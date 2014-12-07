@@ -36,6 +36,7 @@ import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +61,8 @@ public class SqlUtil {
     private static final String PAGEPARAMETER_FIRST = "First" + SUFFIX_PAGE;
     //第二个分页参数
     private static final String PAGEPARAMETER_SECOND = "Second" + SUFFIX_PAGE;
+
+    private static final TypeHandlerRegistry TYPE_HANDLER_REGISTRY = new TypeHandlerRegistry();
 
     private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
@@ -222,17 +225,26 @@ public class SqlUtil {
                 paramMap = (Map) parameterObject;
             } else {
                 paramMap = new HashMap();
-                //这里以及下面使用的地方，主要解决一个参数时的问题，例如使用一个参数Country使用id属性时，不这样处理会导致id=Country
-                MetaObject metaObject = forObject(parameterObject);
+                //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
+                //默认的TYPE_HANDLER_REGISTRY包含的都是一个属性的类型，这些类型不需要反射，只需要他本身的值
+                //对于用户自定义的typeHandler是处理查询结果的，这里不用考虑
+                boolean hasTypeHandler = TYPE_HANDLER_REGISTRY.hasTypeHandler(parameterObject.getClass());
+                if (!hasTypeHandler) {
+                    MetaObject metaObject = forObject(parameterObject);
+                    for (String name : metaObject.getGetterNames()) {
+                        paramMap.put(name, metaObject.getValue(name));
+                    }
+                }
+                //下面这段方法，主要解决一个常见类型的参数时的问题
                 if (boundSql.getParameterMappings() != null && boundSql.getParameterMappings().size() > 0) {
                     for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
                         String name = parameterMapping.getProperty();
                         if (!name.equals(PAGEPARAMETER_FIRST)
-                                && !name.equals(PAGEPARAMETER_SECOND)) {
-                            if (parameterMapping.getJavaType().isAssignableFrom(parameterObject.getClass())) {
+                                && !name.equals(PAGEPARAMETER_SECOND)
+                                && paramMap.get(name) == null) {
+                            if (hasTypeHandler
+                                    || parameterMapping.getJavaType().isAssignableFrom(parameterObject.getClass())) {
                                 paramMap.put(name, parameterObject);
-                            } else {
-                                paramMap.put(name, metaObject.getValue(name));
                             }
                         }
                     }
