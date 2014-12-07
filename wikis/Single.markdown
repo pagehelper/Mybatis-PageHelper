@@ -8,7 +8,11 @@
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
-##最新稳定版为3.3.0
+##最新版本为3.3.1
+
+##3.3.1bug修复 - 2014-12-07
+
+ - 动态sql时，判断条件不会出现在ParameterMappings中，会导致获取不到属性。通常是因为判断条件中的属性没有出现在`#{}`中。 
 
 ##3.3.0改进内容
 
