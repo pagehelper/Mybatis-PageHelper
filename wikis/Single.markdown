@@ -12,7 +12,7 @@
 
 ##3.3.1bug修复 - 2014-12-07
 
- - 动态sql时，判断条件不会出现在ParameterMappings中，会导致获取不到属性。通常是因为判断条件中的属性没有出现在`#{}`中。 
+ - 动态sql时，判断条件不会出现在ParameterMappings中，会导致获取不到属性。通常是因为判断条件中的属性没有出现在`#{}`中。
 
 ##3.3.0改进内容
 
@@ -447,7 +447,25 @@ Mybatis专栏：
 Mybatis工具群： 211286137 (Mybatis相关工具插件等等)
 
 <br/><br/>
-##更新日志   
+##更新日志
+
+###3.3.1bug修复 - 2014-12-07
+
+- 动态sql时，判断条件不会出现在ParameterMappings中，会导致获取不到属性。通常是因为判断条件中的属性没有出现在`#{}`中。
+
+###v3.3.0
+
+1. 对`MappedStatement`对象进行缓存，包括count查询的`MappedStatement`以及分页查询的`MappedStatement`，分页查询改为预编译查询。
+
+2. 独立的`SqlUtil`类，由于原来的`PageHelper`太复杂，因此将拦截器外的其他代码独立到`SqlUtil`中，方便查看代码和维护。`SqlUtil`中增加`Parser`接口，提供一个抽象的`SimpleParser`实现，不同数据库的分页代码通过继承`SimpleParser`实现。
+
+3. 特殊的`Parser`实现类`SqlParser`类，这是一个独立的java类，主要提供了更高性能的count查询sql，可以根据sql自动改为`count(*)`查询，自动去除不需要的`order by`语句，如果需要使用该类，只要把该类放到`SqlUtil`类相同的包下即可，同时需要引入Jar包`jsqlparser-0.9.1.jar`。
+
+4. 增强的`PageInfo`类，`PageInfo`类包含了分页几乎所有需要用到的属性值，减少了对分页逻辑的过多投入。
+
+4. 分页合理化，自动处理pageNum的异常情况。例如当pageNum<=0时，会设置pageNum=1，然后查询第一页。当pageNum>pages(总页数)时，自动将pageNum=pages，查询最后一页。
+
+5. 增加对`PostgreSQL`,`MariaDB`,`SQLite`支持。其中`MariaDB`,`SQLite`和`Mysql`分页一样。
 
 ###v3.2.3  
 
@@ -528,5 +546,4 @@ Mybatis工具群： 211286137 (Mybatis相关工具插件等等)
 
 1. 支持`<foreach>`等标签的分页查询  
 
-2. 提供便捷的使用方式  
-
+2. 提供便捷的使用方式
