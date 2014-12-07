@@ -42,7 +42,7 @@ public interface CountryMapper {
 
     List<Country> selectChoose(@Param("id1") Integer id1,@Param("id2") Integer id2);
 
-    List<Country> selectLike(String contryname);
+    List<Country> selectLike(Country country);
 
     //特殊sql语句的测试 - 主要测试count查询
     List<Country> selectUnion();
