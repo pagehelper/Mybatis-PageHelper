@@ -165,7 +165,7 @@ public class PageHelper implements Interceptor {
                     boundSql = ((MappedStatement) args[0]).getBoundSql(parameterObject);
                 }
                 //判断parameterObject，然后赋值
-                args[1] = SQLUTIL.setPageParameter(parameterObject, boundSql, page);
+                args[1] = SQLUTIL.setPageParameter(ms, parameterObject, boundSql, page);
                 //执行分页查询
                 Object result = invocation.proceed();
                 //得到处理结果

@@ -7,6 +7,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +54,8 @@ public class SqlParser implements SqlUtil.Parser {
         return simpleParser.getPageSql(sql);
     }
 
-    public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-        return simpleParser.setPageParameter(parameterObject, boundSql, page);
+    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+        return simpleParser.setPageParameter(ms, parameterObject, boundSql, page);
     }
 
     public String parse(String sql) {

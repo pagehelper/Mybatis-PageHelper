@@ -110,8 +110,9 @@
   <select id="selectLike" resultType="com.github.pagehelper.model.Country">
     select * from country where 1=1
     <if test="countryname!=null and countryname!=''">
-      and countryname like '%${countryname}%'
+      and lower(countryname) like '%${countryname}%'
     </if>
+    order by id
   </select>
   <select id="selectByOrder2" resultType="com.github.pagehelper.model.Country">
     select * from country order by ${order}

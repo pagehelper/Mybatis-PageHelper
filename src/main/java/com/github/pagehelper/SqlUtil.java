@@ -36,7 +36,6 @@ import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.type.TypeHandlerRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,8 +60,6 @@ public class SqlUtil {
     private static final String PAGEPARAMETER_FIRST = "First" + SUFFIX_PAGE;
     //第二个分页参数
     private static final String PAGEPARAMETER_SECOND = "Second" + SUFFIX_PAGE;
-
-    private static final TypeHandlerRegistry TYPE_HANDLER_REGISTRY = new TypeHandlerRegistry();
 
     private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
@@ -127,8 +124,8 @@ public class SqlUtil {
      * @param page
      * @return
      */
-    public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-        return sqlParser.setPageParameter(parameterObject, boundSql, page);
+    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+        return sqlParser.setPageParameter(ms, parameterObject, boundSql, page);
     }
 
     /**
@@ -163,7 +160,7 @@ public class SqlUtil {
 
         String getPageSql(String sql);
 
-        Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page);
+        Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page);
     }
 
     public static abstract class SimpleParser implements Parser {
@@ -217,7 +214,7 @@ public class SqlUtil {
          */
         public abstract String getPageSql(String sql);
 
-        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
+        public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
             Map paramMap = null;
             if (parameterObject == null) {
                 paramMap = new HashMap();
@@ -226,9 +223,8 @@ public class SqlUtil {
             } else {
                 paramMap = new HashMap();
                 //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
-                //默认的TYPE_HANDLER_REGISTRY包含的都是一个属性的类型，这些类型不需要反射，只需要他本身的值
-                //对于用户自定义的typeHandler是处理查询结果的，这里不用考虑
-                boolean hasTypeHandler = TYPE_HANDLER_REGISTRY.hasTypeHandler(parameterObject.getClass());
+                //TypeHandlerRegistry可以直接处理的会作为一个直接使用的对象进行处理
+                boolean hasTypeHandler = ms.getConfiguration().getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
                 if (!hasTypeHandler) {
                     MetaObject metaObject = forObject(parameterObject);
                     for (String name : metaObject.getGetterNames()) {
@@ -265,8 +261,8 @@ public class SqlUtil {
         }
 
         @Override
-        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+        public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
             paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
             paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
             return paramMap;
@@ -285,8 +281,8 @@ public class SqlUtil {
         }
 
         @Override
-        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+        public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
             paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
             paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
             return paramMap;
@@ -304,8 +300,8 @@ public class SqlUtil {
         }
 
         @Override
-        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+        public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
             paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
             paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
             return paramMap;
@@ -323,8 +319,8 @@ public class SqlUtil {
         }
 
         @Override
-        public Map setPageParameter(Object parameterObject, BoundSql boundSql, Page page) {
-            Map paramMap = super.setPageParameter(parameterObject, boundSql, page);
+        public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
             paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
             paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
             return paramMap;

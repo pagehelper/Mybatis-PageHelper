@@ -51,16 +51,16 @@ public class TestLike {
             Country country = new Country();
             country.setCountryname("c");
             List<Country> list = countryMapper.selectLike(country);
-            assertEquals(32, list.get(0).getId());
+            assertEquals(30, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(28, ((Page) list).getTotal());
+            assertEquals(39, ((Page) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
-            PageHelper.startPage(3, 10);
+            PageHelper.startPage(4, 10);
             list = countryMapper.selectLike(country);
-            assertEquals(132, list.get(0).getId());
-            assertEquals(8, list.size());
-            assertEquals(28, ((Page) list).getTotal());
+            assertEquals(130, list.get(0).getId());
+            assertEquals(9, list.size());
+            assertEquals(39, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }
