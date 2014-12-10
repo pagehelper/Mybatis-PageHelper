@@ -25,7 +25,9 @@
 
 如果你想使用本项目的jar包而不是直接引入类，你可以在这里下载各个版本的jar包（点击Download下的jar即可下载）  
 
- - https://oss.sonatype.org/#nexus-search;quick~pagehelper  
+ - https://oss.sonatype.org/content/repositories/releases/com/github/pagehelper/pagehelper/
+ 
+ - http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
 
 由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
 
