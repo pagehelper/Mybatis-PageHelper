@@ -1,5 +1,6 @@
 package com.github.pagehelper;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -13,7 +14,8 @@ import java.util.List;
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class PageInfo<T> {
+public class PageInfo<T> implements Serializable {
+    private static final long serialVersionUID = 1L;
     //当前页
     private int pageNum;
     //每页的数量
