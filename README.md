@@ -8,7 +8,11 @@
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
-##最新版本为3.3.1
+##最新版本为3.3.2
+
+ - `PageInfo`增加序列化。
+ 
+ - 由于变化不大，不特别通知各位了。
 
 ##3.3.1bug修复 - 2014-12-07
 
