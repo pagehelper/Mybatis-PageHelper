@@ -1,5 +1,7 @@
 package com.github.pagehelper.mapper;
 
+import com.github.pagehelper.model.Country;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +17,21 @@ public class ProviderMethod {
         int index = 0;
         for (Map.Entry<String, Object> entry : param.entrySet()) {
             sbSql.append(" and "+entry.getKey() + "= #{param." + entry.getKey() + "} ");
+        }
+        return sbSql.toString();
+    }
+
+    public String selectCountry(Country country) {
+        StringBuilder sbSql = new StringBuilder();
+        sbSql.append("select * from country where 1=1 ");
+        if (country.getId() > 0) {
+            sbSql.append(" and id = #{id} ");
+        }
+        if (country.getCountrycode() != null) {
+            sbSql.append(" and countrycode = #{countrycode} ");
+        }
+        if (country.getCountryname() != null) {
+            sbSql.append(" and countryname = #{countryname} ");
         }
         return sbSql.toString();
     }
