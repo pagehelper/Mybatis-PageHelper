@@ -93,7 +93,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.3.1</version>
+    <version>3.4.0</version>
 </dependency>
 <dependency>
     <groupId>com.github.jsqlparser</groupId>
