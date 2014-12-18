@@ -25,8 +25,8 @@
 package com.github.pagehelper;
 
 import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
@@ -55,6 +55,7 @@ public class PageHelper implements Interceptor {
     private boolean pageSizeZero = false;
     //分页合理化
     private boolean reasonable = false;
+
     /**
      * 开始分页
      *
@@ -111,10 +112,10 @@ public class PageHelper implements Interceptor {
         if (LOCAL_PAGE.get() == null && rowBounds == RowBounds.DEFAULT) {
             return invocation.proceed();
         } else {
+            //获取原始的ms
+            MappedStatement ms = (MappedStatement) args[0];
             //忽略RowBounds-否则会进行Mybatis自带的内存分页
             args[2] = RowBounds.DEFAULT;
-            MappedStatement ms = (MappedStatement) args[0];
-            Object parameterObject = args[1];
             //分页信息
             Page page = getPage(rowBounds);
             //pageSizeZero的判断
@@ -132,15 +133,11 @@ public class PageHelper implements Interceptor {
                 //返回结果仍然为Page类型 - 便于后面对接收类型的统一处理
                 return page;
             }
+            SqlSource sqlSource = ((MappedStatement) args[0]).getSqlSource();
             //简单的通过total的值来判断是否进行count查询
             if (page.isCount()) {
-                BoundSql boundSql = null;
-                //只有静态sql需要获取boundSql
-                if (!SQLUTIL.isDynamic(ms)) {
-                    boundSql = ms.getBoundSql(parameterObject);
-                }
                 //将参数中的MappedStatement替换为新的qs
-                args[0] = SQLUTIL.getCountMappedStatement(ms, boundSql);
+                SQLUTIL.processCountMappedStatement(ms, sqlSource, args);
                 //查询总数
                 Object result = invocation.proceed();
                 //设置总数
@@ -153,19 +150,8 @@ public class PageHelper implements Interceptor {
             if (page.getPageSize() > 0 &&
                     ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
                             || rowBounds != RowBounds.DEFAULT)) {
-                BoundSql boundSql = null;
-                //只有静态sql需要获取boundSql
-                if (!SQLUTIL.isDynamic(ms)) {
-                    boundSql = ms.getBoundSql(parameterObject);
-                }
                 //将参数中的MappedStatement替换为新的qs
-                args[0] = SQLUTIL.getPageMappedStatement(ms, boundSql);
-                //动态sql时，boundSql在这儿通过新的ms获取
-                if (boundSql == null) {
-                    boundSql = ((MappedStatement) args[0]).getBoundSql(parameterObject);
-                }
-                //判断parameterObject，然后赋值
-                args[1] = SQLUTIL.setPageParameter(ms, parameterObject, boundSql, page);
+                SQLUTIL.processPageMappedStatement(ms, sqlSource, page, args);
                 //执行分页查询
                 Object result = invocation.proceed();
                 //得到处理结果

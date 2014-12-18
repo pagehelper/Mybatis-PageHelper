@@ -3,6 +3,7 @@ package com.github.pagehelper.mapper;
 import com.github.pagehelper.model.Country;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -12,6 +13,10 @@ public interface CountryMapper {
 
     @Select("select * from country order by ${order}")
     List<Country> selectByOrder(@Param("order") String order);
+
+    //增加Provider测试
+    @SelectProvider(type = ProviderMethod.class, method = "select")
+    List<Country> selectByProvider(@Param("param") Map map);
 
     List<Country> selectByOrder2(@Param("order") String order);
 
@@ -30,17 +35,23 @@ public interface CountryMapper {
 
     //下面是三种参数类型的测试方法
     List<Country> selectAllOrderByMap(Map orders);
+
     List<Country> selectAllOrderByList(List<Integer> params);
+
     List<Country> selectAllOrderByArray(Integer[] params);
 
     //测试动态sql,where/if
     List<Country> selectIf(@Param("id") Integer id);
-    List<Country> selectIf3(Country country);
-    List<Country> selectIf2(@Param("id1") Integer id1,@Param("id2") Integer id2);
-    List<Country> selectIf2List(@Param("id1") List<Integer> id1,@Param("id2") List<Integer> id2);
-    List<Country> selectIf2ListAndOrder(@Param("id1") List<Integer> id1,@Param("id2") List<Integer> id2, @Param("order") String order);
 
-    List<Country> selectChoose(@Param("id1") Integer id1,@Param("id2") Integer id2);
+    List<Country> selectIf3(Country country);
+
+    List<Country> selectIf2(@Param("id1") Integer id1, @Param("id2") Integer id2);
+
+    List<Country> selectIf2List(@Param("id1") List<Integer> id1, @Param("id2") List<Integer> id2);
+
+    List<Country> selectIf2ListAndOrder(@Param("id1") List<Integer> id1, @Param("id2") List<Integer> id2, @Param("order") String order);
+
+    List<Country> selectChoose(@Param("id1") Integer id1, @Param("id2") Integer id2);
 
     List<Country> selectLike(Country country);
 
