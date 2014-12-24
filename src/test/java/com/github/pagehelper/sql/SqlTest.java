@@ -44,6 +44,12 @@ public class SqlTest {
     }
 
     @Test
+    public void testSqlAs() throws JSQLParserException {
+        String originalSql = "Select id as 'id' from sys_user o where abc = ? order by id desc , name asc";
+        SqlUtil.testSql("mysql", originalSql);
+    }
+
+    @Test
     public void testSelectParameter() throws JSQLParserException {
         String originalSql = "Select a,b,? as c,? d from sys_user o where abc = ? order by id desc , name asc";
         SqlUtil.testSql("mysql", originalSql);

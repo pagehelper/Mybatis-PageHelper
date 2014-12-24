@@ -66,9 +66,10 @@ public class SqlParser implements SqlUtil.Parser {
         try {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (JSQLParserException e) {
-            //无法解析的直接返回原sql
-            CACHE.put(sql, sql);
-            return sql;
+            //无法解析的用一般方法返回count语句
+            String countSql = simpleParser.getCountSql(sql);
+            CACHE.put(sql, countSql);
+            return countSql;
         }
         Select select = (Select) stmt;
         SelectBody selectBody = select.getSelectBody();

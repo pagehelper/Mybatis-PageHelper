@@ -8,7 +8,15 @@
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
-##最新版本为3.4.0
+##最新版本为3.4.1
+
+ - 重大bug修复，`SqlParser`解析sql失败的时候返回了不带`count(*)`的sql，导致查询失败。
+ 
+ - 产生原因，由于`SqlParser`在系统中出现的位置修改后，导致这里出现错误。
+ 
+ - 强烈推荐各位更新到最新版本。
+
+##3.4.0
 
  - 增加了对`@SelectProvider`注解方法的支持，不使用这种方式的不影响
  
