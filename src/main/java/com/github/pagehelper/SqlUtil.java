@@ -63,6 +63,8 @@ public class SqlUtil {
     //第二个分页参数
     private static final String PAGEPARAMETER_SECOND = "Second" + SUFFIX_PAGE;
 
+    private static final String PROVIDER_OBJECT = "_provider_object";
+
     private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
 
@@ -230,8 +232,12 @@ public class SqlUtil {
                 //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
                 //TypeHandlerRegistry可以直接处理的会作为一个直接使用的对象进行处理
                 boolean hasTypeHandler = ms.getConfiguration().getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
+                MetaObject metaObject = forObject(parameterObject);
+                //需要针对注解形式的MyProviderSqlSource保存原值
+                if (ms.getSqlSource() instanceof MyProviderSqlSource) {
+                    paramMap.put(PROVIDER_OBJECT, parameterObject);
+                }
                 if (!hasTypeHandler) {
-                    MetaObject metaObject = forObject(parameterObject);
                     for (String name : metaObject.getGetterNames()) {
                         paramMap.put(name, metaObject.getValue(name));
                     }
@@ -244,8 +250,10 @@ public class SqlUtil {
                                 && !name.equals(PAGEPARAMETER_SECOND)
                                 && paramMap.get(name) == null) {
                             if (hasTypeHandler
-                                    || parameterMapping.getJavaType().isAssignableFrom(parameterObject.getClass())) {
+                                    || parameterMapping.getJavaType().equals(parameterObject.getClass())) {
                                 paramMap.put(name, parameterObject);
+                            } else {
+                                paramMap.put(name, metaObject.getValue(name));
                             }
                         }
                     }
@@ -375,6 +383,7 @@ public class SqlUtil {
     private class MyProviderSqlSource implements SqlSource {
         private Configuration configuration;
         private ProviderSqlSource providerSqlSource;
+
         /**
          * 用于区分动态的count查询或分页查询
          */
@@ -388,7 +397,12 @@ public class SqlUtil {
 
         @Override
         public BoundSql getBoundSql(Object parameterObject) {
-            BoundSql boundSql = providerSqlSource.getBoundSql(parameterObject);
+            BoundSql boundSql = null;
+            if (parameterObject instanceof Map && ((Map) parameterObject).containsKey(PROVIDER_OBJECT)) {
+                boundSql = providerSqlSource.getBoundSql(((Map) parameterObject).get(PROVIDER_OBJECT));
+            } else {
+                boundSql = providerSqlSource.getBoundSql(parameterObject);
+            }
             if (count) {
                 return new BoundSql(
                         configuration,

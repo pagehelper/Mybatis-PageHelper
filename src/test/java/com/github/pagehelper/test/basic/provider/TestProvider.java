@@ -40,27 +40,44 @@ import static org.junit.Assert.assertEquals;
 
 public class TestProvider {
 
-    /**
-     * 使用Mapper接口调用时，使用PageHelper.startPage效果更好，不需要添加Mapper接口参数
-     */
     @Test
-    public void testMapperWithStartPage() {
+    public void testProvider() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("id",100);
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
-            //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectByProvider(map);
             assertEquals(100, list.get(0).getId());
             assertEquals(1, list.size());
             assertEquals(1, ((Page) list).getTotal());
 
-            //获取第1页，10条内容，默认查询总数count
             map.put("countryname","天朝");
             PageHelper.startPage(1, 10);
             list = countryMapper.selectByProvider(map);
+            assertEquals(0,list.size());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testCountryProvider() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        Country country = new Country();
+        country.setId(100);
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            PageHelper.startPage(1, 10);
+            List<Country> list = countryMapper.selectByCountryProvider(country);
+            assertEquals(100, list.get(0).getId());
+            assertEquals(1, list.size());
+            assertEquals(1, ((Page) list).getTotal());
+
+            country.setCountryname("天朝");
+            PageHelper.startPage(1, 10);
+            list = countryMapper.selectByCountryProvider(country);
             assertEquals(0,list.size());
         } finally {
             sqlSession.close();
