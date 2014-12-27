@@ -1,5 +1,14 @@
 ##更新日志   
 
+###3.4.2 - 2014-12-27
+
+- `PageInfo`中的`judgePageBoudary`方法修改：
+   ```java
+    isLastPage = pageNum == pages && pageNum != 1;
+    //改为
+    isLastPage = pageNum == pages;
+   ```
+
 ###3.4.1 - 2014-12-24
 
  - 重大bug修复，`SqlParser`解析sql失败的时候返回了不带`count(*)`的sql，导致查询失败。
