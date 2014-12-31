@@ -159,7 +159,7 @@ public class PageInfo<T> implements Serializable {
      */
     private void judgePageBoudary() {
         isFirstPage = pageNum == 1;
-        isLastPage = pageNum == pages && pageNum != 1;
+        isLastPage = pageNum == pages;
         hasPreviousPage = pageNum > 1;
         hasNextPage = pageNum < pages;
     }
