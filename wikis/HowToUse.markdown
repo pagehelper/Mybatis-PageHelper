@@ -45,7 +45,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.4.2</version>
+    <version>3.4.3</version>
 </dependency>
 <dependency>
     <groupId>com.github.jsqlparser</groupId>

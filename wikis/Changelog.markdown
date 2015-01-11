@@ -1,4 +1,18 @@
-##更新日志   
+##更新日志
+
+###3.4.3 - 2015-01-11
+
+ - 增加更丰富的调用方法[#23](http://git.oschina.net/free/Mybatis_PageHelper/issues/23)
+   - `startPage(int pageNum, int pageSize)`
+   - `startPage(int pageNum, int pageSize, boolean count)`
+   - +`startPage(int pageNum, int pageSize, boolean count, boolean reasonable)`
+   - +`startPage(int pageNum, int pageSize, boolean count, boolean reasonable, boolean pageSizeZero)`
+   - +`startPage(Object params)`<b>注：只能是`Map`或`ServletRequest`类型</b>
+
+ - 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从`Map`或`ServletRequest`中取值,配置如：
+   `<property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;count=contsql"/>`
+
+ - 解决一个`<foreach>`标签使用对象内部属性循环时的bug[#24](http://git.oschina.net/free/Mybatis_PageHelper/issues/24)
 
 ###3.4.2 - 2014-12-27
 
