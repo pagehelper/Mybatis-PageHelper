@@ -31,7 +31,10 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -51,10 +54,16 @@ public class PageHelper implements Interceptor {
     private boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
     private boolean rowBoundsWithCount = false;
-    //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页
+    //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
     private boolean pageSizeZero = false;
     //分页合理化
     private boolean reasonable = false;
+    //params参数映射
+    private static Map<String, String> PARAMS = new HashMap<String, String>(5);
+    //request获取方法
+    private static Boolean hasRequest;
+    private static Class<?> requestClass;
+    private static Method getParameter;
 
     /**
      * 开始分页
@@ -78,6 +87,116 @@ public class PageHelper implements Interceptor {
     }
 
     /**
+     * 开始分页
+     *
+     * @param pageNum    页码
+     * @param pageSize   每页显示数量
+     * @param count      是否进行count查询
+     * @param reasonable 分页合理化
+     */
+    public static void startPage(int pageNum, int pageSize, boolean count, boolean reasonable) {
+        Page page = new Page(pageNum, pageSize, count);
+        page.setReasonable(reasonable);
+        LOCAL_PAGE.set(page);
+    }
+
+    /**
+     * 开始分页
+     *
+     * @param pageNum      页码
+     * @param pageSize     每页显示数量
+     * @param count        是否进行count查询
+     * @param reasonable   分页合理化
+     * @param pageSizeZero true且pageSize=0时返回全部结果，false时分页
+     */
+    public static void startPage(int pageNum, int pageSize, boolean count, boolean reasonable, boolean pageSizeZero) {
+        Page page = new Page(pageNum, pageSize, count);
+        page.setReasonable(reasonable);
+        page.setPageSizeZero(pageSizeZero);
+        LOCAL_PAGE.set(page);
+    }
+
+    /**
+     * 开始分页
+     *
+     * @param params 只能是Map或ServletRequest类型
+     */
+    public static void startPage(Object params) {
+        int pageNum = 0;
+        int pageSize = 0;
+        try {
+            pageNum = Integer.parseInt(String.valueOf(getParamValue(params, "pageNum", true)));
+            pageSize = Integer.parseInt(String.valueOf(getParamValue(params, "pageSize", true)));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("分页参数不是合法的数字类型!");
+        }
+        Object _count = getParamValue(params, "count", false);
+        boolean count = true;
+        if (_count != null) {
+            count = Boolean.valueOf(String.valueOf(_count));
+        }
+        Page page = new Page(pageNum, pageSize, count);
+        Object reasonable = getParamValue(params, "reasonable", false);
+        if (reasonable != null) {
+            page.setReasonable(Boolean.valueOf(String.valueOf(reasonable)));
+        }
+        Object pageSizeZero = getParamValue(params, "pageSizeZero", false);
+        if (pageSizeZero != null) {
+            page.setPageSizeZero(Boolean.valueOf(String.valueOf(pageSizeZero)));
+        }
+        LOCAL_PAGE.set(page);
+    }
+
+    /**
+     * 从对象中取参数
+     *
+     * @param params
+     * @param paramName
+     * @param required
+     * @return
+     */
+    private static Object getParamValue(Object params, String paramName, boolean required) {
+        if (params == null) {
+            throw new NullPointerException("分页查询参数params不能为空!");
+        }
+        Object value = null;
+        if (params instanceof Map) {
+            if (((Map) params).containsKey(PARAMS.get(paramName))) {
+                value = ((Map) params).get(PARAMS.get(paramName));
+            }
+        } else {
+            if (hasRequest == null) {
+                try {
+                    requestClass = Class.forName("javax.servlet.ServletRequest");
+                    getParameter = requestClass.getMethod("getParameter", String.class);
+                    hasRequest = true;
+                } catch (Exception e) {
+                    hasRequest = false;
+                }
+            }
+            if (hasRequest) {
+                try {
+                    if (requestClass.isAssignableFrom(params.getClass())) {
+                        value = getParameter.invoke(params, PARAMS.get(paramName));
+                    } else {
+                        throw new IllegalArgumentException("分页查询参数params类型错误，只能是Map或ServletRequest类型!");
+                    }
+                } catch (IllegalArgumentException e) {
+                    throw e;
+                } catch (Exception e) {
+                    //忽略
+                }
+            } else {
+                throw new IllegalArgumentException("分页查询参数params类型错误，只能是Map或ServletRequest类型!");
+            }
+        }
+        if (required && value == null) {
+            throw new RuntimeException("分页查询缺少必要的参数:" + paramName);
+        }
+        return value;
+    }
+
+    /**
      * 获取分页参数
      *
      * @param rowBounds RowBounds参数
@@ -95,7 +214,13 @@ public class PageHelper implements Interceptor {
             }
         }
         //分页合理化
-        page.setReasonable(reasonable);
+        if (page.getReasonable() == null) {
+            page.setReasonable(reasonable);
+        }
+        //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+        if (page.getPageSizeZero() == null) {
+            page.setPageSizeZero(pageSizeZero);
+        }
         return page;
     }
 
@@ -119,7 +244,7 @@ public class PageHelper implements Interceptor {
             //分页信息
             Page page = getPage(rowBounds);
             //pageSizeZero的判断
-            if (pageSizeZero && page.getPageSize() == 0) {
+            if ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0) {
                 //执行正常（不分页）查询
                 Object result = invocation.proceed();
                 //得到处理结果
@@ -197,5 +322,21 @@ public class PageHelper implements Interceptor {
         //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
         String reasonable = p.getProperty("reasonable");
         this.reasonable = Boolean.parseBoolean(reasonable);
+        //参数映射
+        PARAMS.put("pageNum", "pageNum");
+        PARAMS.put("pageSize", "pageSize");
+        PARAMS.put("count", "count");
+        PARAMS.put("reasonable", "reasonable");
+        PARAMS.put("pageSizeZero", "pageSizeZero");
+        String params = p.getProperty("params");
+        if (params != null && params.length() > 0) {
+            String[] ps = params.split("[;|,|&]");
+            for (String s : ps) {
+                String[] ss = s.split("=");
+                if (ss.length == 2) {
+                    PARAMS.put(ss[0], ss[1]);
+                }
+            }
+        }
     }
 }

@@ -39,43 +39,66 @@ import java.util.List;
 public class Page<E> extends ArrayList<E> {
     private static final long serialVersionUID = 1L;
 
-    /**不进行count查询*/
+    /**
+     * 不进行count查询
+     */
     private static final int NO_SQL_COUNT = -1;
-    /**进行count查询*/
+    /**
+     * 进行count查询
+     */
     private static final int SQL_COUNT = 0;
-    /**页码，从1开始*/
+    /**
+     * 页码，从1开始
+     */
     private int pageNum;
-    /**页面大小*/
+    /**
+     * 页面大小
+     */
     private int pageSize;
-    /**起始行*/
+    /**
+     * 起始行
+     */
     private int startRow;
-    /**末行*/
+    /**
+     * 末行
+     */
     private int endRow;
-    /**总数*/
+    /**
+     * 总数
+     */
     private long total;
-    /**总页数*/
+    /**
+     * 总页数
+     */
     private int pages;
-    /**分页合理化*/
-    private boolean reasonable;
+    /**
+     * 分页合理化
+     */
+    private Boolean reasonable;
+    /**
+     * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+     */
+    private Boolean pageSizeZero;
 
-    public Page(){
-    	super();
+    public Page() {
+        super();
     }
 
     public Page(int pageNum, int pageSize) {
-        this(pageNum, pageSize, SQL_COUNT);
+        this(pageNum, pageSize, SQL_COUNT, null);
     }
 
     public Page(int pageNum, int pageSize, boolean count) {
-        this(pageNum, pageSize, count ? Page.SQL_COUNT : Page.NO_SQL_COUNT);
+        this(pageNum, pageSize, count ? Page.SQL_COUNT : Page.NO_SQL_COUNT, null);
     }
 
-    public Page(int pageNum, int pageSize, int total) {
+    private Page(int pageNum, int pageSize, int total, Boolean reasonable) {
         super(pageSize > -1 ? pageSize : 0);
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.total = total;
         calculateStartAndEndRow();
+        setReasonable(reasonable);
     }
 
     public Page(RowBounds rowBounds, boolean count) {
@@ -110,7 +133,7 @@ public class Page<E> extends ArrayList<E> {
 
     public void setPageNum(int pageNum) {
         //分页合理化，针对不合理的页码自动处理
-        this.pageNum = (reasonable && pageNum <= 0) ? 1 : pageNum;
+        this.pageNum = ((reasonable != null && reasonable) && pageNum <= 0) ? 1 : pageNum;
     }
 
     public int getPageSize() {
@@ -137,19 +160,34 @@ public class Page<E> extends ArrayList<E> {
             pages = 0;
         }
         //分页合理化，针对不合理的页码自动处理
-        if (reasonable && pageNum > pages) {
+        if ((reasonable != null && reasonable) && pageNum > pages) {
             pageNum = pages;
             calculateStartAndEndRow();
         }
     }
 
-    public void setReasonable(boolean reasonable) {
+    public void setReasonable(Boolean reasonable) {
+        if (reasonable == null) {
+            return;
+        }
         this.reasonable = reasonable;
         //分页合理化，针对不合理的页码自动处理
         if (this.reasonable && this.pageNum <= 0) {
             this.pageNum = 1;
             calculateStartAndEndRow();
         }
+    }
+
+    public Boolean getReasonable() {
+        return reasonable;
+    }
+
+    public Boolean getPageSizeZero() {
+        return pageSizeZero;
+    }
+
+    public void setPageSizeZero(Boolean pageSizeZero) {
+        this.pageSizeZero = pageSizeZero;
     }
 
     /**

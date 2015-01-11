@@ -252,8 +252,7 @@ public class SqlUtil {
                             if (hasTypeHandler
                                     || parameterMapping.getJavaType().equals(parameterObject.getClass())) {
                                 paramMap.put(name, parameterObject);
-                            } else {
-                                paramMap.put(name, metaObject.getValue(name));
+                                break;
                             }
                         }
                     }
