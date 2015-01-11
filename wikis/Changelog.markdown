@@ -9,8 +9,9 @@
    - +`startPage(int pageNum, int pageSize, boolean count, boolean reasonable, boolean pageSizeZero)`
    - +`startPage(Object params)`<b>注：只能是`Map`或`ServletRequest`类型</b>
 
- - 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从`Map`或`ServletRequest`中取值,配置如：
-   `<property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;count=contsql"/>`
+   参数中的`reasonable`、`pageSizeZero`都可以覆盖默认配置，如果传`null`会用默认配置。
+
+ - 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从`Map`或`ServletRequest`中取值，详细内容看文档下面的具体介绍。
 
  - 解决一个`<foreach>`标签使用对象内部属性循环时的bug[#24](http://git.oschina.net/free/Mybatis_PageHelper/issues/24)
 

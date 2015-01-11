@@ -17,8 +17,9 @@
    - +`startPage(int pageNum, int pageSize, boolean count, boolean reasonable, boolean pageSizeZero)`
    - +`startPage(Object params)`<b>注：只能是`Map`或`ServletRequest`类型</b>
 
- - 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从`Map`或`ServletRequest`中取值,配置如：
-   `<property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;count=contsql"/>`
+   参数中的`reasonable`、`pageSizeZero`都可以覆盖默认配置，如果传`null`会用默认配置。
+
+ - 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从`Map`或`ServletRequest`中取值，详细内容看文档下面的具体介绍。
 
  - 解决一个`<foreach>`标签使用对象内部属性循环时的bug[#24](http://git.oschina.net/free/Mybatis_PageHelper/issues/24)
 
@@ -157,9 +158,8 @@
         <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
         <property name="reasonable" value="true"/>
         <!-- 3.4.3版本可用 - 为了支持startPage(Object params)方法 -->
-        <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值 -->
-        <!-- 可以配置pageNum,pageSize,count,pageSizeZero,reasonable,不配置映射的用默认值 -->
-        <property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;count=contsql"/>
+        <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值，详细看下面第6. -->
+        <property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;pageCount=contSql"/>
 	</plugin>
 </plugins>
 ```
@@ -178,7 +178,55 @@
 
 5. 增加`reasonable`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。具体作用请看上面配置文件中的注释内容。
 
-6. 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值，可以配置pageNum,pageSize,count,pageSizeZero,reasonable,不配置映射的用默认值。
+6. 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射(别名)，用于从Map或ServletRequest中取值，可以配置pageNum,pageSize,count,pageSizeZero,reasonable,不配置映射的用默认值。
+
+####params解释
+
+为了支持`startPage(Object params)`方法，增加了一个`params`参数，由于这个参数不易理解，这里详细说明。
+
+当调用这个方法传入`Map`或`ServletRequest`的时候，分页插件自动从中取出和分页有关的参数，然后构造一个`Page`参数，取出的时候就需要知道分页有关参数的`Key`。
+
+这几个`Key`的默认值和含义如下：
+
+      - pageNum：页码，默认值`pageNum`
+      - pageSize：页面大小，默认值`pageSize`
+      - count：是否进行count查询，为了防止冲突，<b>默认值为`countSql`</b>
+      - pageSizeZero：含义和上面的4.一样，默认值`pageSizeZero`
+      - reasonable：含义和上面的5.一样，默认值`reasonable`
+
+如果你不想使用默认的,你就可以通过`params`配置来修改`Key`的名字，例如<b>只</b>修改`pageSize`为`limit`:
+
+```xml
+<property="params" value="pageSize=limit"/>
+```
+
+**在Spring中如何配置呢？**
+
+```xml
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <!-- <property name="configLocation" value="classpath:mybatis/mybatis-sqlconfig.xml" /> -->
+    <property name="mapperLocations" value="classpath:com/template/web/**/*.xml" />
+    <property name="plugins">
+        <array>
+            <!-- 转驼峰拦截器 -->
+            <bean class="com.template.common.mybatis.CameHumpInterceptor"/>
+            <!-- 分页拦截器 -->
+            <bean class="com.github.pagehelper.PageHelper">
+                <property name="properties">
+                    <value>
+                        dialect=mysql
+                        reasonable=true
+                        params=count=countSql;pageSizeZero=zero
+                    </value>
+                </property>
+            </bean>
+        </array>
+    </property>
+</bean>
+```
+
+这里就是增加了一行`params=count=countSql;pageSizeZero=zero`,这里的`=`号看着奇怪，第一个`=`号后面的`count=countSql;pageSizeZero=zero`都是值。
 
 ###3. 如何选择配置这些参数
 

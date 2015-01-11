@@ -83,7 +83,7 @@ public class PageHelper implements Interceptor {
      * @param count    是否进行count查询
      */
     public static void startPage(int pageNum, int pageSize, boolean count) {
-        LOCAL_PAGE.set(new Page(pageNum, pageSize, count));
+        startPage(pageNum, pageSize, count, null);
     }
 
     /**
@@ -92,12 +92,10 @@ public class PageHelper implements Interceptor {
      * @param pageNum    页码
      * @param pageSize   每页显示数量
      * @param count      是否进行count查询
-     * @param reasonable 分页合理化
+     * @param reasonable 分页合理化,null时用默认配置
      */
-    public static void startPage(int pageNum, int pageSize, boolean count, boolean reasonable) {
-        Page page = new Page(pageNum, pageSize, count);
-        page.setReasonable(reasonable);
-        LOCAL_PAGE.set(page);
+    public static void startPage(int pageNum, int pageSize, boolean count, Boolean reasonable) {
+        startPage(pageNum, pageSize, count, reasonable, null);
     }
 
     /**
@@ -106,10 +104,10 @@ public class PageHelper implements Interceptor {
      * @param pageNum      页码
      * @param pageSize     每页显示数量
      * @param count        是否进行count查询
-     * @param reasonable   分页合理化
-     * @param pageSizeZero true且pageSize=0时返回全部结果，false时分页
+     * @param reasonable   分页合理化,null时用默认配置
+     * @param pageSizeZero true且pageSize=0时返回全部结果，false时分页,null时用默认配置
      */
-    public static void startPage(int pageNum, int pageSize, boolean count, boolean reasonable, boolean pageSizeZero) {
+    public static void startPage(int pageNum, int pageSize, boolean count, Boolean reasonable, Boolean pageSizeZero) {
         Page page = new Page(pageNum, pageSize, count);
         page.setReasonable(reasonable);
         page.setPageSizeZero(pageSizeZero);
@@ -325,14 +323,14 @@ public class PageHelper implements Interceptor {
         //参数映射
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
-        PARAMS.put("count", "count");
+        PARAMS.put("count", "countSql");
         PARAMS.put("reasonable", "reasonable");
         PARAMS.put("pageSizeZero", "pageSizeZero");
         String params = p.getProperty("params");
         if (params != null && params.length() > 0) {
             String[] ps = params.split("[;|,|&]");
             for (String s : ps) {
-                String[] ss = s.split("=");
+                String[] ss = s.split("[=|:]");
                 if (ss.length == 2) {
                     PARAMS.put(ss[0], ss[1]);
                 }
