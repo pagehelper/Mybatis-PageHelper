@@ -5,8 +5,8 @@
  - 增加更丰富的调用方法[#23](http://git.oschina.net/free/Mybatis_PageHelper/issues/23)
    - `startPage(int pageNum, int pageSize)`
    - `startPage(int pageNum, int pageSize, boolean count)`
-   - +`startPage(int pageNum, int pageSize, boolean count, boolean reasonable)`
-   - +`startPage(int pageNum, int pageSize, boolean count, boolean reasonable, boolean pageSizeZero)`
+   - +`startPage(int pageNum, int pageSize, boolean count, Boolean reasonable)`
+   - +`startPage(int pageNum, int pageSize, boolean count, Boolean reasonable, Boolean pageSizeZero)`
    - +`startPage(Object params)`<b>注：只能是`Map`或`ServletRequest`类型</b>
 
    参数中的`reasonable`、`pageSizeZero`都可以覆盖默认配置，如果传`null`会用默认配置。
