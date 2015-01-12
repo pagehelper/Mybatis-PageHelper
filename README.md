@@ -8,7 +8,7 @@
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
-##最新版本为3.4.3
+##最新版本为3.5.0
 
  - 增加更丰富的调用方法[#23](http://git.oschina.net/free/Mybatis_PageHelper/issues/23)
    - `startPage(int pageNum, int pageSize)`
@@ -101,7 +101,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.4.3</version>
+    <version>3.5.0</version>
 </dependency>
 <dependency>
     <groupId>com.github.jsqlparser</groupId>
@@ -139,7 +139,7 @@
         <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->
         <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
         <property name="reasonable" value="true"/>
-        <!-- 3.4.3版本可用 - 为了支持startPage(Object params)方法 -->
+        <!-- 3.5.0版本可用 - 为了支持startPage(Object params)方法 -->
         <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值，详细看下面第6. -->
         <property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;pageCount=contSql"/>
 	</plugin>
@@ -181,34 +181,6 @@
 ```xml
 <property="params" value="pageSize=limit"/>
 ```
-
-**在Spring中如何配置呢？**
-
-```xml
-<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="dataSource" ref="dataSource" />
-    <!-- <property name="configLocation" value="classpath:mybatis/mybatis-sqlconfig.xml" /> -->
-    <property name="mapperLocations" value="classpath:com/template/web/**/*.xml" />
-    <property name="plugins">
-        <array>
-            <!-- 转驼峰拦截器 -->
-            <bean class="com.template.common.mybatis.CameHumpInterceptor"/>
-            <!-- 分页拦截器 -->
-            <bean class="com.github.pagehelper.PageHelper">
-                <property name="properties">
-                    <value>
-                        dialect=mysql
-                        reasonable=true
-                        params=count=countSql;pageSizeZero=zero
-                    </value>
-                </property>
-            </bean>
-        </array>
-    </property>
-</bean>
-```
-
-这里就是增加了一行`params=count=countSql;pageSizeZero=zero`,这里的`=`号看着奇怪，第一个`=`号后面的`count=countSql;pageSizeZero=zero`都是值。
 
 
 ###3. 如何选择配置这些参数
@@ -261,6 +233,7 @@
           <value>
             dialect=hsqldb
             reasonable=true
+            params=count=countSql;pageSizeZero=zero
           </value>
         </property>
       </bean>
@@ -270,6 +243,8 @@
 ```   
 
 属性配置按照上面的方式配置，每个配置独立一行即可。
+
+在属性`params=count=countSql;pageSizeZero=zero`中的`=`号看着奇怪，第一个`=`号后面的`count=countSql;pageSizeZero=zero`都是值。 
 
 ###5. 如何在代码中使用  
 

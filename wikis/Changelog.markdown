@@ -1,6 +1,6 @@
 ##更新日志
 
-###3.4.3 - 2015-01-11
+###3.5.0 - 2015-01-11
 
  - 增加更丰富的调用方法[#23](http://git.oschina.net/free/Mybatis_PageHelper/issues/23)
    - `startPage(int pageNum, int pageSize)`

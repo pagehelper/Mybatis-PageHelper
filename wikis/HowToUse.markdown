@@ -45,7 +45,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.4.3</version>
+    <version>3.5.0</version>
 </dependency>
 <dependency>
     <groupId>com.github.jsqlparser</groupId>
@@ -101,7 +101,7 @@
         <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->
         <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
         <property name="reasonable" value="true"/>
-        <!-- 3.4.3版本可用 - 为了支持startPage(Object params)方法 -->
+        <!-- 3.5.0版本可用 - 为了支持startPage(Object params)方法 -->
         <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值 -->
         <!-- 可以配置pageNum,pageSize,count,pageSizeZero,reasonable,不配置映射的用默认值 -->
         <property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;count=contsql"/>
