@@ -141,7 +141,7 @@
         <property name="reasonable" value="true"/>
         <!-- 3.5.0版本可用 - 为了支持startPage(Object params)方法 -->
         <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值，详细看下面第6. -->
-        <property="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;pageCount=contSql"/>
+        <property name="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;pageCount=contSql"/>
 	</plugin>
 </plugins>
 ```   
@@ -179,7 +179,7 @@
 如果你不想使用默认的,你就可以通过`params`配置来修改`Key`的名字，例如<b>只</b>修改`pageSize`为`limit`:
 
 ```xml
-<property="params" value="pageSize=limit"/>
+<property name="params" value="pageSize=limit"/>
 ```
 
 
