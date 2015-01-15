@@ -189,7 +189,7 @@ public class PageHelper implements Interceptor {
             }
         }
         if (required && value == null) {
-            throw new RuntimeException("分页查询缺少必要的参数:" + paramName);
+            throw new RuntimeException("分页查询缺少必要的参数:" + PARAMS.get(paramName));
         }
         return value;
     }
