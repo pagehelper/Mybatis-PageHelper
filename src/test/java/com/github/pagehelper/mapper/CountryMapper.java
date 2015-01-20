@@ -1,6 +1,7 @@
 package com.github.pagehelper.mapper;
 
 import com.github.pagehelper.model.Country;
+import com.github.pagehelper.model.CountryExample;
 import com.github.pagehelper.test.basic.dynamic.Where;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -76,4 +77,7 @@ public interface CountryMapper {
 
     //select Map
     List<Country> selectByWhereMap(Where where);
+
+    //Example
+    List<Country> selectByExample(CountryExample example);
 }

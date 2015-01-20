@@ -8,7 +8,13 @@
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
-##最新版本为3.5.0
+##最新版本为3.5.1
+
+ - 解决[bug#25](http://git.oschina.net/free/Mybatis_PageHelper/issues/25)，当参数是null并且是动态查询时，由于加入分页参数，导致参数不在是null，因而会导致部分判断出错，导致异常。
+ 
+ - 上面这个bug会影响使用了动态标签并且允许入参为null的所有查询，虽然并不常见，但是建议各位使用最新版本
+
+##3.5.0
 
  - 增加更丰富的调用方法[#23](http://git.oschina.net/free/Mybatis_PageHelper/issues/23)
    - `startPage(int pageNum, int pageSize)`
@@ -101,12 +107,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.5.0</version>
-</dependency>
-<dependency>
-    <groupId>com.github.jsqlparser</groupId>
-    <artifactId>jsqlparser</artifactId>
-    <version>0.9.1</version>
+    <version>3.5.1</version>
 </dependency>
 ```  
 

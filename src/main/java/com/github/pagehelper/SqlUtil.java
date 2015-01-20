@@ -64,6 +64,8 @@ public class SqlUtil {
     private static final String PAGEPARAMETER_SECOND = "Second" + SUFFIX_PAGE;
 
     private static final String PROVIDER_OBJECT = "_provider_object";
+    //存储原始的参数
+    private static final String ORIGINAL_PARAMETER_OBJECT = "_ORIGINAL_PARAMETER_OBJECT";
 
     private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
@@ -258,6 +260,8 @@ public class SqlUtil {
                     }
                 }
             }
+            //备份原始参数对象
+            paramMap.put(ORIGINAL_PARAMETER_OBJECT, parameterObject);
             return paramMap;
         }
     }
@@ -357,7 +361,17 @@ public class SqlUtil {
         }
 
         public BoundSql getBoundSql(Object parameterObject) {
-            DynamicContext context = new DynamicContext(configuration, parameterObject);
+            DynamicContext context;
+            //由于增加分页参数后会修改parameterObject的值，因此在前面处理时备份该值
+            //如果发现参数是Map并且包含该KEY，就使用备份的该值
+            //解决bug#25:http://git.oschina.net/free/Mybatis_PageHelper/issues/25
+            if (parameterObject != null
+                    && parameterObject instanceof Map
+                    && ((Map) parameterObject).containsKey(ORIGINAL_PARAMETER_OBJECT)) {
+                context = new DynamicContext(configuration, ((Map) parameterObject).get(ORIGINAL_PARAMETER_OBJECT));
+            } else {
+                context = new DynamicContext(configuration, parameterObject);
+            }
             rootSqlNode.apply(context);
             SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
             Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
