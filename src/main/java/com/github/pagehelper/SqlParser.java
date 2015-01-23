@@ -15,15 +15,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * sql解析类，使用该类时，必须引入jsqlparser-x.x.x.jar
+ * sql解析类，提供更智能的count查询sql
  *
  * @author liuzh
  */
 @SuppressWarnings("rawtypes")
-public class SqlParser implements SqlUtil.Parser {
+public class SqlParser {
     private static final List<SelectItem> COUNT_ITEM;
     private static final Alias TABLE_ALIAS;
-    private SqlUtil.Parser simpleParser;
 
     static {
         COUNT_ITEM = new ArrayList<SelectItem>();
@@ -36,38 +35,31 @@ public class SqlParser implements SqlUtil.Parser {
     //缓存已经修改过的sql
     private Map<String, String> CACHE = new ConcurrentHashMap<String, String>();
 
-    public SqlParser(SqlUtil.Dialect dialect) {
-        simpleParser = SqlUtil.SimpleParser.newParser(dialect);
-    }
-
     public void isSupportedSql(String sql) {
-        simpleParser.isSupportedSql(sql);
+        if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
+            throw new RuntimeException("分页插件不支持包含for update的sql");
+        }
     }
 
-    public String getCountSql(String sql) {
+    /**
+     * 获取智能的countSql
+     *
+     * @param sql
+     * @return
+     */
+    public String getSmartCountSql(String sql) {
         //校验是否支持该sql
         isSupportedSql(sql);
-        return parse(sql);
-    }
-
-    public String getPageSql(String sql) {
-        return simpleParser.getPageSql(sql);
-    }
-
-    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
-        return simpleParser.setPageParameter(ms, parameterObject, boundSql, page);
-    }
-
-    public String parse(String sql) {
         if (CACHE.get(sql) != null) {
             return CACHE.get(sql);
         }
+        //解析SQL
         Statement stmt = null;
         try {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (JSQLParserException e) {
             //无法解析的用一般方法返回count语句
-            String countSql = simpleParser.getCountSql(sql);
+            String countSql = getSimpleCountSql(sql);
             CACHE.put(sql, countSql);
             return countSql;
         }
@@ -82,6 +74,21 @@ public class SqlParser implements SqlUtil.Parser {
         String result = select.toString();
         CACHE.put(sql, result);
         return result;
+    }
+
+    /**
+     * 获取普通的Count-sql
+     *
+     * @param sql 原查询sql
+     * @return 返回count查询sql
+     */
+    public String getSimpleCountSql(final String sql) {
+        isSupportedSql(sql);
+        StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
+        stringBuilder.append("select count(*) from (");
+        stringBuilder.append(sql);
+        stringBuilder.append(") tmp_count");
+        return stringBuilder.toString();
     }
 
     /**

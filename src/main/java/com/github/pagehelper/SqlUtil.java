@@ -80,7 +80,12 @@ public class SqlUtil {
         return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
     }
 
-    private SqlUtil.Parser sqlParser;
+    //处理SQL
+    private static final SqlParser sqlParser = new SqlParser();
+    //具体针对数据库的parser
+    private Parser parser;
+    //数据库方言
+    private Dialect dialect;
 
     //数据库方言 - 使用枚举限制数据库类型
     public enum Dialect {
@@ -97,18 +102,8 @@ public class SqlUtil {
             throw new IllegalArgumentException("Mybatis分页插件无法获取dialect参数!");
         }
         try {
-            Dialect dialect = Dialect.valueOf(strDialect);
-            String sqlParserClass = this.getClass().getPackage().getName() + ".SqlParser";
-            try {
-                //使用SqlParser必须引入jsqlparser-x.x.x.jar
-                Class.forName("net.sf.jsqlparser.statement.select.Select");
-                sqlParser = (Parser) Class.forName(sqlParserClass).getConstructor(Dialect.class).newInstance(dialect);
-            } catch (Exception e) {
-                //找不到时，不用处理
-            }
-            if (sqlParser == null) {
-                sqlParser = SimpleParser.newParser(dialect);
-            }
+            dialect = Dialect.valueOf(strDialect);
+            parser = SimpleParser.newParser(dialect);
         } catch (IllegalArgumentException e) {
             String dialects = null;
             for (Dialect d : Dialect.values()) {
@@ -131,7 +126,7 @@ public class SqlUtil {
      */
     public Map setPageParameter(MappedStatement ms, Object parameterObject, Page page) {
         BoundSql boundSql = ms.getBoundSql(parameterObject);
-        return sqlParser.setPageParameter(ms, parameterObject, boundSql, page);
+        return parser.setPageParameter(ms, parameterObject, boundSql, page);
     }
 
     /**
@@ -195,9 +190,7 @@ public class SqlUtil {
         }
 
         public void isSupportedSql(String sql) {
-            if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
-                throw new RuntimeException("分页插件不支持包含for update的sql");
-            }
+            sqlParser.isSupportedSql(sql);
         }
 
         /**
@@ -207,12 +200,7 @@ public class SqlUtil {
          * @return 返回count查询sql
          */
         public String getCountSql(final String sql) {
-            isSupportedSql(sql);
-            StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
-            stringBuilder.append("select count(*) from (");
-            stringBuilder.append(sql);
-            stringBuilder.append(") tmp_count");
-            return stringBuilder.toString();
+            return sqlParser.getSmartCountSql(sql);
         }
 
         /**
@@ -419,13 +407,13 @@ public class SqlUtil {
             if (count) {
                 return new BoundSql(
                         configuration,
-                        sqlParser.getCountSql(boundSql.getSql()),
+                        parser.getCountSql(boundSql.getSql()),
                         boundSql.getParameterMappings(),
                         parameterObject);
             } else {
                 return new BoundSql(
                         configuration,
-                        sqlParser.getPageSql(boundSql.getSql()),
+                        parser.getPageSql(boundSql.getSql()),
                         getPageParameterMapping(configuration, boundSql),
                         parameterObject);
             }
@@ -576,7 +564,7 @@ public class SqlUtil {
      */
     private SqlSource getPageSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        return new StaticSqlSource(configuration, sqlParser.getPageSql(boundSql.getSql()), getPageParameterMapping(configuration, boundSql));
+        return new StaticSqlSource(configuration, parser.getPageSql(boundSql.getSql()), getPageParameterMapping(configuration, boundSql));
     }
 
     /**
@@ -587,7 +575,7 @@ public class SqlUtil {
      */
     private SqlSource getCountSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        return new StaticSqlSource(configuration, sqlParser.getCountSql(boundSql.getSql()), boundSql.getParameterMappings());
+        return new StaticSqlSource(configuration, parser.getCountSql(boundSql.getSql()), boundSql.getParameterMappings());
     }
 
     /**
@@ -598,9 +586,9 @@ public class SqlUtil {
      */
     public static void testSql(String dialet, String originalSql) {
         SqlUtil sqlUtil = new SqlUtil(dialet);
-        String countSql = sqlUtil.sqlParser.getCountSql(originalSql);
+        String countSql = sqlUtil.parser.getCountSql(originalSql);
         System.out.println(countSql);
-        String pageSql = sqlUtil.sqlParser.getPageSql(originalSql);
+        String pageSql = sqlUtil.parser.getPageSql(originalSql);
         System.out.println(pageSql);
     }
 }
