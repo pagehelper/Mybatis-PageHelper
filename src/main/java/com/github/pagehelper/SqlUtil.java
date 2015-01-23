@@ -158,15 +158,54 @@ public class SqlUtil {
      * 处理SQL
      */
     public static interface Parser {
-        void isSupportedSql(String sql);
 
+        /**
+         * 是否支持MappedStatement全局缓存
+         *
+         * @return
+         */
+        boolean isSupportedMappedStatementCache();
+
+        /**
+         * 获取总数sql - 如果要支持其他数据库，修改这里就可以
+         *
+         * @param sql 原查询sql
+         * @return 返回count查询sql
+         */
         String getCountSql(String sql);
 
+        /**
+         * 获取分页sql - 如果要支持其他数据库，修改这里就可以
+         *
+         * @param sql 原查询sql
+         * @return 返回分页sql
+         */
         String getPageSql(String sql);
 
+        /**
+         * 获取分页参数映射
+         *
+         * @param configuration
+         * @param boundSql
+         * @return
+         */
+        List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql);
+
+        /**
+         * 设置分页参数
+         *
+         * @param ms
+         * @param parameterObject
+         * @param boundSql
+         * @param page
+         * @return
+         */
         Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page);
     }
 
+    /**
+     * 基础的Parser抽象类
+     */
     public static abstract class SimpleParser implements Parser {
         public static Parser newParser(Dialect dialect) {
             Parser parser = null;
@@ -189,27 +228,24 @@ public class SqlUtil {
             return parser;
         }
 
-        public void isSupportedSql(String sql) {
-            sqlParser.isSupportedSql(sql);
+        @Override
+        public boolean isSupportedMappedStatementCache() {
+            return true;
         }
 
-        /**
-         * 获取总数sql - 如果要支持其他数据库，修改这里就可以
-         *
-         * @param sql 原查询sql
-         * @return 返回count查询sql
-         */
         public String getCountSql(final String sql) {
             return sqlParser.getSmartCountSql(sql);
         }
 
-        /**
-         * 获取分页sql - 如果要支持其他数据库，修改这里就可以
-         *
-         * @param sql 原查询sql
-         * @return 返回分页sql
-         */
         public abstract String getPageSql(String sql);
+
+        public List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql) {
+            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+            newParameterMappings.addAll(boundSql.getParameterMappings());
+            newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
+            return newParameterMappings;
+        }
 
         public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
             Map paramMap = null;
@@ -293,7 +329,7 @@ public class SqlUtil {
         }
     }
 
-    //Oracle
+    //Hsqldb
     private static class HsqldbParser extends SimpleParser {
         @Override
         public String getPageSql(String sql) {
@@ -414,7 +450,7 @@ public class SqlUtil {
                 return new BoundSql(
                         configuration,
                         parser.getPageSql(boundSql.getSql()),
-                        getPageParameterMapping(configuration, boundSql),
+                        parser.getPageParameterMapping(configuration, boundSql),
                         parameterObject);
             }
         }
@@ -431,18 +467,22 @@ public class SqlUtil {
      */
     private MappedStatement getMappedStatement(MappedStatement ms, SqlSource sqlSource, Object parameterObject, String suffix) {
         MappedStatement qs = null;
-        try {
-            qs = ms.getConfiguration().getMappedStatement(ms.getId() + suffix);
-        } catch (Exception e) {
-            //ignore
+        if (parser.isSupportedMappedStatementCache()) {
+            try {
+                qs = ms.getConfiguration().getMappedStatement(ms.getId() + suffix);
+            } catch (Exception e) {
+                //ignore
+            }
         }
         if (qs == null) {
             //创建一个新的MappedStatement
             qs = newMappedStatement(ms, getsqlSource(ms, sqlSource, parameterObject, suffix), suffix);
-            try {
-                ms.getConfiguration().addMappedStatement(qs);
-            } catch (Exception e) {
-                //ignore
+            if (parser.isSupportedMappedStatementCache()) {
+                try {
+                    ms.getConfiguration().addMappedStatement(qs);
+                } catch (Exception e) {
+                    //ignore
+                }
             }
         }
         return qs;
@@ -541,21 +581,6 @@ public class SqlUtil {
     }
 
     /**
-     * 增加分页参数映射
-     *
-     * @param configuration
-     * @param boundSql
-     * @return
-     */
-    private List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql) {
-        List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-        newParameterMappings.addAll(boundSql.getParameterMappings());
-        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
-        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
-        return newParameterMappings;
-    }
-
-    /**
      * 获取分页的sqlSource
      *
      * @param configuration
@@ -564,7 +589,7 @@ public class SqlUtil {
      */
     private SqlSource getPageSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        return new StaticSqlSource(configuration, parser.getPageSql(boundSql.getSql()), getPageParameterMapping(configuration, boundSql));
+        return new StaticSqlSource(configuration, parser.getPageSql(boundSql.getSql()), parser.getPageParameterMapping(configuration, boundSql));
     }
 
     /**
