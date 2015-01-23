@@ -8,6 +8,12 @@
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
+##3.6.0-SNAPSHOT开发计划
+
+ - 支持sqlserver
+ 
+ - 简单修改结构
+
 ##最新版本为3.5.1
 
  - 解决[bug#25](http://git.oschina.net/free/Mybatis_PageHelper/issues/25)，当参数是null并且是动态查询时，由于加入分页参数，导致参数不在是null，因而会导致部分判断出错，导致异常。
