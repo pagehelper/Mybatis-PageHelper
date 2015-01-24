@@ -67,12 +67,12 @@ public class SqlUtil {
     //request获取方法
     private static Boolean hasRequest;
     private static Class<?> requestClass;
-    private static Method getParameter;
+    private static Method getParameterMap;
 
     static {
         try {
             requestClass = Class.forName("javax.servlet.ServletRequest");
-            getParameter = requestClass.getMethod("getParameter", String.class);
+            getParameterMap = requestClass.getMethod("getParameterMap", new Class[]{});
             hasRequest = true;
         } catch (Exception e) {
             hasRequest = false;
@@ -179,23 +179,39 @@ public class SqlUtil {
     public static Page getPageFromObject(Object params) {
         int pageNum;
         int pageSize;
+        MetaObject paramsObject = null;
+        if (params == null) {
+            throw new NullPointerException("分页查询参数params不能为空!");
+        }
+        if (hasRequest && requestClass.isAssignableFrom(params.getClass())) {
+            try {
+                paramsObject = forObject(getParameterMap.invoke(params, new Object[]{}));
+            } catch (Exception e) {
+                //忽略
+            }
+        } else {
+            paramsObject = forObject(params);
+        }
+        if (paramsObject == null) {
+            throw new NullPointerException("分页查询参数params处理失败!");
+        }
         try {
-            pageNum = Integer.parseInt(String.valueOf(getParamValue(params, "pageNum", true)));
-            pageSize = Integer.parseInt(String.valueOf(getParamValue(params, "pageSize", true)));
+            pageNum = Integer.parseInt(String.valueOf(getParamValue(paramsObject, "pageNum", true)));
+            pageSize = Integer.parseInt(String.valueOf(getParamValue(paramsObject, "pageSize", true)));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("分页参数不是合法的数字类型!");
         }
-        Object _count = getParamValue(params, "count", false);
+        Object _count = getParamValue(paramsObject, "count", false);
         boolean count = true;
         if (_count != null) {
             count = Boolean.valueOf(String.valueOf(_count));
         }
         Page page = new Page(pageNum, pageSize, count);
-        Object reasonable = getParamValue(params, "reasonable", false);
+        Object reasonable = getParamValue(paramsObject, "reasonable", false);
         if (reasonable != null) {
             page.setReasonable(Boolean.valueOf(String.valueOf(reasonable)));
         }
-        Object pageSizeZero = getParamValue(params, "pageSizeZero", false);
+        Object pageSizeZero = getParamValue(paramsObject, "pageSizeZero", false);
         if (pageSizeZero != null) {
             page.setPageSizeZero(Boolean.valueOf(String.valueOf(pageSizeZero)));
         }
@@ -205,28 +221,15 @@ public class SqlUtil {
     /**
      * 从对象中取参数
      *
-     * @param params
+     * @param paramsObject
      * @param paramName
      * @param required
      * @return
      */
-    public static Object getParamValue(Object params, String paramName, boolean required) {
-        if (params == null) {
-            throw new NullPointerException("分页查询参数params不能为空!");
-        }
+    public static Object getParamValue(MetaObject paramsObject, String paramName, boolean required) {
         Object value = null;
-        if (params instanceof Map) {
-            if (((Map) params).containsKey(PARAMS.get(paramName))) {
-                value = ((Map) params).get(PARAMS.get(paramName));
-            }
-        } else if (hasRequest && requestClass.isAssignableFrom(params.getClass())) {
-            try {
-                value = getParameter.invoke(params, PARAMS.get(paramName));
-            } catch (Exception e) {
-                //忽略
-            }
-        } else {
-            //TODO 其他类型
+        if (paramsObject.hasGetter(PARAMS.get(paramName))) {
+            value = paramsObject.getValue(PARAMS.get(paramName));
         }
         if (required && value == null) {
             throw new RuntimeException("分页查询缺少必要的参数:" + PARAMS.get(paramName));
