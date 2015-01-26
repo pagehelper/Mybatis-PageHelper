@@ -24,7 +24,7 @@
  
  - `startPage`方法返回值从`void`改为`Page`，获取`Page`后可以修改参数值
  
- - `Page`增加一个针对sqlserver的属性`orderBy`，用户看上面的**注意事项**
+ - `Page`增加一个针对sqlserver的属性`orderBy`，用法看上面的<b>注意事项</b>
  
  - `Page`增加了一个链式赋值的方法，可以像下面这样使用：
    `PageHelper.startPage(1,10).count(false).reasonable(true).pageSizeZero(false)`
