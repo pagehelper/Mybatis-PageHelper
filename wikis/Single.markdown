@@ -194,7 +194,7 @@
 
 其他五个参数说明：
 
-1. 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,<b>没有默认值，必须指定该属性</b>。
+1. 增加`dialect`属性，使用时必须指定该属性，可选值为`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`sqlserver`,<b>没有默认值，必须指定该属性</b>。
 
 2. 增加`offsetAsPageNum`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页时，会将`offset`参数当成`pageNum`使用，可以用页码和页面大小两个参数进行分页。
 
