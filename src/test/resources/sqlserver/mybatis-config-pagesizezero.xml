@@ -41,7 +41,7 @@
 
   <plugins>
     <plugin interceptor="com.github.pagehelper.PageHelper">
-      <property name="dialect" value="mysql"/>
+      <property name="dialect" value="sqlserver"/>
       <property name="offsetAsPageNum" value="true"/>
       <property name="rowBoundsWithCount" value="true"/>
       <property name="pageSizeZero" value="true"/>
@@ -54,10 +54,10 @@
 				<property name="" value="" />
 			</transactionManager>
 			<dataSource type="UNPOOLED">
-				<property name="driver" value="com.mysql.jdbc.Driver" />
-				<property name="url" value="jdbc:mysql://localhost:3306/pagehelper" />
-        <property name="username" value="pagehelper" />
-        <property name="password" value="pagehelper" />
+        <property name="driver" value="net.sourceforge.jtds.jdbc.Driver" />
+        <property name="url" value="jdbc:jtds:sqlserver://127.0.0.1:1433/tempdb" />
+        <property name="username" value="sa" />
+        <property name="password" value="jj" />
 			</dataSource>
 		</environment>
 	</environments>

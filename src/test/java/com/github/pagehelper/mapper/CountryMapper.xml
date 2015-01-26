@@ -5,11 +5,11 @@
 
 <mapper namespace="com.github.pagehelper.mapper.CountryMapper">
   <select id="selectAll" resultType="Country">
-    select * from country
+    select * from country order by id
   </select>
 
   <select id="selectGreterThanId" resultType="Country">
-    select * from country where id &gt;#{id}
+    select * from country where id &gt;#{id} order by id
   </select>
 
   <select id="selectGreterThanIdAndNotEquelContryname" resultType="Country">
@@ -24,19 +24,21 @@
     select * from country order by ${order1} desc,${order2} asc
   </select>
   <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.Country">
-    select * from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2}
+    select * from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2} order by id
   </select>
   <select id="selectAllOrderByList" resultType="com.github.pagehelper.model.Country">
     select * from country where id not in
     <foreach collection="list" item="par" separator="," open="(" close=")">
       #{par}
     </foreach>
+    order by id
   </select>
   <select id="selectAllOrderByArray" resultType="com.github.pagehelper.model.Country">
     select * from country where id not in
     <foreach collection="array" item="par" separator="," open="(" close=")">
       #{par}
     </foreach>
+    order by id
   </select>
   <select id="selectIf" resultType="com.github.pagehelper.model.Country">
     select * from country
@@ -44,18 +46,21 @@
     <!--<if test="id!=null">-->
       where id &gt; #{id}
     </if>
+    order by id
   </select>
   <select id="selectIf3" parameterType="Country" resultType="com.github.pagehelper.model.Country">
     select * from country
     <if test="id > 0">
       where id &gt; #{id}
     </if>
+    order by id
   </select>
   <select id="selectIf2" resultType="com.github.pagehelper.model.Country">
     select * from country where id &gt; #{id1}
     <if test="id2!=null">
       and id &gt; #{id2}
     </if>
+    order by id
   </select>
   <select id="selectIf2List" resultType="com.github.pagehelper.model.Country">
     select * from country
@@ -73,6 +78,7 @@
         </foreach>
       </if>
     </where>
+    order by id
   </select>
   <select id="selectIf2ListAndOrder" resultType="com.github.pagehelper.model.Country">
     select * from country
@@ -93,6 +99,9 @@
     <if test="order!=null and order!=''">
       order by ${order}
     </if>
+    <if test="order==null or order==''">
+      order by id
+    </if>
   </select>
   <select id="selectChoose" resultType="com.github.pagehelper.model.Country">
     select * from country
@@ -106,6 +115,7 @@
         </otherwise>
       </choose>
     </where>
+    order by id
   </select>
   <select id="selectLike" resultType="com.github.pagehelper.model.Country">
     select * from country where 1=1
@@ -119,14 +129,9 @@
   </select>
 
   <select id="selectUnion" resultType="com.github.pagehelper.model.Country">
-    select * from country where id &gt;180
+    select id,countryname,countrycode from country where id &gt;180
     union
-    select * from country where id &lt;=10 order by id
-  </select>
-  <select id="selectUnion" resultType="com.github.pagehelper.model.Country" databaseId="oracle">
-    select * from country where id &gt;180
-    union
-    select * from country where id &lt;=10
+    select id,countryname,countrycode from country where id &lt;=10 order by id
   </select>
   <select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
     select a.id,b.countryname,a.countrycode from country a
@@ -134,7 +139,7 @@
     order by a.id
   </select>
   <select id="selectWith" resultType="com.github.pagehelper.model.Country">
-    with rs as (select id from country where id>150) select * from country where id in (select * from rs)
+    with rs as (select id from country where id>150) select * from country where id in (select * from rs) order by id
   </select>
 
   <!--select column中包含参数时-->
@@ -155,7 +160,7 @@
   </select>
 
   <select id="selectGroupBy" resultType="com.github.pagehelper.model.Country">
-    select countryname,countrycode,count(id) id from country group by countryname,countrycode
+    select countryname,countrycode,count(id) id from country group by countryname,countrycode order by countryname,countrycode
   </select>
 
   <select id="selectByWhereMap" resultType="com.github.pagehelper.model.Country">
@@ -165,6 +170,7 @@
         ${key} = #{val}
       </foreach>
     </where>
+    order by id
   </select>
 
   <sql id="Example_Where_Clause" >
@@ -209,6 +215,9 @@
     </if>
     <if test="orderByClause != null" >
       order by ${orderByClause}
+    </if>
+    <if test="orderByClause == null" >
+      order by id
     </if>
   </select>
 </mapper>

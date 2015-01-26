@@ -48,7 +48,7 @@ import java.util.*;
  * Mybatis - sql工具，获取分页和count的MappedStatement，设置分页参数
  *
  * @author liuzh/abel533/isea533
- * @since 3.3.0
+ * @since 3.6.0
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -115,7 +115,7 @@ public class SqlUtil {
 
     //数据库方言 - 使用枚举限制数据库类型
     public enum Dialect {
-        mysql, mariadb, sqlite, oracle, hsqldb, postgresql
+        mysql, mariadb, sqlite, oracle, hsqldb, postgresql, sqlserver
     }
 
     public static void setLocalPage(Page page) {
@@ -127,14 +127,14 @@ public class SqlUtil {
      *
      * @return
      */
-    public static Page getLocalPage() {
+    private static Page getLocalPage() {
         return LOCAL_PAGE.get();
     }
 
     /**
      * 移除本地变量
      */
-    public static void clearLocalPage() {
+    private static void clearLocalPage() {
         LOCAL_PAGE.remove();
     }
 
@@ -473,6 +473,9 @@ public class SqlUtil {
                 case hsqldb:
                     parser = new HsqldbParser();
                     break;
+                case sqlserver:
+                    parser = new SqlServerbParser();
+                    break;
                 case postgresql:
                 default:
                     parser = new PostgreSQLParser();
@@ -616,6 +619,33 @@ public class SqlUtil {
             paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
             paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
             return paramMap;
+        }
+    }
+
+    //SqlServer
+    private static class SqlServerbParser extends SimpleParser {
+        private static final SqlServer pageSql = new SqlServer();
+
+        @Override
+        public boolean isSupportedMappedStatementCache() {
+            //由于sqlserver每次分页参数都是直接写入到sql语句中，因此不能缓存MS
+            return false;
+        }
+
+        @Override
+        public List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql) {
+            return boundSql.getParameterMappings();
+        }
+
+        @Override
+        public String getPageSql(String sql) {
+            Page page = getLocalPage();
+            return pageSql.convertToPageSql(sql, page.getStartRow(), page.getPageSize(), page.getOrderBy());
+        }
+
+        @Override
+        public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+            return super.setPageParameter(ms, parameterObject, boundSql, page);
         }
     }
 
@@ -863,6 +893,9 @@ public class SqlUtil {
      */
     public static void testSql(String dialet, String originalSql) {
         SqlUtil sqlUtil = new SqlUtil(dialet);
+        if (sqlUtil.dialect == Dialect.sqlserver) {
+            setLocalPage(new Page(1, 10));
+        }
         String countSql = sqlUtil.parser.getCountSql(originalSql);
         System.out.println(countSql);
         String pageSql = sqlUtil.parser.getPageSql(originalSql);

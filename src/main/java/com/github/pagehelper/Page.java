@@ -33,7 +33,7 @@ import java.util.List;
  * Mybatis - 分页对象
  *
  * @author liuzh/abel533/isea533
- * @version 3.3.0
+ * @version 3.6.0
  *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
 public class Page<E> extends ArrayList<E> {
@@ -71,6 +71,10 @@ public class Page<E> extends ArrayList<E> {
      * 总页数
      */
     private int pages;
+    /**
+     * 针对sqlserver - 在其他数据库中该字段无效
+     */
+    private String orderBy;
     /**
      * 分页合理化
      */
@@ -190,6 +194,10 @@ public class Page<E> extends ArrayList<E> {
         this.pageSizeZero = pageSizeZero;
     }
 
+    public String getOrderBy() {
+        return orderBy;
+    }
+
     /**
      * 计算起止行号
      */
@@ -202,15 +210,89 @@ public class Page<E> extends ArrayList<E> {
         return this.total > NO_SQL_COUNT;
     }
 
+    //增加链式调用方法
+
+    /**
+     * 设置页码
+     *
+     * @param pageNum
+     * @return
+     */
+    public Page<E> pageNum(int pageNum) {
+        //分页合理化，针对不合理的页码自动处理
+        this.pageNum = ((reasonable != null && reasonable) && pageNum <= 0) ? 1 : pageNum;
+        return this;
+    }
+
+    /**
+     * 设置页面大小
+     *
+     * @param pageSize
+     * @return
+     */
+    public Page<E> pageSize(int pageSize) {
+        this.pageSize = pageSize;
+        calculateStartAndEndRow();
+        return this;
+    }
+
+    /**
+     * 是否执行count查询
+     *
+     * @param count
+     * @return
+     */
+    public Page<E> count(Boolean count) {
+        this.total = count ? Page.SQL_COUNT : Page.NO_SQL_COUNT;
+        return this;
+    }
+
+    /**
+     * 针对sqlserver有效
+     *
+     * @param orderBy
+     * @return
+     */
+    public Page<E> orderBy(String orderBy) {
+        this.orderBy = orderBy;
+        return this;
+    }
+
+    /**
+     * 设置合理化
+     *
+     * @param reasonable
+     * @return
+     */
+    public Page<E> reasonable(Boolean reasonable) {
+        setReasonable(reasonable);
+        return this;
+    }
+
+    /**
+     * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+     *
+     * @param pageSizeZero
+     * @return
+     */
+    public Page<E> pageSizeZero(Boolean pageSizeZero) {
+        setPageSizeZero(pageSizeZero);
+        return this;
+    }
+
     @Override
     public String toString() {
-        return "Page{" +
-                "pageNum=" + pageNum +
-                ", pageSize=" + pageSize +
-                ", startRow=" + startRow +
-                ", endRow=" + endRow +
-                ", total=" + total +
-                ", pages=" + pages +
-                '}';
+        final StringBuffer sb = new StringBuffer("Page{");
+        sb.append("pageNum=").append(pageNum);
+        sb.append(", pageSize=").append(pageSize);
+        sb.append(", startRow=").append(startRow);
+        sb.append(", endRow=").append(endRow);
+        sb.append(", total=").append(total);
+        sb.append(", pages=").append(pages);
+        sb.append(", orderBy='").append(orderBy).append('\'');
+        sb.append(", reasonable=").append(reasonable);
+        sb.append(", pageSizeZero=").append(pageSizeZero);
+        sb.append('}');
+        return sb.toString();
     }
 }

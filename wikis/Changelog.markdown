@@ -1,6 +1,20 @@
 ##更新日志
 
-##3.5.1 - 2015-01-20
+##3.6.0-SNAPSHOT - 2015-01-26
+
+ - 支持sqlserver(对sqlserver2005进行测试)
+ 
+ - sqlserver注意事项： 
+   - 请先保证你的SQL可以执行
+   - sql中最好直接包含order by，可以自动从sql提取
+   - 如果没有order by，可以通过入参提供，但是需要自己保证正确
+   - 如果sql有order by，可以通过orderby参数覆盖sql中的order by
+   - order by的列名不能使用别名(`UNION,INTERSECT,MINUS,EXCEPT`等复杂sql不受限制，具体可以自己尝试)
+   - 表和列使用别名的时候不要使用单引号(')
+
+ - 简单修改结构
+
+###3.5.1 - 2015-01-20
 
  - 解决[bug#25](http://git.oschina.net/free/Mybatis_PageHelper/issues/25)，当参数是null并且是动态查询时，由于加入分页参数，导致参数不在是null，因而会导致部分判断出错，导致异常。
  

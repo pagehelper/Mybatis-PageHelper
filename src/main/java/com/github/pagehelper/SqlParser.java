@@ -203,7 +203,7 @@ public class SqlParser {
         } else if (fromItem instanceof LateralSubSelect) {
             LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
             if (lateralSubSelect.getSubSelect() != null) {
-                SubSelect subSelect = (SubSelect) (lateralSubSelect.getSubSelect());
+                SubSelect subSelect = lateralSubSelect.getSubSelect();
                 if (subSelect.getSelectBody() != null) {
                     processSelectBody(subSelect.getSelectBody());
                 }

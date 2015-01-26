@@ -2,19 +2,27 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`六种数据库分页。  
+该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`,`SqlServer`七种数据库的<b>物理分页</b>。  
 
 [点击提交BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
 
-##3.6.0-SNAPSHOT开发计划
+##最新版本为3.6.0-SNAPSHOT
 
- - 支持sqlserver
+ - 支持sqlserver(对sqlserver2005进行测试)
  
+ - sqlserver注意事项： 
+   - 请先保证你的SQL可以执行
+   - sql中最好直接包含order by，可以自动从sql提取
+   - 如果没有order by，可以通过入参提供，但是需要自己保证正确
+   - 如果sql有order by，可以通过orderby参数覆盖sql中的order by
+   - order by的列名不能使用别名(`UNION,INTERSECT,MINUS,EXCEPT`等复杂sql不受限制，具体可以自己尝试)
+   - 表和列使用别名的时候不要使用单引号(')
+
  - 简单修改结构
 
-##最新版本为3.5.1
+##3.5.1
 
  - 解决[bug#25](http://git.oschina.net/free/Mybatis_PageHelper/issues/25)，当参数是null并且是动态查询时，由于加入分页参数，导致参数不在是null，因而会导致部分判断出错，导致异常。
  
@@ -68,7 +76,7 @@
 
 ##使用方法  
 
-分页插件项目中的正式代码一共有个5个Java文件，这5个文件的说明如下：  
+分页插件项目中的正式代码一共有个6个Java文件，这6个文件的说明如下：  
 
  - `Page<E>`\[必须\]：分页参数类，该类继承`ArrayList`，虽然分页查询返回的结果实际类型是`Page<E>`,但是可以完全不出现所有的代码中，可以直接当成`List`使用。返回值不建议使用`Page`，建议仍然用`List`。如果需要用到分页信息，使用下面的`PageInfo`类对List进行包装即可。  
  
@@ -76,14 +84,15 @@
  
  - `PageInfo`\[可选\]：`Page<E>`的包装类，包含了全面的分页属性信息。  
  
- - `SqlParser`\[可选\]：提供高效的count查询sql。主要是智能替换原sql语句为count(*)，去除不带参数的order by语句。需要`jsqlparser-0.9.1.jar`支持。  
+ - `SqlParser`\[必须\]：提供高效的count查询sql。主要是智能替换原sql语句为count(*)，去除不带参数的order by语句。需要`jsqlparser-0.9.1.jar`支持。  
  
  - `SqlUtil`\[必须\]：分页插件工具类，分页插件逻辑类，分页插件的主要实现方法都在这个类中。 
 
+ - `SqlServer`\[必须\]：sqlserver分页工具，该类独立，依赖jsqlparser，3.6.0版本添加。
 
 ###1. 引入分页插件  
 
-引入分页插件一共有下面3种方式，推荐使用引入分页代码的方式，这种方式易于控制，并且可以根据自己需求进行修改。  
+引入分页插件一共有下面3种方式，推荐使用Maven方式，这种方式方便更新。  
 
 ####1). 引入分页代码
 
@@ -113,9 +122,27 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.5.1</version>
+    <version>3.6.0-SNAPSHOT</version>
 </dependency>
 ```  
+
+当使用maven中央库中的快照版时，需要在pom.xml中添加如下配置：  
+
+```xml
+<repositories>
+    <repository>
+          <id>sonatype-nexus-snapshots</id>
+          <name>Sonatype Nexus Snapshots</name>
+          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+          <releases>
+                <enabled>false</enabled>
+          </releases>
+          <snapshots>
+                <enabled>true</enabled>
+          </snapshots>
+    </repository>
+</repositories>
+```
 
 ###2. 在Mybatis配置xml中配置拦截器插件:    
 

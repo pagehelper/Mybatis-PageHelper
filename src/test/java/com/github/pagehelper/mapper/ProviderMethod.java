@@ -18,6 +18,7 @@ public class ProviderMethod {
         for (Map.Entry<String, Object> entry : param.entrySet()) {
             sbSql.append(" and "+entry.getKey() + "= #{param." + entry.getKey() + "} ");
         }
+        sbSql.append("order by id");
         return sbSql.toString();
     }
 
@@ -33,6 +34,7 @@ public class ProviderMethod {
         if (country.getCountryname() != null) {
             sbSql.append(" and countryname = #{countryname} ");
         }
+        sbSql.append("order by id");
         return sbSql.toString();
     }
 }

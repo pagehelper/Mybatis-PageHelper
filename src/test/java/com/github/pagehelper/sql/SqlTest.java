@@ -41,6 +41,7 @@ public class SqlTest {
         SqlUtil.testSql("hsqldb", originalSql);
         SqlUtil.testSql("oracle", originalSql);
         SqlUtil.testSql("postgresql", originalSql);
+        SqlUtil.testSql("sqlserver", originalSql);
     }
 
     @Test
@@ -56,6 +57,7 @@ public class SqlTest {
         SqlUtil.testSql("hsqldb", originalSql);
         SqlUtil.testSql("oracle", originalSql);
         SqlUtil.testSql("postgresql", originalSql);
+        SqlUtil.testSql("sqlserver", originalSql);
     }
 
     @Test
@@ -67,11 +69,12 @@ public class SqlTest {
                 "name" +
                 ") " +
                 " " +
-                "select ? name,? as code from person.StateProvince where CountryRegionCode in (select * from cr)";
+                "select ? name,? as code from person.StateProvince where CountryRegionCode in (select * from cr) order by name";
         SqlUtil.testSql("mysql", originalSql);
         SqlUtil.testSql("hsqldb", originalSql);
         SqlUtil.testSql("oracle", originalSql);
         SqlUtil.testSql("postgresql", originalSql);
+        SqlUtil.testSql("sqlserver", originalSql);
     }
 
     @Test
@@ -104,7 +107,6 @@ public class SqlTest {
         System.out.println(sqlParser.getSmartCountSql("select * from (select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
                 "union " +
                 "select * from aa10 where aaa100 = 'AAC031')"));
-//        System.out.println(sqlParser.parse(""));
     }
 
     @Test
