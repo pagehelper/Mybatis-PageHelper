@@ -22,6 +22,15 @@
 
  - 简单修改结构
  
+ - `startPage`方法返回值从`void`改为`Page`，获取`Page`后可以修改参数值
+ 
+ - `Page`增加一个针对sqlserver的属性`orderBy`，用户看上面的**注意事项**
+ 
+ - `Page`增加了一个链式赋值的方法，可以像下面这样使用：
+   `PageHelper.startPage(1,10).count(false).reasonable(true).pageSizeZero(false)`
+   
+ - `PageHelper`增加了`startPage(int pageNum, int pageSize,String orderBy)`方法，针对sqlserver
+ 
 ##3.5.1
 
  - 解决[bug#25](http://git.oschina.net/free/Mybatis_PageHelper/issues/25)，当参数是null并且是动态查询时，由于加入分页参数，导致参数不在是null，因而会导致部分判断出错，导致异常。

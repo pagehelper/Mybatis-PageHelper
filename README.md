@@ -2,7 +2,7 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`,`SqlServer`七种数据库的<b>物理分页</b>。  
+该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`,`SqlServer(2005测试通过)`七种数据库的<b>物理分页</b>。  
 
 [点击提交BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
@@ -21,6 +21,15 @@
    - 表和列使用别名的时候不要使用单引号(')
 
  - 简单修改结构
+ 
+ - `startPage`方法返回值从`void`改为`Page`，获取`Page`后可以修改参数值
+ 
+ - `Page`增加一个针对sqlserver的属性`orderBy`，用户看上面的**注意事项**
+ 
+ - `Page`增加了一个链式赋值的方法，可以像下面这样使用：
+   `PageHelper.startPage(1,10).count(false).reasonable(true).pageSizeZero(false)`
+   
+ - `PageHelper`增加了`startPage(int pageNum, int pageSize,String orderBy)`方法，针对sqlserver
 
 ##3.5.1
 
