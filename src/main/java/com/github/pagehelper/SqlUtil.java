@@ -474,7 +474,7 @@ public class SqlUtil {
                     parser = new HsqldbParser();
                     break;
                 case sqlserver:
-                    parser = new SqlServerbParser();
+                    parser = new SqlServerParser();
                     break;
                 case postgresql:
                 default:
@@ -623,7 +623,7 @@ public class SqlUtil {
     }
 
     //SqlServer
-    private static class SqlServerbParser extends SimpleParser {
+    private static class SqlServerParser extends SimpleParser {
         private static final SqlServer pageSql = new SqlServer();
 
         @Override

@@ -53,6 +53,12 @@ public class SqlServerTest {
     }
 
     @Test
+    public void testSqlDistinct() throws JSQLParserException {
+        String originalSql = "select distinct countrycode from country order by countrycode";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
+
+    @Test
     public void testSqlTableAll() throws JSQLParserException {
         String originalSql = "Select country.* from country where id > 10 order by id desc , countryname asc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
