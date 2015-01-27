@@ -2,11 +2,13 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`,`SqlServer(2005测试通过)`七种数据库的<b>物理分页</b>。  
+该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`,`SqlServer(2005,2008测试通过)`七种数据库的<b>物理分页</b>。  
 
 [点击提交BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
 ##嫌这页文档内容太多太乱？[点击查看wiki文档](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)
+
+##Mybatis工具群： 211286137
 
 ##最新版本为3.6.0-SNAPSHOT
 
@@ -17,6 +19,7 @@
    - sql中最好直接包含order by，可以自动从sql提取
    - 如果没有order by，可以通过入参提供，但是需要自己保证正确
    - 如果sql有order by，可以通过orderby参数覆盖sql中的order by
+   - 如果sql中没有order by，也没有通过参数指定order by，那么就会使用默认的`ORDER BY ID`
    - order by的列名不能使用别名(`UNION,INTERSECT,MINUS,EXCEPT`等复杂sql不受限制，具体可以自己尝试)
    - 表和列使用别名的时候不要使用单引号(')
 
@@ -135,7 +138,7 @@
 </dependency>
 ```  
 
-当使用maven中央库中的快照版时，需要在pom.xml中添加如下配置：  
+当使用maven中央库中的快照版（带`"-SNAPSHOT"`的版本）时，需要在pom.xml中添加如下配置：  
 
 ```xml
 <repositories>

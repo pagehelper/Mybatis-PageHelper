@@ -18,6 +18,7 @@
 #mysql
 #oracle
 #postgresql
+#sqlserver
 database = hsqldb
 ```  
 各种数据库对应的sql文件都在对应的目录中。

@@ -51,7 +51,7 @@
 </dependency>
 ```  
 
-当使用maven中央库中的快照版时，需要在pom.xml中添加如下配置：  
+当使用maven中央库中的快照版（带`"-SNAPSHOT"`的版本）时，需要在pom.xml中添加如下配置：  
 
 ```xml
 <repositories>

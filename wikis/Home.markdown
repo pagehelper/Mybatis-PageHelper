@@ -2,7 +2,7 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`六种数据库分页。
+该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`,`SqlServer(2005,2008测试通过)`七种数据库的<b>物理分页</b>。
 
 项目文档：  
 
@@ -13,10 +13,8 @@
  3. [分页插件项目测试](Test) 
  
  4. [更新日志](Changelog) 
- 
- 5. [单文件文档](Single)
 
- 6. [点击提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
+ 5. [点击提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
 <br>
 <br>

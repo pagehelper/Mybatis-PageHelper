@@ -9,6 +9,7 @@
    - sql中最好直接包含order by，可以自动从sql提取
    - 如果没有order by，可以通过入参提供，但是需要自己保证正确
    - 如果sql有order by，可以通过orderby参数覆盖sql中的order by
+   - 如果sql中没有order by，也没有通过参数指定order by，那么就会使用默认的`ORDER BY ID`
    - order by的列名不能使用别名(`UNION,INTERSECT,MINUS,EXCEPT`等复杂sql不受限制，具体可以自己尝试)
    - 表和列使用别名的时候不要使用单引号(')
 
