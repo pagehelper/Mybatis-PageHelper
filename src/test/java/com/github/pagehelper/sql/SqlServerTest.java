@@ -92,6 +92,40 @@ public class SqlServerTest {
     }
 
     @Test
+    public void testSqlLeftJoin() throws JSQLParserException {
+        String originalSql = "select * " +
+                "  from (select distinct A.USERID, " +
+                "                        A.USERCODE, " +
+                "                        A.USERNAME, " +
+                "                        A.USERPWD, " +
+                "                        A.CREATEDATE, " +
+                "                        A.UPDATEDATE, " +
+                "                        A.USERSTATE, " +
+                "                        A.MEMO, " +
+                "                        A.USERPHONE, " +
+                "                        A.USEREMAIL, " +
+                "                        A.IDCARD, " +
+                "                        D.DEPTNAME, " +
+                "                        D.DEPTID " +
+                "          from BASE_SYS_USER A " +
+                "          left JOIN BASE_SYS_ROLE_USER_REL B " +
+                "            ON A.USERID = B.USERID " +
+                "          left JOIN BASE_SYS_ROLE C " +
+                "            on C.ROLEID = B.ROLEID " +
+                "          left join BASE_SYS_DEPT_USER_REL REL " +
+                "            on REL.USERID = A.USERID " +
+                "          left join BASE_SYS_DEPT D " +
+                "            on D.DEPTID = REL.DEPTID " +
+                "         where 1 = 1 " +
+                "           and C.ROLEID = ? " +
+                "           and D.DEPTID = ? " +
+                "           and A.USERNAME LIKE '%heh%' " +
+                "           and A.USERSTATE = ? " +
+                "         ) A Order by A.createDate desc";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
+
+    @Test
     public void testSqlUnion() throws JSQLParserException {
         String originalSql = "select countryname,countrycode code from country where id >170 " +
                 "union all " +

@@ -61,8 +61,6 @@ public class SqlServer {
     private static final String START_ROW = String.valueOf(Long.MIN_VALUE);
     //结束行号
     private static final String PAGE_SIZE = String.valueOf(Long.MAX_VALUE);
-    //默认的ORDER BY
-    private static final String DEFAULT_ORDER_BY = "ORDER BY ID";
     //外层包装表
     private static final String WRAP_TABLE = "WRAP_OUTER_TABLE";
     //表别名名字
@@ -270,9 +268,7 @@ public class SqlServer {
             //注意：order by别名的时候有错,由于没法判断一个列是否为别名，所以不能解决
             orderByBuilder.append(PlainSelect.orderByToString(false, plainSelect.getOrderByElements()));
         } else {
-            //使用默认的ORDER BY，不再提示报错
-            orderByBuilder.append(DEFAULT_ORDER_BY);
-            //throw new RuntimeException("请您指定order by参数或者在sql中包含order by语句!");
+            throw new RuntimeException("请您指定order by参数或者在sql中包含order by语句!");
         }
         //需要把改orderby清空
         if (isNotEmptyList(plainSelect.getOrderByElements())) {
