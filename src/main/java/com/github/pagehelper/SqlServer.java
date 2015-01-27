@@ -30,7 +30,6 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 
@@ -65,8 +64,6 @@ public class SqlServer {
     private static final String WRAP_TABLE = "WRAP_OUTER_TABLE";
     //表别名名字
     private static final String PAGE_TABLE_NAME = "PAGE_TABLE_ALIAS";
-    //别名表
-    private static final Table PAGE_TABLE = new Table(PAGE_TABLE_NAME);
     //private
     public static final Alias PAGE_TABLE_ALIAS = new Alias(PAGE_TABLE_NAME);
     //行号
@@ -146,7 +143,7 @@ public class SqlServer {
             throw new RuntimeException("被分页的语句已经包含了Top，不能再通过分页插件进行分页查询!");
         }
         //获取查询列
-        List<SelectItem> selectItems = getSelectItems((PlainSelect) selectBody, PAGE_TABLE);
+        List<SelectItem> selectItems = getSelectItems((PlainSelect) selectBody);
         //对一层的SQL增加ROW_NUMBER()
         addRowNumber((PlainSelect) selectBody, orderBy);
         //处理子语句中的order by
@@ -196,7 +193,7 @@ public class SqlServer {
         PlainSelect plainSelect = setOperationList.getPlainSelects().get(setOperationList.getPlainSelects().size() - 1);
 
         PlainSelect selectBody = new PlainSelect();
-        List<SelectItem> selectItems = getSelectItems(plainSelect, new Table(WRAP_TABLE));
+        List<SelectItem> selectItems = getSelectItems(plainSelect);
         selectBody.setSelectItems(selectItems);
 
         //设置fromIterm
@@ -216,10 +213,9 @@ public class SqlServer {
      * 获取查询列
      *
      * @param plainSelect
-     * @param table
      * @return
      */
-    private List<SelectItem> getSelectItems(PlainSelect plainSelect, Table table) {
+    private List<SelectItem> getSelectItems(PlainSelect plainSelect) {
         //设置selectItems
         List<SelectItem> selectItems = new ArrayList<SelectItem>();
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
@@ -228,14 +224,14 @@ public class SqlServer {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
                 if (selectExpressionItem.getAlias() != null) {
                     //直接使用别名
-                    Column column = new Column(table, selectExpressionItem.getAlias().getName());
+                    Column column = new Column(selectExpressionItem.getAlias().getName());
                     SelectExpressionItem expressionItem = new SelectExpressionItem(column);
                     selectItems.add(expressionItem);
                 } else if (selectExpressionItem.getExpression() instanceof Column) {
                     Column column = (Column) selectExpressionItem.getExpression();
                     SelectExpressionItem item = null;
                     if (column.getTable() != null) {
-                        Column newColumn = new Column(table, column.getColumnName());
+                        Column newColumn = new Column(column.getColumnName());
                         item = new SelectExpressionItem(newColumn);
                         selectItems.add(item);
                     } else {

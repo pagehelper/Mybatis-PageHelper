@@ -60,9 +60,9 @@ public class PageHelper implements Interceptor {
      *
      * @param pageNum  页码
      * @param pageSize 每页显示数量
-     * @param orderBy 针对sqlserver - 建议在sql中直接包含order by
+     * @param orderBy  针对sqlserver - 建议在sql中直接包含order by
      */
-    public static Page startPage(int pageNum, int pageSize,String orderBy) {
+    public static Page startPage(int pageNum, int pageSize, String orderBy) {
         return startPage(pageNum, pageSize, true).orderBy(orderBy);
     }
 
