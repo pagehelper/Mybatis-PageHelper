@@ -207,6 +207,7 @@ public class SqlServer {
         //order by
         if (isNotEmptyList(plainSelect.getOrderByElements())) {
             selectBody.setOrderByElements(plainSelect.getOrderByElements());
+            plainSelect.setOrderByElements(null);
         }
         return selectBody;
     }

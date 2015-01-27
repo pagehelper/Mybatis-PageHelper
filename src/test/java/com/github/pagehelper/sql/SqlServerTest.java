@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author liuzh
  */
 public class SqlServerTest {
-    SqlServer sqlServer = new SqlServer();
+    public static final SqlServer sqlServer = new SqlServer();
 
     @Test
     public void testSqlTest() throws JSQLParserException {
@@ -54,7 +54,7 @@ public class SqlServerTest {
 
     @Test
     public void testSqlDistinct() throws JSQLParserException {
-        String originalSql = "select distinct countrycode from country order by countrycode";
+        String originalSql = "select distinct countrycode,countryname from country order by countrycode";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
