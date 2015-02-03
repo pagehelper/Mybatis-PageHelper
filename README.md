@@ -15,6 +15,32 @@
 
 ##最新版本为3.6.0
 
+###Maven坐标
+
+```xml  
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+    <version>3.6.0</version>
+</dependency>
+```  
+
+###下载JAR包
+
+分页插件pagehelper.jar： 
+
+ - https://oss.sonatype.org/content/repositories/releases/com/github/pagehelper/pagehelper/
+ 
+ - http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
+
+由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
+
+ - SqlParser.jar：http://search.maven.org/remotecontent?filepath=com/github/jsqlparser/jsqlparser/0.9.1/jsqlparser-0.9.1.jar
+ 
+ - SqlParser - github地址：https://github.com/JSQLParser/JSqlParser  
+ 
+##3.6.0更新日志：
+
  - 支持db2数据库
  
  - 支持sqlserver(2005+)数据库
