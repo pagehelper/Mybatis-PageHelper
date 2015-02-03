@@ -1,4 +1,4 @@
-#Mybatis分页插件 - PageHelper说明   
+#Mybatis分页插件 - PageHelper   
 
 如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。  
 
