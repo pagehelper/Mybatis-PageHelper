@@ -1,10 +1,19 @@
 #Mybatis分页插件 - PageHelper说明   
 
-如果你也在用Mybatis，建议尝试该分页插件，这个一定是<b>最方便</b>使用的分页插件。  
+如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。  
 
-该插件目前支持`Oracle`,`Mysql`,`MariaDB`,`SQLite`,`Hsqldb`,`PostgreSQL`,`SqlServer(2005,2008测试通过)`七种数据库的<b>物理分页</b>。
+该插件目前支持以下数据库的<b>物理分页</b>:
 
-项目文档：  
+ - `Oracle`
+ - `Mysql`
+ - `MariaDB`
+ - `SQLite`
+ - `Hsqldb`
+ - `PostgreSQL`
+ - `DB2`
+ - `SqlServer(2005+)`
+ 
+##项目文档：  
 
  1. [如何使用分页插件](HowToUse)  
  

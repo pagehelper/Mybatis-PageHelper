@@ -2,7 +2,9 @@
 
 ##3.6.0-SNAPSHOT - 2015-01-26
 
- - 支持sqlserver(对sqlserver2005进行测试)
+ - 支持db2数据库
+ 
+ - 支持sqlserver(2005+)数据库
  
  - sqlserver注意事项： 
    - 请先保证你的SQL可以执行

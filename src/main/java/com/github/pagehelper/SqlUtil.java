@@ -115,7 +115,7 @@ public class SqlUtil {
 
     //数据库方言 - 使用枚举限制数据库类型
     public enum Dialect {
-        mysql, mariadb, sqlite, oracle, hsqldb, postgresql, sqlserver
+        mysql, mariadb, sqlite, oracle, hsqldb, postgresql, sqlserver, db2
     }
 
     public static void setLocalPage(Page page) {
@@ -476,6 +476,9 @@ public class SqlUtil {
                 case sqlserver:
                     parser = new SqlServerParser();
                     break;
+                case db2:
+                    parser = new Db2Parser();
+                    break;
                 case postgresql:
                 default:
                     parser = new PostgreSQLParser();
@@ -646,6 +649,26 @@ public class SqlUtil {
         @Override
         public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
             return super.setPageParameter(ms, parameterObject, boundSql, page);
+        }
+    }
+
+    //Db2Parser
+    private static class Db2Parser extends SimpleParser {
+        @Override
+        public String getPageSql(String sql) {
+            StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
+            sqlBuilder.append("select * from (select tmp_page.*,rownumber() over() as row_id from ( ");
+            sqlBuilder.append(sql);
+            sqlBuilder.append(" ) as tmp_page) where row_id between  ? and ?");
+            return sqlBuilder.toString();
+        }
+
+        @Override
+        public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+            Map paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
+            paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow() + 1);
+            paramMap.put(PAGEPARAMETER_SECOND, page.getEndRow());
+            return paramMap;
         }
     }
 
