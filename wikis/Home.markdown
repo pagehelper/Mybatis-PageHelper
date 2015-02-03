@@ -4,14 +4,14 @@
 
 该插件目前支持以下数据库的<b>物理分页</b>:
 
- - `Oracle`
- - `Mysql`
- - `MariaDB`
- - `SQLite`
- - `Hsqldb`
- - `PostgreSQL`
- - `DB2`
- - `SqlServer(2005+)`
+ 1. `Oracle`
+ 2. `Mysql`
+ 3. `MariaDB`
+ 4. `SQLite`
+ 5. `Hsqldb`
+ 6. `PostgreSQL`
+ 7. `DB2`
+ 8. `SqlServer(2005+)`
  
 ##项目文档：  
 
