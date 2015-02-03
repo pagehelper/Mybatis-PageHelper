@@ -25,10 +25,6 @@
 
  5. [点击提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
-<br>
-<br>
-<br>
-
 ##相关链接
 
 对应于oschub的项目地址：http://git.oschina.net/free/Mybatis_PageHelper
