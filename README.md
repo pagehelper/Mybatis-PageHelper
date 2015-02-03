@@ -33,11 +33,11 @@
  
  - http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
 
-由于使用了sql解析工具，你还需要下载这个文件（这个文件完全独立，不依赖其他）：  
+由于使用了sql解析工具，你还需要下载jsqlparser.jar（这个文件完全独立，不依赖其他）：  
 
- - jsqlparser.jar：http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
+ - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
- - jsqlparser.jar：http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+ - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
  
 ##3.6.0更新日志：
 

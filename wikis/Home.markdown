@@ -22,8 +22,10 @@
  3. [分页插件项目测试](Test) 
  
  4. [更新日志](Changelog) 
+ 
+ 5. [源码说明](Source)
 
- 5. [点击提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
+ 6. [点击提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
 ##相关链接
 
