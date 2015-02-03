@@ -109,7 +109,7 @@ public class PageHelper implements Interceptor {
     /**
      * 开始分页
      *
-     * @param params 只能是Map或ServletRequest类型
+     * @param params
      */
     public static Page startPage(Object params) {
         Page page = SqlUtil.getPageFromObject(params);

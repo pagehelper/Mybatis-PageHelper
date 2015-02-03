@@ -171,7 +171,7 @@ public class SqlUtil {
     }
 
     /**
-     * 从request或Map中获取分页参数
+     * 对象中获取分页参数
      *
      * @param params
      * @return
