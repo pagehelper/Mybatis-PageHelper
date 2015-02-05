@@ -24,12 +24,16 @@
 
 package com.github.pagehelper.model;
 
+import java.io.Serializable;
+
 /**
  * Description: Country
  * Author: liuzh
  * Update: liuzh(2014-06-06 13:38)
  */
-public class Country {
+public class Country implements Serializable {
+    private static final long serialVersionUID = 6569081236403751407L;
+
     private int id;
     private String countryname;
     private String countrycode;
