@@ -245,9 +245,13 @@ public class SqlUtil {
      * @throws Throwable 抛出异常
      */
     public Object processPage(Invocation invocation) throws Throwable {
-        Object result = _processPage(invocation);
-        clearLocalPage();
-        return result;
+        try{
+            Object result = _processPage(invocation);
+            clearLocalPage();
+            return result;
+        } finally {
+            clearLocalPage();
+        }
     }
 
     /**
