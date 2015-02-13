@@ -34,6 +34,7 @@ import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,23 @@ public class TestExample {
             assertEquals(101, list.get(0).getId());
             assertEquals(20, list.size());
             assertEquals(83, ((Page) list).getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testInList() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            CountryExample example = new CountryExample();
+            example.createCriteria().andIdIn(Arrays.asList(1,2,3,4,5));
+            PageHelper.startPage(1,20);
+            List<Country> list = countryMapper.selectByExample(example);
+            assertEquals(1, list.get(0).getId());
+            assertEquals(5, list.size());
+            assertEquals(5, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }
