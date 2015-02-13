@@ -124,7 +124,8 @@ public class SqlParser {
         // select中包含group by时在else中处理
         if (selectBody instanceof PlainSelect
                 && !selectItemsHashParameters(((PlainSelect) selectBody).getSelectItems())
-                && ((PlainSelect) selectBody).getGroupByColumnReferences() == null) {
+                && ((PlainSelect) selectBody).getGroupByColumnReferences() == null
+                && ((PlainSelect) selectBody).getDistinct() == null) {
             ((PlainSelect) selectBody).setSelectItems(COUNT_ITEM);
         } else {
             PlainSelect plainSelect = new PlainSelect();

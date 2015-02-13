@@ -104,4 +104,6 @@ public interface CountryMapper {
 
     //Example
     List<Country> selectByExample(CountryExample example);
+
+    List<Country> selectDistinct();
 }

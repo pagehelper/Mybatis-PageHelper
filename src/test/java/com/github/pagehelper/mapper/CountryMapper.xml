@@ -245,4 +245,7 @@
       order by id
     </if>
   </select>
+  <select id="selectDistinct" resultType="com.github.pagehelper.model.Country">
+    select distinct SUBSTRING(countryname,1,1) countryname from country
+  </select>
 </mapper>
