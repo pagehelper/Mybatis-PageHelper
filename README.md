@@ -13,7 +13,7 @@
  7. `DB2`
  8. `SqlServer(2005+)`
 
-##最新版本为3.6.0
+##最新版本为3.6.1
 
 ###Maven坐标
 
@@ -21,7 +21,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.6.0</version>
+    <version>3.6.1</version>
 </dependency>
 ```  
 
@@ -38,7 +38,13 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+##3.6.1更新日志：
+
+ - 解决select distinct导致count查询结果不正确的bug#35
  
+ - 完善测试
+
 ##3.6.0更新日志：
 
  - 支持db2数据库
