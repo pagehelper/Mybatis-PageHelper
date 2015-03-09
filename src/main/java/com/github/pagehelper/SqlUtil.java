@@ -776,6 +776,9 @@ public class SqlUtil {
      */
     private MappedStatement getMappedStatement(MappedStatement ms, SqlSource sqlSource, Object parameterObject, String suffix) {
         MappedStatement qs = null;
+        if (ms.getId().endsWith(SUFFIX_PAGE) || ms.getId().endsWith(SUFFIX_COUNT)) {
+            throw new RuntimeException("分页插件配置错误:请不要在系统中配置多个分页插件(使用Spring时,mybatis-config.xml和Spring<bean>配置方式，请选择其中一种，不要同时配置多个分页插件)！");
+        }
         if (parser.isSupportedMappedStatementCache()) {
             try {
                 qs = ms.getConfiguration().getMappedStatement(ms.getId() + suffix);
