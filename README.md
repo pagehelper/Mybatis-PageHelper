@@ -13,7 +13,7 @@
  7. `DB2`
  8. `SqlServer(2005+)`
 
-##最新版本为3.6.1
+##最新版本为3.6.2
 
 ###Maven坐标
 
@@ -21,7 +21,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.6.1</version>
+    <version>3.6.2</version>
 </dependency>
 ```  
 
@@ -38,6 +38,13 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+ 
+##3.6.2更新日志：
+
+ - 本次更新只是增加了一个异常提示，当<b>错误</b>的配置了多个分页插件时，会有更友好的错误提示：
+ 
+   >分页插件配置错误:请不要在系统中配置多个分页插件(使用Spring时,mybatis-config.xml和Spring<bean>配置方式，请选择其中一种，不要同时配置多个分页插件)！
+
 
 ##3.6.1更新日志：
 
