@@ -503,7 +503,9 @@ public class SqlUtil {
 
         public List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql) {
             List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-            newParameterMappings.addAll(boundSql.getParameterMappings());
+            if (boundSql.getParameterMappings() != null) {
+                newParameterMappings.addAll(boundSql.getParameterMappings());
+            }
             newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
             newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
             return newParameterMappings;
