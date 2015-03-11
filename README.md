@@ -13,7 +13,7 @@
  7. `DB2`
  8. `SqlServer(2005+)`
 
-##最新版本为3.6.2
+##最新版本为3.6.3
 
 ###Maven坐标
 
@@ -21,7 +21,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.6.2</version>
+    <version>3.6.3</version>
 </dependency>
 ```  
 
@@ -38,6 +38,10 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+ 
+##3.6.3更新日志：
+
+ - 解决了一个潜在的bug，对[通用Mapper](http://git.oschina.net/free/Mapper)中的`SqlMapper`进行分页时，需要使用这个版本
  
 ##3.6.2更新日志：
 
