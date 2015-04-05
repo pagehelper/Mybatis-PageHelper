@@ -243,6 +243,8 @@ public class SqlUtil implements Constant {
         if (SqlUtil.getLocalPage() == null && rowBounds == RowBounds.DEFAULT) {
             return invocation.proceed();
         } else {
+            //忽略RowBounds-否则会进行Mybatis自带的内存分页
+            args[2] = RowBounds.DEFAULT;
             //分页信息
             Page page = getPage(rowBounds);
             //pageSizeZero的判断
@@ -262,8 +264,6 @@ public class SqlUtil implements Constant {
             }
             //获取原始的ms
             MappedStatement ms = (MappedStatement) args[0];
-            //忽略RowBounds-否则会进行Mybatis自带的内存分页
-            args[2] = RowBounds.DEFAULT;
             SqlSource sqlSource = ms.getSqlSource();
             //简单的通过total的值来判断是否进行count查询
             if (page.isCount()) {
