@@ -25,7 +25,7 @@
 package com.github.pagehelper;
 
 /**
- * Created by liuzh on 2015/4/5.
+ * @author liuzh
  */
 public interface Constant {
     //分页的id后缀

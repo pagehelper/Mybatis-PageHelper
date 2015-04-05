@@ -41,7 +41,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by liuzh on 2015/4/5.
+ * 创建新的MappedStatement
+ *
+ * @author liuzh
  */
 public class MSUtils implements Constant {
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
@@ -112,7 +114,7 @@ public class MSUtils implements Constant {
         }
         if (qs == null) {
             //创建一个新的MappedStatement
-            qs = newMappedStatement(ms, getsqlSource(ms, sqlSource, parameterObject, suffix), suffix);
+            qs = newMappedStatement(ms, getsqlSource(ms, sqlSource, parameterObject, suffix == SUFFIX_COUNT), suffix);
             if (parser.isSupportedMappedStatementCache()) {
                 try {
                     ms.getConfiguration().addMappedStatement(qs);
@@ -167,33 +169,19 @@ public class MSUtils implements Constant {
     }
 
     /**
-     * 判断当前执行的是否为动态sql
-     *
-     * @param ms
-     * @return
-     */
-    public static boolean isDynamic(MappedStatement ms) {
-        return ms.getSqlSource() instanceof DynamicSqlSource;
-    }
-
-    /**
      * 获取新的sqlSource
      *
      * @param ms
      * @param sqlSource
      * @param parameterObject
-     * @param suffix
+     * @param count
      * @return
      */
-    public SqlSource getsqlSource(MappedStatement ms, SqlSource sqlSource, Object parameterObject, String suffix) {
-        //1. 从XMLLanguageDriver.java和XMLScriptBuilder.java可以看出只有两种SqlSource
-        //2. 增加注解情况的ProviderSqlSource
-        //3. 对于RawSqlSource需要进一步测试完善
-        //如果是动态sql
-        if (isDynamic(ms)) {
+    public SqlSource getsqlSource(MappedStatement ms, SqlSource sqlSource, Object parameterObject, boolean count) {
+        if (sqlSource instanceof DynamicSqlSource) {//动态sql
             MetaObject msObject = SystemMetaObject.forObject(ms);
             SqlNode sqlNode = (SqlNode) msObject.getValue("sqlSource.rootSqlNode");
-            MixedSqlNode mixedSqlNode = null;
+            MixedSqlNode mixedSqlNode;
             if (sqlNode instanceof MixedSqlNode) {
                 mixedSqlNode = (MixedSqlNode) sqlNode;
             } else {
@@ -201,27 +189,40 @@ public class MSUtils implements Constant {
                 contents.add(sqlNode);
                 mixedSqlNode = new MixedSqlNode(contents);
             }
-            return new PageDynamicSqlSource(this, ms.getConfiguration(), mixedSqlNode, suffix == SUFFIX_COUNT);
-        } else if (sqlSource instanceof ProviderSqlSource) {
-            return new PageProviderSqlSource(parser, ms.getConfiguration(), (ProviderSqlSource) sqlSource, suffix == SUFFIX_COUNT);
-        }
-        //如果是静态分页sql
-        else if (suffix == SUFFIX_PAGE) {
-            //改为分页sql
-            return getPageSqlSource(ms.getConfiguration(), sqlSource, parameterObject);
-        }
-        //如果是静态count-sql
-        else {
-            return getCountSqlSource(ms.getConfiguration(), sqlSource, parameterObject);
+            return new PageDynamicSqlSource(this, ms.getConfiguration(), mixedSqlNode, count);
+        } else if (sqlSource instanceof ProviderSqlSource) {//注解式sql
+            return new PageProviderSqlSource(parser, ms.getConfiguration(), (ProviderSqlSource) sqlSource, count);
+        } else if (count) {//RawSqlSource和StaticSqlSource
+            return getStaticCountSqlSource(ms.getConfiguration(), sqlSource, parameterObject);
+        } else {
+            return getStaticPageSqlSource(ms.getConfiguration(), sqlSource, parameterObject);
         }
     }
 
-    public SqlSource getPageSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
+    /**
+     * 获取静态的分页SqlSource
+     * <br/>
+     * ParameterMappings需要增加分页参数的映射
+     *
+     * @param configuration
+     * @param sqlSource
+     * @param parameterObject
+     * @return
+     */
+    public SqlSource getStaticPageSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         return new StaticSqlSource(configuration, parser.getPageSql(boundSql.getSql()), parser.getPageParameterMapping(configuration, boundSql));
     }
 
-    public SqlSource getCountSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
+    /**
+     * 获取静态的count的SqlSource
+     *
+     * @param configuration
+     * @param sqlSource
+     * @param parameterObject
+     * @return
+     */
+    public SqlSource getStaticCountSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         return new StaticSqlSource(configuration, parser.getCountSql(boundSql.getSql()), boundSql.getParameterMappings());
     }

@@ -35,6 +35,9 @@ import org.apache.ibatis.session.Configuration;
 
 import java.util.Map;
 
+/**
+ * @author liuzh
+ */
 public class PageDynamicSqlSource implements SqlSource, Constant {
     private Configuration configuration;
     private SqlNode rootSqlNode;
@@ -69,9 +72,9 @@ public class PageDynamicSqlSource implements SqlSource, Constant {
         Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
         SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
         if (count) {
-            sqlSource = msUtils.getCountSqlSource(configuration, sqlSource, parameterObject);
+            sqlSource = msUtils.getStaticCountSqlSource(configuration, sqlSource, parameterObject);
         } else {
-            sqlSource = msUtils.getPageSqlSource(configuration, sqlSource, parameterObject);
+            sqlSource = msUtils.getStaticPageSqlSource(configuration, sqlSource, parameterObject);
         }
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         //设置条件参数

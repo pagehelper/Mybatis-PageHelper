@@ -31,7 +31,7 @@ import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 /**
- * Created by liuzh on 2015/4/5.
+ * @author liuzh
  */
 public class SystemMetaObject {
     public static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();

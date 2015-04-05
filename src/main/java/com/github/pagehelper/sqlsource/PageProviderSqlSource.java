@@ -33,6 +33,9 @@ import org.apache.ibatis.session.Configuration;
 
 import java.util.Map;
 
+/**
+ * @author liuzh
+ */
 public class PageProviderSqlSource implements SqlSource, Constant {
     private Configuration configuration;
     private ProviderSqlSource providerSqlSource;

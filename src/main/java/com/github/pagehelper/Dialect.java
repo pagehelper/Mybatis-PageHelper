@@ -24,6 +24,9 @@
 
 package com.github.pagehelper;
 
+/**
+ * @author liuzh
+ */
 public enum Dialect {
     mysql, mariadb, sqlite, oracle, hsqldb, postgresql, sqlserver, db2;
 

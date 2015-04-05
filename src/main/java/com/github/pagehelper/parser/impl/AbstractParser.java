@@ -24,8 +24,12 @@
 
 package com.github.pagehelper.parser.impl;
 
-import com.github.pagehelper.*;
+import com.github.pagehelper.Constant;
+import com.github.pagehelper.Dialect;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.SystemMetaObject;
 import com.github.pagehelper.parser.Parser;
+import com.github.pagehelper.parser.SqlParser;
 import com.github.pagehelper.sqlsource.PageProviderSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -38,6 +42,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author liuzh
+ */
 public abstract class AbstractParser implements Parser, Constant {
     //处理SQL
     public static final SqlParser sqlParser = new SqlParser();

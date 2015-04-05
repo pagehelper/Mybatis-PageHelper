@@ -24,7 +24,7 @@
 
 package com.github.pagehelper.sql;
 
-import com.github.pagehelper.SqlServer;
+import com.github.pagehelper.parser.SqlServer;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Test;
 

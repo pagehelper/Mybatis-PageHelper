@@ -31,7 +31,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import java.util.Map;
 
 /**
- * Created by liuzh on 2015/4/5.
+ * @author liuzh
  */
 public class MysqlParser extends AbstractParser {
     @Override
