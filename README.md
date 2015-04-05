@@ -13,7 +13,7 @@
  7. `DB2`
  8. `SqlServer(2005+)`
 
-##最新版本为3.6.3
+##最新版本为3.6.4
 
 ###Maven坐标
 
@@ -21,7 +21,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.6.3</version>
+    <version>3.6.4</version>
 </dependency>
 ```  
 
@@ -38,7 +38,26 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
- 
+
+##3.6.4更新日志：
+
+ - 重构，将原来的内部类全部独立出来，尤其是`Parser`接口以及全部实现。
+   现在可以直接使用`Parser`，使用方法如下：
+
+   ```java
+   String originalSql = "Select * from country o where id > 10 order by id desc ";
+
+   Parser parser = AbstractParser.newParser("mysql");
+   //获取count查询sql
+   String countSql = parser.getCountSql(originalSql);
+   //获取分页sql，这种方式不适合sqlserver数据库
+   String pageSql = parser.getPageSql(originalSql);
+
+   //sqlserver用下面的方法
+   SqlServer sqlServer = new SqlServer();
+   pageSql = sqlServer.convertToPageSql(originalSql, 1, 10);
+   ```
+
 ##3.6.3更新日志：
 
  - 解决了一个潜在的bug，对[通用Mapper](http://git.oschina.net/free/Mapper)中的`SqlMapper`进行分页时，需要使用这个版本

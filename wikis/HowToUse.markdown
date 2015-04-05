@@ -26,7 +26,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.6.3</version>
+    <version>3.6.4</version>
 </dependency>
 ```  
 
@@ -80,7 +80,8 @@
         <!-- 3.5.0版本可用 - 为了支持startPage(Object params)方法 -->
         <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值 -->
         <!-- 可以配置pageNum,pageSize,count,pageSizeZero,reasonable,不配置映射的用默认值 -->
-        <property name="params" value="pageNum=start;pageSize=limit;pageSizeZero=zero;reasonable=heli;count=contsql"/>
+        <!-- 不理解该含义的前提下，不要随便复制该配置 -->
+        <property name="params" value="pageNum=start;pageSize=limit;"/>
 	</plugin>
 </plugins>
 ```
