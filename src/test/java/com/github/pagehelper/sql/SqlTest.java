@@ -36,7 +36,7 @@ public class SqlTest {
 
     @Test
     public void testSqlTest() throws JSQLParserException {
-        String originalSql = "Select * from sys_user o where abc = ? order by id desc , name asc";
+        String originalSql = "Select * from sys_user o where abc = ? and exists(select 1 from sys_role r where o.rolieid = r.id) order by id desc , name asc";
         SqlUtil.testSql("mysql", originalSql);
         SqlUtil.testSql("hsqldb", originalSql);
         SqlUtil.testSql("oracle", originalSql);
