@@ -26,6 +26,7 @@ package com.github.pagehelper.parser;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -87,9 +88,9 @@ public class SqlParser {
         }
         Select select = (Select) stmt;
         SelectBody selectBody = select.getSelectBody();
-        //处理body
+        //处理body-去order by
         processSelectBody(selectBody);
-        //处理with
+        //处理with-去order by
         processWithItemsList(select.getWithItemsList());
         //处理为count查询
         sqlToCount(select);
@@ -120,12 +121,8 @@ public class SqlParser {
      */
     public void sqlToCount(Select select) {
         SelectBody selectBody = select.getSelectBody();
-        // select中包含参数时在else中处理
-        // select中包含group by时在else中处理
-        if (selectBody instanceof PlainSelect
-                && !selectItemsHashParameters(((PlainSelect) selectBody).getSelectItems())
-                && ((PlainSelect) selectBody).getGroupByColumnReferences() == null
-                && ((PlainSelect) selectBody).getDistinct() == null) {
+        // 是否能简化count查询
+        if (selectBody instanceof PlainSelect && isSimpleCount((PlainSelect) selectBody)) {
             ((PlainSelect) selectBody).setSelectItems(COUNT_ITEM);
         } else {
             PlainSelect plainSelect = new PlainSelect();
@@ -136,6 +133,36 @@ public class SqlParser {
             plainSelect.setSelectItems(COUNT_ITEM);
             select.setSelectBody(plainSelect);
         }
+    }
+
+    /**
+     * 是否可以用简单的count查询方式
+     *
+     * @param select
+     * @return
+     */
+    public boolean isSimpleCount(PlainSelect select) {
+        //包含group by的时候不可以
+        if (select.getGroupByColumnReferences() != null) {
+            return false;
+        }
+        //包含distinct的时候不可以
+        if (select.getDistinct() != null) {
+            return false;
+        }
+        for (SelectItem item : select.getSelectItems()) {
+            //select列中包含参数的时候不可以，否则会引起参数个数错误
+            if (item.toString().contains("?")) {
+                return false;
+            }
+            //如果查询列中包含函数，也不可以，函数可能会聚合列
+            if (item instanceof SelectExpressionItem) {
+                if(((SelectExpressionItem)item).getExpression() instanceof Function){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -247,24 +274,6 @@ public class SqlParser {
         }
         for (OrderByElement orderByElement : orderByElements) {
             if (orderByElement.toString().contains("?")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断selectItems是否包含参数，有参数的不能去
-     *
-     * @param selectItems
-     * @return
-     */
-    public boolean selectItemsHashParameters(List<SelectItem> selectItems) {
-        if (selectItems == null) {
-            return false;
-        }
-        for (SelectItem selectItem : selectItems) {
-            if (selectItem.toString().contains("?")) {
                 return true;
             }
         }

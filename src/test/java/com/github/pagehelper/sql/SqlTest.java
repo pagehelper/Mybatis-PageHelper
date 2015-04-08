@@ -45,8 +45,28 @@ public class SqlTest {
     }
 
     @Test
+    public void testSqlTest2() throws JSQLParserException {
+        String originalSql = "Select username,usertype,userrole from sys_user o where abc = ? order by id desc , name asc";
+        SqlUtil.testSql("mysql", originalSql);
+        SqlUtil.testSql("hsqldb", originalSql);
+        SqlUtil.testSql("oracle", originalSql);
+        SqlUtil.testSql("postgresql", originalSql);
+        SqlUtil.testSql("sqlserver", originalSql);
+    }
+
+    @Test
+    public void testSqlFunctionTest() throws JSQLParserException {
+        String originalSql = "Select sum(userid) from sys_user o where abc = ? order by id desc , name asc";
+        SqlUtil.testSql("mysql", originalSql);
+        SqlUtil.testSql("hsqldb", originalSql);
+        SqlUtil.testSql("oracle", originalSql);
+        SqlUtil.testSql("postgresql", originalSql);
+        SqlUtil.testSql("sqlserver", originalSql);
+    }
+
+    @Test
     public void testSqlAs() throws JSQLParserException {
-        String originalSql = "Select id as 'id' from sys_user o where abc = ? order by id desc , name asc";
+        String originalSql = "Select id as `id` from sys_user o where abc = ? order by id desc , name asc";
         SqlUtil.testSql("mysql", originalSql);
     }
 
