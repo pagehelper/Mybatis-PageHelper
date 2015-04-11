@@ -102,6 +102,14 @@
 
 6. 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值，可以配置pageNum,pageSize,count,pageSizeZero,reasonable,不配置映射的用默认值。
 
+<b>重要提示：</b>
+
+当`offsetAsPageNum=false`的时候，由于PageNum问题，`RowBounds`查询的时候reasonable会强制为false。使用`PageHelper.startPage`方法不受影响。
+
+另外使用`RowBounds`在这种情况下返回的`Page`对象由于没有正确的`pageNum`属性，所以也不能使用`PageInfo`处理。
+
+如果你不理解为什么，可以看这样一个例子：查询`offset=7,limit=10`，这个时候`pageNum=?`，这种情况没法计算`pageNum`，没法判断当前是第几页。
+
 ###3. 如何选择配置这些参数
 
 单独看每个参数的说明可能是一件让人不爽的事情，这里列举一些可能会用到某些参数的情况。

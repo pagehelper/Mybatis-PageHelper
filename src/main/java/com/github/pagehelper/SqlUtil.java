@@ -130,6 +130,8 @@ public class SqlUtil implements Constant {
                     page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
                 } else {
                     page = new Page(rowBounds, rowBoundsWithCount);
+                    //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
+                    page.setReasonable(false);
                 }
             } else {
                 page = getPageFromObject(params);
@@ -306,6 +308,7 @@ public class SqlUtil implements Constant {
         //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
         String reasonable = p.getProperty("reasonable");
         this.reasonable = Boolean.parseBoolean(reasonable);
+        //当offsetAsPageNum=false的时候，不能
         //参数映射
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
