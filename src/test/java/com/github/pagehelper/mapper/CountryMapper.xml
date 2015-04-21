@@ -149,6 +149,15 @@
     </if>
     order by id
   </select>
+  <select id="selectByMap" resultType="com.github.pagehelper.model.Country">
+    select * from country where 1=1
+    <if test="countryname!=null and countryname !=''">
+      and countryname= #{countryname}
+    </if>
+    <if test="countrycode!=null and countrycode !=''">
+      and countrycode= #{countrycode}
+    </if>
+  </select>
   <select id="selectByOrder2" resultType="com.github.pagehelper.model.Country">
     select * from country order by ${order}
   </select>

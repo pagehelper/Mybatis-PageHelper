@@ -72,10 +72,6 @@ public class Page<E> extends ArrayList<E> {
      */
     private int pages;
     /**
-     * 针对sqlserver - 在其他数据库中该字段无效
-     */
-    private String orderBy;
-    /**
      * 分页合理化
      */
     private Boolean reasonable;
@@ -194,10 +190,6 @@ public class Page<E> extends ArrayList<E> {
         this.pageSizeZero = pageSizeZero;
     }
 
-    public String getOrderBy() {
-        return orderBy;
-    }
-
     /**
      * 计算起止行号
      */
@@ -248,17 +240,6 @@ public class Page<E> extends ArrayList<E> {
     }
 
     /**
-     * 针对sqlserver有效
-     *
-     * @param orderBy
-     * @return
-     */
-    public Page<E> orderBy(String orderBy) {
-        this.orderBy = orderBy;
-        return this;
-    }
-
-    /**
      * 设置合理化
      *
      * @param reasonable
@@ -289,7 +270,6 @@ public class Page<E> extends ArrayList<E> {
         sb.append(", endRow=").append(endRow);
         sb.append(", total=").append(total);
         sb.append(", pages=").append(pages);
-        sb.append(", orderBy='").append(orderBy).append('\'');
         sb.append(", reasonable=").append(reasonable);
         sb.append(", pageSizeZero=").append(pageSizeZero);
         sb.append('}');

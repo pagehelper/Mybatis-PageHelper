@@ -89,23 +89,7 @@ public class SqlServer {
      * @return
      */
     public String convertToPageSql(String sql, int offset, int limit) {
-        return convertToPageSql(sql, offset, limit, null);
-    }
-
-    /**
-     * 转换为分页语句
-     *
-     * @param sql
-     * @param offset
-     * @param limit
-     * @param orderBy
-     * @return
-     */
-    public String convertToPageSql(String sql, int offset, int limit, String orderBy) {
-        StringBuilder key = new StringBuilder(sql.length() + 40);
-        key.append(sql);
-        key.append(orderBy);
-        String pageSql = CACHE.get(key.toString());
+        String pageSql = CACHE.get(sql);
         if (pageSql == null) {
             //解析SQL
             Statement stmt;
@@ -118,9 +102,9 @@ public class SqlServer {
                 throw new RuntimeException("分页语句必须是Select查询!");
             }
             //获取分页查询的select
-            Select pageSelect = getPageSelect((Select) stmt, orderBy);
+            Select pageSelect = getPageSelect((Select) stmt);
             pageSql = pageSelect.toString();
-            CACHE.put(key.toString(), pageSql);
+            CACHE.put(sql, pageSql);
         }
         pageSql = pageSql.replace(START_ROW, String.valueOf(offset));
         pageSql = pageSql.replace(PAGE_SIZE, String.valueOf(limit));
@@ -133,7 +117,7 @@ public class SqlServer {
      * @param select
      * @return
      */
-    private Select getPageSelect(Select select, String orderBy) {
+    private Select getPageSelect(Select select) {
         SelectBody selectBody = select.getSelectBody();
         if (selectBody instanceof SetOperationList) {
             selectBody = wrapSetOperationList((SetOperationList) selectBody);
@@ -145,7 +129,7 @@ public class SqlServer {
         //获取查询列
         List<SelectItem> selectItems = getSelectItems((PlainSelect) selectBody);
         //对一层的SQL增加ROW_NUMBER()
-        addRowNumber((PlainSelect) selectBody, orderBy);
+        addRowNumber((PlainSelect) selectBody);
         //处理子语句中的order by
         processSelectBody(selectBody, 0);
 
@@ -254,18 +238,15 @@ public class SqlServer {
      *
      * @param plainSelect
      */
-    private void addRowNumber(PlainSelect plainSelect, String orderBy) {
+    private void addRowNumber(PlainSelect plainSelect) {
         //增加ROW_NUMBER()
         StringBuilder orderByBuilder = new StringBuilder();
         orderByBuilder.append("ROW_NUMBER() OVER (");
-        if (isNotEmptyString(orderBy)) {
-            //使用设置的值
-            orderByBuilder.append(orderBy);
-        } else if (isNotEmptyList(plainSelect.getOrderByElements())) {
+        if (isNotEmptyList(plainSelect.getOrderByElements())) {
             //注意：order by别名的时候有错,由于没法判断一个列是否为别名，所以不能解决
             orderByBuilder.append(PlainSelect.orderByToString(false, plainSelect.getOrderByElements()));
         } else {
-            throw new RuntimeException("请您指定order by参数或者在sql中包含order by语句!");
+            throw new RuntimeException("请您在sql中包含order by语句!");
         }
         //需要把改orderby清空
         if (isNotEmptyList(plainSelect.getOrderByElements())) {

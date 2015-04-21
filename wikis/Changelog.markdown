@@ -44,7 +44,7 @@
  - sqlserver注意事项： 
    - 请先保证你的SQL可以执行
    - sql中最好直接包含order by，可以自动从sql提取
-   - 如果没有order by，可以通过入参提供，但是需要自己保证正确
+   - 如果没有order by，可以通过入参提供，但是需要自己保证正确(<b>3.7.0版本以后，移除了该参数，请在sql中包含order by</b>)
    - 如果sql有order by，可以通过orderby参数覆盖sql中的order by
    - order by的列名不能使用别名(`UNION,INTERSECT,MINUS,EXCEPT`等复杂sql不受限制，具体可以自己尝试)
    - 表和列使用别名的时候不要使用单引号(')
@@ -53,12 +53,12 @@
  
  - `startPage`方法返回值从`void`改为`Page`，获取`Page`后可以修改参数值
  
- - `Page`增加一个针对sqlserver的属性`orderBy`，用法看上面的<b>注意事项</b>
+ - `Page`增加一个针对sqlserver的属性`orderBy`(<b>3.7.0版本以后，移除了该属性</b>)，用法看上面的<b>注意事项</b>
  
  - `Page`增加了一个链式赋值的方法，可以像下面这样使用：
    `PageHelper.startPage(1,10).count(false).reasonable(true).pageSizeZero(false)`
    
- - `PageHelper`增加了`startPage(int pageNum, int pageSize,String orderBy)`方法，针对sqlserver
+ - `PageHelper`增加了`startPage(int pageNum, int pageSize,String orderBy)`方法(<b>3.7.0版本以后，移除了该方法</b>)，针对sqlserver
 
 ###3.5.1 - 2015-01-20
 

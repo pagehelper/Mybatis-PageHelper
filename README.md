@@ -39,6 +39,15 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
+##3.7.0更新日志：
+
+ - 由于`orderby`参数经常被错误认为的使用，因此该版本全面移除了`orderby`
+ - `Page<E>`移除`orderby`属性
+ - `PageHelper`的`startPage`方法中，移除包含`orderby`参数的方法，sqlserver相关包含该参数的全部移除
+ - 对SqlServer进行分页查询时，请在sql中包含order by语句，否则会抛出异常
+ - 当`offsetAsPageNum=false`的时候，由于PageNum问题，`RowBounds`查询的时候`reasonable`会强制为false，已解决
+ - 少数情况下的select中包含单个函数查询时，会使用嵌套的count查询
+
 ##3.6.4更新日志：
 
  - 重构，将原来的内部类全部独立出来，尤其是`Parser`接口以及全部实现。
@@ -57,48 +66,6 @@
    SqlServer sqlServer = new SqlServer();
    pageSql = sqlServer.convertToPageSql(originalSql, 1, 10);
    ```
-
-##3.6.3更新日志：
-
- - 解决了一个潜在的bug，对[通用Mapper](http://git.oschina.net/free/Mapper)中的`SqlMapper`进行分页时，需要使用这个版本
- 
-##3.6.2更新日志：
-
- - 本次更新只是增加了一个异常提示，当<b>错误</b>的配置了多个分页插件时，会有更友好的错误提示：
- 
-   >分页插件配置错误:请不要在系统中配置多个分页插件(使用Spring时,mybatis-config.xml和Spring<bean>配置方式，请选择其中一种，不要同时配置多个分页插件)！
-
-
-##3.6.1更新日志：
-
- - 解决select distinct导致count查询结果不正确的bug#35
- 
- - 完善测试
-
-##3.6.0更新日志：
-
- - 支持db2数据库
- 
- - 支持sqlserver(2005+)数据库
- 
- - sqlserver注意事项： 
-   - 请先保证你的SQL可以执行
-   - sql中最好直接包含order by，可以自动从sql提取
-   - 如果没有order by，可以通过入参提供，但是需要自己保证正确
-   - 如果sql有order by，可以通过orderby参数覆盖sql中的order by
-   - order by的列名不能使用别名(`UNION,INTERSECT,MINUS,EXCEPT`等复杂sql不受限制，具体可以自己尝试)
-   - 表和列使用别名的时候不要使用单引号(')
-
- - 简单修改结构
- 
- - `startPage`方法返回值从`void`改为`Page`，获取`Page`后可以修改参数值
- 
- - `Page`增加一个针对sqlserver的属性`orderBy`，用法看上面的<b>注意事项</b>
- 
- - `Page`增加了一个链式赋值的方法，可以像下面这样使用：
-   `PageHelper.startPage(1,10).count(false).reasonable(true).pageSizeZero(false)`
-   
- - `PageHelper`增加了`startPage(int pageNum, int pageSize,String orderBy)`方法，针对sqlserver
 
 ##项目文档[wiki](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)：  
 

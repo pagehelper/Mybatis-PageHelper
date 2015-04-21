@@ -55,7 +55,7 @@ public class SqlServerParser extends AbstractParser {
     @Override
     public String getPageSql(String sql) {
         Page page = SqlUtil.getLocalPage();
-        return pageSql.convertToPageSql(sql, page.getStartRow(), page.getPageSize(), page.getOrderBy());
+        return pageSql.convertToPageSql(sql, page.getStartRow(), page.getPageSize());
     }
 
     @Override
