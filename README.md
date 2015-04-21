@@ -13,7 +13,7 @@
  7. `DB2`
  8. `SqlServer(2005+)`
 
-##最新版本为3.6.4
+##最新版本为3.7.0
 
 ###Maven坐标
 
@@ -21,7 +21,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.6.4</version>
+    <version>3.7.0</version>
 </dependency>
 ```  
 
