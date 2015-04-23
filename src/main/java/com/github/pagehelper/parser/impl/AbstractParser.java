@@ -70,8 +70,13 @@ public abstract class AbstractParser implements Parser, Constant {
                 parser = new Db2Parser();
                 break;
             case postgresql:
-            default:
                 parser = new PostgreSQLParser();
+                break;
+            case informix:
+                parser = new InformixParser();
+                break;
+            default:
+                break;
         }
         return parser;
     }

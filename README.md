@@ -39,6 +39,10 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
+##开发版3.7.1-SNAPSHOT
+
+ - 增加`Infomix`数据库支持，设置`dialect`值为`infomix`即可
+
 ##3.7.0更新日志：
 
  - 由于`orderby`参数经常被错误认为的使用，因此该版本全面移除了`orderby`
