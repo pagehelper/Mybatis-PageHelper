@@ -12,7 +12,8 @@
  6. `PostgreSQL`
  7. `DB2`
  8. `SqlServer(2005+)`
- 
+ 9. `Infomix`
+
 ##项目文档：  
 
  1. [如何使用分页插件](HowToUse)  
