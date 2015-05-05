@@ -13,7 +13,7 @@
  7. `DB2`
  8. `SqlServer(2005+)`
 
-##最新版本为3.7.0
+##最新版本为3.7.1
 
 ###Maven坐标
 
@@ -39,7 +39,7 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
-##开发版3.7.1-SNAPSHOT
+##3.7.1更新日志：
 
  - 增加`Infomix`数据库支持，设置`dialect`值为`infomix`即可
 
@@ -51,25 +51,6 @@
  - 对SqlServer进行分页查询时，请在sql中包含order by语句，否则会抛出异常
  - 当`offsetAsPageNum=false`的时候，由于PageNum问题，`RowBounds`查询的时候`reasonable`会强制为false，已解决
  - 少数情况下的select中包含单个函数查询时，会使用嵌套的count查询
-
-##3.6.4更新日志：
-
- - 重构，将原来的内部类全部独立出来，尤其是`Parser`接口以及全部实现。
-   现在可以直接使用`Parser`，使用方法如下：
-
-   ```java
-   String originalSql = "Select * from country o where id > 10 order by id desc ";
-
-   Parser parser = AbstractParser.newParser("mysql");
-   //获取count查询sql
-   String countSql = parser.getCountSql(originalSql);
-   //获取分页sql，这种方式不适合sqlserver数据库
-   String pageSql = parser.getPageSql(originalSql);
-
-   //sqlserver用下面的方法
-   SqlServer sqlServer = new SqlServer();
-   pageSql = sqlServer.convertToPageSql(originalSql, 1, 10);
-   ```
 
 ##项目文档[wiki](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)：  
 

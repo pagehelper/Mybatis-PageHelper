@@ -1,6 +1,19 @@
 ##更新日志
 
-##3.6.4 - 2015-04-05
+##3.7.1 - 2015-05-05
+
+ - 增加`Infomix`数据库支持，设置`dialect`值为`infomix`即可
+
+###3.7.0 - 2015-04-21
+
+ - 由于`orderby`参数经常被错误认为的使用，因此该版本全面移除了`orderby`
+ - `Page<E>`移除`orderby`属性
+ - `PageHelper`的`startPage`方法中，移除包含`orderby`参数的方法，sqlserver相关包含该参数的全部移除
+ - 对SqlServer进行分页查询时，请在sql中包含order by语句，否则会抛出异常
+ - 当`offsetAsPageNum=false`的时候，由于PageNum问题，`RowBounds`查询的时候`reasonable`会强制为false，已解决
+ - 少数情况下的select中包含单个函数查询时，会使用嵌套的count查询
+
+###3.6.4 - 2015-04-05
 
  - 重构，将原来的内部类全部独立出来，尤其是`Parser`接口以及全部实现。
    现在可以直接使用`Parser`，使用方法如下：
