@@ -12,7 +12,7 @@
  6. `PostgreSQL`
  7. `DB2`
  8. `SqlServer(2005+)`
- 9. `Infomix`
+ 9. `Informix`
 
 ##最新版本为3.7.1
 
@@ -42,7 +42,7 @@
 
 ##3.7.1更新日志：
 
- - 增加`Infomix`数据库支持，设置`dialect`值为`infomix`即可
+ - 增加`Informix`数据库支持，设置`dialect`值为`informix`即可
  - 解决入参为不可变`Map`类型时的错误
 
 ##3.7.0更新日志：

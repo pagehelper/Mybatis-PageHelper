@@ -12,7 +12,7 @@
  6. `PostgreSQL`
  7. `DB2`
  8. `SqlServer(2005+)`
- 9. `Infomix`
+ 9. `Informix`
 
 ##项目文档：  
 
