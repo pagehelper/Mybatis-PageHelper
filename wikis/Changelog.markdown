@@ -2,7 +2,7 @@
 
 ##3.7.2 - 2015-05-13
 
- - jsqlparser解析sql会抛出Error异常，由于直接只捕获Exception，所以导致部分解析失败的sql无法使用嵌套方式处理，所以修改为捕获`Throwable`。
+ - jsqlparser解析sql会抛出Error异常，由于只捕获Exception，所以导致部分解析失败的sql无法使用嵌套方式处理，所以修改为捕获`Throwable`。
 
 ###3.7.1 - 2015-05-05
 
