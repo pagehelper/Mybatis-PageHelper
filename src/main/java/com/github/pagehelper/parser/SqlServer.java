@@ -95,7 +95,7 @@ public class SqlServer {
             Statement stmt;
             try {
                 stmt = CCJSqlParserUtil.parse(sql);
-            } catch (JSQLParserException e) {
+            } catch (Throwable e) {
                 throw new RuntimeException("不支持该SQL转换为分页查询!");
             }
             if (!(stmt instanceof Select)) {

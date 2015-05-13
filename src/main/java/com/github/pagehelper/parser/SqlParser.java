@@ -80,7 +80,7 @@ public class SqlParser {
         Statement stmt = null;
         try {
             stmt = CCJSqlParserUtil.parse(sql);
-        } catch (JSQLParserException e) {
+        } catch (Throwable e) {
             //无法解析的用一般方法返回count语句
             String countSql = getSimpleCountSql(sql);
             CACHE.put(sql, countSql);
