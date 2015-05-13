@@ -14,7 +14,7 @@
  8. `SqlServer(2005+)`
  9. `Informix`
 
-##最新版本为3.7.1
+##最新版本为3.7.2
 
 ###Maven坐标
 
@@ -22,7 +22,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.7.1</version>
+    <version>3.7.2</version>
 </dependency>
 ```  
 
@@ -39,6 +39,10 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+##3.7.2更新日志：
+
+ - jsqlparser解析sql会抛出Error异常，由于直接只捕获Exception，所以导致部分解析失败的sql无法使用嵌套方式处理，所以修改为捕获`Throwable`。
 
 ##3.7.1更新日志：
 
