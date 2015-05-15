@@ -26,7 +26,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.6.4</version>
+    <version>3.7.2</version>
 </dependency>
 ```  
 
@@ -76,7 +76,7 @@
         <!-- 3.3.0版本可用 - 分页参数合理化，默认false禁用 -->
         <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->
         <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
-        <property name="reasonable" value="true"/>
+        <property name="reasonable" value="false"/>
         <!-- 3.5.0版本可用 - 为了支持startPage(Object params)方法 -->
         <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值 -->
         <!-- 可以配置pageNum,pageSize,count,pageSizeZero,reasonable,不配置映射的用默认值 -->
