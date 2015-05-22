@@ -18,7 +18,7 @@
  8. `SqlServer(2005+)`
  9. `Informix`
 
-##最新版本为3.7.2
+##最新版本为3.7.3
 
 ###Maven坐标
 
@@ -26,7 +26,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.7.2</version>
+    <version>3.7.3</version>
 </dependency>
 ```  
 
