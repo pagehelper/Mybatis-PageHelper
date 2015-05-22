@@ -1,4 +1,4 @@
-#Mybatis分页插件 - PageHelper   
+#Mybatis分页插件 - PageHelper
 
 如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。
 
@@ -17,6 +17,8 @@
  7. `DB2`
  8. `SqlServer(2005+)`
  9. `Informix`
+
+##物理分页
 
 ##最新版本为3.7.3
 
