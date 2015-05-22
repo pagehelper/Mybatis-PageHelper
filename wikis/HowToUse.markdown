@@ -288,3 +288,15 @@ assertEquals(true, page.isHasNextPage());
 本项目中包含大量测试，您可以通过查看测试代码了解使用方法。  
 
 测试代码地址：http://git.oschina.net/free/Mybatis_PageHelper/tree/master/src/test/java/com/github/pagehelper/test
+
+##MyBatis和Spring集成示例
+
+如果和Spring集成不熟悉，可以参考下面两个
+
+<b>只有基础的配置信息，没有任何现成的功能，作为新手入门搭建框架的基础</b>
+
+- [集成Spring3.x](https://github.com/abel533/Mybatis-Spring)
+
+- [集成Spring4.x](https://github.com/abel533/Mybatis-Spring/tree/spring4)
+
+这两个集成框架集成了MyBatis分页插件和MyBatis通用Mapper。

@@ -1,6 +1,10 @@
 #Mybatis分页插件 - PageHelper   
 
-如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。  
+如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。
+
+分页插件支持任何复杂的单表、多表分页，部分特殊情况请看[重要提示](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Important.markdown)。
+
+想要使用分页插件？请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)
 
 该插件目前支持以下数据库的<b>物理分页</b>:
 
@@ -40,6 +44,16 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
+##3.7.3更新日志：
+
+ - `Page`继承的`ArrayList`，会根据`pageSize`初始化大小，这就导致当`pageSize`过大（如`Integer.MAX_VALUE`），实际数据量很小时的内存溢出，此处改为初始化大小为0的`List`。
+
+ - 当想查询某页后面的全部数据时，可以使用`PageHelper.startPage(pageNum, Integer.MAX_VALUE)`进行分页，`RowBounds(offset, Integer.MAX_VALUE)`一样。
+
+ - 针对`PageHelper.startPage(1, Integer.MAX_VALUE)`优化，会取消分页，直接查询全部数据（能起到`pageSizeZero`参数所起的作用）。
+
+ - 针对`RowBounds(0, Integer.MAX_VALUE)`优化，会取消分页，直接查询全部数据（能起到`pageSizeZero`参数所起的作用）。
+
 ##3.7.2更新日志：
 
  - jsqlparser解析sql会抛出Error异常，由于只捕获Exception，所以导致部分解析失败的sql无法使用嵌套方式处理，所以修改为捕获`Throwable`。
@@ -62,9 +76,25 @@
 
 ###[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)
 
+如果要使用分页插件，这篇文档一定要看，看完肯定没有问题。
+
+如果和Spring集成不熟悉，可以参考下面两个MyBatis和Spring集成的框架
+
+<b>只有基础的配置信息，没有任何现成的功能，作为新手入门搭建框架的基础</b>
+
+- [集成Spring3.x](https://github.com/abel533/Mybatis-Spring)
+
+- [集成Spring4.x](https://github.com/abel533/Mybatis-Spring/tree/spring4)
+
+这两个集成框架集成了MyBatis分页插件和MyBatis通用Mapper。
+
 ###[更新日志](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Changelog.markdown)
 
+包含全部的详细的更新日志。
+
 ###[重要提示](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Important.markdown)
+
+提示很重要，建议一定看一遍！
 
 ###[提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
