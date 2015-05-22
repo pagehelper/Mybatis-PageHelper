@@ -163,7 +163,6 @@
         <property name="properties">
           <value>
             dialect=hsqldb
-            reasonable=true
           </value>
         </property>
       </bean>
