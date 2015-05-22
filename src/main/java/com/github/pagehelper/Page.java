@@ -94,6 +94,10 @@ public class Page<E> extends ArrayList<E> {
 
     private Page(int pageNum, int pageSize, int total, Boolean reasonable) {
         super(0);
+        if (pageNum == 1 && pageSize == Integer.MAX_VALUE) {
+            pageSizeZero = true;
+            pageSize = 0;
+        }
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.total = total;
@@ -108,11 +112,16 @@ public class Page<E> extends ArrayList<E> {
 
     public Page(RowBounds rowBounds, int total) {
         super(0);
-        this.pageSize = rowBounds.getLimit();
+        if (rowBounds.getOffset() == 0 && rowBounds.getLimit() == Integer.MAX_VALUE) {
+            pageSizeZero = true;
+            this.pageSize = 0;
+        } else {
+            this.pageSize = rowBounds.getLimit();
+        }
         this.startRow = rowBounds.getOffset();
         //RowBounds方式默认不求count总数，如果想求count,可以修改这里为SQL_COUNT
         this.total = total;
-        this.endRow = this.startRow + this.pageSize;
+        this.endRow = this.startRow + rowBounds.getLimit();
     }
 
     public List<E> getResult() {
@@ -187,7 +196,9 @@ public class Page<E> extends ArrayList<E> {
     }
 
     public void setPageSizeZero(Boolean pageSizeZero) {
-        this.pageSizeZero = pageSizeZero;
+        if (pageSizeZero != null) {
+            this.pageSizeZero = pageSizeZero;
+        }
     }
 
     /**
