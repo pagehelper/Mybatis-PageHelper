@@ -1,6 +1,12 @@
-#Mybatis分页插件 - PageHelper文档   
+#Mybatis分页插件 - PageHelper
 
-如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。  
+如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。
+
+分页插件支持任何复杂的单表、多表分页，部分特殊情况请看[重要提示](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Important.markdown)。
+
+想要使用分页插件？请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)。
+
+##物理分页
 
 该插件目前支持以下数据库的<b>物理分页</b>:
 
@@ -13,6 +19,10 @@
  7. `DB2`
  8. `SqlServer(2005+)`
  9. `Informix`
+
+配置`dialect`属性时，使用小写形式：
+
+`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`
 
 ##项目文档：  
 

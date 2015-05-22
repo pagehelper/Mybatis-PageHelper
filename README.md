@@ -20,6 +20,10 @@
  8. `SqlServer(2005+)`
  9. `Informix`
 
+配置`dialect`属性时，使用小写形式：
+
+`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`
+
 ##最新版本为3.7.3
 
 ###Maven坐标
