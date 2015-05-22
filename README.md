@@ -6,6 +6,8 @@
 
 想要使用分页插件？请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)。
 
+##物理分页
+
 该插件目前支持以下数据库的<b>物理分页</b>:
 
  1. `Oracle`
@@ -17,8 +19,6 @@
  7. `DB2`
  8. `SqlServer(2005+)`
  9. `Informix`
-
-##物理分页
 
 ##最新版本为3.7.3
 
