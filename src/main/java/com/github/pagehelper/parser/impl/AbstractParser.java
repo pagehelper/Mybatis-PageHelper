@@ -27,7 +27,6 @@ package com.github.pagehelper.parser.impl;
 import com.github.pagehelper.Constant;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.SystemMetaObject;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.SqlParser;
 import com.github.pagehelper.sqlsource.PageProviderSqlSource;
@@ -35,6 +34,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.ArrayList;
