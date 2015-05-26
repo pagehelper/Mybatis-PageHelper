@@ -24,7 +24,9 @@
 
 `oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`
 
-##最新版本为3.7.3
+##分页插件支持MyBatis3.2.0~3.3.0(包含)
+
+##分页插件最新版本为3.7.4
 
 ###Maven坐标
 
@@ -32,7 +34,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.7.3</version>
+    <version>3.7.4</version>
 </dependency>
 ```  
 
@@ -49,6 +51,12 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+##3.7.4更新日志：
+
+ - 为了支持`3.3.0`去掉了分页插件自带的`SytemObjectMetaObject`类(该类在早期版本为了支持3.2.0以前的MyBatis)
+
+ - 最新支持MyBatis3.2.0到3.3.0版本
 
 ##3.7.3更新日志：
 
