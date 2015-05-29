@@ -52,6 +52,12 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
+##3.7.5-SNAPSHOT更新日志：
+
+ - 增加对MyBatis3.0以前版本的检测，如果发现包含老版本的jar包，会抛出异常
+
+ - 解决3.7.1更新中实际没有解决的入参为不可变`Map`类型时的错误
+
 ##3.7.4更新日志：
 
  - 为了支持`3.3.0`去掉了分页插件自带的`SytemObjectMetaObject`类(该类在早期版本为了支持3.2.0以前的MyBatis)
