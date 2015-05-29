@@ -63,6 +63,35 @@ public class BasicTest {
     }
 
     @Test
+    public void testNamespace3() {
+        SqlSession sqlSession = MybatisRowBoundsHelper.getSqlSession();
+        try {
+            Map<String, Object> map = new HashMap<String, Object>();
+            Country country = new Country();
+            map.put("country", country);
+            //同时测试不可变Map
+            map = Collections.unmodifiableMap(map);
+            List<Country> list = sqlSession.selectList("select1", map, new RowBounds(1, 10));
+            assertEquals(10, list.size());
+            //判断查询结果的位置是否正确
+            assertEquals(1, list.get(0).getId());
+
+            map = new HashMap<String, Object>();
+            country = new Country();
+            country.setCountryname("China");
+            map.put("country", country);
+            //同时测试不可变Map
+            map = Collections.unmodifiableMap(map);
+            list = sqlSession.selectList("select1", map, new RowBounds(1, 10));
+            assertEquals(1, list.size());
+            //判断查询结果的位置是否正确
+            assertEquals(35, list.get(0).getId());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Test
     public void testNamespace2() {
         SqlSession sqlSession = MybatisRowBoundsHelper.getSqlSession();
         try {
