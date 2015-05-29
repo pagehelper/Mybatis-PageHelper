@@ -107,7 +107,9 @@ public abstract class AbstractParser implements Parser, Constant {
         if (parameterObject == null) {
             paramMap = new HashMap();
         } else if (parameterObject instanceof Map) {
-            paramMap = (Map) parameterObject;
+            //解决不可变Map的情况
+            paramMap = new HashMap();
+            paramMap.putAll((Map) parameterObject);
         } else {
             paramMap = new HashMap();
             //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
