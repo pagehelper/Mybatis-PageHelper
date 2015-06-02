@@ -138,13 +138,11 @@ public class PageHelper implements Interceptor {
      * @param p 属性值
      */
     public void setProperties(Properties p) {
-        //MyBatis3.0以前版本校验
+        //MyBatis3.2.0版本校验
         try {
-            Class.forName("org.apache.ibatis.builder.xml.dynamic.DynamicSqlSource");
-            //如果能找到这个类，就说明使用了老版本的MyBatis
-            throw new RuntimeException("项目中存在MyBatis 3.0以前版本的jar包，请使用MyBatis3.2.0以后版本!");
+            Class.forName("org.apache.ibatis.scripting.xmltags.SqlNode");//SqlNode是3.2.0之后新增的类
         } catch (ClassNotFoundException e) {
-            //找不到是正确的
+            throw new RuntimeException("您使用的MyBatis版本太低，MyBatis分页插件PageHelper支持MyBatis3.2.0及以上版本!");
         }
         //数据库方言
         String dialect = p.getProperty("dialect");
