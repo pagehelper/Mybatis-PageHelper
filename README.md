@@ -26,7 +26,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为3.7.4
+##分页插件最新版本为3.7.5
 
 ###Maven坐标
 
@@ -34,7 +34,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.7.4</version>
+    <version>3.7.5</version>
 </dependency>
 ```  
 
@@ -52,9 +52,9 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
-##3.7.5-SNAPSHOT更新日志：
+##3.7.5更新日志：
 
- - 增加对MyBatis3.0以前版本的检测，如果发现包含老版本的jar包，会抛出异常
+ - 增加对MyBatis3.2.0以上版本的校验，如果是不是3.2.0以上版本，会抛出异常提示
 
  - 解决3.7.1更新中实际没有解决的入参为不可变`Map`类型时的错误
 

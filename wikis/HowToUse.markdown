@@ -26,7 +26,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.7.4</version>
+    <version>3.7.5</version>
 </dependency>
 ```  
 
