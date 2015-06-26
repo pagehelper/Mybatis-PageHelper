@@ -85,7 +85,6 @@
     <if test="id2!=null">
       and id &gt; #{id2}
     </if>
-    order by id
   </select>
   <select id="selectIf2List" resultType="com.github.pagehelper.model.Country">
     select * from country

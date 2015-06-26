@@ -102,7 +102,7 @@ public abstract class AbstractParser implements Parser, Constant {
         return newParameterMappings;
     }
 
-    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+    public static Map<String, Object> processParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql) {
         Map paramMap = null;
         if (parameterObject == null) {
             paramMap = new HashMap();
@@ -144,5 +144,9 @@ public abstract class AbstractParser implements Parser, Constant {
         //备份原始参数对象
         paramMap.put(ORIGINAL_PARAMETER_OBJECT, parameterObject);
         return paramMap;
+    }
+
+    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+        return processParameter(ms, parameterObject, boundSql);
     }
 }

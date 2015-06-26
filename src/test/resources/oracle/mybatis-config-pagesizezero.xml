@@ -24,46 +24,46 @@
   -->
 
 <!DOCTYPE configuration
-    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
-  <settings>
-    <setting name="cacheEnabled" value="true"/>
-    <setting name="lazyLoadingEnabled" value="false"/>
-    <setting name="aggressiveLazyLoading" value="true"/>
-    <setting name="logImpl" value="LOG4J"/>
-  </settings>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="lazyLoadingEnabled" value="false"/>
+        <setting name="aggressiveLazyLoading" value="true"/>
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
 
-  <typeAliases>
-    <package name="com.github.pagehelper.model"/>
-  </typeAliases>
+    <typeAliases>
+        <package name="com.github.pagehelper.model"/>
+    </typeAliases>
 
-  <plugins>
-    <plugin interceptor="com.github.pagehelper.PageHelper">
-      <property name="dialect" value="oracle"/>
-      <property name="offsetAsPageNum" value="true"/>
-      <property name="rowBoundsWithCount" value="true"/>
-      <property name="pageSizeZero" value="true"/>
-    </plugin>
-  </plugins>
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+            <property name="dialect" value="oracle"/>
+            <property name="offsetAsPageNum" value="true"/>
+            <property name="rowBoundsWithCount" value="true"/>
+            <property name="pageSizeZero" value="true"/>
+        </plugin>
+    </plugins>
 
-	<environments default="development">
-		<environment id="development">
-			<transactionManager type="JDBC">
-				<property name="" value="" />
-			</transactionManager>
-			<dataSource type="UNPOOLED">
-        <property name="driver" value="oracle.jdbc.driver.OracleDriver" />
-        <property name="url" value=" jdbc:oracle:thin:@//localhost:1521/orcl" />
-        <property name="username" value="scott" />
-        <property name="password" value="tiger" />
-			</dataSource>
-		</environment>
-	</environments>
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC">
+                <property name="" value=""/>
+            </transactionManager>
+            <dataSource type="UNPOOLED">
+                <property name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+                <property name="url" value=" jdbc:oracle:thin:@//localhost:1521/orcl"/>
+                <property name="username" value="scott"/>
+                <property name="password" value="tiger"/>
+            </dataSource>
+        </environment>
+    </environments>
 
-	<mappers>
-		<mapper resource="com/github/pagehelper/mapper/CountryMapper.xml" />
-	</mappers>
+    <mappers>
+        <mapper resource="com/github/pagehelper/mapper/CountryMapper.xml"/>
+    </mappers>
 
 </configuration>
