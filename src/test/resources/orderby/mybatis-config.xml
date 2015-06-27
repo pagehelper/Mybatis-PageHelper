@@ -36,10 +36,10 @@
     </settings>
 
     <plugins>
-        <plugin interceptor="com.github.orderbyhelper.OrderByHelper"/>
         <plugin interceptor="com.github.pagehelper.PageHelper">
             <property name="dialect" value="hsqldb"/>
         </plugin>
+        <plugin interceptor="com.github.orderbyhelper.OrderByHelper"/>
     </plugins>
 
     <environments default="development">

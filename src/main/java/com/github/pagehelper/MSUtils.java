@@ -24,9 +24,11 @@
 
 package com.github.pagehelper;
 
+import com.github.orderbyhelper.sqlsource.OrderByStaticSqlSource;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.sqlsource.PageDynamicSqlSource;
 import com.github.pagehelper.sqlsource.PageProviderSqlSource;
+import com.github.pagehelper.sqlsource.PageStaticSqlSource;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.*;
@@ -212,7 +214,7 @@ public class MSUtils implements Constant {
      */
     public SqlSource getStaticPageSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        return new StaticSqlSource(configuration, parser.getPageSql(boundSql.getSql()), parser.getPageParameterMapping(configuration, boundSql));
+        return new PageStaticSqlSource(configuration, boundSql.getSql(), parser.getPageParameterMapping(configuration, boundSql), parser);
     }
 
     /**
