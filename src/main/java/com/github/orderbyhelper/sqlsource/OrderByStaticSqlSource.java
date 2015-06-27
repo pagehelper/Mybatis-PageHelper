@@ -1,10 +1,7 @@
 package com.github.orderbyhelper.sqlsource;
 
 import com.github.orderbyhelper.OrderByHelper;
-import com.github.pagehelper.parser.OrderByParser;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.*;
+import com.github.orderbyhelper.OrderByParser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -21,16 +18,18 @@ import java.util.List;
  * @author liuzh
  * @since 2015-06-26
  */
-public class OrderByStaticSqlSource implements SqlSource, OrderBy {
+public class OrderByStaticSqlSource implements SqlSource, OrderBySqlSource {
     private String sql;
     private List<ParameterMapping> parameterMappings;
     private Configuration configuration;
+    private SqlSource original;
 
     public OrderByStaticSqlSource(StaticSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.sql = (String) metaObject.getValue("sql");
         this.parameterMappings = (List<ParameterMapping>) metaObject.getValue("parameterMappings");
         this.configuration = (Configuration) metaObject.getValue("configuration");
+        this.original = sqlSource;
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
@@ -41,4 +40,9 @@ public class OrderByStaticSqlSource implements SqlSource, OrderBy {
         }
         return new BoundSql(configuration, tempSql, parameterMappings, parameterObject);
     }
+
+    public SqlSource getOriginal() {
+        return original;
+    }
+
 }

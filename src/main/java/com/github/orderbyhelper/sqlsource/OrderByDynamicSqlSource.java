@@ -9,8 +9,6 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,15 +17,17 @@ import java.util.Map;
  * @author liuzh
  * @since 2015-06-26
  */
-public class OrderByDynamicSqlSource implements SqlSource, OrderBy {
+public class OrderByDynamicSqlSource implements SqlSource, OrderBySqlSource {
 
     private Configuration configuration;
     private SqlNode rootSqlNode;
+    private SqlSource original;
 
     public OrderByDynamicSqlSource(DynamicSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.configuration = (Configuration) metaObject.getValue("configuration");
         this.rootSqlNode = (SqlNode) metaObject.getValue("rootSqlNode");
+        this.original = sqlSource;
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
@@ -42,6 +42,10 @@ public class OrderByDynamicSqlSource implements SqlSource, OrderBy {
             boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());
         }
         return boundSql;
+    }
+
+    public SqlSource getOriginal(){
+        return original;
     }
 
 }

@@ -13,17 +13,23 @@ import org.apache.ibatis.scripting.defaults.RawSqlSource;
  * @author liuzh
  * @since 2015-06-26
  */
-public class OrderByRawSqlSource implements SqlSource, OrderBy {
+public class OrderByRawSqlSource implements SqlSource, OrderBySqlSource {
 
     private final SqlSource sqlSource;
+    private SqlSource original;
 
     public OrderByRawSqlSource(RawSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.sqlSource = new OrderByStaticSqlSource((StaticSqlSource) metaObject.getValue("sqlSource"));
+        this.original = sqlSource;
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
         return sqlSource.getBoundSql(parameterObject);
+    }
+
+    public SqlSource getOriginal() {
+        return original;
     }
 
 }

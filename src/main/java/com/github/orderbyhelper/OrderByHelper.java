@@ -1,11 +1,9 @@
 package com.github.orderbyhelper;
 
 import com.github.orderbyhelper.sqlsource.*;
-import com.github.pagehelper.parser.impl.AbstractParser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.plugin.*;
@@ -16,7 +14,6 @@ import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -61,7 +58,7 @@ public class OrderByHelper implements Interceptor {
      * @return
      */
     public static boolean hasOrderBy(MappedStatement ms) {
-        if (ms.getSqlSource() instanceof OrderBy) {
+        if (ms.getSqlSource() instanceof OrderBySqlSource) {
             return true;
         }
         return false;

@@ -1,4 +1,4 @@
-package com.github.pagehelper.parser;
+package com.github.orderbyhelper;
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -7,7 +7,7 @@ import net.sf.jsqlparser.statement.select.*;
 import java.util.List;
 
 /**
- * 处理Order by
+ * 处理 Order by
  *
  * @author liuzh
  * @since 2015-06-27

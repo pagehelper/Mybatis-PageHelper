@@ -24,8 +24,6 @@
 
 package com.github.orderbyhelper.sqlsource;
 
-import com.github.orderbyhelper.OrderByHelper;
-import com.github.pagehelper.Constant;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.builder.StaticSqlSource;
@@ -41,11 +39,12 @@ import java.util.HashMap;
 /**
  * @author liuzh
  */
-public class OrderByProviderSqlSource implements SqlSource, OrderBy {
+public class OrderByProviderSqlSource implements SqlSource, OrderBySqlSource {
     private SqlSourceBuilder sqlSourceParser;
     private Class<?> providerType;
     private Method providerMethod;
     private Boolean providerTakesParameterObject;
+    private SqlSource original;
 
     public OrderByProviderSqlSource(ProviderSqlSource provider) {
         MetaObject metaObject = SystemMetaObject.forObject(provider);
@@ -53,6 +52,7 @@ public class OrderByProviderSqlSource implements SqlSource, OrderBy {
         this.providerType = (Class<?>) metaObject.getValue("providerType");
         this.providerMethod = (Method) metaObject.getValue("providerMethod");
         this.providerTakesParameterObject = (Boolean) metaObject.getValue("providerTakesParameterObject");
+        this.original = provider;
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
@@ -77,4 +77,9 @@ public class OrderByProviderSqlSource implements SqlSource, OrderBy {
                     + ").  Cause: " + e, e);
         }
     }
+
+    public SqlSource getOriginal() {
+        return original;
+    }
+
 }
