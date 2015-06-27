@@ -24,6 +24,7 @@
 
 package com.github.pagehelper;
 
+import com.github.orderbyhelper.OrderByHelper;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
@@ -69,6 +70,18 @@ public class PageHelper implements Interceptor {
     /**
      * 开始分页
      *
+     * @param pageNum  页码
+     * @param pageSize 每页显示数量
+     * @param orderBy  排序
+     */
+    public static Page startPage(int pageNum, int pageSize, String orderBy) {
+        orderBy(orderBy);
+        return startPage(pageNum, pageSize);
+    }
+
+    /**
+     * 开始分页
+     *
      * @param pageNum    页码
      * @param pageSize   每页显示数量
      * @param count      是否进行count查询
@@ -106,6 +119,14 @@ public class PageHelper implements Interceptor {
         return page;
     }
 
+    /**
+     * 排序
+     *
+     * @param orderBy
+     */
+    public static void orderBy(String orderBy) {
+        OrderByHelper.orderBy(orderBy);
+    }
 
     /**
      * Mybatis拦截器方法

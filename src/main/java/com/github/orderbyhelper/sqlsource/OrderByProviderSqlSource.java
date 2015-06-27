@@ -28,6 +28,7 @@ import com.github.orderbyhelper.OrderByHelper;
 import com.github.pagehelper.Constant;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.SqlSourceBuilder;
+import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.SqlSource;
@@ -51,7 +52,7 @@ public class OrderByProviderSqlSource implements SqlSource, OrderBy {
         this.sqlSourceParser = (SqlSourceBuilder) metaObject.getValue("sqlSourceParser");
         this.providerType = (Class<?>) metaObject.getValue("providerType");
         this.providerMethod = (Method) metaObject.getValue("providerMethod");
-        this.providerTakesParameterObject = (Boolean)metaObject.getValue("providerTakesParameterObject");
+        this.providerTakesParameterObject = (Boolean) metaObject.getValue("providerTakesParameterObject");
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
@@ -67,12 +68,9 @@ public class OrderByProviderSqlSource implements SqlSource, OrderBy {
             } else {
                 sql = (String) providerMethod.invoke(providerType.newInstance());
             }
-            String orderBy = OrderByHelper.getOrderBy();
-            if(orderBy!=null){
-                sql += " order by " + orderBy;
-            }
             Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
-            return sqlSourceParser.parse(sql, parameterType, new HashMap<String, Object>());
+            StaticSqlSource sqlSource = (StaticSqlSource) sqlSourceParser.parse(sql, parameterType, new HashMap<String, Object>());
+            return new OrderByStaticSqlSource(sqlSource);
         } catch (Exception e) {
             throw new BuilderException("Error invoking SqlProvider method ("
                     + providerType.getName() + "." + providerMethod.getName()

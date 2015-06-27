@@ -1,6 +1,7 @@
 package com.github.orderbyhelper.sqlsource;
 
 import org.apache.ibatis.builder.SqlSourceBuilder;
+import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.reflection.MetaObject;
@@ -26,19 +27,7 @@ public class OrderByDynamicSqlSource implements SqlSource, OrderBy {
     public OrderByDynamicSqlSource(DynamicSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.configuration = (Configuration) metaObject.getValue("configuration");
-        SqlNode sqlNode = (SqlNode) metaObject.getValue("rootSqlNode");
-        List<SqlNode> contents = null;
-        if (sqlNode instanceof TextSqlNode) {
-            contents = new LinkedList<SqlNode>();
-            contents.add(sqlNode);
-
-        } else {
-            MixedSqlNode mixedSqlNode = (MixedSqlNode) sqlNode;
-            metaObject = SystemMetaObject.forObject(mixedSqlNode);
-            contents = (List<SqlNode>) metaObject.getValue("contents");
-        }
-        contents.add(new IfSqlNode(new TextSqlNode("order by ${orderByHelper}"),"orderByHelper != null and orderByHelper != ''"));
-        this.rootSqlNode = new MixedSqlNode(contents);
+        this.rootSqlNode = (SqlNode) metaObject.getValue("rootSqlNode");
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
@@ -47,6 +36,7 @@ public class OrderByDynamicSqlSource implements SqlSource, OrderBy {
         SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
         Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
         SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
+        sqlSource = new OrderByStaticSqlSource((StaticSqlSource) sqlSource);
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {
             boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());

@@ -24,6 +24,7 @@
 
 package com.github.pagehelper;
 
+import com.github.orderbyhelper.OrderByHelper;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.impl.AbstractParser;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -57,6 +58,8 @@ public class SqlUtil implements Constant {
     private boolean pageSizeZero = false;
     //分页合理化
     private boolean reasonable = false;
+    //支持order by
+    private boolean orderby = false;
     //params参数映射
     private static Map<String, String> PARAMS = new HashMap<String, String>(5);
     //request获取方法
@@ -226,10 +229,18 @@ public class SqlUtil implements Constant {
      */
     public Object processPage(Invocation invocation) throws Throwable {
         try {
+            if(orderby){
+                if (OrderByHelper.getOrderBy() != null) {
+                    OrderByHelper.processIntercept(invocation);
+                }
+            }
             Object result = _processPage(invocation);
             return result;
         } finally {
             clearLocalPage();
+            if(orderby){
+                OrderByHelper.clear();
+            }
         }
     }
 
@@ -309,6 +320,9 @@ public class SqlUtil implements Constant {
         //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
         String reasonable = p.getProperty("reasonable");
         this.reasonable = Boolean.parseBoolean(reasonable);
+        //order by
+        String orderby = p.getProperty("orderby");
+        this.orderby = Boolean.parseBoolean(orderby);
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         PARAMS.put("pageNum", "pageNum");

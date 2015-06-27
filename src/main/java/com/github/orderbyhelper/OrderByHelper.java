@@ -92,23 +92,12 @@ public class OrderByHelper implements Interceptor {
         }
     }
 
-    public static void processParameter(Invocation invocation) {
-        final Object[] args = invocation.getArgs();
-        MappedStatement ms = (MappedStatement) args[0];
-        Object parameterObject = args[1];
-        BoundSql boundSql = ms.getBoundSql(parameterObject);
-        Map<String, Object> parameter = AbstractParser.processParameter(ms, parameterObject, boundSql);
-        parameter.put("orderByHelper", getOrderBy());
-        args[1] = parameter;
-    }
-
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        processParameter(invocation);
-        if (getOrderBy() != null) {
-            processIntercept(invocation);
-        }
         try {
+            if (getOrderBy() != null) {
+                processIntercept(invocation);
+            }
             return invocation.proceed();
         } finally {
             clear();
