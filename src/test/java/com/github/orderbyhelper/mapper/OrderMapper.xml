@@ -43,4 +43,12 @@
     <select id="selectWith" resultType="com.github.orderbyhelper.mapper.OrderCountry">
         with rs as (select id from country_order where id>#{start}) select * from country_order where id in (select * from rs)
     </select>
+    <select id="selectDynamic" resultType="com.github.orderbyhelper.mapper.OrderCountry">
+        select * from country_order 
+        <where>
+            <if test="id != null">
+                id &lt; #{id}
+            </if>
+        </where>
+    </select>
 </mapper>

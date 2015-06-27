@@ -94,7 +94,7 @@ public abstract class AbstractParser implements Parser, Constant {
 
     public List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql) {
         List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-        if (boundSql.getParameterMappings() != null) {
+        if (boundSql != null && boundSql.getParameterMappings() != null) {
             newParameterMappings.addAll(boundSql.getParameterMappings());
         }
         newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());

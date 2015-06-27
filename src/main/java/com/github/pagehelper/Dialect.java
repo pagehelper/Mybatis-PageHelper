@@ -46,4 +46,23 @@ public enum Dialect {
             throw new IllegalArgumentException("Mybatis分页插件dialect参数值错误，可选值为[" + dialects + "]");
         }
     }
+
+    public static String[] dialects() {
+        Dialect[] dialects = Dialect.values();
+        String[] ds = new String[dialects.length];
+        for (int i = 0; i < dialects.length; i++) {
+            ds[i] = dialects[i].toString();
+        }
+        return ds;
+    }
+
+    public static String fromJdbcUrl(String jdbcUrl) {
+        String[] dialects = dialects();
+        for (String dialect : dialects) {
+            if (jdbcUrl.indexOf(":" + dialect + ":") != -1) {
+                return dialect;
+            }
+        }
+        return null;
+    }
 }

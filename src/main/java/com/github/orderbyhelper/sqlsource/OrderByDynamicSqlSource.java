@@ -44,7 +44,7 @@ public class OrderByDynamicSqlSource implements SqlSource, OrderBySqlSource {
         return boundSql;
     }
 
-    public SqlSource getOriginal(){
+    public SqlSource getOriginal() {
         return original;
     }
 

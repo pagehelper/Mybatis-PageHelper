@@ -24,21 +24,24 @@
 
 package com.github.pagehelper;
 
-import com.github.orderbyhelper.sqlsource.OrderByStaticSqlSource;
+import com.github.orderbyhelper.sqlsource.*;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.sqlsource.PageDynamicSqlSource;
 import com.github.pagehelper.sqlsource.PageProviderSqlSource;
+import com.github.pagehelper.sqlsource.PageRawSqlSource;
 import com.github.pagehelper.sqlsource.PageStaticSqlSource;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
 
+import javax.activation.UnsupportedDataTypeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +120,7 @@ public class MSUtils implements Constant {
         }
         if (qs == null) {
             //创建一个新的MappedStatement
-            qs = newMappedStatement(ms, getsqlSource(ms, sqlSource, parameterObject, suffix == SUFFIX_COUNT), suffix);
+            qs = newMappedStatement(ms, getSqlSource(sqlSource, suffix == SUFFIX_COUNT), suffix);
             if (parser.isSupportedMappedStatementCache()) {
                 try {
                     ms.getConfiguration().addMappedStatement(qs);
@@ -174,59 +177,25 @@ public class MSUtils implements Constant {
     /**
      * 获取新的sqlSource
      *
-     * @param ms
      * @param sqlSource
-     * @param parameterObject
      * @param count
      * @return
      */
-    public SqlSource getsqlSource(MappedStatement ms, SqlSource sqlSource, Object parameterObject, boolean count) {
-        if (sqlSource instanceof DynamicSqlSource) {//动态sql
-            MetaObject msObject = SystemMetaObject.forObject(ms);
-            SqlNode sqlNode = (SqlNode) msObject.getValue("sqlSource.rootSqlNode");
-            MixedSqlNode mixedSqlNode;
-            if (sqlNode instanceof MixedSqlNode) {
-                mixedSqlNode = (MixedSqlNode) sqlNode;
-            } else {
-                List<SqlNode> contents = new ArrayList<SqlNode>(1);
-                contents.add(sqlNode);
-                mixedSqlNode = new MixedSqlNode(contents);
-            }
-            return new PageDynamicSqlSource(this, ms.getConfiguration(), mixedSqlNode, count);
-        } else if (sqlSource instanceof ProviderSqlSource) {//注解式sql
-            return new PageProviderSqlSource(parser, ms.getConfiguration(), (ProviderSqlSource) sqlSource, count);
-        } else if (count) {//RawSqlSource和StaticSqlSource
-            return getStaticCountSqlSource(ms.getConfiguration(), sqlSource, parameterObject);
-        } else {
-            return getStaticPageSqlSource(ms.getConfiguration(), sqlSource, parameterObject);
+    public SqlSource getSqlSource(SqlSource sqlSource, boolean count) {
+        SqlSource tempSqlSource = sqlSource;
+        if (sqlSource instanceof OrderBySqlSource) {
+            tempSqlSource = ((OrderBySqlSource) tempSqlSource).getOriginal();
         }
-    }
-
-    /**
-     * 获取静态的分页SqlSource
-     * <br/>
-     * ParameterMappings需要增加分页参数的映射
-     *
-     * @param configuration
-     * @param sqlSource
-     * @param parameterObject
-     * @return
-     */
-    public SqlSource getStaticPageSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
-        BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        return new PageStaticSqlSource(configuration, boundSql.getSql(), parser.getPageParameterMapping(configuration, boundSql), parser);
-    }
-
-    /**
-     * 获取静态的count的SqlSource
-     *
-     * @param configuration
-     * @param sqlSource
-     * @param parameterObject
-     * @return
-     */
-    public SqlSource getStaticCountSqlSource(Configuration configuration, SqlSource sqlSource, Object parameterObject) {
-        BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        return new StaticSqlSource(configuration, parser.getCountSql(boundSql.getSql()), boundSql.getParameterMappings());
+        if (tempSqlSource instanceof StaticSqlSource) {
+            return new PageStaticSqlSource((StaticSqlSource) tempSqlSource, parser, count);
+        } else if (tempSqlSource instanceof RawSqlSource) {
+            return new PageRawSqlSource((RawSqlSource) tempSqlSource, parser, count);
+        } else if (tempSqlSource instanceof ProviderSqlSource) {
+            return new PageProviderSqlSource((ProviderSqlSource) tempSqlSource, parser, count);
+        } else if (tempSqlSource instanceof DynamicSqlSource) {
+            return new PageDynamicSqlSource((DynamicSqlSource) tempSqlSource, parser, count);
+        } else {
+            throw new RuntimeException("分页插件不支持当前的SqlSource类型:[" + tempSqlSource.getClass() + "]");
+        }
     }
 }

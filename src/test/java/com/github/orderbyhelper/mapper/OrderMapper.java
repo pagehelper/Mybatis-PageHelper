@@ -30,4 +30,5 @@ public interface OrderMapper {
     @SelectProvider(type = OrderProvider.class, method = "selectProvider")
     List<OrderCountry> selectProvider(@Param("start") int start);
 
+    List<OrderCountry> selectDynamic(@Param("id") int start);
 }

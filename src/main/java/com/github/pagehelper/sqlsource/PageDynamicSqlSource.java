@@ -24,12 +24,19 @@
 
 package com.github.pagehelper.sqlsource;
 
+import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
+import com.github.orderbyhelper.sqlsource.OrderByStaticSqlSource;
 import com.github.pagehelper.Constant;
 import com.github.pagehelper.MSUtils;
+import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.SqlSourceBuilder;
+import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.SqlSource;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
+import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
 
@@ -38,20 +45,19 @@ import java.util.Map;
 /**
  * @author liuzh
  */
-public class PageDynamicSqlSource implements SqlSource, Constant {
+public class PageDynamicSqlSource implements SqlSource, OrderBySqlSource, Constant {
     private Configuration configuration;
     private SqlNode rootSqlNode;
-    /**
-     * 用于区分动态的count查询或分页查询
-     */
+    private SqlSource original;
     private Boolean count;
+    private Parser parser;
 
-    private MSUtils msUtils;
-
-    public PageDynamicSqlSource(MSUtils msUtils, Configuration configuration, SqlNode rootSqlNode, Boolean count) {
-        this.msUtils = msUtils;
-        this.configuration = configuration;
-        this.rootSqlNode = rootSqlNode;
+    public PageDynamicSqlSource(DynamicSqlSource sqlSource, Parser parser, Boolean count) {
+        MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
+        this.configuration = (Configuration) metaObject.getValue("configuration");
+        this.rootSqlNode = (SqlNode) metaObject.getValue("rootSqlNode");
+        this.original = sqlSource;
+        this.parser = parser;
         this.count = count;
     }
 
@@ -71,10 +77,14 @@ public class PageDynamicSqlSource implements SqlSource, Constant {
         SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
         Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
         SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
+
         if (count) {
-            sqlSource = msUtils.getStaticCountSqlSource(configuration, sqlSource, parameterObject);
+            BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
+            sqlSource = new StaticSqlSource(configuration, parser.getCountSql(boundSql.getSql()), boundSql.getParameterMappings());
         } else {
-            sqlSource = msUtils.getStaticPageSqlSource(configuration, sqlSource, parameterObject);
+            sqlSource = new OrderByStaticSqlSource((StaticSqlSource) sqlSource);
+            BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
+            sqlSource = new StaticSqlSource(configuration, parser.getPageSql(boundSql.getSql()), parser.getPageParameterMapping(configuration, boundSql));
         }
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         //设置条件参数
@@ -83,4 +93,9 @@ public class PageDynamicSqlSource implements SqlSource, Constant {
         }
         return boundSql;
     }
+
+    public SqlSource getOriginal() {
+        return original;
+    }
+
 }

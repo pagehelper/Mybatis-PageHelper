@@ -157,7 +157,7 @@ public class SqlParser {
             }
             //如果查询列中包含函数，也不可以，函数可能会聚合列
             if (item instanceof SelectExpressionItem) {
-                if(((SelectExpressionItem)item).getExpression() instanceof Function){
+                if (((SelectExpressionItem) item).getExpression() instanceof Function) {
                     return false;
                 }
             }

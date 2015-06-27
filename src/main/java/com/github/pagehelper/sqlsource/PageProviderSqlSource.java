@@ -24,43 +24,79 @@
 
 package com.github.pagehelper.sqlsource;
 
+import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
+import com.github.orderbyhelper.sqlsource.OrderByStaticSqlSource;
 import com.github.pagehelper.Constant;
 import com.github.pagehelper.parser.Parser;
+import org.apache.ibatis.builder.BuilderException;
+import org.apache.ibatis.builder.SqlSourceBuilder;
+import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.SqlSource;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author liuzh
  */
-public class PageProviderSqlSource implements SqlSource, Constant {
+public class PageProviderSqlSource implements SqlSource, OrderBySqlSource, Constant {
+    private SqlSourceBuilder sqlSourceParser;
+    private Class<?> providerType;
+    private Method providerMethod;
+    private Boolean providerTakesParameterObject;
+    private SqlSource original;
     private Configuration configuration;
-    private ProviderSqlSource providerSqlSource;
-
-    /**
-     * 用于区分动态的count查询或分页查询
-     */
     private Boolean count;
-
     private Parser parser;
 
-    public PageProviderSqlSource(Parser parser, Configuration configuration, ProviderSqlSource providerSqlSource, Boolean count) {
+    public PageProviderSqlSource(ProviderSqlSource provider, Parser parser, Boolean count) {
+        MetaObject metaObject = SystemMetaObject.forObject(provider);
+        this.sqlSourceParser = (SqlSourceBuilder) metaObject.getValue("sqlSourceParser");
+        this.providerType = (Class<?>) metaObject.getValue("providerType");
+        this.providerMethod = (Method) metaObject.getValue("providerMethod");
+        this.providerTakesParameterObject = (Boolean) metaObject.getValue("providerTakesParameterObject");
+        this.configuration = (Configuration) metaObject.getValue("sqlSourceParser.configuration");
+        this.original = provider;
         this.parser = parser;
-        this.configuration = configuration;
-        this.providerSqlSource = providerSqlSource;
         this.count = count;
     }
 
-    @Override
+    private SqlSource createSqlSource(Object parameterObject) {
+        try {
+            String sql;
+            if (providerTakesParameterObject) {
+                sql = (String) providerMethod.invoke(providerType.newInstance(), parameterObject);
+            } else {
+                sql = (String) providerMethod.invoke(providerType.newInstance());
+            }
+            Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+            StaticSqlSource sqlSource = (StaticSqlSource) sqlSourceParser.parse(sql, parameterType, new HashMap<String, Object>());
+            return new OrderByStaticSqlSource(sqlSource);
+        } catch (Exception e) {
+            throw new BuilderException("Error invoking SqlProvider method ("
+                    + providerType.getName() + "." + providerMethod.getName()
+                    + ").  Cause: " + e, e);
+        }
+    }
+
+    public SqlSource getOriginal() {
+        return original;
+    }
+
     public BoundSql getBoundSql(Object parameterObject) {
-        BoundSql boundSql = null;
+        BoundSql boundSql;
         if (parameterObject instanceof Map && ((Map) parameterObject).containsKey(PROVIDER_OBJECT)) {
-            boundSql = providerSqlSource.getBoundSql(((Map) parameterObject).get(PROVIDER_OBJECT));
+            SqlSource sqlSource = createSqlSource(((Map) parameterObject).get(PROVIDER_OBJECT));
+            boundSql = sqlSource.getBoundSql(((Map) parameterObject).get(PROVIDER_OBJECT));
         } else {
-            boundSql = providerSqlSource.getBoundSql(parameterObject);
+            SqlSource sqlSource = createSqlSource(parameterObject);
+            boundSql = sqlSource.getBoundSql(parameterObject);
         }
         if (count) {
             return new BoundSql(

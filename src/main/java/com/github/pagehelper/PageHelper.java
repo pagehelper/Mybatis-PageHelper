@@ -28,9 +28,13 @@ import com.github.orderbyhelper.OrderByHelper;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.Properties;
 
 /**
@@ -45,6 +49,10 @@ import java.util.Properties;
 public class PageHelper implements Interceptor {
     //sql工具类
     private SqlUtil sqlUtil;
+    //属性参数信息
+    private Properties properties;
+    //自动获取dialect
+    private Boolean autoDialect;
 
     /**
      * 开始分页
@@ -136,7 +144,40 @@ public class PageHelper implements Interceptor {
      * @throws Throwable 抛出异常
      */
     public Object intercept(Invocation invocation) throws Throwable {
+        if (autoDialect) {
+            initSqlUtil(invocation);
+        }
         return sqlUtil.processPage(invocation);
+    }
+
+    /**
+     * 初始化sqlUtil
+     *
+     * @param invocation
+     */
+    public synchronized void initSqlUtil(Invocation invocation) {
+        if (sqlUtil == null) {
+            String url = null;
+            try {
+                MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
+                MetaObject msObject = SystemMetaObject.forObject(ms);
+                DataSource dataSource = (DataSource) msObject.getValue("configuration.environment.dataSource");
+                url = dataSource.getConnection().getMetaData().getURL();
+            } catch (SQLException e) {
+                throw new RuntimeException("分页插件初始化异常:" + e.getMessage());
+            }
+            if (url == null || url.length() == 0) {
+                throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
+            }
+            String dialect = Dialect.fromJdbcUrl(url);
+            if (dialect == null) {
+                throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
+            }
+            sqlUtil = new SqlUtil(dialect);
+            sqlUtil.setProperties(properties);
+            properties = null;
+            autoDialect = false;
+        }
     }
 
     /**
@@ -167,7 +208,13 @@ public class PageHelper implements Interceptor {
         }
         //数据库方言
         String dialect = p.getProperty("dialect");
-        sqlUtil = new SqlUtil(dialect);
-        sqlUtil.setProperties(p);
+        if (dialect == null || dialect.length() == 0) {
+            autoDialect = true;
+            this.properties = p;
+        } else {
+            autoDialect = false;
+            sqlUtil = new SqlUtil(dialect);
+            sqlUtil.setProperties(p);
+        }
     }
 }
