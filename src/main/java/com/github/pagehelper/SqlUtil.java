@@ -227,9 +227,6 @@ public class SqlUtil implements Constant {
      */
     public Object processPage(Invocation invocation) throws Throwable {
         try {
-            if (OrderByHelper.getOrderBy() != null) {
-                OrderByHelper.processIntercept(invocation);
-            }
             Object result = _processPage(invocation);
             return result;
         } finally {
@@ -249,6 +246,9 @@ public class SqlUtil implements Constant {
         final Object[] args = invocation.getArgs();
         RowBounds rowBounds = (RowBounds) args[2];
         if (SqlUtil.getLocalPage() == null && rowBounds == RowBounds.DEFAULT) {
+            if (OrderByHelper.getOrderBy() != null) {
+                OrderByHelper.processIntercept(invocation);
+            }
             return invocation.proceed();
         } else {
             //忽略RowBounds-否则会进行Mybatis自带的内存分页
