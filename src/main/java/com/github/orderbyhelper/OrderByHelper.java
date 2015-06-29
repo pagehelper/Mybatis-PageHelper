@@ -85,6 +85,8 @@ public class OrderByHelper implements Interceptor {
                 msObject.setValue("sqlSource", new OrderByProviderSqlSource((ProviderSqlSource) sqlSource));
             } else if (sqlSource instanceof DynamicSqlSource) {
                 msObject.setValue("sqlSource", new OrderByDynamicSqlSource((DynamicSqlSource) sqlSource));
+            } else {
+                throw new RuntimeException("无法处理该类型[" + sqlSource.getClass() + "]的SqlSource");
             }
         }
     }

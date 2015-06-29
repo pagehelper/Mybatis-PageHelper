@@ -280,15 +280,20 @@ public class SqlUtil implements Constant {
         if (sqlSource instanceof OrderBySqlSource) {
             tempSqlSource = ((OrderBySqlSource) tempSqlSource).getOriginal();
         }
+        SqlSource pageSqlSource;
         if (tempSqlSource instanceof StaticSqlSource) {
-            msObject.setValue("sqlSource", new PageStaticSqlSource((StaticSqlSource) tempSqlSource, parser));
+            pageSqlSource = new PageStaticSqlSource((StaticSqlSource) tempSqlSource, parser);
         } else if (tempSqlSource instanceof RawSqlSource) {
-            msObject.setValue("sqlSource", new PageRawSqlSource((RawSqlSource) tempSqlSource, parser));
+            pageSqlSource = new PageRawSqlSource((RawSqlSource) tempSqlSource, parser);
         } else if (tempSqlSource instanceof ProviderSqlSource) {
-            msObject.setValue("sqlSource", new PageProviderSqlSource((ProviderSqlSource) tempSqlSource, parser));
+            pageSqlSource = new PageProviderSqlSource((ProviderSqlSource) tempSqlSource, parser);
         } else if (tempSqlSource instanceof DynamicSqlSource) {
-            msObject.setValue("sqlSource", new PageDynamicSqlSource((DynamicSqlSource) tempSqlSource, parser));
+            pageSqlSource = new PageDynamicSqlSource((DynamicSqlSource) tempSqlSource, parser);
+        } else {
+            throw new RuntimeException("无法处理该类型[" + sqlSource.getClass() + "]的SqlSource");
         }
+        msObject.setValue("sqlSource", pageSqlSource);
+        //由于count查询需要修改返回值，因此这里要创建一个Count查询的MS
         msCountMap.put(ms.getId(), MSUtils.newCountMappedStatement(ms));
     }
 
