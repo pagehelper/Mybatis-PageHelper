@@ -52,6 +52,18 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
+##4.0.0-SNAPSHOT 开发版：
+
+ - 增加对排序的支持
+
+ - 可以单独使用`PageHelper.orderBy(String orderBy)`对查询语句增加排序
+
+ - `PageHelper.orderBy(String orderBy)`也可以配合`startPage`的其他方法使用
+
+ - 可以使用`PageHelper.startPage(int start,int size,String orderBy)`对分页查询进行排序
+
+ - 修改分页查询的处理逻辑，主要是将原`sqlSource`包装成可以分页和排序的`sqlSource`
+
 ##3.7.5更新日志：
 
  - 增加对MyBatis3.2.0以上版本的校验，如果是不是3.2.0以上版本，会抛出异常提示
