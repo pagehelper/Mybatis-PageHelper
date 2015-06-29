@@ -54,6 +54,8 @@
 
 ##4.0.0-SNAPSHOT 开发版：
 
+ - 配置属性`dialect`不在强制要求，可以不写，分页插件会自动判断
+
  - 增加对排序的支持
 
  - 可以单独使用`PageHelper.orderBy(String orderBy)`对查询语句增加排序
