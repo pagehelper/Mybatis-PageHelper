@@ -20,37 +20,46 @@ import java.util.List;
  * @author liuzh
  * @since 2015-06-27
  */
-public class PageStaticSqlSource implements SqlSource, OrderBySqlSource {
+public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSource {
     private String sql;
     private List<ParameterMapping> parameterMappings;
     private Configuration configuration;
     private Parser parser;
     private SqlSource original;
-    private Boolean count;
 
-    public PageStaticSqlSource(StaticSqlSource sqlSource, Parser parser, Boolean count) {
+    public PageStaticSqlSource(StaticSqlSource sqlSource, Parser parser) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.sql = (String) metaObject.getValue("sql");
         this.parameterMappings = (List<ParameterMapping>) metaObject.getValue("parameterMappings");
         this.configuration = (Configuration) metaObject.getValue("configuration");
         this.original = sqlSource;
         this.parser = parser;
-        this.count = count;
     }
 
-    public BoundSql getBoundSql(Object parameterObject) {
+    @Override
+    protected BoundSql getDefaultBoundSql(Object parameterObject) {
         String tempSql = sql;
-        if (count) {
-            tempSql = parser.getCountSql(sql);
-            return new BoundSql(configuration, tempSql, parameterMappings, parameterObject);
-        } else {
-            String orderBy = OrderByHelper.getOrderBy();
-            if (orderBy != null) {
-                tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
-            }
-            tempSql = parser.getPageSql(tempSql);
-            return new BoundSql(configuration, tempSql, parser.getPageParameterMapping(configuration, original.getBoundSql(parameterObject)), parameterObject);
+        String orderBy = OrderByHelper.getOrderBy();
+        if (orderBy != null) {
+            tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
         }
+        return new BoundSql(configuration, tempSql, parameterMappings, parameterObject);
+    }
+
+    @Override
+    protected BoundSql getCountBoundSql(Object parameterObject) {
+        return new BoundSql(configuration, parser.getCountSql(sql), parameterMappings, parameterObject);
+    }
+
+    @Override
+    protected BoundSql getPageBoundSql(Object parameterObject) {
+        String tempSql = sql;
+        String orderBy = OrderByHelper.getOrderBy();
+        if (orderBy != null) {
+            tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
+        }
+        tempSql = parser.getPageSql(tempSql);
+        return new BoundSql(configuration, tempSql, parser.getPageParameterMapping(configuration, original.getBoundSql(parameterObject)), parameterObject);
     }
 
     public SqlSource getOriginal() {

@@ -25,13 +25,20 @@
 package com.github.pagehelper;
 
 import com.github.orderbyhelper.OrderByHelper;
+import com.github.orderbyhelper.sqlsource.*;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.impl.AbstractParser;
+import com.github.pagehelper.sqlsource.*;
+import org.apache.ibatis.builder.StaticSqlSource;
+import org.apache.ibatis.builder.annotation.ProviderSqlSource;
+import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.scripting.defaults.RawSqlSource;
+import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.session.RowBounds;
 
 import java.lang.reflect.Method;
@@ -39,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mybatis - sql工具，获取分页和count的MappedStatement，设置分页参数
@@ -50,6 +58,18 @@ import java.util.Properties;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SqlUtil implements Constant {
     private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
+    private static final ThreadLocal<Boolean> COUNT = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return null;
+        }
+    };
+    private static final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
+
+    public static Boolean getCOUNT() {
+        return COUNT.get();
+    }
+
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     private boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
@@ -77,8 +97,6 @@ public class SqlUtil implements Constant {
 
     //具体针对数据库的parser
     private Parser parser;
-    //处理MS
-    private MSUtils msUtils;
     //数据库方言
     private Dialect dialect;
 
@@ -93,7 +111,6 @@ public class SqlUtil implements Constant {
         }
         dialect = Dialect.of(strDialect);
         parser = AbstractParser.newParser(dialect);
-        msUtils = new MSUtils(parser);
 
     }
 
@@ -115,6 +132,7 @@ public class SqlUtil implements Constant {
      */
     public static void clearLocalPage() {
         LOCAL_PAGE.remove();
+        COUNT.remove();
     }
 
     /**
@@ -236,6 +254,45 @@ public class SqlUtil implements Constant {
     }
 
     /**
+     * 是否已经处理过
+     *
+     * @param ms
+     * @return
+     */
+    public static boolean isPageSqlSource(MappedStatement ms) {
+        if (ms.getSqlSource() instanceof PageSqlSource) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 修改SqlSource
+     *
+     * @param ms
+     * @param parser
+     * @throws Throwable
+     */
+    public static void processMappedStatement(MappedStatement ms, Parser parser) throws Throwable {
+        SqlSource sqlSource = ms.getSqlSource();
+        MetaObject msObject = SystemMetaObject.forObject(ms);
+        SqlSource tempSqlSource = sqlSource;
+        if (sqlSource instanceof OrderBySqlSource) {
+            tempSqlSource = ((OrderBySqlSource) tempSqlSource).getOriginal();
+        }
+        if (tempSqlSource instanceof StaticSqlSource) {
+            msObject.setValue("sqlSource", new PageStaticSqlSource((StaticSqlSource) tempSqlSource, parser));
+        } else if (tempSqlSource instanceof RawSqlSource) {
+            msObject.setValue("sqlSource", new PageRawSqlSource((RawSqlSource) tempSqlSource, parser));
+        } else if (tempSqlSource instanceof ProviderSqlSource) {
+            msObject.setValue("sqlSource", new PageProviderSqlSource((ProviderSqlSource) tempSqlSource, parser));
+        } else if (tempSqlSource instanceof DynamicSqlSource) {
+            msObject.setValue("sqlSource", new PageDynamicSqlSource((DynamicSqlSource) tempSqlSource, parser));
+        }
+        msCountMap.put(ms.getId(), MSUtils.newCountMappedStatement(ms));
+    }
+
+    /**
      * Mybatis拦截器方法
      *
      * @param invocation 拦截器入参
@@ -251,12 +308,19 @@ public class SqlUtil implements Constant {
             }
             return invocation.proceed();
         } else {
+            //获取原始的ms
+            MappedStatement ms = (MappedStatement) args[0];
+            //判断并处理为PageSqlSource
+            if (!isPageSqlSource(ms)) {
+                processMappedStatement(ms, parser);
+            }
             //忽略RowBounds-否则会进行Mybatis自带的内存分页
             args[2] = RowBounds.DEFAULT;
             //分页信息
             Page page = getPage(rowBounds);
             //pageSizeZero的判断
             if ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0) {
+                COUNT.set(null);
                 //执行正常（不分页）查询
                 Object result = invocation.proceed();
                 //得到处理结果
@@ -270,15 +334,16 @@ public class SqlUtil implements Constant {
                 //返回结果仍然为Page类型 - 便于后面对接收类型的统一处理
                 return page;
             }
-            //获取原始的ms
-            MappedStatement ms = (MappedStatement) args[0];
-            SqlSource sqlSource = ms.getSqlSource();
+
             //简单的通过total的值来判断是否进行count查询
             if (page.isCount()) {
-                //将参数中的MappedStatement替换为新的qs
-                msUtils.processCountMappedStatement(ms, sqlSource, args);
+                COUNT.set(Boolean.TRUE);
+                //替换MS
+                args[0] = msCountMap.get(ms.getId());
                 //查询总数
                 Object result = invocation.proceed();
+                //还原ms
+                args[0] = ms;
                 //设置总数
                 page.setTotal((Integer) ((List) result).get(0));
                 if (page.getTotal() == 0) {
@@ -290,7 +355,10 @@ public class SqlUtil implements Constant {
                     ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
                             || rowBounds != RowBounds.DEFAULT)) {
                 //将参数中的MappedStatement替换为新的qs
-                msUtils.processPageMappedStatement(ms, sqlSource, page, args);
+                COUNT.set(null);
+                BoundSql boundSql = ms.getBoundSql(args[1]);
+                args[1] = parser.setPageParameter(ms, args[1], boundSql, page);
+                COUNT.set(Boolean.FALSE);
                 //执行分页查询
                 Object result = invocation.proceed();
                 //得到处理结果

@@ -45,17 +45,17 @@ import java.util.Map;
 /**
  * @author liuzh
  */
-public class PageProviderSqlSource implements SqlSource, OrderBySqlSource, Constant {
+public class PageProviderSqlSource extends PageSqlSource implements OrderBySqlSource, Constant {
+
     private SqlSourceBuilder sqlSourceParser;
     private Class<?> providerType;
     private Method providerMethod;
     private Boolean providerTakesParameterObject;
     private SqlSource original;
     private Configuration configuration;
-    private Boolean count;
     private Parser parser;
 
-    public PageProviderSqlSource(ProviderSqlSource provider, Parser parser, Boolean count) {
+    public PageProviderSqlSource(ProviderSqlSource provider, Parser parser) {
         MetaObject metaObject = SystemMetaObject.forObject(provider);
         this.sqlSourceParser = (SqlSourceBuilder) metaObject.getValue("sqlSourceParser");
         this.providerType = (Class<?>) metaObject.getValue("providerType");
@@ -64,7 +64,6 @@ public class PageProviderSqlSource implements SqlSource, OrderBySqlSource, Const
         this.configuration = (Configuration) metaObject.getValue("sqlSourceParser.configuration");
         this.original = provider;
         this.parser = parser;
-        this.count = count;
     }
 
     private SqlSource createSqlSource(Object parameterObject) {
@@ -85,11 +84,26 @@ public class PageProviderSqlSource implements SqlSource, OrderBySqlSource, Const
         }
     }
 
-    public SqlSource getOriginal() {
-        return original;
+    @Override
+    protected BoundSql getDefaultBoundSql(Object parameterObject) {
+        SqlSource sqlSource = createSqlSource(parameterObject);
+        return sqlSource.getBoundSql(parameterObject);
     }
 
-    public BoundSql getBoundSql(Object parameterObject) {
+    @Override
+    protected BoundSql getCountBoundSql(Object parameterObject) {
+        BoundSql boundSql;
+        SqlSource sqlSource = createSqlSource(parameterObject);
+        boundSql = sqlSource.getBoundSql(parameterObject);
+        return new BoundSql(
+                configuration,
+                parser.getCountSql(boundSql.getSql()),
+                boundSql.getParameterMappings(),
+                parameterObject);
+    }
+
+    @Override
+    protected BoundSql getPageBoundSql(Object parameterObject) {
         BoundSql boundSql;
         if (parameterObject instanceof Map && ((Map) parameterObject).containsKey(PROVIDER_OBJECT)) {
             SqlSource sqlSource = createSqlSource(((Map) parameterObject).get(PROVIDER_OBJECT));
@@ -98,18 +112,14 @@ public class PageProviderSqlSource implements SqlSource, OrderBySqlSource, Const
             SqlSource sqlSource = createSqlSource(parameterObject);
             boundSql = sqlSource.getBoundSql(parameterObject);
         }
-        if (count) {
-            return new BoundSql(
-                    configuration,
-                    parser.getCountSql(boundSql.getSql()),
-                    boundSql.getParameterMappings(),
-                    parameterObject);
-        } else {
-            return new BoundSql(
-                    configuration,
-                    parser.getPageSql(boundSql.getSql()),
-                    parser.getPageParameterMapping(configuration, boundSql),
-                    parameterObject);
-        }
+        return new BoundSql(
+                configuration,
+                parser.getPageSql(boundSql.getSql()),
+                parser.getPageParameterMapping(configuration, boundSql),
+                parameterObject);
+    }
+
+    public SqlSource getOriginal() {
+        return original;
     }
 }

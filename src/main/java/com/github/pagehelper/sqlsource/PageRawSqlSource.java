@@ -16,22 +16,29 @@ import org.apache.ibatis.scripting.defaults.RawSqlSource;
  * @author liuzh
  * @since 2015-06-26
  */
-public class PageRawSqlSource implements SqlSource, OrderBySqlSource {
-    private SqlSource sqlSource;
+public class PageRawSqlSource extends PageSqlSource implements OrderBySqlSource {
+    private PageSqlSource sqlSource;
     private SqlSource original;
-    private Parser parser;
-    private Boolean count;
 
-    public PageRawSqlSource(RawSqlSource sqlSource, Parser parser, Boolean count) {
+    public PageRawSqlSource(RawSqlSource sqlSource, Parser parser) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
-        this.sqlSource = new PageStaticSqlSource((StaticSqlSource) metaObject.getValue("sqlSource"), parser, count);
+        this.sqlSource = new PageStaticSqlSource((StaticSqlSource) metaObject.getValue("sqlSource"), parser);
         this.original = sqlSource;
-        this.parser = parser;
-        this.count = count;
     }
 
-    public BoundSql getBoundSql(Object parameterObject) {
-        return sqlSource.getBoundSql(parameterObject);
+    @Override
+    protected BoundSql getDefaultBoundSql(Object parameterObject) {
+        return sqlSource.getDefaultBoundSql(parameterObject);
+    }
+
+    @Override
+    protected BoundSql getCountBoundSql(Object parameterObject) {
+        return sqlSource.getCountBoundSql(parameterObject);
+    }
+
+    @Override
+    protected BoundSql getPageBoundSql(Object parameterObject) {
+        return sqlSource.getPageBoundSql(parameterObject);
     }
 
     public SqlSource getOriginal() {
