@@ -25,7 +25,7 @@
 package com.github.pagehelper;
 
 import com.github.orderbyhelper.OrderByHelper;
-import com.github.orderbyhelper.sqlsource.*;
+import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.impl.AbstractParser;
 import com.github.pagehelper.sqlsource.*;
@@ -65,19 +65,6 @@ public class SqlUtil implements Constant {
         }
     };
     private static final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
-
-    public static Boolean getCOUNT() {
-        return COUNT.get();
-    }
-
-    //RowBounds参数offset作为PageNum使用 - 默认不使用
-    private boolean offsetAsPageNum = false;
-    //RowBounds是否进行count查询 - 默认不查询
-    private boolean rowBoundsWithCount = false;
-    //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
-    private boolean pageSizeZero = false;
-    //分页合理化
-    private boolean reasonable = false;
     //params参数映射
     private static Map<String, String> PARAMS = new HashMap<String, String>(5);
     //request获取方法
@@ -95,6 +82,14 @@ public class SqlUtil implements Constant {
         }
     }
 
+    //RowBounds参数offset作为PageNum使用 - 默认不使用
+    private boolean offsetAsPageNum = false;
+    //RowBounds是否进行count查询 - 默认不查询
+    private boolean rowBoundsWithCount = false;
+    //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+    private boolean pageSizeZero = false;
+    //分页合理化
+    private boolean reasonable = false;
     //具体针对数据库的parser
     private Parser parser;
     //数据库方言
@@ -114,8 +109,8 @@ public class SqlUtil implements Constant {
 
     }
 
-    public static void setLocalPage(Page page) {
-        LOCAL_PAGE.set(page);
+    public static Boolean getCOUNT() {
+        return COUNT.get();
     }
 
     /**
@@ -127,46 +122,16 @@ public class SqlUtil implements Constant {
         return LOCAL_PAGE.get();
     }
 
+    public static void setLocalPage(Page page) {
+        LOCAL_PAGE.set(page);
+    }
+
     /**
      * 移除本地变量
      */
     public static void clearLocalPage() {
         LOCAL_PAGE.remove();
         COUNT.remove();
-    }
-
-    /**
-     * 获取分页参数
-     *
-     * @param params RowBounds参数
-     * @return 返回Page对象
-     */
-    public Page getPage(Object params) {
-        Page page = getLocalPage();
-        if (page == null) {
-            if (params instanceof RowBounds) {
-                RowBounds rowBounds = (RowBounds) params;
-                if (offsetAsPageNum) {
-                    page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
-                } else {
-                    page = new Page(rowBounds, rowBoundsWithCount);
-                    //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
-                    page.setReasonable(false);
-                }
-            } else {
-                page = getPageFromObject(params);
-            }
-            setLocalPage(page);
-        }
-        //分页合理化
-        if (page.getReasonable() == null) {
-            page.setReasonable(reasonable);
-        }
-        //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
-        if (page.getPageSizeZero() == null) {
-            page.setPageSizeZero(pageSizeZero);
-        }
-        return page;
     }
 
     /**
@@ -230,27 +195,18 @@ public class SqlUtil implements Constant {
         if (paramsObject.hasGetter(PARAMS.get(paramName))) {
             value = paramsObject.getValue(PARAMS.get(paramName));
         }
+        if (value != null && value.getClass().isArray()) {
+            Object[] values = (Object[]) value;
+            if (values.length == 0) {
+                value = null;
+            } else {
+                value = values[0];
+            }
+        }
         if (required && value == null) {
             throw new RuntimeException("分页查询缺少必要的参数:" + PARAMS.get(paramName));
         }
         return value;
-    }
-
-    /**
-     * Mybatis拦截器方法
-     *
-     * @param invocation 拦截器入参
-     * @return 返回执行结果
-     * @throws Throwable 抛出异常
-     */
-    public Object processPage(Invocation invocation) throws Throwable {
-        try {
-            Object result = _processPage(invocation);
-            return result;
-        } finally {
-            clearLocalPage();
-            OrderByHelper.clear();
-        }
     }
 
     /**
@@ -295,6 +251,87 @@ public class SqlUtil implements Constant {
         msObject.setValue("sqlSource", pageSqlSource);
         //由于count查询需要修改返回值，因此这里要创建一个Count查询的MS
         msCountMap.put(ms.getId(), MSUtils.newCountMappedStatement(ms));
+    }
+
+    /**
+     * 测试[控制台输出]count和分页sql
+     *
+     * @param dialect     数据库类型
+     * @param originalSql 原sql
+     */
+    public static void testSql(String dialect, String originalSql) {
+        testSql(Dialect.of(dialect), originalSql);
+    }
+
+    /**
+     * 测试[控制台输出]count和分页sql
+     *
+     * @param dialect     数据库类型
+     * @param originalSql 原sql
+     */
+    public static void testSql(Dialect dialect, String originalSql) {
+        Parser parser = AbstractParser.newParser(dialect);
+        if (dialect == Dialect.sqlserver) {
+            setLocalPage(new Page(1, 10));
+        }
+        String countSql = parser.getCountSql(originalSql);
+        System.out.println(countSql);
+        String pageSql = parser.getPageSql(originalSql);
+        System.out.println(pageSql);
+        if (dialect == Dialect.sqlserver) {
+            clearLocalPage();
+        }
+    }
+
+    /**
+     * 获取分页参数
+     *
+     * @param params RowBounds参数
+     * @return 返回Page对象
+     */
+    public Page getPage(Object params) {
+        Page page = getLocalPage();
+        if (page == null) {
+            if (params instanceof RowBounds) {
+                RowBounds rowBounds = (RowBounds) params;
+                if (offsetAsPageNum) {
+                    page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
+                } else {
+                    page = new Page(rowBounds, rowBoundsWithCount);
+                    //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
+                    page.setReasonable(false);
+                }
+            } else {
+                page = getPageFromObject(params);
+            }
+            setLocalPage(page);
+        }
+        //分页合理化
+        if (page.getReasonable() == null) {
+            page.setReasonable(reasonable);
+        }
+        //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+        if (page.getPageSizeZero() == null) {
+            page.setPageSizeZero(pageSizeZero);
+        }
+        return page;
+    }
+
+    /**
+     * Mybatis拦截器方法
+     *
+     * @param invocation 拦截器入参
+     * @return 返回执行结果
+     * @throws Throwable 抛出异常
+     */
+    public Object processPage(Invocation invocation) throws Throwable {
+        try {
+            Object result = _processPage(invocation);
+            return result;
+        } finally {
+            clearLocalPage();
+            OrderByHelper.clear();
+        }
     }
 
     /**
@@ -403,36 +440,6 @@ public class SqlUtil implements Constant {
                     PARAMS.put(ss[0], ss[1]);
                 }
             }
-        }
-    }
-
-    /**
-     * 测试[控制台输出]count和分页sql
-     *
-     * @param dialect     数据库类型
-     * @param originalSql 原sql
-     */
-    public static void testSql(String dialect, String originalSql) {
-        testSql(Dialect.of(dialect), originalSql);
-    }
-
-    /**
-     * 测试[控制台输出]count和分页sql
-     *
-     * @param dialect     数据库类型
-     * @param originalSql 原sql
-     */
-    public static void testSql(Dialect dialect, String originalSql) {
-        Parser parser = AbstractParser.newParser(dialect);
-        if (dialect == Dialect.sqlserver) {
-            setLocalPage(new Page(1, 10));
-        }
-        String countSql = parser.getCountSql(originalSql);
-        System.out.println(countSql);
-        String pageSql = parser.getPageSql(originalSql);
-        System.out.println(pageSql);
-        if (dialect == Dialect.sqlserver) {
-            clearLocalPage();
         }
     }
 }
