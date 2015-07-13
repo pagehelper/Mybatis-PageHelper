@@ -1,6 +1,22 @@
 ##更新日志
 
-##3.7.5 - 2015-06-12
+##4.0.0 - 2015-07-13
+
+ - 配置属性`dialect`不在强制要求，可以不写，分页插件会自动判断
+
+ - 解决从request中获取分页参数时的错误,感谢<b>探路者☆</b>
+
+ - `PageInfo`增加空构造方法，所有属性增加`setter`方法
+
+ - 增加对排序的支持
+
+ - 可以单独使用`PageHelper.orderBy(String orderBy)`对查询语句增加排序，也可以配合`startPage`的其他方法使用
+
+ - 可以使用`PageHelper.startPage(int start,int size,String orderBy)`对分页查询进行排序
+
+ - 修改分页查询的处理逻辑，主要是将原`sqlSource`包装成可以分页和排序的`sqlSource`
+
+###3.7.5 - 2015-06-12
 
  - 增加对MyBatis3.2.0以上版本的校验，如果是不是3.2.0以上版本，会抛出异常提示
 

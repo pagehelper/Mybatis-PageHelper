@@ -24,9 +24,11 @@
 
 `oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`
 
+##MyBatis工具网站:[http://mybatis.tk](http://www.mybatis.tk)
+
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为3.7.5
+##分页插件最新版本为4.0.0
 
 ###Maven坐标
 
@@ -34,7 +36,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>3.7.5</version>
+    <version>4.0.0</version>
 </dependency>
 ```  
 
@@ -52,59 +54,21 @@
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
 
-##4.0.0-SNAPSHOT 开发版：
+##4.0.0更新日志：
 
  - 配置属性`dialect`不在强制要求，可以不写，分页插件会自动判断
 
+ - 解决从request中获取分页参数时的错误,感谢<b>探路者☆</b>
+
+ - `PageInfo`增加空构造方法，所有属性增加`setter`方法
+
  - 增加对排序的支持
 
- - 可以单独使用`PageHelper.orderBy(String orderBy)`对查询语句增加排序
-
- - `PageHelper.orderBy(String orderBy)`也可以配合`startPage`的其他方法使用
+ - 可以单独使用`PageHelper.orderBy(String orderBy)`对查询语句增加排序，也可以配合`startPage`的其他方法使用
 
  - 可以使用`PageHelper.startPage(int start,int size,String orderBy)`对分页查询进行排序
 
  - 修改分页查询的处理逻辑，主要是将原`sqlSource`包装成可以分页和排序的`sqlSource`
-
-##3.7.5更新日志：
-
- - 增加对MyBatis3.2.0以上版本的校验，如果是不是3.2.0以上版本，会抛出异常提示
-
- - 解决3.7.1更新中实际没有解决的入参为不可变`Map`类型时的错误
-
-##3.7.4更新日志：
-
- - 为了支持`3.3.0`去掉了分页插件自带的`SytemObjectMetaObject`类(该类在早期版本为了支持3.2.0以前的MyBatis)
-
- - 最新支持MyBatis3.2.0到3.3.0版本
-
-##3.7.3更新日志：
-
- - `Page`继承的`ArrayList`，会根据`pageSize`初始化大小，这就导致当`pageSize`过大（如`Integer.MAX_VALUE`）的内存溢出（实际数据量很小），此处改为初始化大小为0的`List`。
-
- - 当想查询某页后面的全部数据时，可以使用`PageHelper.startPage(pageNum, Integer.MAX_VALUE)`进行分页，`RowBounds(offset, Integer.MAX_VALUE)`一样。
-
- - 针对`PageHelper.startPage(1, Integer.MAX_VALUE)`优化，会取消分页，直接查询全部数据（能起到`pageSizeZero`参数所起的作用）。
-
- - 针对`RowBounds(0, Integer.MAX_VALUE)`优化，会取消分页，直接查询全部数据（能起到`pageSizeZero`参数所起的作用）。
-
-##3.7.2更新日志：
-
- - jsqlparser解析sql会抛出Error异常，由于只捕获Exception，所以导致部分解析失败的sql无法使用嵌套方式处理，所以修改为捕获`Throwable`。
-
-##3.7.1更新日志：
-
- - 增加`Informix`数据库支持，设置`dialect`值为`informix`即可
- - 解决入参为不可变`Map`类型时的错误
-
-##3.7.0更新日志：
-
- - 由于`orderby`参数经常被错误认为的使用，因此该版本全面移除了`orderby`
- - `Page<E>`移除`orderby`属性
- - `PageHelper`的`startPage`方法中，移除包含`orderby`参数的方法，sqlserver相关包含该参数的全部移除
- - 对SqlServer进行分页查询时，请在sql中包含order by语句，否则会抛出异常
- - 当`offsetAsPageNum=false`的时候，由于PageNum问题，`RowBounds`查询的时候`reasonable`会强制为false，已解决
- - 少数情况下的select中包含单个函数查询时，会使用嵌套的count查询
 
 ##项目文档[wiki](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)：  
 
@@ -160,4 +124,4 @@ Mybatis专栏：
 
 作者邮箱： abel533@gmail.com  
 
-Mybatis工具群： 211286137 (Mybatis相关工具插件等等)
+Mybatis工具群： <a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=29e4cce8ac3c65d14a1dc40c9ba5c8e71304f143f3ad759ac0b05146e0952044"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="Mybatis工具" title="Mybatis工具"></a>
