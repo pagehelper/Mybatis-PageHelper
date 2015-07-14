@@ -74,6 +74,8 @@
 
 ###[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)
 
+###[如何使用排序插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/UseOrderBy.md)
+
 如果要使用分页插件，这篇文档一定要看，看完肯定没有问题。
 
 如果和Spring集成不熟悉，可以参考下面两个MyBatis和Spring集成的框架
