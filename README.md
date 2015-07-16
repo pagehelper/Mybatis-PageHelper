@@ -122,8 +122,6 @@ Mybatis专栏：
 
 - http://blog.csdn.net/isea533   
 
-作者QQ： 120807756  
-
 作者邮箱： abel533@gmail.com  
 
 Mybatis工具群： <a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=29e4cce8ac3c65d14a1dc40c9ba5c8e71304f143f3ad759ac0b05146e0952044"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="Mybatis工具" title="Mybatis工具"></a>
