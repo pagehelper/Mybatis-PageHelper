@@ -28,7 +28,7 @@
 
   <groupId>com.github.pagehelper</groupId>
   <artifactId>pagehelper</artifactId>
-  <version>3.7.5</version>
+  <version>3.7.6</version>
   <packaging>jar</packaging>
 
   <name>pagehelper</name>
