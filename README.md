@@ -58,6 +58,8 @@
 
  - 解决[#60 -使用RPC时，因Page类引用了RowBounds，导致反序列化失败](http://git.oschina.net/free/Mybatis_PageHelper/issues/60) by [马金凯](http://git.oschina.net/mxb)
 
+ - 这个改动主要是去掉了`Page<E>`构造方法中的`RowBounds`，用`int[]`数组替换了`RowBounds`
+
 ##4.0.0更新日志：
 
  - 配置属性`dialect`不在强制要求，可以不写，分页插件会自动判断
