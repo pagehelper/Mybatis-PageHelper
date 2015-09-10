@@ -297,7 +297,7 @@ public class SqlUtil implements Constant {
                 if (offsetAsPageNum) {
                     page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
                 } else {
-                    page = new Page(rowBounds, rowBoundsWithCount);
+                    page = new Page(new int[]{rowBounds.getOffset(), rowBounds.getLimit()}, rowBoundsWithCount);
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
                 }
