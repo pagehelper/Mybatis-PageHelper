@@ -1,5 +1,9 @@
 ##更新日志
 
+##4.0.1 -2015-09-10
+
+ - 解决[#60 -使用RPC时，因Page类引用了RowBounds，导致反序列化失败](http://git.oschina.net/free/Mybatis_PageHelper/issues/60) by [马金凯](http://git.oschina.net/mxb)
+
 ##4.0.0 - 2015-07-13
 
  - 配置属性`dialect`不在强制要求，可以不写，分页插件会自动判断

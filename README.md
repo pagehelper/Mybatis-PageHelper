@@ -28,7 +28,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.0.0
+##分页插件最新版本为4.0.1
 
 ###Maven坐标
 
@@ -36,7 +36,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
 </dependency>
 ```  
 
@@ -53,6 +53,10 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+##4.0.1更新日志：
+
+ - 解决[#60 -使用RPC时，因Page类引用了RowBounds，导致反序列化失败](http://git.oschina.net/free/Mybatis_PageHelper/issues/60) by [马金凯](http://git.oschina.net/mxb)
 
 ##4.0.0更新日志：
 

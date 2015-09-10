@@ -26,7 +26,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
 </dependency>
 ```  
 
@@ -62,6 +62,7 @@
 <plugins>
     <!-- com.github.pagehelper为PageHelper类所在包名 -->
     <plugin interceptor="com.github.pagehelper.PageHelper">
+        <!-- 4.0.0以后版本可以不设置该参数 -->
         <property name="dialect" value="mysql"/>
         <!-- 该参数默认为false -->
         <!-- 设置为true时，会将RowBounds第一个参数offset当成pageNum页码使用 -->

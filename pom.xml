@@ -28,7 +28,7 @@
 
   <groupId>com.github.pagehelper</groupId>
   <artifactId>pagehelper</artifactId>
-  <version>4.0.0</version>
+  <version>4.0.1</version>
   <packaging>jar</packaging>
 
   <name>pagehelper</name>
@@ -175,6 +175,9 @@
                 <goals>
                   <goal>jar</goal>
                 </goals>
+                <configuration>
+                  <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
               </execution>
             </executions>
           </plugin>
