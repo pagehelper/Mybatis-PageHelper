@@ -24,8 +24,6 @@
 
 package com.github.pagehelper;
 
-import org.apache.ibatis.session.RowBounds;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,23 +103,32 @@ public class Page<E> extends ArrayList<E> {
         setReasonable(reasonable);
     }
 
-    public Page(RowBounds rowBounds, boolean count) {
+    /**
+     * int[] rowBounds
+     *    0 : offset
+     *    1 : limit
+     */
+    public Page(int[] rowBounds, boolean count) {
         this(rowBounds, count ? Page.SQL_COUNT : Page.NO_SQL_COUNT);
     }
 
-
-    public Page(RowBounds rowBounds, int total) {
+    /**
+     * int[] rowBounds
+     *    0 : offset
+     *    1 : limit
+     */
+    public Page(int[] rowBounds, int total) {
         super(0);
-        if (rowBounds.getOffset() == 0 && rowBounds.getLimit() == Integer.MAX_VALUE) {
+        if (rowBounds[0] == 0 && rowBounds[1] == Integer.MAX_VALUE) {
             pageSizeZero = true;
             this.pageSize = 0;
         } else {
-            this.pageSize = rowBounds.getLimit();
+            this.pageSize = rowBounds[1];
         }
-        this.startRow = rowBounds.getOffset();
+        this.startRow = rowBounds[0];
         //RowBounds方式默认不求count总数，如果想求count,可以修改这里为SQL_COUNT
         this.total = total;
-        this.endRow = this.startRow + rowBounds.getLimit();
+        this.endRow = this.startRow + rowBounds[1];
     }
 
     public List<E> getResult() {
