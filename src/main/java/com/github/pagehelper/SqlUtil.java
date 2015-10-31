@@ -282,25 +282,31 @@ public class SqlUtil implements Constant {
     /**
      * 获取分页参数
      *
-     * @param params
+     * @param args
      * @return 返回Page对象
      */
-    public Page getPage(Object params) {
+    public Page getPage(Object[] args) {
         Page page = getLocalPage();
         if (page == null || page.isOrderByOnly()) {
             Page oldPage = page;
             //这种情况下,page.isOrderByOnly()必然为true，所以不用写到条件中
-            if ((params == null || params == RowBounds.DEFAULT) && page != null) {
+            if ((args[2] == null || args[2] == RowBounds.DEFAULT) && page != null) {
                 return oldPage;
             }
-            if (params instanceof RowBounds && params != RowBounds.DEFAULT) {
-                RowBounds rowBounds = (RowBounds) params;
+            if (args[2] instanceof RowBounds && args[2] != RowBounds.DEFAULT) {
+                RowBounds rowBounds = (RowBounds) args[2];
                 if (offsetAsPageNum) {
                     page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
                 } else {
                     page = new Page(new int[]{rowBounds.getOffset(), rowBounds.getLimit()}, rowBoundsWithCount);
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
+                }
+            } else {
+                try {
+                    page = getPageFromObject(args[1]);
+                } catch (Exception e) {
+                    return null;
                 }
             }
             if (oldPage != null) {
@@ -344,13 +350,13 @@ public class SqlUtil implements Constant {
      */
     private Object _processPage(Invocation invocation) throws Throwable {
         final Object[] args = invocation.getArgs();
-        //保存RowBounds状态
-        RowBounds rowBounds = (RowBounds) args[2];
-        if (SqlUtil.getLocalPage() == null && rowBounds == RowBounds.DEFAULT) {
+        //分页信息
+        Page page = getPage(args);
+        if (page == null) {
             return invocation.proceed();
         } else {
-            //分页信息
-            Page page = getPage(rowBounds);
+            //保存RowBounds状态
+            RowBounds rowBounds = (RowBounds) args[2];
             //获取原始的ms
             MappedStatement ms = (MappedStatement) args[0];
             //判断并处理为PageSqlSource
