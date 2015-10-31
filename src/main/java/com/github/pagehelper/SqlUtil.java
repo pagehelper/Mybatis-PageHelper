@@ -24,7 +24,6 @@
 
 package com.github.pagehelper;
 
-import com.github.orderbyhelper.OrderByHelper;
 import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.impl.AbstractParser;
@@ -58,12 +57,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SqlUtil implements Constant {
     private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
-    private static final ThreadLocal<Boolean> COUNT = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return null;
-        }
-    };
     private static final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
     //params参数映射
     private static Map<String, String> PARAMS = new HashMap<String, String>(5);
@@ -110,7 +103,11 @@ public class SqlUtil implements Constant {
     }
 
     public static Boolean getCOUNT() {
-        return COUNT.get();
+        Page page = getLocalPage();
+        if (page != null) {
+            return page.getCountSignal();
+        }
+        return null;
     }
 
     /**
@@ -131,7 +128,6 @@ public class SqlUtil implements Constant {
      */
     public static void clearLocalPage() {
         LOCAL_PAGE.remove();
-        COUNT.remove();
     }
 
     /**
@@ -145,7 +141,7 @@ public class SqlUtil implements Constant {
         int pageSize;
         MetaObject paramsObject = null;
         if (params == null) {
-            throw new NullPointerException("分页查询参数params不能为空!");
+            throw new NullPointerException("无法获取分页查询参数!");
         }
         if (hasRequest && requestClass.isAssignableFrom(params.getClass())) {
             try {
@@ -157,7 +153,7 @@ public class SqlUtil implements Constant {
             paramsObject = SystemMetaObject.forObject(params);
         }
         if (paramsObject == null) {
-            throw new NullPointerException("分页查询参数params处理失败!");
+            throw new NullPointerException("分页查询参数处理失败!");
         }
         try {
             pageNum = Integer.parseInt(String.valueOf(getParamValue(paramsObject, "pageNum", true)));
@@ -286,13 +282,18 @@ public class SqlUtil implements Constant {
     /**
      * 获取分页参数
      *
-     * @param params RowBounds参数
+     * @param params
      * @return 返回Page对象
      */
     public Page getPage(Object params) {
         Page page = getLocalPage();
-        if (page == null) {
-            if (params instanceof RowBounds) {
+        if (page == null || page.isOrderByOnly()) {
+            Page oldPage = page;
+            //这种情况下,page.isOrderByOnly()必然为true，所以不用写到条件中
+            if ((params == null || params == RowBounds.DEFAULT) && page != null) {
+                return oldPage;
+            }
+            if (params instanceof RowBounds && params != RowBounds.DEFAULT) {
                 RowBounds rowBounds = (RowBounds) params;
                 if (offsetAsPageNum) {
                     page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
@@ -301,8 +302,9 @@ public class SqlUtil implements Constant {
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
                 }
-            } else {
-                page = getPageFromObject(params);
+            }
+            if (oldPage != null) {
+                page.setOrderBy(oldPage.getOrderBy());
             }
             setLocalPage(page);
         }
@@ -330,7 +332,6 @@ public class SqlUtil implements Constant {
             return result;
         } finally {
             clearLocalPage();
-            OrderByHelper.clear();
         }
     }
 
@@ -343,13 +344,13 @@ public class SqlUtil implements Constant {
      */
     private Object _processPage(Invocation invocation) throws Throwable {
         final Object[] args = invocation.getArgs();
+        //保存RowBounds状态
         RowBounds rowBounds = (RowBounds) args[2];
         if (SqlUtil.getLocalPage() == null && rowBounds == RowBounds.DEFAULT) {
-            if (OrderByHelper.getOrderBy() != null) {
-                OrderByHelper.processIntercept(invocation);
-            }
             return invocation.proceed();
         } else {
+            //分页信息
+            Page page = getPage(rowBounds);
             //获取原始的ms
             MappedStatement ms = (MappedStatement) args[0];
             //判断并处理为PageSqlSource
@@ -358,11 +359,9 @@ public class SqlUtil implements Constant {
             }
             //忽略RowBounds-否则会进行Mybatis自带的内存分页
             args[2] = RowBounds.DEFAULT;
-            //分页信息
-            Page page = getPage(rowBounds);
-            //pageSizeZero的判断
-            if ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0) {
-                COUNT.set(null);
+            //如果只进行排序 或 pageSizeZero的判断
+            if (page.isOrderByOnly() || ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0)) {
+                page.setCountSignal(null);
                 //执行正常（不分页）查询
                 Object result = invocation.proceed();
                 //得到处理结果
@@ -379,7 +378,7 @@ public class SqlUtil implements Constant {
 
             //简单的通过total的值来判断是否进行count查询
             if (page.isCount()) {
-                COUNT.set(Boolean.TRUE);
+                page.setCountSignal(Boolean.TRUE);
                 //替换MS
                 args[0] = msCountMap.get(ms.getId());
                 //查询总数
@@ -391,16 +390,18 @@ public class SqlUtil implements Constant {
                 if (page.getTotal() == 0) {
                     return page;
                 }
+            } else {
+                page.setTotal(-1l);
             }
             //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
             if (page.getPageSize() > 0 &&
                     ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
                             || rowBounds != RowBounds.DEFAULT)) {
                 //将参数中的MappedStatement替换为新的qs
-                COUNT.set(null);
+                page.setCountSignal(null);
                 BoundSql boundSql = ms.getBoundSql(args[1]);
                 args[1] = parser.setPageParameter(ms, args[1], boundSql, page);
-                COUNT.set(Boolean.FALSE);
+                page.setCountSignal(Boolean.FALSE);
                 //执行分页查询
                 Object result = invocation.proceed();
                 //得到处理结果
@@ -429,6 +430,7 @@ public class SqlUtil implements Constant {
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
         PARAMS.put("count", "countSql");
+        PARAMS.put("orderBy", "orderBy");
         PARAMS.put("reasonable", "reasonable");
         PARAMS.put("pageSizeZero", "pageSizeZero");
         String params = p.getProperty("params");
