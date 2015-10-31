@@ -32,7 +32,7 @@ public enum Dialect {
 
     public static Dialect of(String dialect) {
         try {
-            Dialect d = Dialect.valueOf(dialect);
+            Dialect d = Dialect.valueOf(dialect.toLowerCase());
             return d;
         } catch (IllegalArgumentException e) {
             String dialects = null;
