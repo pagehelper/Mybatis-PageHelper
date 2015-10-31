@@ -75,31 +75,13 @@ public abstract class AbstractParser implements Parser, Constant {
             case informix:
                 parser = new InformixParser();
                 break;
-            default:
+            case h2:
+                parser = new H2Parser();
                 break;
+            default:
+                throw new RuntimeException("分页插件" + dialect + "方言错误!");
         }
         return parser;
-    }
-
-    @Override
-    public boolean isSupportedMappedStatementCache() {
-        return true;
-    }
-
-    public String getCountSql(final String sql) {
-        return sqlParser.getSmartCountSql(sql);
-    }
-
-    public abstract String getPageSql(String sql);
-
-    public List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql) {
-        List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
-        if (boundSql != null && boundSql.getParameterMappings() != null) {
-            newParameterMappings.addAll(boundSql.getParameterMappings());
-        }
-        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
-        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
-        return newParameterMappings;
     }
 
     public static Map<String, Object> processParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql) {
@@ -144,6 +126,27 @@ public abstract class AbstractParser implements Parser, Constant {
         //备份原始参数对象
         paramMap.put(ORIGINAL_PARAMETER_OBJECT, parameterObject);
         return paramMap;
+    }
+
+    @Override
+    public boolean isSupportedMappedStatementCache() {
+        return true;
+    }
+
+    public String getCountSql(final String sql) {
+        return sqlParser.getSmartCountSql(sql);
+    }
+
+    public abstract String getPageSql(String sql);
+
+    public List<ParameterMapping> getPageParameterMapping(Configuration configuration, BoundSql boundSql) {
+        List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+        if (boundSql != null && boundSql.getParameterMappings() != null) {
+            newParameterMappings.addAll(boundSql.getParameterMappings());
+        }
+        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_FIRST, Integer.class).build());
+        newParameterMappings.add(new ParameterMapping.Builder(configuration, PAGEPARAMETER_SECOND, Integer.class).build());
+        return newParameterMappings;
     }
 
     public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {

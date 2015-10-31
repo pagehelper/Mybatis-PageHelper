@@ -49,7 +49,8 @@ public class MybatisPageSizeZeroHelper {
             Reader reader = Resources.getResourceAsReader(TestUtil.getXmlPath() + "/mybatis-config-pagesizezero.xml");
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
             reader.close();
-            if (TestUtil.getXmlPath().equalsIgnoreCase("hsqldb")) {
+            if (TestUtil.getXmlPath().equalsIgnoreCase("hsqldb")
+                    || TestUtil.getXmlPath().equalsIgnoreCase("h2")) {
                 //创建数据库
                 SqlSession session = null;
                 try {
