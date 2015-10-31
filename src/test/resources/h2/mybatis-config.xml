@@ -40,7 +40,6 @@
     </typeAliases>
 
     <plugins>
-        <plugin interceptor="com.github.orderbyhelper.OrderByHelper"/>
         <plugin interceptor="com.github.pagehelper.PageHelper"/>
     </plugins>
 

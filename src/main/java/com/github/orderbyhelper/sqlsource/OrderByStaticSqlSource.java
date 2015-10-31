@@ -1,7 +1,7 @@
 package com.github.orderbyhelper.sqlsource;
 
-import com.github.orderbyhelper.OrderByHelper;
 import com.github.orderbyhelper.OrderByParser;
+import com.github.pagehelper.PageHelper;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -33,7 +33,7 @@ public class OrderByStaticSqlSource implements SqlSource, OrderBySqlSource {
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
-        String orderBy = OrderByHelper.getOrderBy();
+        String orderBy = PageHelper.getOrderBy();
         String tempSql = sql;
         if (orderBy != null) {
             tempSql = OrderByParser.converToOrderBySql(sql, orderBy);

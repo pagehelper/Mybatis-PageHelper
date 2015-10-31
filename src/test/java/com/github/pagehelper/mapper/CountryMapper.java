@@ -108,4 +108,6 @@ public interface CountryMapper {
     List<Country> selectDistinct();
 
     List<Country> selectExists();
+
+    List<Country> selectByPageNumSize(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 }

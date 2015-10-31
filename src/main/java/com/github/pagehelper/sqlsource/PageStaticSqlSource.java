@@ -1,8 +1,8 @@
 package com.github.pagehelper.sqlsource;
 
-import com.github.orderbyhelper.OrderByHelper;
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
 import com.github.orderbyhelper.OrderByParser;
+import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
@@ -39,7 +39,7 @@ public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSour
     @Override
     protected BoundSql getDefaultBoundSql(Object parameterObject) {
         String tempSql = sql;
-        String orderBy = OrderByHelper.getOrderBy();
+        String orderBy = PageHelper.getOrderBy();
         if (orderBy != null) {
             tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
         }
@@ -54,7 +54,7 @@ public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSour
     @Override
     protected BoundSql getPageBoundSql(Object parameterObject) {
         String tempSql = sql;
-        String orderBy = OrderByHelper.getOrderBy();
+        String orderBy = PageHelper.getOrderBy();
         if (orderBy != null) {
             tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
         }

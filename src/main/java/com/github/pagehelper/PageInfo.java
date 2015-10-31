@@ -25,6 +25,7 @@
 package com.github.pagehelper;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,6 +47,9 @@ public class PageInfo<T> implements Serializable {
     private int pageSize;
     //当前页的数量
     private int size;
+    //排序
+    private String orderBy;
+
     //由于startRow和endRow不常用，这里说个具体的用法
     //可以在页面中"显示startRow到endRow 共size条数据"
 
@@ -105,11 +109,12 @@ public class PageInfo<T> implements Serializable {
             Page page = (Page) list;
             this.pageNum = page.getPageNum();
             this.pageSize = page.getPageSize();
+            this.orderBy = page.getOrderBy();
 
-            this.total = page.getTotal();
             this.pages = page.getPages();
             this.list = page;
             this.size = page.size();
+            this.total = page.getTotal();
             //由于结果是>startRow的，所以实际的需要+1
             if (this.size == 0) {
                 this.startRow = 0;
@@ -119,6 +124,18 @@ public class PageInfo<T> implements Serializable {
                 //计算实际的endRow（最后一页的时候特殊）
                 this.endRow = this.startRow - 1 + this.size;
             }
+        } else if (list instanceof Collection) {
+            this.pageNum = 1;
+            this.pageSize = list.size();
+
+            this.pages = 1;
+            this.list = list;
+            this.size = list.size();
+            this.total = list.size();
+            this.startRow = 0;
+            this.endRow = list.size() > 0 ? list.size() - 1 : 0;
+        }
+        if (list instanceof Collection) {
             this.navigatePages = navigatePages;
             //计算导航页
             calcNavigatepageNums();
@@ -213,6 +230,14 @@ public class PageInfo<T> implements Serializable {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
     }
 
     public int getStartRow() {

@@ -265,4 +265,7 @@
       and countryname = #{country.countryname}
     </if>
   </select>
+  <select id="selectByPageNumSize" resultType="com.github.pagehelper.model.Country">
+    select * from country
+  </select>
 </mapper>

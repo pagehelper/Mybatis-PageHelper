@@ -24,7 +24,6 @@
 
 package com.github.pagehelper;
 
-import com.github.orderbyhelper.OrderByHelper;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
@@ -83,8 +82,9 @@ public class PageHelper implements Interceptor {
      * @param orderBy  排序
      */
     public static Page startPage(int pageNum, int pageSize, String orderBy) {
-        orderBy(orderBy);
-        return startPage(pageNum, pageSize);
+        Page page = startPage(pageNum, pageSize);
+        page.setOrderBy(orderBy);
+        return page;
     }
 
     /**
@@ -112,6 +112,11 @@ public class PageHelper implements Interceptor {
         Page page = new Page(pageNum, pageSize, count);
         page.setReasonable(reasonable);
         page.setPageSizeZero(pageSizeZero);
+        //当已经执行过orderBy的时候
+        Page oldPage = SqlUtil.getLocalPage();
+        if (oldPage != null && oldPage.isOrderByOnly()) {
+            page.setOrderBy(oldPage.getOrderBy());
+        }
         SqlUtil.setLocalPage(page);
         return page;
     }
@@ -123,6 +128,11 @@ public class PageHelper implements Interceptor {
      */
     public static Page startPage(Object params) {
         Page page = SqlUtil.getPageFromObject(params);
+        //当已经执行过orderBy的时候
+        Page oldPage = SqlUtil.getLocalPage();
+        if (oldPage != null && oldPage.isOrderByOnly()) {
+            page.setOrderBy(oldPage.getOrderBy());
+        }
         SqlUtil.setLocalPage(page);
         return page;
     }
@@ -133,7 +143,33 @@ public class PageHelper implements Interceptor {
      * @param orderBy
      */
     public static void orderBy(String orderBy) {
-        OrderByHelper.orderBy(orderBy);
+        Page page = SqlUtil.getLocalPage();
+        if (page != null) {
+            page.setOrderBy(orderBy);
+        } else {
+            page = new Page();
+            page.setOrderBy(orderBy);
+            page.setOrderByOnly(true);
+            SqlUtil.setLocalPage(page);
+        }
+    }
+
+    /**
+     * 获取orderBy
+     *
+     * @return
+     */
+    public static String getOrderBy() {
+        Page page = SqlUtil.getLocalPage();
+        if (page != null) {
+            String orderBy = page.getOrderBy();
+            if (orderBy == null || orderBy.length() == 0) {
+                return null;
+            } else {
+                return orderBy;
+            }
+        }
+        return null;
     }
 
     /**

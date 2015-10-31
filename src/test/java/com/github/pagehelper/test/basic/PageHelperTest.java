@@ -59,27 +59,29 @@ public class PageHelperTest {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
-            PageHelper.startPage(1, 10);
+            PageHelper.startPage(1, 10, "id desc");
             List<Country> list = countryMapper.selectAll();
             assertEquals(10, list.size());
             assertEquals(183, ((Page) list).getTotal());
 
 
             //获取第2页，10条内容，显式查询总数count
-            PageHelper.startPage(2, 10, true);
+            PageHelper.orderBy("countryname desc");
             list = countryMapper.selectAll();
-            assertEquals(10, list.size());
+            assertEquals(183, list.size());
             assertEquals(183, ((Page) list).getTotal());
 
 
             //获取第2页，10条内容，不查询总数count
             PageHelper.startPage(2, 10, false);
+            PageHelper.orderBy("id asc");
             list = countryMapper.selectAll();
             assertEquals(10, list.size());
             assertEquals(-1, ((Page) list).getTotal());
 
 
             //获取第3页，20条内容，默认查询总数count
+            PageHelper.orderBy("countryname desc");
             PageHelper.startPage(3, 20);
             list = countryMapper.selectAll();
             assertEquals(20, list.size());
@@ -227,6 +229,46 @@ public class PageHelperTest {
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
             assertEquals(20, list.get(list.size() - 1).getId());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    /**
+     * 使用Mapper接口调用时，使用PageHelper.startPage效果更好，不需要添加Mapper接口参数
+     */
+    @Test
+    public void testMapperWithParameterObject() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            List<Country> list = countryMapper.selectByPageNumSize(1, 10);
+            assertEquals(10, list.size());
+            assertEquals(183, ((Page) list).getTotal());
+
+
+            //获取第2页，10条内容，显式查询总数count
+            PageHelper.orderBy("countryname desc");
+            list = countryMapper.selectAll();
+            assertEquals(183, list.size());
+            assertEquals(183, ((Page) list).getTotal());
+
+
+            //获取第2页，10条内容，不查询总数count
+            PageHelper.startPage(2, 10, false);
+            PageHelper.orderBy("id asc");
+            list = countryMapper.selectAll();
+            assertEquals(10, list.size());
+            assertEquals(-1, ((Page) list).getTotal());
+
+
+            //获取第3页，20条内容，默认查询总数count
+            PageHelper.orderBy("countryname desc");
+            PageHelper.startPage(3, 20);
+            list = countryMapper.selectAll();
+            assertEquals(20, list.size());
+            assertEquals(183, ((Page) list).getTotal());
         } finally {
             sqlSession.close();
         }
