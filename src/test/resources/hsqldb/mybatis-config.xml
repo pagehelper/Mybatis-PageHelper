@@ -41,7 +41,10 @@
 
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageHelper">
-            <property name="dialect" value="hsqldb"/>
+            <!-- dialect参数可以忽略不写 -->
+            <!-- 如果需要用自己的实现方法，可以将value写成类的全限定名称 -->
+            <!-- 如下所示，该类必须继承Parser接口 -->
+            <property name="dialect" value="com.github.pagehelper.parser.impl.HsqldbParser"/>
         </plugin>
     </plugins>
 
