@@ -19,16 +19,21 @@
  7. `DB2`
  8. `SqlServer(2005+)`
  9. `Informix`
+ 10. `h2`
 
-配置`dialect`属性时，使用小写形式：
+配置`dialect`属性时，可以使用小写形式：
 
-`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`
+`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`
+
+在4.0.0版本以后，`dialect`参数可以不配置，系统能自动识别这里提到的所有数据库。
+
+对于不支持的数据库，可以实现`com.github.pagehelper.parser.Parser`接口，然后配置到`dialect`参数中(4.0.2+)。
 
 ##MyBatis工具网站:[http://mybatis.tk](http://www.mybatis.tk)
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.0.1
+##分页插件最新版本为4.0.2
 
 ###Maven坐标
 
@@ -36,7 +41,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.2</version>
 </dependency>
 ```  
 
@@ -53,6 +58,20 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+##4.0.2更新日志：
+
+ - 简化`Page<E>`类，包含排序条件`orderBy`
+
+ - `dialect`参数是数据库名称时不区分大小写
+
+ - `dialect`参数可以设置为实现`com.github.pagehelper.parser.Parser`接口的实现类全限定名称
+
+ - 增加对`h2`数据库的支持
+
+ - 将`OrderByHelper`(排序插件)融合到`PageHelper`中，移除`OrderByHelper`
+
+ - 该版本调整比较大，但对开发人员影响较小，为以后扩展和完善提供方便
 
 ##4.0.1更新日志：
 

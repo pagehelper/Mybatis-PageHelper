@@ -1,12 +1,26 @@
 ##更新日志
 
-##4.0.1 -2015-09-10
+##4.0.2 - 2015-11-02
+
+ - 简化`Page<E>`类，包含排序条件`orderBy`
+
+ - `dialect`参数是数据库名称时不区分大小写
+
+ - `dialect`参数可以设置为实现`com.github.pagehelper.parser.Parser`接口的实现类全限定名称
+
+ - 增加对`h2`数据库的支持
+
+ - 将`OrderByHelper`(排序插件)融合到`PageHelper`中，移除`OrderByHelper`
+
+ - 该版本调整比较大，但对开发人员影响较小，为以后扩展和完善提供方便
+
+###4.0.1 -2015-09-10
 
  - 解决[#60 -使用RPC时，因Page类引用了RowBounds，导致反序列化失败](http://git.oschina.net/free/Mybatis_PageHelper/issues/60) by [马金凯](http://git.oschina.net/mxb)
 
  - 这个改动主要是去掉了`Page<E>`构造方法中的`RowBounds`，用`int[]`数组替换了`RowBounds`
 
-##4.0.0 - 2015-07-13
+###4.0.0 - 2015-07-13
 
  - 配置属性`dialect`不在强制要求，可以不写，分页插件会自动判断
 
