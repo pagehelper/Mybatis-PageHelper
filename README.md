@@ -19,7 +19,7 @@
  7. `DB2`
  8. `SqlServer(2005+)`
  9. `Informix`
- 10. `h2`
+ 10. `H2`
 
 配置`dialect`属性时，可以使用小写形式：
 
@@ -67,7 +67,7 @@
 
  - `dialect`参数可以设置为实现`com.github.pagehelper.parser.Parser`接口的实现类全限定名称
 
- - 增加对`h2`数据库的支持
+ - 增加对`H2`数据库的支持
 
  - 将`OrderByHelper`(排序插件)融合到`PageHelper`中，移除`OrderByHelper`
 
