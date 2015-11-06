@@ -90,6 +90,47 @@ public class PageHelper implements Interceptor {
     /**
      * 开始分页
      *
+     * @param offset  页码
+     * @param limit 每页显示数量
+     */
+    public static Page offsetPage(int offset, int limit) {
+        return offsetPage(offset, limit, true);
+    }
+
+    /**
+     * 开始分页
+     *
+     * @param offset 页码
+     * @param limit  每页显示数量
+     * @param count  是否进行count查询
+     */
+    public static Page offsetPage(int offset, int limit, boolean count) {
+        Page page = new Page(new int[]{offset, limit}, count);
+        //当已经执行过orderBy的时候
+        Page oldPage = SqlUtil.getLocalPage();
+        if (oldPage != null && oldPage.isOrderByOnly()) {
+            page.setOrderBy(oldPage.getOrderBy());
+        }
+        SqlUtil.setLocalPage(page);
+        return page;
+    }
+
+    /**
+     * 开始分页
+     *
+     * @param offset  页码
+     * @param limit   每页显示数量
+     * @param orderBy 排序
+     */
+    public static Page offsetPage(int offset, int limit, String orderBy) {
+        Page page = offsetPage(offset, limit);
+        page.setOrderBy(orderBy);
+        return page;
+    }
+
+    /**
+     * 开始分页
+     *
      * @param pageNum    页码
      * @param pageSize   每页显示数量
      * @param count      是否进行count查询

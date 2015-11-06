@@ -123,6 +123,7 @@ public class Page<E> extends ArrayList<E> {
             this.pageSize = 0;
         } else {
             this.pageSize = rowBounds[1];
+            this.pageNum = rowBounds[1] != 0 ? ((rowBounds[0] + rowBounds[1]) / rowBounds[1] + 1) : 0;
         }
         this.startRow = rowBounds[0];
         this.count = count;
@@ -137,8 +138,16 @@ public class Page<E> extends ArrayList<E> {
         return pages;
     }
 
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
     public int getEndRow() {
         return endRow;
+    }
+
+    public void setEndRow(int endRow) {
+        this.endRow = endRow;
     }
 
     public int getPageNum() {
@@ -160,6 +169,10 @@ public class Page<E> extends ArrayList<E> {
 
     public int getStartRow() {
         return startRow;
+    }
+
+    public void setStartRow(int startRow) {
+        this.startRow = startRow;
     }
 
     public long getTotal() {
@@ -222,6 +235,10 @@ public class Page<E> extends ArrayList<E> {
         return this.count;
     }
 
+    public void setCount(boolean count) {
+        this.count = count;
+    }
+
     public String getOrderBy() {
         return orderBy;
     }
@@ -245,7 +262,6 @@ public class Page<E> extends ArrayList<E> {
     public void setCountSignal(Boolean countSignal) {
         this.countSignal = countSignal;
     }
-
 
     //增加链式调用方法
 
