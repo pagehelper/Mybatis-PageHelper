@@ -24,8 +24,10 @@
 
 package com.github.pagehelper.mapper;
 
+import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.model.CountryExample;
+import com.github.pagehelper.model.CountryQueryModel;
 import com.github.pagehelper.test.basic.dynamic.Where;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -110,4 +112,12 @@ public interface CountryMapper {
     List<Country> selectExists();
 
     List<Country> selectByPageNumSize(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
+
+    List<Country> selectByPageNumSizeOrderBy(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("orderBy") String orderBy);
+
+    List<Country> selectByOrderBy(@Param("orderBy") String orderBy);
+
+    List<Country> selectByQueryModel(CountryQueryModel queryModel);
+
+    PageInfo<Country> selectPageInfo();
 }

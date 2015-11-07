@@ -41,10 +41,7 @@ import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.session.RowBounds;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -57,14 +54,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SqlUtil implements Constant {
     private static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
-    private static final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
     //params参数映射
     private static Map<String, String> PARAMS = new HashMap<String, String>(5);
     //request获取方法
     private static Boolean hasRequest;
     private static Class<?> requestClass;
     private static Method getParameterMap;
-
     static {
         try {
             requestClass = Class.forName("javax.servlet.ServletRequest");
@@ -75,6 +70,8 @@ public class SqlUtil implements Constant {
         }
     }
 
+    //缓存count查询的ms
+    private final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     private boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
@@ -85,6 +82,12 @@ public class SqlUtil implements Constant {
     private boolean reasonable = false;
     //具体针对数据库的parser
     private Parser parser;
+    //只返回PageInfo的查询结果
+    private ReturnPageInfo returnPageInfo = ReturnPageInfo.NONE;
+    //存储返回值为是否为PageInfo
+    private Map<String, Boolean> returnPageInfoMap = new ConcurrentHashMap<String, Boolean>();
+    //是否支持接口参数来传递分页参数，默认false
+    private boolean supportMethodsArguments = false;
 
     /**
      * 构造方法
@@ -173,22 +176,41 @@ public class SqlUtil implements Constant {
         if (paramsObject == null) {
             throw new NullPointerException("分页查询参数处理失败!");
         }
+        Object orderBy = getParamValue(paramsObject, "orderBy", false);
+        boolean hasOrderBy = false;
+        if (orderBy != null && orderBy.toString().length() > 0) {
+            hasOrderBy = true;
+        }
         try {
-            pageNum = Integer.parseInt(String.valueOf(getParamValue(paramsObject, "pageNum", true)));
-            pageSize = Integer.parseInt(String.valueOf(getParamValue(paramsObject, "pageSize", true)));
+            Object _pageNum = getParamValue(paramsObject, "pageNum", hasOrderBy ? false : true);
+            Object _pageSize = getParamValue(paramsObject, "pageSize", hasOrderBy ? false : true);
+            if (_pageNum == null || _pageSize == null) {
+                Page page = new Page();
+                page.setOrderBy(orderBy.toString());
+                page.setOrderByOnly(true);
+                return page;
+            }
+            pageNum = Integer.parseInt(String.valueOf(_pageNum));
+            pageSize = Integer.parseInt(String.valueOf(_pageSize));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("分页参数不是合法的数字类型!");
         }
+        Page page = new Page(pageNum, pageSize);
+        //count查询
         Object _count = getParamValue(paramsObject, "count", false);
-        boolean count = true;
         if (_count != null) {
-            count = Boolean.valueOf(String.valueOf(_count));
+            page.setCount(Boolean.valueOf(String.valueOf(_count)));
         }
-        Page page = new Page(pageNum, pageSize, count);
+        //排序
+        if (hasOrderBy) {
+            page.setOrderBy(orderBy.toString());
+        }
+        //分页合理化
         Object reasonable = getParamValue(paramsObject, "reasonable", false);
         if (reasonable != null) {
             page.setReasonable(Boolean.valueOf(String.valueOf(reasonable)));
         }
+        //查询全部
         Object pageSizeZero = getParamValue(paramsObject, "pageSizeZero", false);
         if (pageSizeZero != null) {
             page.setPageSizeZero(Boolean.valueOf(String.valueOf(pageSizeZero)));
@@ -237,37 +259,6 @@ public class SqlUtil implements Constant {
     }
 
     /**
-     * 修改SqlSource
-     *
-     * @param ms
-     * @param parser
-     * @throws Throwable
-     */
-    public static void processMappedStatement(MappedStatement ms, Parser parser) throws Throwable {
-        SqlSource sqlSource = ms.getSqlSource();
-        MetaObject msObject = SystemMetaObject.forObject(ms);
-        SqlSource tempSqlSource = sqlSource;
-        if (sqlSource instanceof OrderBySqlSource) {
-            tempSqlSource = ((OrderBySqlSource) tempSqlSource).getOriginal();
-        }
-        SqlSource pageSqlSource;
-        if (tempSqlSource instanceof StaticSqlSource) {
-            pageSqlSource = new PageStaticSqlSource((StaticSqlSource) tempSqlSource, parser);
-        } else if (tempSqlSource instanceof RawSqlSource) {
-            pageSqlSource = new PageRawSqlSource((RawSqlSource) tempSqlSource, parser);
-        } else if (tempSqlSource instanceof ProviderSqlSource) {
-            pageSqlSource = new PageProviderSqlSource((ProviderSqlSource) tempSqlSource, parser);
-        } else if (tempSqlSource instanceof DynamicSqlSource) {
-            pageSqlSource = new PageDynamicSqlSource((DynamicSqlSource) tempSqlSource, parser);
-        } else {
-            throw new RuntimeException("无法处理该类型[" + sqlSource.getClass() + "]的SqlSource");
-        }
-        msObject.setValue("sqlSource", pageSqlSource);
-        //由于count查询需要修改返回值，因此这里要创建一个Count查询的MS
-        msCountMap.put(ms.getId(), MSUtils.newCountMappedStatement(ms));
-    }
-
-    /**
      * 测试[控制台输出]count和分页sql
      *
      * @param dialect     数据库类型
@@ -295,6 +286,37 @@ public class SqlUtil implements Constant {
         if (dialect == Dialect.sqlserver) {
             clearLocalPage();
         }
+    }
+
+    /**
+     * 修改SqlSource
+     *
+     * @param ms
+     * @param parser
+     * @throws Throwable
+     */
+    public void processMappedStatement(MappedStatement ms, Parser parser) throws Throwable {
+        SqlSource sqlSource = ms.getSqlSource();
+        MetaObject msObject = SystemMetaObject.forObject(ms);
+        SqlSource tempSqlSource = sqlSource;
+        if (sqlSource instanceof OrderBySqlSource) {
+            tempSqlSource = ((OrderBySqlSource) tempSqlSource).getOriginal();
+        }
+        SqlSource pageSqlSource;
+        if (tempSqlSource instanceof StaticSqlSource) {
+            pageSqlSource = new PageStaticSqlSource((StaticSqlSource) tempSqlSource, parser);
+        } else if (tempSqlSource instanceof RawSqlSource) {
+            pageSqlSource = new PageRawSqlSource((RawSqlSource) tempSqlSource, parser);
+        } else if (tempSqlSource instanceof ProviderSqlSource) {
+            pageSqlSource = new PageProviderSqlSource((ProviderSqlSource) tempSqlSource, parser);
+        } else if (tempSqlSource instanceof DynamicSqlSource) {
+            pageSqlSource = new PageDynamicSqlSource((DynamicSqlSource) tempSqlSource, parser);
+        } else {
+            throw new RuntimeException("无法处理该类型[" + sqlSource.getClass() + "]的SqlSource");
+        }
+        msObject.setValue("sqlSource", pageSqlSource);
+        //由于count查询需要修改返回值，因此这里要创建一个Count查询的MS
+        msCountMap.put(ms.getId(), MSUtils.newCountMappedStatement(ms));
     }
 
     /**
@@ -368,14 +390,101 @@ public class SqlUtil implements Constant {
      */
     private Object _processPage(Invocation invocation) throws Throwable {
         final Object[] args = invocation.getArgs();
+        Page page = null;
+        //支持方法参数时，会先尝试获取Page
+        if (supportMethodsArguments) {
+            page = getPage(args);
+        }
         //分页信息
-        Page page = getPage(args);
         RowBounds rowBounds = (RowBounds) args[2];
-        if (SqlUtil.getLocalPage() == null && rowBounds == RowBounds.DEFAULT) {
+        //支持方法参数时，如果page == null就说明没有分页条件，不需要分页查询
+        if ((supportMethodsArguments && page == null)
+                //当不支持分页参数时，判断LocalPage和RowBounds判断是否需要分页
+                || (!supportMethodsArguments && SqlUtil.getLocalPage() == null && rowBounds == RowBounds.DEFAULT)) {
             return invocation.proceed();
         } else {
-            return doProcessPage(invocation, page, args);
+            //不支持分页参数时，page==null，这里需要获取
+            if (page == null) {
+                page = getPage(args);
+            }
+            page = doProcessPage(invocation, page, args);
+            return processPageInfo(page, args);
         }
+    }
+
+    /**
+     * 处理Page结果，看是否需要处理为PageInfo
+     *
+     * @param page
+     * @param args
+     * @return
+     */
+    private Object processPageInfo(Page<?> page, Object[] args) {
+        switch (returnPageInfo) {
+            case NONE:
+                return page;
+            case ALWAYS:
+                return returnPageInfo(page);
+            case CHECK:
+                if (isReturnPageInfo((MappedStatement) args[0])) {
+                    return returnPageInfo(page);
+                } else {
+                    return page;
+                }
+        }
+        return page;
+    }
+
+    /**
+     * 返回PageInfo类型
+     *
+     * @param page
+     * @return
+     */
+    private Object returnPageInfo(Page<?> page) {
+        List<PageInfo> list = new ArrayList<PageInfo>();
+        list.add(new PageInfo(page));
+        return list;
+    }
+
+    /**
+     * 是否为返回PageInfo的方法
+     *
+     * @param ms
+     * @return
+     */
+    private boolean isReturnPageInfo(MappedStatement ms) {
+        String msId = ms.getId();
+        if (!returnPageInfoMap.containsKey(msId)) {
+            String _interface = msId.substring(0, msId.lastIndexOf("."));
+            String _methodName = msId.substring(_interface.length() + 1);
+            try {
+                Class<?> mapperClass = Class.forName(_interface);
+                Method[] methods = mapperClass.getDeclaredMethods();
+                Method m = null;
+                for (Method method : methods) {
+                    if (method.getName().equals(_methodName)) {
+                        m = method;
+                        break;
+                    }
+                }
+                if (m == null) {
+                    returnPageInfoMap.put(msId, false);
+                } else {
+                    Class<?> returnClass = m.getReturnType();
+                    if (returnClass.equals(PageInfo.class)) {
+                        returnPageInfoMap.put(msId, true);
+                    } else {
+                        returnPageInfoMap.put(msId, false);
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                returnPageInfoMap.put(msId, false);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return returnPageInfoMap.get(msId);
     }
 
     /**
@@ -484,6 +593,14 @@ public class SqlUtil implements Constant {
         //分页合理化，true开启，如果分页参数不合理会自动修正。默认false不启用
         String reasonable = p.getProperty("reasonable");
         this.reasonable = Boolean.parseBoolean(reasonable);
+        //是否支持接口参数来传递分页参数，默认false
+        String supportMethodsArguments = p.getProperty("supportMethodsArguments");
+        this.supportMethodsArguments = Boolean.parseBoolean(supportMethodsArguments);
+        //returnPageInfo
+        String returnPageInfo = p.getProperty("returnPageInfo");
+        if (returnPageInfo != null && returnPageInfo.length() > 0) {
+            this.returnPageInfo = ReturnPageInfo.valueOf(returnPageInfo.toUpperCase());
+        }
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         PARAMS.put("pageNum", "pageNum");
