@@ -1,5 +1,11 @@
 ##更新日志
 
+###4.0.3 - 2015-11-09
+
+ - `PageHelper`新增3个`offsetPage`方法，参数主要是`offset`和`limit`，允许不规则分页
+
+ - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`，具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
+
 ##4.0.2 - 2015-11-02
 
  - 简化`Page<E>`类，包含排序条件`orderBy`

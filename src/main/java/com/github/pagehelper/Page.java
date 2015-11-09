@@ -123,7 +123,7 @@ public class Page<E> extends ArrayList<E> {
             this.pageSize = 0;
         } else {
             this.pageSize = rowBounds[1];
-            this.pageNum = rowBounds[1] != 0 ? ((rowBounds[0] + rowBounds[1]) / rowBounds[1] + 1) : 0;
+            this.pageNum = rowBounds[1] != 0 ? (int) (Math.ceil(((double) rowBounds[0] + rowBounds[1]) / rowBounds[1])) : 0;
         }
         this.startRow = rowBounds[0];
         this.count = count;

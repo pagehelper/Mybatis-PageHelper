@@ -33,7 +33,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.0.2
+##分页插件最新版本为4.0.3
 
 ###Maven坐标
 
@@ -41,7 +41,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.0.2</version>
+    <version>4.0.3</version>
 </dependency>
 ```  
 
@@ -58,6 +58,12 @@
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+##4.0.3更新日志：
+
+ - `PageHelper`新增3个`offsetPage`方法，参数主要是`offset`和`limit`，允许不规则分页
+
+ - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`，具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
 
 ##4.0.2更新日志：
 

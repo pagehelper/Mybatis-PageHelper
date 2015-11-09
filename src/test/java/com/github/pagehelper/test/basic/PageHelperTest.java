@@ -26,7 +26,6 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisHelper;
@@ -230,43 +229,6 @@ public class PageHelperTest {
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
             assertEquals(20, list.get(list.size() - 1).getId());
-        } finally {
-            sqlSession.close();
-        }
-    }
-
-
-    /**
-     * 使用命名空间方式的RowBounds进行分页，使用RowBounds时不进行count查询
-     * 通过修改代码可以进行count查询，没法通过其他方法改变参数
-     * 因为如果通过调用一个别的方法来标记count查询，还不如直接startPage
-     * <p/>
-     * 同时使用startPage时，以startPage为准，会根据startPage参数来查询
-     */
-    @Test
-    public void testNamespaceWithRowBounds2() {
-        SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
-        try {
-            PageHelper.startPage(1, 6);
-            List<Country> list = countryMapper.selectAll();
-            assertEquals(6, list.size());
-            assertEquals(183, ((Page) list).getTotal());
-
-            PageHelper.offsetPage(6, 20);
-            list = countryMapper.selectAll();
-            PageInfo<Country> pageInfo = new PageInfo<Country>(list);
-            System.out.println(pageInfo.toString());
-            assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
-
-            PageHelper.offsetPage(105, 20, "id desc");
-            list = countryMapper.selectAll();
-            pageInfo = new PageInfo<Country>(list);
-            System.out.println(pageInfo.toString());
-            assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
-            assertEquals(7, ((Page) list).getPageNum());
         } finally {
             sqlSession.close();
         }
