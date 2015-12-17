@@ -55,9 +55,16 @@
 
 由于使用了sql解析工具，你还需要下载jsqlparser.jar（这个文件完全独立，不依赖其他）：  
 
- - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
+ - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.4/
  
  - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+##4.1.0更新日志：
+
+- 增加对`SqlServer2012`的支持
+- jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
+- <b>准备</b>增加SQL语句中`for update`支持（jsqlparser新版支持`forupdate`）
+- <b>准备</b>增加拦截器级别的多数据源自动识别，根据具体的数据源来选择对应的数据库分页
 
 ##4.0.3更新日志：
 

@@ -1,12 +1,19 @@
 ##更新日志
 
+##4.1.0 - 2015-11-17
+
+- 增加对`SqlServer2012`的支持
+- jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
+- <b>准备</b>增加SQL语句中`for update`支持（jsqlparser新版支持`forupdate`）
+- <b>准备</b>增加拦截器级别的多数据源自动识别，根据具体的数据源来选择对应的数据库分页
+
 ###4.0.3 - 2015-11-09
 
  - `PageHelper`新增3个`offsetPage`方法，参数主要是`offset`和`limit`，允许不规则分页
 
  - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`，具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
 
-##4.0.2 - 2015-11-02
+###4.0.2 - 2015-11-02
 
  - 简化`Page<E>`类，包含排序条件`orderBy`
 

@@ -59,7 +59,7 @@ public class PageHelper implements Interceptor {
      * @param pageNum  页码
      * @param pageSize 每页显示数量
      */
-    public static Page startPage(int pageNum, int pageSize) {
+    public static Page<?> startPage(int pageNum, int pageSize) {
         return startPage(pageNum, pageSize, true);
     }
 
@@ -70,7 +70,7 @@ public class PageHelper implements Interceptor {
      * @param pageSize 每页显示数量
      * @param count    是否进行count查询
      */
-    public static Page startPage(int pageNum, int pageSize, boolean count) {
+    public static Page<?> startPage(int pageNum, int pageSize, boolean count) {
         return startPage(pageNum, pageSize, count, null);
     }
 
@@ -81,8 +81,8 @@ public class PageHelper implements Interceptor {
      * @param pageSize 每页显示数量
      * @param orderBy  排序
      */
-    public static Page startPage(int pageNum, int pageSize, String orderBy) {
-        Page page = startPage(pageNum, pageSize);
+    public static Page<?> startPage(int pageNum, int pageSize, String orderBy) {
+        Page<?> page = startPage(pageNum, pageSize);
         page.setOrderBy(orderBy);
         return page;
     }
@@ -93,7 +93,7 @@ public class PageHelper implements Interceptor {
      * @param offset  页码
      * @param limit 每页显示数量
      */
-    public static Page offsetPage(int offset, int limit) {
+    public static Page<?> offsetPage(int offset, int limit) {
         return offsetPage(offset, limit, true);
     }
 
@@ -104,10 +104,10 @@ public class PageHelper implements Interceptor {
      * @param limit  每页显示数量
      * @param count  是否进行count查询
      */
-    public static Page offsetPage(int offset, int limit, boolean count) {
-        Page page = new Page(new int[]{offset, limit}, count);
+    public static Page<?> offsetPage(int offset, int limit, boolean count) {
+        Page<?> page = new Page(new int[]{offset, limit}, count);
         //当已经执行过orderBy的时候
-        Page oldPage = SqlUtil.getLocalPage();
+        Page<?> oldPage = SqlUtil.getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
@@ -122,8 +122,8 @@ public class PageHelper implements Interceptor {
      * @param limit   每页显示数量
      * @param orderBy 排序
      */
-    public static Page offsetPage(int offset, int limit, String orderBy) {
-        Page page = offsetPage(offset, limit);
+    public static Page<?> offsetPage(int offset, int limit, String orderBy) {
+        Page<?> page = offsetPage(offset, limit);
         page.setOrderBy(orderBy);
         return page;
     }
@@ -136,7 +136,7 @@ public class PageHelper implements Interceptor {
      * @param count      是否进行count查询
      * @param reasonable 分页合理化,null时用默认配置
      */
-    public static Page startPage(int pageNum, int pageSize, boolean count, Boolean reasonable) {
+    public static Page<?> startPage(int pageNum, int pageSize, boolean count, Boolean reasonable) {
         return startPage(pageNum, pageSize, count, reasonable, null);
     }
 
@@ -149,12 +149,12 @@ public class PageHelper implements Interceptor {
      * @param reasonable   分页合理化,null时用默认配置
      * @param pageSizeZero true且pageSize=0时返回全部结果，false时分页,null时用默认配置
      */
-    public static Page startPage(int pageNum, int pageSize, boolean count, Boolean reasonable, Boolean pageSizeZero) {
-        Page page = new Page(pageNum, pageSize, count);
+    public static Page<?> startPage(int pageNum, int pageSize, boolean count, Boolean reasonable, Boolean pageSizeZero) {
+        Page<?> page = new Page(pageNum, pageSize, count);
         page.setReasonable(reasonable);
         page.setPageSizeZero(pageSizeZero);
         //当已经执行过orderBy的时候
-        Page oldPage = SqlUtil.getLocalPage();
+        Page<?> oldPage = SqlUtil.getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
@@ -167,10 +167,10 @@ public class PageHelper implements Interceptor {
      *
      * @param params
      */
-    public static Page startPage(Object params) {
-        Page page = SqlUtil.getPageFromObject(params);
+    public static Page<?> startPage(Object params) {
+        Page<?> page = SqlUtil.getPageFromObject(params);
         //当已经执行过orderBy的时候
-        Page oldPage = SqlUtil.getLocalPage();
+        Page<?> oldPage = SqlUtil.getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
@@ -184,7 +184,7 @@ public class PageHelper implements Interceptor {
      * @param orderBy
      */
     public static void orderBy(String orderBy) {
-        Page page = SqlUtil.getLocalPage();
+        Page<?> page = SqlUtil.getLocalPage();
         if (page != null) {
             page.setOrderBy(orderBy);
         } else {
@@ -201,7 +201,7 @@ public class PageHelper implements Interceptor {
      * @return
      */
     public static String getOrderBy() {
-        Page page = SqlUtil.getLocalPage();
+        Page<?> page = SqlUtil.getLocalPage();
         if (page != null) {
             String orderBy = page.getOrderBy();
             if (orderBy == null || orderBy.length() == 0) {
@@ -293,5 +293,13 @@ public class PageHelper implements Interceptor {
             sqlUtil = new SqlUtil(dialect);
             sqlUtil.setProperties(p);
         }
+    }
+
+    public SqlUtil getSqlUtil() {
+        return sqlUtil;
+    }
+
+    public void setSqlUtil(SqlUtil sqlUtil) {
+        this.sqlUtil = sqlUtil;
     }
 }

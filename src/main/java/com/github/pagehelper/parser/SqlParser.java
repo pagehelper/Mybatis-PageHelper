@@ -24,7 +24,6 @@
 
 package com.github.pagehelper.parser;
 
-import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -72,9 +71,12 @@ public class SqlParser {
      */
     public String getSmartCountSql(String sql) {
         //校验是否支持该sql
-        isSupportedSql(sql);
+        //isSupportedSql(sql);
         if (CACHE.get(sql) != null) {
             return CACHE.get(sql);
+        }
+        if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
+            System.out.println("==============");
         }
         //解析SQL
         Statement stmt = null;
@@ -180,10 +182,10 @@ public class SqlParser {
             }
         } else {
             SetOperationList operationList = (SetOperationList) selectBody;
-            if (operationList.getPlainSelects() != null && operationList.getPlainSelects().size() > 0) {
-                List<PlainSelect> plainSelects = operationList.getPlainSelects();
-                for (PlainSelect plainSelect : plainSelects) {
-                    processPlainSelect(plainSelect);
+            if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+                List<SelectBody> plainSelects = operationList.getSelects();
+                for (SelectBody plainSelect : plainSelects) {
+                    processSelectBody(plainSelect);
                 }
             }
             if (!orderByHashParameters(operationList.getOrderByElements())) {

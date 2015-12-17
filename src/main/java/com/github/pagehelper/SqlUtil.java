@@ -580,6 +580,48 @@ public class SqlUtil implements Constant {
         return page;
     }
 
+    public void setOffsetAsPageNum(boolean offsetAsPageNum) {
+        this.offsetAsPageNum = offsetAsPageNum;
+    }
+
+    public void setRowBoundsWithCount(boolean rowBoundsWithCount) {
+        this.rowBoundsWithCount = rowBoundsWithCount;
+    }
+
+    public void setPageSizeZero(boolean pageSizeZero) {
+        this.pageSizeZero = pageSizeZero;
+    }
+
+    public void setReasonable(boolean reasonable) {
+        this.reasonable = reasonable;
+    }
+
+    public void setReturnPageInfo(ReturnPageInfo returnPageInfo) {
+        this.returnPageInfo = returnPageInfo;
+    }
+
+    public void setSupportMethodsArguments(boolean supportMethodsArguments) {
+        this.supportMethodsArguments = supportMethodsArguments;
+    }
+
+    public void setParams(String params) {
+        PARAMS.put("pageNum", "pageNum");
+        PARAMS.put("pageSize", "pageSize");
+        PARAMS.put("count", "countSql");
+        PARAMS.put("orderBy", "orderBy");
+        PARAMS.put("reasonable", "reasonable");
+        PARAMS.put("pageSizeZero", "pageSizeZero");
+        if (params != null && params.length() > 0) {
+            String[] ps = params.split("[;|,|&]");
+            for (String s : ps) {
+                String[] ss = s.split("[=|:]");
+                if (ss.length == 2) {
+                    PARAMS.put(ss[0], ss[1]);
+                }
+            }
+        }
+    }
+
     public void setProperties(Properties p) {
         //offset作为PageNum使用
         String offsetAsPageNum = p.getProperty("offsetAsPageNum");
@@ -603,21 +645,6 @@ public class SqlUtil implements Constant {
         }
         //当offsetAsPageNum=false的时候，不能
         //参数映射
-        PARAMS.put("pageNum", "pageNum");
-        PARAMS.put("pageSize", "pageSize");
-        PARAMS.put("count", "countSql");
-        PARAMS.put("orderBy", "orderBy");
-        PARAMS.put("reasonable", "reasonable");
-        PARAMS.put("pageSizeZero", "pageSizeZero");
-        String params = p.getProperty("params");
-        if (params != null && params.length() > 0) {
-            String[] ps = params.split("[;|,|&]");
-            for (String s : ps) {
-                String[] ss = s.split("[=|:]");
-                if (ss.length == 2) {
-                    PARAMS.put(ss[0], ss[1]);
-                }
-            }
-        }
+        setParams(p.getProperty("params"));
     }
 }
