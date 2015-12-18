@@ -53,14 +53,14 @@ public class TestDynamicIf {
             List<Country> list = countryMapper.selectIf(1);
             assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(182, ((Page) list).getTotal());
+            assertEquals(182, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             list = countryMapper.selectIf(null);
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -78,14 +78,14 @@ public class TestDynamicIf {
             List<Country> list = countryMapper.selectIf(1);
             assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(182, ((Page) list).getTotal());
+            assertEquals(182, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
             list = countryMapper.selectIf(1);
             assertEquals(12, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(182, ((Page) list).getTotal());
+            assertEquals(182, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -94,6 +94,7 @@ public class TestDynamicIf {
     /**
      * 单个POJO参数情况特殊
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testMapper() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
@@ -109,7 +110,7 @@ public class TestDynamicIf {
             List<Country> list = countryMapper.selectIf3(country);
             assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(182, ((Page) list).getTotal());
+            assertEquals(182, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

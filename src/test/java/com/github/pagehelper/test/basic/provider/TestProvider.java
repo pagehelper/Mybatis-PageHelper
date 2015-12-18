@@ -51,7 +51,7 @@ public class TestProvider {
             List<Country> list = countryMapper.selectByProvider(map);
             assertEquals(100, list.get(0).getId());
             assertEquals(1, list.size());
-            assertEquals(1, ((Page) list).getTotal());
+            assertEquals(1, ((Page<?>) list).getTotal());
 
             map.put("countryname","天朝");
             PageHelper.startPage(1, 10);
@@ -73,7 +73,7 @@ public class TestProvider {
             List<Country> list = countryMapper.selectByCountryProvider(country);
             assertEquals(100, list.get(0).getId());
             assertEquals(1, list.size());
-            assertEquals(1, ((Page) list).getTotal());
+            assertEquals(1, ((Page<?>) list).getTotal());
 
             country.setCountryname("天朝");
             PageHelper.startPage(1, 10);

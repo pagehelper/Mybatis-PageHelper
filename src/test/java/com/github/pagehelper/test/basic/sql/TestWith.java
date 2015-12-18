@@ -56,14 +56,14 @@ public class TestWith {
             List<Country> list = countryMapper.selectWith();
             assertEquals(151, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(33, ((Page) list).getTotal());
+            assertEquals(33, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
             list = countryMapper.selectWith();
             assertEquals(161, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(33, ((Page) list).getTotal());
+            assertEquals(33, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

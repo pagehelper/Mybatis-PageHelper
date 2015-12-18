@@ -51,7 +51,7 @@ public class TestParameterNone {
             List<Country> list = countryMapper.selectAll();
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

@@ -32,10 +32,7 @@ import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -54,14 +51,14 @@ public class TestIntMax {
             List<Country> list = countryMapper.selectIf(1);
             assertEquals(2, list.get(0).getId());
             assertEquals(182, list.size());
-            assertEquals(182, ((Page) list).getTotal());
+            assertEquals(182, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1,  Integer.MAX_VALUE);
             list = countryMapper.selectIf(null);
             assertEquals(1, list.get(0).getId());
             assertEquals(183, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

@@ -57,7 +57,7 @@ public class RowBoundsTest {
             //获取第1页，10条内容，默认查询总数count
             List<Country> list = countryMapper.selectAll(new RowBounds(1, 10));
             //新增PageInfo对象，对返回结果进行封装
-            PageInfo page = new PageInfo(list);
+            PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(10, list.size());
             assertEquals(183, page.getTotal());
             //判断查询结果的位置是否正确
@@ -68,7 +68,7 @@ public class RowBoundsTest {
             //获取第10页，10条内容，显式查询总数count
             list = countryMapper.selectAll(new RowBounds(10, 10));
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(91, list.get(0).getId());
             assertEquals(100, list.get(list.size() - 1).getId());
@@ -77,7 +77,7 @@ public class RowBoundsTest {
             //获取第3页，20条内容，默认查询总数count
             list = countryMapper.selectAll(new RowBounds(6, 20));
             assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(101, list.get(0).getId());
             assertEquals(120, list.get(list.size() - 1).getId());
@@ -100,7 +100,7 @@ public class RowBoundsTest {
             //获取从0开始，10条内容
             List<Country> list = sqlSession.selectList("selectAll", null, new RowBounds(1, 10));
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.get(list.size() - 1).getId());
@@ -109,7 +109,7 @@ public class RowBoundsTest {
             //获取从10开始，10条内容
             list = sqlSession.selectList("selectAll", null, new RowBounds(10, 10));
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(91, list.get(0).getId());
             assertEquals(100, list.get(list.size() - 1).getId());
@@ -118,7 +118,7 @@ public class RowBoundsTest {
             //获取从20开始，20条内容
             list = sqlSession.selectList("selectAll", null, new RowBounds(6, 20));
             assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(101, list.get(0).getId());
             assertEquals(120, list.get(list.size() - 1).getId());
@@ -134,34 +134,22 @@ public class RowBoundsTest {
             //获取从0开始，10条内容
             List<Country> list = sqlSession.selectList("selectIf", null, new RowBounds(1, 10));
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.get(list.size() - 1).getId());
 
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put("id", 10);
             //获取从10开始，10条内容
             list = sqlSession.selectList("selectIf", map, new RowBounds(10, 10));
             assertEquals(10, list.size());
-            assertEquals(173, ((Page) list).getTotal());
+            assertEquals(173, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(101, list.get(0).getId());
             assertEquals(110, list.get(list.size() - 1).getId());
         } finally {
             sqlSession.close();
-        }
-    }
-
-    class IdBean{
-        private Integer id;
-
-        public Integer getId() {
-            return id;
-        }
-
-        public void setId(Integer id) {
-            this.id = id;
         }
     }
 
@@ -173,18 +161,18 @@ public class RowBoundsTest {
             PageHelper.startPage(1, 10);
             List<Country> list = sqlSession.selectList("selectIf", null);
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.get(list.size() - 1).getId());
 
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put("id", 10);
             //获取从10开始，10条内容
             PageHelper.startPage(10, 10);
             list = sqlSession.selectList("selectIf", map);
             assertEquals(10, list.size());
-            assertEquals(173, ((Page) list).getTotal());
+            assertEquals(173, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(101, list.get(0).getId());
             assertEquals(110, list.get(list.size() - 1).getId());
@@ -194,7 +182,7 @@ public class RowBoundsTest {
             PageHelper.startPage(10, 10);
             list = sqlSession.selectList("selectIf", country);
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
             assertEquals(91, list.get(0).getId());
             assertEquals(100, list.get(list.size() - 1).getId());
@@ -214,17 +202,29 @@ public class RowBoundsTest {
             //limit=0,这时候相当于用分页插件求count,但是前提必须是配置rounbounds方式求count，否则都是-1
             //这里由于没有配置，应该都是-1
             List<Country> list = countryMapper.selectAll(new RowBounds(1, 0));
-            PageInfo page = new PageInfo(list);
+            PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(0, list.size());
             assertEquals(183, page.getTotal());
 
             //pageSize<0的时候同上
             list = countryMapper.selectAll(new RowBounds(1, -100));
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(0, list.size());
             assertEquals(183, page.getTotal());
         } finally {
             sqlSession.close();
+        }
+    }
+
+    class IdBean {
+        private Integer id;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
         }
     }
 }

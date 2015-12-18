@@ -49,14 +49,14 @@ public class TestParameterMap {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put("order1", 1);
             map.put("order2", 2);
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectAllOrderByMap(map);
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(181, ((Page) list).getTotal());
+            assertEquals(181, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

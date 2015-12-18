@@ -30,7 +30,6 @@ import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,8 +40,6 @@ import java.util.List;
  */
 public class RemoveOrderTest {
 
-    private static final Logger LOGGER = Logger.getLogger(RemoveOrderTest.class);
-
     @Test
     public void simpleOrderTest() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
@@ -52,7 +49,7 @@ public class RemoveOrderTest {
             PageHelper.startPage(1, 50);
             List<Country> list = countryMapper.selectAllOrderby();
             //总数183
-            Assert.assertEquals(183, ((Page)list).getTotal());
+            Assert.assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -68,7 +65,7 @@ public class RemoveOrderTest {
             PageHelper.startPage(1, 50);
             List<Country> list = countryMapper.selectAllOrderByParams("countryname", "countrycode");
             //总数183
-            Assert.assertEquals(183, ((Page)list).getTotal());
+            Assert.assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

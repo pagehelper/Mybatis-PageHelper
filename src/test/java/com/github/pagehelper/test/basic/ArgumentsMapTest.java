@@ -47,15 +47,15 @@ public class ArgumentsMapTest {
         try {
             List<Country> list = countryMapper.selectByPageNumSizeOrderBy(1, 10, "id desc");
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             list = countryMapper.selectByPageNumSize(2, 10);
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             list = countryMapper.selectByPageNumSize(3, 20);
             assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             list = countryMapper.selectByOrderBy("id desc");
             assertEquals(183, list.size());

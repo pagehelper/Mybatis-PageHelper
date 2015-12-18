@@ -55,7 +55,7 @@ public class TestDynamicWhere {
             List<Country> list = countryMapper.selectByWhereMap(new Where(where));
             assertEquals(100, list.get(0).getId());
             assertEquals(1, list.size());
-            assertEquals(1, ((Page) list).getTotal());
+            assertEquals(1, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

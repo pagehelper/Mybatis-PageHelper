@@ -55,7 +55,7 @@ public class TestSelectItems {
             assertEquals("Angola", list.get(0).getCountryname());
             assertEquals("AO", list.get(0).getCountrycode());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
@@ -65,7 +65,7 @@ public class TestSelectItems {
             assertEquals("Angola", list.get(0).getCountryname());
             assertNull(list.get(0).getCountrycode());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -85,7 +85,7 @@ public class TestSelectItems {
             //1,'Angola','AO'
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
@@ -93,7 +93,7 @@ public class TestSelectItems {
             //1,'Angola','AO'
             assertEquals(5, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

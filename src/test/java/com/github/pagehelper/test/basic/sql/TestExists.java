@@ -51,14 +51,14 @@ public class TestExists {
             List<Country> list = countryMapper.selectExists();
             assertEquals(101, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(83, ((Page) list).getTotal());
+            assertEquals(83, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
             list = countryMapper.selectExists();
             assertEquals(111, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(83, ((Page) list).getTotal());
+            assertEquals(83, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

@@ -29,15 +29,12 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.model.CountryExample;
-import com.github.pagehelper.test.basic.dynamic.Where;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -52,7 +49,7 @@ public class TestExample {
             List<Country> list = countryMapper.selectByExample(null);
             assertEquals(1, list.get(0).getId());
             assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -69,7 +66,7 @@ public class TestExample {
             List<Country> list = countryMapper.selectByExample(example);
             assertEquals(101, list.get(0).getId());
             assertEquals(20, list.size());
-            assertEquals(83, ((Page) list).getTotal());
+            assertEquals(83, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -86,7 +83,7 @@ public class TestExample {
             List<Country> list = countryMapper.selectByExample(example);
             assertEquals(1, list.get(0).getId());
             assertEquals(5, list.size());
-            assertEquals(5, ((Page) list).getTotal());
+            assertEquals(5, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

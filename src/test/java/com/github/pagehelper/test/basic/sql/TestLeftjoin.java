@@ -51,14 +51,14 @@ public class TestLeftjoin {
             List<Country> list = countryMapper.selectLeftjoin();
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
             list = countryMapper.selectLeftjoin();
             assertEquals(11, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

@@ -46,24 +46,24 @@ public class OffsetTest {
             PageHelper.startPage(1, 6);
             List<Country> list = countryMapper.selectAll();
             assertEquals(6, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             PageHelper.offsetPage(6, 20);
             list = countryMapper.selectAll();
             PageInfo<Country> pageInfo = new PageInfo<Country>(list);
             System.out.println(pageInfo.toString());
-            assertEquals(2, ((Page) list).getPageNum());
+            assertEquals(2, ((Page<?>) list).getPageNum());
             assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             PageHelper.offsetPage(105, 20, "id desc");
             list = countryMapper.selectAll();
             pageInfo = new PageInfo<Country>(list);
             System.out.println(pageInfo.toString());
-            assertEquals(7, ((Page) list).getPageNum());
+            assertEquals(7, ((Page<?>) list).getPageNum());
             assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
-            assertEquals(7, ((Page) list).getPageNum());
+            assertEquals(183, ((Page<?>) list).getTotal());
+            assertEquals(7, ((Page<?>) list).getPageNum());
         } finally {
             sqlSession.close();
         }
@@ -76,15 +76,15 @@ public class OffsetTest {
         try {
             PageHelper.offsetPage(5, 5);
             List<Country> list = countryMapper.selectAll();
-            assertEquals(2, ((Page) list).getPageNum());
+            assertEquals(2, ((Page<?>) list).getPageNum());
             assertEquals(5, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             PageHelper.offsetPage(15, 5);
             list = countryMapper.selectAll();
-            assertEquals(4, ((Page) list).getPageNum());
+            assertEquals(4, ((Page<?>) list).getPageNum());
             assertEquals(5, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

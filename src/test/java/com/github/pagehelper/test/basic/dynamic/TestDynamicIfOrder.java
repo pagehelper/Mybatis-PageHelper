@@ -56,21 +56,21 @@ public class TestDynamicIfOrder {
             List<Country> list = countryMapper.selectIf2ListAndOrder(Arrays.asList(1, 2), Arrays.asList(3, 4), null);
             assertEquals(5, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(179, ((Page) list).getTotal());
+            assertEquals(179, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             list = countryMapper.selectIf2ListAndOrder(Arrays.asList(1, 2), null, "id");
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(181, ((Page) list).getTotal());
+            assertEquals(181, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             list = countryMapper.selectIf2ListAndOrder(new ArrayList<Integer>(0), null, "countryname");
             assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

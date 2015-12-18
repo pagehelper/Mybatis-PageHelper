@@ -53,7 +53,7 @@ public class TestNamespaceMap {
             List<Country> list = sqlSession.selectList("selectLike", map);
             assertEquals(30, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(39, ((Page) list).getTotal());
+            assertEquals(39, ((Page<?>) list).getTotal());
 
             PageHelper.startPage(1, 10);
             map.put("countryname", "China");
@@ -61,7 +61,7 @@ public class TestNamespaceMap {
             list = sqlSession.selectList("selectByMap", map);
             assertEquals(35, list.get(0).getId());
             assertEquals(1, list.size());
-            assertEquals(1, ((Page) list).getTotal());
+            assertEquals(1, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

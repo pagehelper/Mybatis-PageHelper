@@ -53,14 +53,14 @@ public class PageSizeZeroTest {
             //pageSize=0的时候查询全部结果
             PageHelper.startPage(1, 0);
             List<Country> list = countryMapper.selectAll();
-            PageInfo page = new PageInfo(list);
+            PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(183, list.size());
             assertEquals(183, page.getTotal());
 
             //pageSize=0的时候查询全部结果
             PageHelper.startPage(10, 0);
             list = countryMapper.selectAll();
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(183, list.size());
             assertEquals(183, page.getTotal());
         } finally {
@@ -78,14 +78,14 @@ public class PageSizeZeroTest {
         try {
             //pageSize=0的时候查询全部结果
             List<Country> list = countryMapper.selectAll(new RowBounds(1, 0));
-            PageInfo page = new PageInfo(list);
+            PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(183, list.size());
             assertEquals(183, page.getTotal());
 
             //pageSize=0的时候查询全部结果
             PageHelper.startPage(10, 0);
             list = countryMapper.selectAll(new RowBounds(1000, 0));
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(183, list.size());
             assertEquals(183, page.getTotal());
         } finally {

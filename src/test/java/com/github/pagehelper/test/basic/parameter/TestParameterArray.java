@@ -51,7 +51,7 @@ public class TestParameterArray {
             List<Country> list = countryMapper.selectAllOrderByArray(new Integer[]{1,2});
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(181, ((Page) list).getTotal());
+            assertEquals(181, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

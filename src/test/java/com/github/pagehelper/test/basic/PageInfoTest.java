@@ -49,7 +49,7 @@ public class PageInfoTest {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectAll();
-            PageInfo page = new PageInfo(list);
+            PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(1, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(1, page.getStartRow());
@@ -67,7 +67,7 @@ public class PageInfoTest {
             //获取第2页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
             list = countryMapper.selectAll();
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(2, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(11, page.getStartRow());
@@ -85,7 +85,7 @@ public class PageInfoTest {
             //获取第19页，10条内容，默认查询总数count
             PageHelper.startPage(19, 10);
             list = countryMapper.selectAll();
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(19, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(181, page.getStartRow());
@@ -116,7 +116,7 @@ public class PageInfoTest {
             //获取第1页，50条内容，默认查询总数count
             PageHelper.startPage(1, 50);
             List<Country> list = countryMapper.selectAll();
-            PageInfo page = new PageInfo(list);
+            PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(1, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(1, page.getStartRow());
@@ -134,7 +134,7 @@ public class PageInfoTest {
             //获取第2页，50条内容，默认查询总数count
             PageHelper.startPage(2, 50);
             list = countryMapper.selectAll();
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(2, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(51, page.getStartRow());
@@ -151,7 +151,7 @@ public class PageInfoTest {
             //获取第3页，50条内容，默认查询总数count
             PageHelper.startPage(3, 50);
             list = countryMapper.selectAll();
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(3, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(101, page.getStartRow());
@@ -169,7 +169,7 @@ public class PageInfoTest {
             //获取第4页，50条内容，默认查询总数count
             PageHelper.startPage(4, 50);
             list = countryMapper.selectAll();
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(4, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(151, page.getStartRow());
@@ -200,7 +200,7 @@ public class PageInfoTest {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectAll();
-            PageInfo page = new PageInfo(list, 20);
+            PageInfo<Country> page = new PageInfo<Country>(list, 20);
             assertEquals(1, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(1, page.getStartRow());
@@ -217,7 +217,7 @@ public class PageInfoTest {
             //获取第2页，50条内容，默认查询总数count
             PageHelper.startPage(2, 50);
             list = countryMapper.selectAll();
-            page = new PageInfo(list, 2);
+            page = new PageInfo<Country>(list, 2);
             assertEquals(2, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(51, page.getStartRow());

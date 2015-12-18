@@ -52,19 +52,19 @@ public class ArgumentsObjTest {
             queryModel.setOrderBy("id desc");
             List<Country> list = countryMapper.selectByQueryModel(queryModel);
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             queryModel.setPageNum(2);
             queryModel.setOrderBy(null);
             list = countryMapper.selectByQueryModel(queryModel);
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             queryModel.setPageNum(3);
             queryModel.setPageSize(20);
             list = countryMapper.selectByQueryModel(queryModel);
             assertEquals(20, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             queryModel.setPageNum(null);
             queryModel.setPageSize(null);

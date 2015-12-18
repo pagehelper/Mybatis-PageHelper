@@ -49,7 +49,7 @@ public class PageTest {
             //分页插件会自动改为查询最后一页
             PageHelper.startPage(20, 50);
             List<Country> list = countryMapper.selectAll();
-            PageInfo page = new PageInfo(list);
+            PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(33, list.size());
             assertEquals(151, page.getStartRow());
             assertEquals(4, page.getPageNum());
@@ -59,7 +59,7 @@ public class PageTest {
             //由于只有7天数据，分页插件会自动改为查询最后一页
             PageHelper.startPage(-3, 50);
             list = countryMapper.selectAll();
-            page = new PageInfo(list);
+            page = new PageInfo<Country>(list);
             assertEquals(50, list.size());
             assertEquals(1, page.getStartRow());
             assertEquals(1, page.getPageNum());

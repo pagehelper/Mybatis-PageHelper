@@ -51,14 +51,14 @@ public class TestAnnotations {
             List<Country> list = countryMapper.selectByOrder2("id");
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             list = countryMapper.selectByOrder("countryname");
             assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(183, ((Page) list).getTotal());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

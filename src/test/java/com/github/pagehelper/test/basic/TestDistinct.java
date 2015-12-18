@@ -47,7 +47,7 @@ public class TestDistinct {
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectDistinct();
             assertEquals(10, list.size());
-            assertEquals(24, ((Page) list).getTotal());
+            assertEquals(24, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

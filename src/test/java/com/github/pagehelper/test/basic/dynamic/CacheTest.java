@@ -84,14 +84,14 @@ public class CacheTest {
             List<Country> list = countryMapper.selectIf2List(Arrays.asList(1, 2), Arrays.asList(3, 4));
             assertEquals(5, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(179, ((Page) list).getTotal());
+            assertEquals(179, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             list = countryMapper.selectIf2List(Arrays.asList(1,2),null);
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(181, ((Page) list).getTotal());
+            assertEquals(181, ((Page<?>) list).getTotal());
             sqlSession.close();
         }
     }

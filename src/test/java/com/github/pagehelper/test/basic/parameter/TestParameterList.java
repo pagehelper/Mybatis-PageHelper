@@ -55,7 +55,7 @@ public class TestParameterList {
             List<Country> list = countryMapper.selectAllOrderByList(paList);
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(181, ((Page) list).getTotal());
+            assertEquals(181, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

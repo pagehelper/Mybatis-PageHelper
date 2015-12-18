@@ -24,10 +24,7 @@
 
 package com.github.pagehelper.test.namespace;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisRowBoundsHelper;
 import org.apache.ibatis.session.RowBounds;
