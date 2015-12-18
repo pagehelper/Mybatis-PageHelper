@@ -91,6 +91,7 @@ public class PageDynamicSqlSource extends PageSqlSource implements OrderBySqlSou
         return boundSql;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     protected BoundSql getPageBoundSql(Object parameterObject) {
         DynamicContext context;

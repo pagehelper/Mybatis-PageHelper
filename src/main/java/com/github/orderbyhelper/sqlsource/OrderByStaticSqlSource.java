@@ -24,6 +24,7 @@ public class OrderByStaticSqlSource implements SqlSource, OrderBySqlSource {
     private Configuration configuration;
     private SqlSource original;
 
+    @SuppressWarnings("unchecked")
     public OrderByStaticSqlSource(StaticSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.sql = (String) metaObject.getValue("sql");

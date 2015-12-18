@@ -24,27 +24,12 @@
 
 package com.github.pagehelper;
 
-import com.github.orderbyhelper.sqlsource.*;
-import com.github.pagehelper.parser.Parser;
-import com.github.pagehelper.sqlsource.PageDynamicSqlSource;
-import com.github.pagehelper.sqlsource.PageProviderSqlSource;
-import com.github.pagehelper.sqlsource.PageRawSqlSource;
-import com.github.pagehelper.sqlsource.PageStaticSqlSource;
-import org.apache.ibatis.builder.StaticSqlSource;
-import org.apache.ibatis.builder.annotation.ProviderSqlSource;
-import org.apache.ibatis.mapping.*;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
-import org.apache.ibatis.scripting.defaults.RawSqlSource;
-import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
-import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
-import org.apache.ibatis.scripting.xmltags.SqlNode;
-import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ResultMap;
+import org.apache.ibatis.mapping.ResultMapping;
 
-import javax.activation.UnsupportedDataTypeException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 创建新的MappedStatement,主要是Count返回值int

@@ -27,6 +27,7 @@ public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSour
     private Parser parser;
     private SqlSource original;
 
+    @SuppressWarnings("unchecked")
     public PageStaticSqlSource(StaticSqlSource sqlSource, Parser parser) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.sql = (String) metaObject.getValue("sql");

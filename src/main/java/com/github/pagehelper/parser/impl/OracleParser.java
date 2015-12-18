@@ -44,8 +44,8 @@ public class OracleParser extends AbstractParser {
     }
 
     @Override
-    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
-        Map paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
+    public Map<String, Object> setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page<?> page) {
+        Map<String, Object> paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
         paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
         paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
         return paramMap;

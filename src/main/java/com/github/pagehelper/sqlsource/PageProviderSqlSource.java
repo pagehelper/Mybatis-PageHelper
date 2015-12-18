@@ -102,6 +102,7 @@ public class PageProviderSqlSource extends PageSqlSource implements OrderBySqlSo
                 parameterObject);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     protected BoundSql getPageBoundSql(Object parameterObject) {
         BoundSql boundSql;

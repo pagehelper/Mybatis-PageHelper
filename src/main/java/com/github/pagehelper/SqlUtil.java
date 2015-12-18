@@ -136,7 +136,7 @@ public class SqlUtil implements Constant {
      *
      * @return
      */
-    public static Page getLocalPage() {
+    public static <T> Page<T> getLocalPage() {
         return LOCAL_PAGE.get();
     }
 
@@ -157,7 +157,7 @@ public class SqlUtil implements Constant {
      * @param params
      * @return
      */
-    public static Page getPageFromObject(Object params) {
+    public static <T> Page<T> getPageFromObject(Object params) {
         int pageNum;
         int pageSize;
         MetaObject paramsObject = null;

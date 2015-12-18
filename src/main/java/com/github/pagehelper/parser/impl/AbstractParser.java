@@ -84,16 +84,17 @@ public abstract class AbstractParser implements Parser, Constant {
         return parser;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static Map<String, Object> processParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql) {
-        Map paramMap = null;
+        Map<String, Object> paramMap = null;
         if (parameterObject == null) {
-            paramMap = new HashMap();
+            paramMap = new HashMap<String, Object>();
         } else if (parameterObject instanceof Map) {
             //解决不可变Map的情况
-            paramMap = new HashMap();
+            paramMap = new HashMap<String, Object>();
             paramMap.putAll((Map) parameterObject);
         } else {
-            paramMap = new HashMap();
+            paramMap = new HashMap<String, Object>();
             //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
             //TypeHandlerRegistry可以直接处理的会作为一个直接使用的对象进行处理
             boolean hasTypeHandler = ms.getConfiguration().getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
@@ -149,7 +150,7 @@ public abstract class AbstractParser implements Parser, Constant {
         return newParameterMappings;
     }
 
-    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+    public Map<String, Object> setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page<?> page) {
         return processParameter(ms, parameterObject, boundSql);
     }
 }

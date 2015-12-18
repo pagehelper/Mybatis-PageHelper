@@ -54,12 +54,12 @@ public class SqlServerParser extends AbstractParser {
 
     @Override
     public String getPageSql(String sql) {
-        Page page = SqlUtil.getLocalPage();
+        Page<?> page = SqlUtil.getLocalPage();
         return pageSql.convertToPageSql(sql, page.getStartRow(), page.getPageSize());
     }
 
     @Override
-    public Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page) {
+    public Map<String, Object> setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page<?> page) {
         return super.setPageParameter(ms, parameterObject, boundSql, page);
     }
 }

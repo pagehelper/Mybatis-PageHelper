@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author liuzh
  */
-@SuppressWarnings("rawtypes")
 public class SqlParser {
     private static final List<SelectItem> COUNT_ITEM;
     private static final Alias TABLE_ALIAS;
@@ -71,13 +70,14 @@ public class SqlParser {
      */
     public String getSmartCountSql(String sql) {
         //校验是否支持该sql
-        //isSupportedSql(sql);
+        isSupportedSql(sql);
         if (CACHE.get(sql) != null) {
             return CACHE.get(sql);
         }
-        if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
-            System.out.println("==============");
-        }
+        //TODO 尝试增加对for update支持
+//        if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
+//            System.out.println("==============");
+//        }
         //解析SQL
         Statement stmt = null;
         try {

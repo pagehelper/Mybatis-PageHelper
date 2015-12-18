@@ -351,7 +351,7 @@ public class SqlServer {
      * @param list
      * @return
      */
-    private boolean isNotEmptyList(List<?> list) {
+    public boolean isNotEmptyList(List<?> list) {
         if (list == null || list.size() == 0) {
             return false;
         }
@@ -364,7 +364,7 @@ public class SqlServer {
      * @param str
      * @return
      */
-    private boolean isNotEmptyString(String str) {
+    public boolean isNotEmptyString(String str) {
         if (str == null || str.length() == 0) {
             return false;
         }

@@ -81,5 +81,5 @@ public interface Parser {
      * @param page
      * @return
      */
-    Map setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page page);
+    Map<String, Object> setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page<?> page);
 }

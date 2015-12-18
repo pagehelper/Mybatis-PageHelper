@@ -1,7 +1,6 @@
 package com.github.pagehelper.sqlsource;
 
 import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
-import com.github.orderbyhelper.sqlsource.OrderByStaticSqlSource;
 import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;

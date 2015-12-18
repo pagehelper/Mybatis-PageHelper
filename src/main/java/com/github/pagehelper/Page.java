@@ -322,6 +322,16 @@ public class Page<E> extends ArrayList<E> {
         return this;
     }
 
+    /**
+     * 转换为PageInfo
+     *
+     * @return
+     */
+    public PageInfo<E> toPageInfo() {
+        PageInfo<E> pageInfo = new PageInfo<E>(this);
+        return pageInfo;
+    }
+
     @Override
     public String toString() {
         return "Page{" +
