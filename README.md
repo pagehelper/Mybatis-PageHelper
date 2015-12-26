@@ -69,6 +69,7 @@
 - jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
 - 增加`ISelect`接口，方便调用，使用方法可以参考`src/test/java/com.github.pagehelper.test.basic.TestISelect`测试。
   使用该接口可以参考如下用法(返回值为`Page`或`PageInfo`)：
+
 ```java
 //jdk6,7用法，创建接口
 Page<Country> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(new ISelect() {
@@ -102,7 +103,6 @@ long total = PageHelper.count(new ISelect() {
 //lambda
 total = PageHelper.count(()->countryMapper.selectLike(country));
 ```
-- 实际上大家可以自己包装一下`PageHelper`类，增加定制化方法
 
 ##4.0.3更新日志：
 
