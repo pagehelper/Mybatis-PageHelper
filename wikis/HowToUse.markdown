@@ -82,11 +82,11 @@
         <!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值 -->
         <!-- 可以配置pageNum,pageSize,count,pageSizeZero,reasonable,orderBy,不配置映射的用默认值 -->
         <!-- 不理解该含义的前提下，不要随便复制该配置 -->
-        <property name="params" value="pageNum=start;pageSize=limit;"/>
+        <property name="params" value="pageNum=pageHelperStart;pageSize=pageHelperRows;"/>
         <!-- 支持通过Mapper接口参数来传递分页参数 -->
-        <property name="supportMethodsArguments" value="true"/>
+        <property name="supportMethodsArguments" value="false"/>
         <!-- always总是返回PageInfo类型,check检查返回类型是否为PageInfo,none返回Page -->
-        <property name="returnPageInfo" value="check"/>
+        <property name="returnPageInfo" value="none"/>
 	</plugin>
 </plugins>
 ```
@@ -95,7 +95,7 @@
 
 其他五个参数说明：
 
-1. 增加`dialect`属性，使用时可以指定该属性（<b>不指定的情况下，分页插件会自动判断</b>），可选值为`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`。
+1. 增加`dialect`属性，使用时可以指定该属性（<b>不指定的情况下，分页插件会自动判断</b>），可选值为`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`。
 
 2. 增加`offsetAsPageNum`属性，默认值为`false`，使用默认值时不需要增加该配置，需要设为`true`时，需要配置该参数。当该参数设置为`true`时，使用`RowBounds`分页时，会将`offset`参数当成`pageNum`使用，可以用页码和页面大小两个参数进行分页。
 
@@ -107,9 +107,9 @@
 
 6. 为了支持`startPage(Object params)`方法，增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值，可以配置pageNum,pageSize,count,pageSizeZero,reasonable,orderBy,不配置映射的用默认值。
 
-7. `supportMethodsArguments`支持通过Mapper接口参数来传递分页参数，具体用法参考`com.github.pagehelper.test.basic`包下的`ArgumentsMapTest`和`ArgumentsObjTest`测试类。
+7. `supportMethodsArguments`支持通过Mapper接口参数来传递分页参数，默认值`false`，具体用法参考`com.github.pagehelper.test.basic`包下的`ArgumentsMapTest`和`ArgumentsObjTest`测试类。
 
-8. `returnPageInfo`用来支持直接返回`PageInfo`类型，可选参数always总是返回PageInfo类型,check检查返回类型是否为PageInfo,none返回Page(List)类型。用法和配置参考`com.github.pagehelper.test.basic`包下的`PageInfoTest`，特别要注意接口的返回值和xml中的`resultType`类型。
+8. `returnPageInfo`用来支持直接返回`PageInfo`类型，默认值`none`，可选参数always总是返回PageInfo类型,check检查返回类型是否为PageInfo,none返回Page(List)类型。用法和配置参考`com.github.pagehelper.test.basic`包下的`PageInfoTest`，特别要注意接口的返回值和xml中的`resultType`类型。
 
 <b>重要提示：</b>
 
