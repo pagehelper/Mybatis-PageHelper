@@ -49,8 +49,6 @@
             <property name="supportMethodsArguments" value="true"/>
             <!-- 运行时自动判断数据库类型，支持多数据源DataSource分页 -->
             <property name="autoRuntimeDialect" value="true"/>
-            <!-- always总是返回PageInfo类型,check检查返回类型是否为PageInfo,none返回Page -->
-            <property name="returnPageInfo" value="check"/>
         </plugin>
     </plugins>
 

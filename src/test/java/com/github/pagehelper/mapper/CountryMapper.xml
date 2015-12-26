@@ -282,7 +282,4 @@
     <select id="selectByQueryModel" resultType="com.github.pagehelper.model.Country">
         select * from country
     </select>
-    <select id="selectPageInfo" resultType="com.github.pagehelper.model.Country">
-        select * from country
-    </select>
 </mapper>

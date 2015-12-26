@@ -83,10 +83,6 @@ public class SqlUtil implements Constant {
     private boolean reasonable = false;
     //具体针对数据库的parser
     private Parser parser;
-    //只返回PageInfo的查询结果
-    private ReturnPageInfo returnPageInfo = ReturnPageInfo.NONE;
-    //存储返回值为是否为PageInfo
-    private Map<String, Boolean> returnPageInfoMap = new ConcurrentHashMap<String, Boolean>();
     //是否支持接口参数来传递分页参数，默认false
     private boolean supportMethodsArguments = false;
 
@@ -405,87 +401,11 @@ public class SqlUtil implements Constant {
             return invocation.proceed();
         } else {
             //不支持分页参数时，page==null，这里需要获取
-            if (page == null) {
+            if (!supportMethodsArguments && page == null) {
                 page = getPage(args);
             }
-            page = doProcessPage(invocation, page, args);
-            return processPageInfo(page, args);
+            return doProcessPage(invocation, page, args);
         }
-    }
-
-    /**
-     * 处理Page结果，看是否需要处理为PageInfo
-     *
-     * @param page
-     * @param args
-     * @return
-     */
-    private Object processPageInfo(Page<?> page, Object[] args) {
-        switch (returnPageInfo) {
-            case NONE:
-                return page;
-            case ALWAYS:
-                return returnPageInfo(page);
-            case CHECK:
-                if (isReturnPageInfo((MappedStatement) args[0])) {
-                    return returnPageInfo(page);
-                } else {
-                    return page;
-                }
-        }
-        return page;
-    }
-
-    /**
-     * 返回PageInfo类型
-     *
-     * @param page
-     * @return
-     */
-    private Object returnPageInfo(Page<?> page) {
-        List<PageInfo> list = new ArrayList<PageInfo>();
-        list.add(new PageInfo(page));
-        return list;
-    }
-
-    /**
-     * 是否为返回PageInfo的方法
-     *
-     * @param ms
-     * @return
-     */
-    private boolean isReturnPageInfo(MappedStatement ms) {
-        String msId = ms.getId();
-        if (!returnPageInfoMap.containsKey(msId)) {
-            String _interface = msId.substring(0, msId.lastIndexOf("."));
-            String _methodName = msId.substring(_interface.length() + 1);
-            try {
-                Class<?> mapperClass = Class.forName(_interface);
-                Method[] methods = mapperClass.getDeclaredMethods();
-                Method m = null;
-                for (Method method : methods) {
-                    if (method.getName().equals(_methodName)) {
-                        m = method;
-                        break;
-                    }
-                }
-                if (m == null) {
-                    returnPageInfoMap.put(msId, false);
-                } else {
-                    Class<?> returnClass = m.getReturnType();
-                    if (returnClass.equals(PageInfo.class)) {
-                        returnPageInfoMap.put(msId, true);
-                    } else {
-                        returnPageInfoMap.put(msId, false);
-                    }
-                }
-            } catch (ClassNotFoundException e) {
-                returnPageInfoMap.put(msId, false);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return returnPageInfoMap.get(msId);
     }
 
     /**
@@ -597,10 +517,6 @@ public class SqlUtil implements Constant {
         this.reasonable = reasonable;
     }
 
-    public void setReturnPageInfo(ReturnPageInfo returnPageInfo) {
-        this.returnPageInfo = returnPageInfo;
-    }
-
     public void setSupportMethodsArguments(boolean supportMethodsArguments) {
         this.supportMethodsArguments = supportMethodsArguments;
     }
@@ -639,11 +555,6 @@ public class SqlUtil implements Constant {
         //是否支持接口参数来传递分页参数，默认false
         String supportMethodsArguments = p.getProperty("supportMethodsArguments");
         this.supportMethodsArguments = Boolean.parseBoolean(supportMethodsArguments);
-        //returnPageInfo
-        String returnPageInfo = p.getProperty("returnPageInfo");
-        if (StringUtil.isNotEmpty(returnPageInfo)) {
-            this.returnPageInfo = ReturnPageInfo.valueOf(returnPageInfo.toUpperCase());
-        }
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         setParams(p.getProperty("params"));
@@ -655,7 +566,6 @@ public class SqlUtil implements Constant {
         this.pageSizeZero = config.isPageSizeZero();
         this.reasonable = config.isReasonable();
         this.supportMethodsArguments = config.isSupportMethodsArguments();
-        this.returnPageInfo = config.getReturnPageInfo();
         setParams(config.getParams());
     }
 }

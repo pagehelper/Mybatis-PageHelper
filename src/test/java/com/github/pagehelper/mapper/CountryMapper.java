@@ -119,6 +119,4 @@ public interface CountryMapper {
     List<Country> selectByOrderBy(@Param("orderBy") String orderBy);
 
     List<Country> selectByQueryModel(CountryQueryModel queryModel);
-
-    PageInfo<Country> selectPageInfo();
 }

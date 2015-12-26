@@ -41,8 +41,6 @@ public class SqlUtilConfig {
     private boolean pageSizeZero = false;
     //分页合理化
     private boolean reasonable = false;
-    //只返回PageInfo的查询结果
-    private ReturnPageInfo returnPageInfo = ReturnPageInfo.NONE;
     //是否支持接口参数来传递分页参数，默认false
     private boolean supportMethodsArguments = false;
     //参数别名
@@ -88,14 +86,6 @@ public class SqlUtilConfig {
 
     public void setReasonable(boolean reasonable) {
         this.reasonable = reasonable;
-    }
-
-    public ReturnPageInfo getReturnPageInfo() {
-        return returnPageInfo;
-    }
-
-    public void setReturnPageInfo(ReturnPageInfo returnPageInfo) {
-        this.returnPageInfo = returnPageInfo;
     }
 
     public boolean isSupportMethodsArguments() {

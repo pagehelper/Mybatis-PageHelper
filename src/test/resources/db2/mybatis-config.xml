@@ -44,8 +44,6 @@
             <property name="dialect" value="db2"/>
             <!-- 支持通过Mapper接口参数来传递分页参数 -->
             <property name="supportMethodsArguments" value="true"/>
-            <!-- always总是返回PageInfo类型,check检查返回类型是否为PageInfo,none返回Page -->
-            <property name="returnPageInfo" value="check"/>
         </plugin>
     </plugins>
 

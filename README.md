@@ -58,13 +58,18 @@
 
 由于使用了sql解析工具，你还需要下载jsqlparser.jar（这个文件完全独立，不依赖其他）：  
 
+####4.1.0及以后版本需要0.9.4版本
+
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.4/
- 
- - http://git.oschina.net/free/Mybatis_PageHelper/attach_files
+
+####4.1.0以前版本需要0.9.1版本
+
+ - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
 
 ##4.1.0更新日志：
 
 - 增加`autoRuntimeDialect`参数，允许在运行时根据多数据源自动识别对应方言的分页，<b>该参数会先在快照版中进行测试，如果没有收到任何反馈，正式版会取消该参数<b>
+- 去掉了4.0.3版本增加的`returnPageInfo`参数，接口返回值不支持`PageInfo`类型，可以使用下面`ISelect`中演示的方法获取
 - 增加对`SqlServer2012`的支持，需要手动指定`dialect=sqlserver2012`，否则会使用2005的方式进行分页
 - jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
 - 增加`ISelect`接口，方便调用，使用方法可以参考`src/test/java/com.github.pagehelper.test.basic.TestISelect`测试。
@@ -108,7 +113,7 @@ total = PageHelper.count(()->countryMapper.selectLike(country));
 
  - `PageHelper`新增3个`offsetPage`方法，参数主要是`offset`和`limit`，允许不规则分页
 
- - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`，具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
+ - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`（该参数在4.1.0版本去掉），具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
 
 ##4.0.2更新日志：
 

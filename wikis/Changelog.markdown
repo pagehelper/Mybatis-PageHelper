@@ -7,11 +7,11 @@
 - <b>准备</b>增加SQL语句中`for update`支持（jsqlparser新版支持`forupdate`）
 - <b>准备</b>增加拦截器级别的多数据源自动识别，根据具体的数据源来选择对应的数据库分页
 
-###4.0.3 - 2015-11-09
+###4.0.3 - 2015-11-09：
 
  - `PageHelper`新增3个`offsetPage`方法，参数主要是`offset`和`limit`，允许不规则分页
 
- - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`，具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
+ - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`（该参数在4.1.0版本去掉），具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
 
 ###4.0.2 - 2015-11-02
 
