@@ -25,8 +25,8 @@ public class SqlServer2012Dialect extends AbstractParser {
     public Map<String, Object> setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page<?> page) {
         Map<String, Object> paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
         // OFFSET (@PageNumber-1)*@RowsPerPage ROWS
-        paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow() );
-        paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize() );
+        paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
+        paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
         return paramMap;
     }
 

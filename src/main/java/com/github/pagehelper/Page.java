@@ -113,8 +113,8 @@ public class Page<E> extends ArrayList<E> {
 
     /**
      * int[] rowBounds
-     *    0 : offset
-     *    1 : limit
+     * 0 : offset
+     * 1 : limit
      */
     public Page(int[] rowBounds, boolean count) {
         super(0);
@@ -138,41 +138,46 @@ public class Page<E> extends ArrayList<E> {
         return pages;
     }
 
-    public void setPages(int pages) {
+    public Page<E> setPages(int pages) {
         this.pages = pages;
+        return this;
     }
 
     public int getEndRow() {
         return endRow;
     }
 
-    public void setEndRow(int endRow) {
+    public Page<E> setEndRow(int endRow) {
         this.endRow = endRow;
+        return this;
     }
 
     public int getPageNum() {
         return pageNum;
     }
 
-    public void setPageNum(int pageNum) {
+    public Page<E> setPageNum(int pageNum) {
         //分页合理化，针对不合理的页码自动处理
         this.pageNum = ((reasonable != null && reasonable) && pageNum <= 0) ? 1 : pageNum;
+        return this;
     }
 
     public int getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(int pageSize) {
+    public Page<E> setPageSize(int pageSize) {
         this.pageSize = pageSize;
+        return this;
     }
 
     public int getStartRow() {
         return startRow;
     }
 
-    public void setStartRow(int startRow) {
+    public Page<E> setStartRow(int startRow) {
         this.startRow = startRow;
+        return this;
     }
 
     public long getTotal() {
@@ -201,9 +206,9 @@ public class Page<E> extends ArrayList<E> {
         return reasonable;
     }
 
-    public void setReasonable(Boolean reasonable) {
+    public Page<E> setReasonable(Boolean reasonable) {
         if (reasonable == null) {
-            return;
+            return this;
         }
         this.reasonable = reasonable;
         //分页合理化，针对不合理的页码自动处理
@@ -211,16 +216,18 @@ public class Page<E> extends ArrayList<E> {
             this.pageNum = 1;
             calculateStartAndEndRow();
         }
+        return this;
     }
 
     public Boolean getPageSizeZero() {
         return pageSizeZero;
     }
 
-    public void setPageSizeZero(Boolean pageSizeZero) {
+    public Page<E> setPageSizeZero(Boolean pageSizeZero) {
         if (pageSizeZero != null) {
             this.pageSizeZero = pageSizeZero;
         }
+        return this;
     }
 
     /**
@@ -235,16 +242,18 @@ public class Page<E> extends ArrayList<E> {
         return this.count;
     }
 
-    public void setCount(boolean count) {
+    public Page<E> setCount(boolean count) {
         this.count = count;
+        return this;
     }
 
     public String getOrderBy() {
         return orderBy;
     }
 
-    public void setOrderBy(String orderBy) {
+    public <E> Page<E> setOrderBy(String orderBy) {
         this.orderBy = orderBy;
+        return (Page<E>) this;
     }
 
     public boolean isOrderByOnly() {
@@ -330,6 +339,23 @@ public class Page<E> extends ArrayList<E> {
     public PageInfo<E> toPageInfo() {
         PageInfo<E> pageInfo = new PageInfo<E>(this);
         return pageInfo;
+    }
+
+    public <E> Page<E> doSelectPage(ISelect select) {
+        select.doSelect();
+        return (Page<E>) this;
+    }
+
+    public <E> PageInfo<E> doSelectPageInfo(ISelect select) {
+        select.doSelect();
+        return (PageInfo<E>) this.toPageInfo();
+    }
+
+    public long doCount(ISelect select) {
+        this.pageSizeZero = true;
+        this.pageSize = 0;
+        select.doSelect();
+        return this.total;
     }
 
     @Override

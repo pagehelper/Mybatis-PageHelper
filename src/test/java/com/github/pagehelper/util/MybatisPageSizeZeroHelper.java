@@ -74,9 +74,10 @@ public class MybatisPageSizeZeroHelper {
 
     /**
      * 获取Session
+     *
      * @return
      */
-    public static SqlSession getSqlSession(){
+    public static SqlSession getSqlSession() {
         return sqlSessionFactory.openSession();
     }
 }

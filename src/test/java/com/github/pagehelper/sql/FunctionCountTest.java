@@ -60,14 +60,13 @@ public class FunctionCountTest {
         List<SelectItem> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
         for (SelectItem item : selectItems) {
             if (item instanceof SelectExpressionItem) {
-                Expression exp = ((SelectExpressionItem)item).getExpression();
+                Expression exp = ((SelectExpressionItem) item).getExpression();
                 if (exp instanceof Function) {
                     System.out.println("Function:" + item.toString());
                 } else {
                     System.out.println("Not a function:" + exp.toString());
                 }
-            }
-            else {
+            } else {
                 System.out.println("Not a function:" + item.toString());
             }
         }

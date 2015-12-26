@@ -88,7 +88,7 @@ public class CacheTest {
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectIf2List(Arrays.asList(1,2),null);
+            list = countryMapper.selectIf2List(Arrays.asList(1, 2), null);
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(181, ((Page<?>) list).getTotal());

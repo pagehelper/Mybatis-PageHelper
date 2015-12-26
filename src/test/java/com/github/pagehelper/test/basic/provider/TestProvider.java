@@ -43,8 +43,8 @@ public class TestProvider {
     @Test
     public void testProvider() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put("id",100);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("id", 100);
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             PageHelper.startPage(1, 10);
@@ -53,10 +53,10 @@ public class TestProvider {
             assertEquals(1, list.size());
             assertEquals(1, ((Page<?>) list).getTotal());
 
-            map.put("countryname","天朝");
+            map.put("countryname", "天朝");
             PageHelper.startPage(1, 10);
             list = countryMapper.selectByProvider(map);
-            assertEquals(0,list.size());
+            assertEquals(0, list.size());
         } finally {
             sqlSession.close();
         }
@@ -78,7 +78,7 @@ public class TestProvider {
             country.setCountryname("天朝");
             PageHelper.startPage(1, 10);
             list = countryMapper.selectByCountryProvider(country);
-            assertEquals(0,list.size());
+            assertEquals(0, list.size());
         } finally {
             sqlSession.close();
         }

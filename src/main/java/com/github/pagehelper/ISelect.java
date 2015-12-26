@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 abel533@gmail.com
+ * Copyright (c) 2014-2016 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,19 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.test.basic.dynamic;
-
-import java.util.Map;
+package com.github.pagehelper;
 
 /**
- * Created by liuzh on 2015/1/11.
+ * 分页查询接口
+ *
+ * @author liuzh_3nofxnp
+ * @since 2015-12-18 18:51
  */
-public class Where {
-    private Map<String, Object> map;
+public interface ISelect {
 
-    public Where(Map<String, Object> map) {
-        this.map = map;
-    }
+    /**
+     * 在接口中调用自己的查询方法
+     */
+    void doSelect();
 
-    public Map<String, Object> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, Object> map) {
-        this.map = map;
-    }
 }

@@ -357,17 +357,4 @@ public class SqlServer {
         }
         return true;
     }
-
-    /**
-     * 字符串不空
-     *
-     * @param str
-     * @return
-     */
-    public boolean isNotEmptyString(String str) {
-        if (str == null || str.length() == 0) {
-            return false;
-        }
-        return true;
-    }
 }

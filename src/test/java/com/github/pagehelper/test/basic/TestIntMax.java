@@ -54,7 +54,7 @@ public class TestIntMax {
             assertEquals(182, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
-            PageHelper.startPage(1,  Integer.MAX_VALUE);
+            PageHelper.startPage(1, Integer.MAX_VALUE);
             list = countryMapper.selectIf(null);
             assertEquals(1, list.get(0).getId());
             assertEquals(183, list.size());

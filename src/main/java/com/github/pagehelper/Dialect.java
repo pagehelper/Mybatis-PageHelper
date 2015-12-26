@@ -28,7 +28,7 @@ package com.github.pagehelper;
  * @author liuzh
  */
 public enum Dialect {
-    mysql, mariadb, sqlite, oracle, hsqldb, postgresql, sqlserver, db2, informix, h2;
+    mysql, mariadb, sqlite, oracle, hsqldb, postgresql, sqlserver, db2, informix, h2, sqlserver2012;
 
     public static Dialect of(String dialect) {
         try {

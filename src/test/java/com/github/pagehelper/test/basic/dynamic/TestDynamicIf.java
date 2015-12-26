@@ -65,6 +65,7 @@ public class TestDynamicIf {
             sqlSession.close();
         }
     }
+
     /**
      * 使用Mapper接口调用时，使用PageHelper.startPage效果更好，不需要添加Mapper接口参数
      */

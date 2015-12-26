@@ -50,8 +50,16 @@ public class PageHelper implements Interceptor {
     private SqlUtil sqlUtil;
     //属性参数信息
     private Properties properties;
+    //配置对象方式
+    private SqlUtilConfig sqlUtilConfig;
     //自动获取dialect
     private Boolean autoDialect;
+
+    public static long count(ISelect select) {
+        Page<?> page = startPage(1, -1, true);
+        select.doSelect();
+        return page.getTotal();
+    }
 
     /**
      * 开始分页
@@ -59,7 +67,7 @@ public class PageHelper implements Interceptor {
      * @param pageNum  页码
      * @param pageSize 每页显示数量
      */
-    public static <T> Page<T> startPage(int pageNum, int pageSize) {
+    public static <E> Page<E> startPage(int pageNum, int pageSize) {
         return startPage(pageNum, pageSize, true);
     }
 
@@ -70,7 +78,7 @@ public class PageHelper implements Interceptor {
      * @param pageSize 每页显示数量
      * @param count    是否进行count查询
      */
-    public static <T> Page<T> startPage(int pageNum, int pageSize, boolean count) {
+    public static <E> Page<E> startPage(int pageNum, int pageSize, boolean count) {
         return startPage(pageNum, pageSize, count, null);
     }
 
@@ -81,8 +89,8 @@ public class PageHelper implements Interceptor {
      * @param pageSize 每页显示数量
      * @param orderBy  排序
      */
-    public static <T> Page<T> startPage(int pageNum, int pageSize, String orderBy) {
-        Page<T> page = startPage(pageNum, pageSize);
+    public static <E> Page<E> startPage(int pageNum, int pageSize, String orderBy) {
+        Page<E> page = startPage(pageNum, pageSize);
         page.setOrderBy(orderBy);
         return page;
     }
@@ -90,10 +98,10 @@ public class PageHelper implements Interceptor {
     /**
      * 开始分页
      *
-     * @param offset  页码
-     * @param limit 每页显示数量
+     * @param offset 页码
+     * @param limit  每页显示数量
      */
-    public static <T> Page<T> offsetPage(int offset, int limit) {
+    public static <E> Page<E> offsetPage(int offset, int limit) {
         return offsetPage(offset, limit, true);
     }
 
@@ -104,10 +112,10 @@ public class PageHelper implements Interceptor {
      * @param limit  每页显示数量
      * @param count  是否进行count查询
      */
-    public static <T> Page<T> offsetPage(int offset, int limit, boolean count) {
-        Page<T> page = new Page<T>(new int[]{offset, limit}, count);
+    public static <E> Page<E> offsetPage(int offset, int limit, boolean count) {
+        Page<E> page = new Page<E>(new int[]{offset, limit}, count);
         //当已经执行过orderBy的时候
-        Page<T> oldPage = SqlUtil.getLocalPage();
+        Page<E> oldPage = SqlUtil.getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
@@ -122,8 +130,8 @@ public class PageHelper implements Interceptor {
      * @param limit   每页显示数量
      * @param orderBy 排序
      */
-    public static <T> Page<T> offsetPage(int offset, int limit, String orderBy) {
-        Page<T> page = offsetPage(offset, limit);
+    public static <E> Page<E> offsetPage(int offset, int limit, String orderBy) {
+        Page<E> page = offsetPage(offset, limit);
         page.setOrderBy(orderBy);
         return page;
     }
@@ -136,7 +144,7 @@ public class PageHelper implements Interceptor {
      * @param count      是否进行count查询
      * @param reasonable 分页合理化,null时用默认配置
      */
-    public static <T> Page<T> startPage(int pageNum, int pageSize, boolean count, Boolean reasonable) {
+    public static <E> Page<E> startPage(int pageNum, int pageSize, boolean count, Boolean reasonable) {
         return startPage(pageNum, pageSize, count, reasonable, null);
     }
 
@@ -149,12 +157,12 @@ public class PageHelper implements Interceptor {
      * @param reasonable   分页合理化,null时用默认配置
      * @param pageSizeZero true且pageSize=0时返回全部结果，false时分页,null时用默认配置
      */
-    public static <T> Page<T> startPage(int pageNum, int pageSize, boolean count, Boolean reasonable, Boolean pageSizeZero) {
-        Page<T> page = new Page<T>(pageNum, pageSize, count);
+    public static <E> Page<E> startPage(int pageNum, int pageSize, boolean count, Boolean reasonable, Boolean pageSizeZero) {
+        Page<E> page = new Page<E>(pageNum, pageSize, count);
         page.setReasonable(reasonable);
         page.setPageSizeZero(pageSizeZero);
         //当已经执行过orderBy的时候
-        Page<T> oldPage = SqlUtil.getLocalPage();
+        Page<E> oldPage = SqlUtil.getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
@@ -167,10 +175,10 @@ public class PageHelper implements Interceptor {
      *
      * @param params
      */
-    public static <T> Page<T> startPage(Object params) {
-        Page<T> page = SqlUtil.getPageFromObject(params);
+    public static <E> Page<E> startPage(Object params) {
+        Page<E> page = SqlUtil.getPageFromObject(params);
         //当已经执行过orderBy的时候
-        Page<T> oldPage = SqlUtil.getLocalPage();
+        Page<E> oldPage = SqlUtil.getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
@@ -204,7 +212,7 @@ public class PageHelper implements Interceptor {
         Page<?> page = SqlUtil.getLocalPage();
         if (page != null) {
             String orderBy = page.getOrderBy();
-            if (orderBy == null || orderBy.length() == 0) {
+            if (StringUtil.isEmpty(orderBy)) {
                 return null;
             } else {
                 return orderBy;
@@ -234,7 +242,7 @@ public class PageHelper implements Interceptor {
      */
     public synchronized void initSqlUtil(Invocation invocation) {
         if (sqlUtil == null) {
-            String url = null;
+            String url;
             try {
                 MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
                 MetaObject msObject = SystemMetaObject.forObject(ms);
@@ -243,7 +251,7 @@ public class PageHelper implements Interceptor {
             } catch (SQLException e) {
                 throw new RuntimeException("分页插件初始化异常:" + e.getMessage());
             }
-            if (url == null || url.length() == 0) {
+            if (StringUtil.isEmpty(url)) {
                 throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
             }
             String dialect = Dialect.fromJdbcUrl(url);
@@ -251,8 +259,13 @@ public class PageHelper implements Interceptor {
                 throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
             }
             sqlUtil = new SqlUtil(dialect);
-            sqlUtil.setProperties(properties);
+            if (this.properties != null) {
+                sqlUtil.setProperties(properties);
+            } else if (this.sqlUtilConfig != null) {
+                sqlUtil.setSqlUtilConfig(this.sqlUtilConfig);
+            }
             properties = null;
+            sqlUtilConfig = null;
             autoDialect = false;
         }
     }
@@ -271,27 +284,48 @@ public class PageHelper implements Interceptor {
         }
     }
 
-    /**
-     * 设置属性值
-     *
-     * @param p 属性值
-     */
-    public void setProperties(Properties p) {
+    private void checkVersion() {
         //MyBatis3.2.0版本校验
         try {
             Class.forName("org.apache.ibatis.scripting.xmltags.SqlNode");//SqlNode是3.2.0之后新增的类
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("您使用的MyBatis版本太低，MyBatis分页插件PageHelper支持MyBatis3.2.0及以上版本!");
         }
+    }
+
+    /**
+     * 设置属性值
+     *
+     * @param p 属性值
+     */
+    public void setProperties(Properties p) {
+        checkVersion();
         //数据库方言
         String dialect = p.getProperty("dialect");
-        if (dialect == null || dialect.length() == 0) {
+        if (StringUtil.isEmpty(dialect)) {
             autoDialect = true;
             this.properties = p;
         } else {
             autoDialect = false;
             sqlUtil = new SqlUtil(dialect);
             sqlUtil.setProperties(p);
+        }
+    }
+
+    /**
+     * 设置属性值
+     *
+     * @param config
+     */
+    public void setSqlUtilConfig(SqlUtilConfig config) {
+        checkVersion();
+        if (StringUtil.isEmpty(config.getDialect())) {
+            autoDialect = true;
+            this.sqlUtilConfig = config;
+        } else {
+            autoDialect = false;
+            sqlUtil = new SqlUtil(config.getDialect());
+            sqlUtil.setSqlUtilConfig(config);
         }
     }
 

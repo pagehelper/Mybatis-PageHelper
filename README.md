@@ -17,17 +17,20 @@
  5. `Hsqldb`
  6. `PostgreSQL`
  7. `DB2`
- 8. `SqlServer(2005+)`
+ 8. `SqlServer(2005,2008)`
  9. `Informix`
  10. `H2`
+ 11. `SqlServer2012`
 
 配置`dialect`属性时，可以使用小写形式：
 
-`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`
+`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`
 
 在4.0.0版本以后，`dialect`参数可以不配置，系统能自动识别这里提到的所有数据库。
 
-对于不支持的数据库，可以实现`com.github.pagehelper.parser.Parser`接口，然后配置到`dialect`参数中(4.0.2+)。
+对于不支持的数据库，可以实现`com.github.pagehelper.parser.Parser`接口，然后配置到`dialect`参数中(4.0.2版本增加)。
+
+<b>特别注意：</b>使用SqlServer2012数据库时，需要手动指定`sqlserver2012`，否则会使用2005的方式进行分页。
 
 ##MyBatis工具网站:[http://mybatis.tk](http://www.mybatis.tk)
 
@@ -65,6 +68,8 @@
 - jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
 - <b>准备</b>增加SQL语句中`for update`支持（jsqlparser新版支持`forupdate`）
 - <b>准备</b>增加拦截器级别的多数据源自动识别，根据具体的数据源来选择对应的数据库分页
+- 看看partially support SQL Server 2012 and Oracle 12c OFFSET ... FETCH ...
+- https://github.com/JSQLParser/JSqlParser/releases
 
 ##4.0.3更新日志：
 

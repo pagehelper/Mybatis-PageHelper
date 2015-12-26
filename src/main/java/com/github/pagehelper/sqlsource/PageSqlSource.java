@@ -27,7 +27,7 @@ public abstract class PageSqlSource implements SqlSource {
      * @param parameterObject
      * @return
      */
-    protected abstract BoundSql getDefaultBoundSql(Object  parameterObject);
+    protected abstract BoundSql getDefaultBoundSql(Object parameterObject);
 
     /**
      * 获取Count查询的BoundSql
@@ -35,7 +35,7 @@ public abstract class PageSqlSource implements SqlSource {
      * @param parameterObject
      * @return
      */
-    protected abstract BoundSql getCountBoundSql(Object  parameterObject);
+    protected abstract BoundSql getCountBoundSql(Object parameterObject);
 
     /**
      * 获取分页查询的BoundSql
@@ -43,7 +43,7 @@ public abstract class PageSqlSource implements SqlSource {
      * @param parameterObject
      * @return
      */
-    protected abstract BoundSql getPageBoundSql(Object  parameterObject);
+    protected abstract BoundSql getPageBoundSql(Object parameterObject);
 
     /**
      * 获取BoundSql
@@ -54,9 +54,9 @@ public abstract class PageSqlSource implements SqlSource {
     @Override
     public BoundSql getBoundSql(Object parameterObject) {
         Boolean count = getCount();
-        if(count == null){
+        if (count == null) {
             return getDefaultBoundSql(parameterObject);
-        } else if(count){
+        } else if (count) {
             return getCountBoundSql(parameterObject);
         } else {
             return getPageBoundSql(parameterObject);

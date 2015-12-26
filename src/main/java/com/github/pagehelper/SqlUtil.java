@@ -60,6 +60,7 @@ public class SqlUtil implements Constant {
     private static Boolean hasRequest;
     private static Class<?> requestClass;
     private static Method getParameterMap;
+
     static {
         try {
             requestClass = Class.forName("javax.servlet.ServletRequest");
@@ -611,7 +612,7 @@ public class SqlUtil implements Constant {
         PARAMS.put("orderBy", "orderBy");
         PARAMS.put("reasonable", "reasonable");
         PARAMS.put("pageSizeZero", "pageSizeZero");
-        if (params != null && params.length() > 0) {
+        if (StringUtil.isNotEmpty(params)) {
             String[] ps = params.split("[;|,|&]");
             for (String s : ps) {
                 String[] ss = s.split("[=|:]");
@@ -640,11 +641,21 @@ public class SqlUtil implements Constant {
         this.supportMethodsArguments = Boolean.parseBoolean(supportMethodsArguments);
         //returnPageInfo
         String returnPageInfo = p.getProperty("returnPageInfo");
-        if (returnPageInfo != null && returnPageInfo.length() > 0) {
+        if (StringUtil.isNotEmpty(returnPageInfo)) {
             this.returnPageInfo = ReturnPageInfo.valueOf(returnPageInfo.toUpperCase());
         }
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         setParams(p.getProperty("params"));
+    }
+
+    public void setSqlUtilConfig(SqlUtilConfig config) {
+        this.offsetAsPageNum = config.isOffsetAsPageNum();
+        this.rowBoundsWithCount = config.isRowBoundsWithCount();
+        this.pageSizeZero = config.isPageSizeZero();
+        this.reasonable = config.isReasonable();
+        this.supportMethodsArguments = config.isSupportMethodsArguments();
+        this.returnPageInfo = config.getReturnPageInfo();
+        setParams(config.getParams());
     }
 }

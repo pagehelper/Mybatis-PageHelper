@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 abel533@gmail.com
+ * Copyright (c) 2014-2016 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,22 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.test.basic.dynamic;
-
-import java.util.Map;
+package com.github.pagehelper;
 
 /**
- * Created by liuzh on 2015/1/11.
+ * @author liuzh
+ * @since 4.1.0
  */
-public class Where {
-    private Map<String, Object> map;
+public class StringUtil {
 
-    public Where(Map<String, Object> map) {
-        this.map = map;
+    public static boolean isEmpty(String str) {
+        if (str == null || str.length() == 0) {
+            return true;
+        }
+        return false;
     }
 
-    public Map<String, Object> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, Object> map) {
-        this.map = map;
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
     }
 }

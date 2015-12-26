@@ -45,7 +45,7 @@ public class TestExample {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
-            PageHelper.startPage(1,20);
+            PageHelper.startPage(1, 20);
             List<Country> list = countryMapper.selectByExample(null);
             assertEquals(1, list.get(0).getId());
             assertEquals(20, list.size());
@@ -62,7 +62,7 @@ public class TestExample {
         try {
             CountryExample example = new CountryExample();
             example.createCriteria().andIdGreaterThan(100);
-            PageHelper.startPage(1,20);
+            PageHelper.startPage(1, 20);
             List<Country> list = countryMapper.selectByExample(example);
             assertEquals(101, list.get(0).getId());
             assertEquals(20, list.size());
@@ -78,8 +78,8 @@ public class TestExample {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             CountryExample example = new CountryExample();
-            example.createCriteria().andIdIn(Arrays.asList(1,2,3,4,5));
-            PageHelper.startPage(1,20);
+            example.createCriteria().andIdIn(Arrays.asList(1, 2, 3, 4, 5));
+            PageHelper.startPage(1, 20);
             List<Country> list = countryMapper.selectByExample(example);
             assertEquals(1, list.get(0).getId());
             assertEquals(5, list.size());

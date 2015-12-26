@@ -66,6 +66,9 @@ public abstract class AbstractParser implements Parser, Constant {
             case sqlserver:
                 parser = new SqlServerParser();
                 break;
+            case sqlserver2012:
+                parser = new SqlServer2012Dialect();
+                break;
             case db2:
                 parser = new Db2Parser();
                 break;

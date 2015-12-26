@@ -28,256 +28,261 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.github.pagehelper.mapper.CountryMapper">
-  <cache/>
-  <select id="selectAll" resultType="Country">
-    select * from country order by id
-  </select>
+    <cache/>
+    <select id="selectAll" resultType="Country">
+        select * from country order by id
+    </select>
 
-  <select id="selectGreterThanId" resultType="Country">
-    select * from country where id &gt;#{id} order by id
-  </select>
+    <select id="selectGreterThanId" resultType="Country">
+        select * from country where id &gt;#{id} order by id
+    </select>
 
-  <select id="selectGreterThanIdAndNotEquelContryname" resultType="Country">
-    select a.* from country a left join country b on a.id = b.id where a.id &gt;#{id} and b.countryname &lt;&gt; #{countryname} order by a.id
-  </select>
+    <select id="selectGreterThanIdAndNotEquelContryname" resultType="Country">
+        select a.* from country a left join country b on a.id = b.id where a.id &gt;#{id} and b.countryname &lt;&gt;
+        #{countryname} order by a.id
+    </select>
 
-  <select id="selectAllOrderby" resultType="com.github.pagehelper.model.Country">
-      select * from country order by countrycode desc
-  </select>
+    <select id="selectAllOrderby" resultType="com.github.pagehelper.model.Country">
+        select * from country order by countrycode desc
+    </select>
 
-  <select id="selectAllOrderByParams" resultType="com.github.pagehelper.model.Country">
-    select * from country order by ${order1} desc,${order2} asc
-  </select>
-  <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.Country">
-    select * from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2} order by id
-  </select>
-  <select id="selectAllOrderByList" resultType="com.github.pagehelper.model.Country">
-    select * from country where id not in
-    <foreach collection="list" item="par" separator="," open="(" close=")">
-      #{par}
-    </foreach>
-    order by id
-  </select>
-  <select id="selectAllOrderByArray" resultType="com.github.pagehelper.model.Country">
-    select * from country where id not in
-    <foreach collection="array" item="par" separator="," open="(" close=")">
-      #{par}
-    </foreach>
-    order by id
-  </select>
-  <select id="selectIf" resultType="com.github.pagehelper.model.Country">
-    select * from country
-    <if test="@Ognl@isNotNull(id)">
-    <!--<if test="id!=null">-->
-      where id &gt; #{id}
-    </if>
-    order by id
-  </select>
-  <select id="selectIf3" parameterType="Country" resultType="com.github.pagehelper.model.Country">
-    select * from country
-    <if test="id > 0">
-      where id &gt; #{id}
-    </if>
-    order by id
-  </select>
-  <select id="selectIf2" resultType="com.github.pagehelper.model.Country">
-    select * from country where id &gt; #{id1}
-    <if test="id2!=null">
-      and id &gt; #{id2}
-    </if>
-  </select>
-  <select id="selectIf2List" resultType="com.github.pagehelper.model.Country">
-    select * from country
-    <where>
-      <if test="id1!=null and id1.size>0">
-        id not in
-        <foreach collection="id1" item="id" open="(" close=")" separator=",">
-          #{id}
+    <select id="selectAllOrderByParams" resultType="com.github.pagehelper.model.Country">
+        select * from country order by ${order1} desc,${order2} asc
+    </select>
+    <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.Country">
+        select * from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2} order by id
+    </select>
+    <select id="selectAllOrderByList" resultType="com.github.pagehelper.model.Country">
+        select * from country where id not in
+        <foreach collection="list" item="par" separator="," open="(" close=")">
+            #{par}
         </foreach>
-      </if>
-      <if test="id2!=null and id2.size>0">
-        and id not in
-        <foreach collection="id2" item="id" open="(" close=")" separator=",">
-          #{id}
+        order by id
+    </select>
+    <select id="selectAllOrderByArray" resultType="com.github.pagehelper.model.Country">
+        select * from country where id not in
+        <foreach collection="array" item="par" separator="," open="(" close=")">
+            #{par}
         </foreach>
-      </if>
-    </where>
-    order by id
-  </select>
-  <select id="selectIf2ListAndOrder" resultType="com.github.pagehelper.model.Country">
-    select * from country
-    <where>
-      <if test="id1!=null and id1.size>0">
-        id not in
-        <foreach collection="id1" item="id" open="(" close=")" separator=",">
-          #{id}
-        </foreach>
-      </if>
-      <if test="id2!=null and id2.size>0">
-        and id not in
-        <foreach collection="id2" item="id" open="(" close=")" separator=",">
-          #{id}
-        </foreach>
-      </if>
-    </where>
-    <if test="order!=null and order!=''">
-      order by ${order}
-    </if>
-    <if test="order==null or order==''">
-      order by id
-    </if>
-  </select>
-  <select id="selectChoose" resultType="com.github.pagehelper.model.Country">
-    select * from country
-    <where>
-      <choose>
-        <when test="id1!=null">
-          id &lt;&gt; #{id1}
-        </when>
-        <otherwise>
-          and id &lt;&gt; #{id2}
-        </otherwise>
-      </choose>
-    </where>
-    order by id
-  </select>
-  <select id="selectLike" resultType="com.github.pagehelper.model.Country">
-    select * from country where 1=1
-    <if test="countryname!=null and countryname!=''">
-      and lower(countryname) like '%${countryname}%'
-    </if>
-    order by id
-  </select>
-  <select id="selectByMap" resultType="com.github.pagehelper.model.Country">
-    select * from country where 1=1
-    <if test="countryname!=null and countryname !=''">
-      and countryname= #{countryname}
-    </if>
-    <if test="countrycode!=null and countrycode !=''">
-      and countrycode= #{countrycode}
-    </if>
-  </select>
-  <select id="selectByOrder2" resultType="com.github.pagehelper.model.Country">
-    select * from country order by ${order}
-  </select>
-
-  <select id="selectUnion" resultType="com.github.pagehelper.model.Country">
-    select id,countryname,countrycode from country where id &gt;180
-    union
-    select id,countryname,countrycode from country where id &lt;=10 order by id
-  </select>
-  <select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
-    select a.id,b.countryname,a.countrycode from country a
-    left join country b on a.id = b.id
-    order by a.id
-  </select>
-  <select id="selectWith" resultType="com.github.pagehelper.model.Country">
-    with rs as (select id from country where id>150) select * from country where id in (select * from rs) order by id
-  </select>
-
-  <!--select column中包含参数时-->
-  <select id="selectColumns" resultType="com.github.pagehelper.model.Country">
-    select
-    <if test="columns==null or columns.length == 0">
-      *
-    </if>
-    <if test="columns!=null and columns.length > 0">
-      <foreach collection="columns" item="column" separator=",">
-        ${column}
-      </foreach>
-    </if>
-    from country order by id
-  </select>
-  <select id="selectMULId" resultType="com.github.pagehelper.model.Country">
-    select id * #{mul} as id,countryname,countrycode from country order by id
-  </select>
-
-  <select id="selectGroupBy" resultType="com.github.pagehelper.model.Country">
-    select countryname,countrycode,count(id) id from country group by countryname,countrycode order by countryname,countrycode
-  </select>
-
-  <select id="selectByWhereMap" resultType="com.github.pagehelper.model.Country">
-    select * from country
-    <where>
-      <foreach collection="map" item="val" index="key" separator="and">
-        ${key} = #{val}
-      </foreach>
-    </where>
-    order by id
-  </select>
-
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue" >
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue" >
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue" >
-                  and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
-            </foreach>
-          </trim>
+        order by id
+    </select>
+    <select id="selectIf" resultType="com.github.pagehelper.model.Country">
+        select * from country
+        <if test="@Ognl@isNotNull(id)">
+            <!--<if test="id!=null">-->
+            where id &gt; #{id}
         </if>
-      </foreach>
-    </where>
-  </sql>
+        order by id
+    </select>
+    <select id="selectIf3" parameterType="Country" resultType="com.github.pagehelper.model.Country">
+        select * from country
+        <if test="id > 0">
+            where id &gt; #{id}
+        </if>
+        order by id
+    </select>
+    <select id="selectIf2" resultType="com.github.pagehelper.model.Country">
+        select * from country where id &gt; #{id1}
+        <if test="id2!=null">
+            and id &gt; #{id2}
+        </if>
+    </select>
+    <select id="selectIf2List" resultType="com.github.pagehelper.model.Country">
+        select * from country
+        <where>
+            <if test="id1!=null and id1.size>0">
+                id not in
+                <foreach collection="id1" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="id2!=null and id2.size>0">
+                and id not in
+                <foreach collection="id2" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        order by id
+    </select>
+    <select id="selectIf2ListAndOrder" resultType="com.github.pagehelper.model.Country">
+        select * from country
+        <where>
+            <if test="id1!=null and id1.size>0">
+                id not in
+                <foreach collection="id1" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="id2!=null and id2.size>0">
+                and id not in
+                <foreach collection="id2" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        <if test="order!=null and order!=''">
+            order by ${order}
+        </if>
+        <if test="order==null or order==''">
+            order by id
+        </if>
+    </select>
+    <select id="selectChoose" resultType="com.github.pagehelper.model.Country">
+        select * from country
+        <where>
+            <choose>
+                <when test="id1!=null">
+                    id &lt;&gt; #{id1}
+                </when>
+                <otherwise>
+                    and id &lt;&gt; #{id2}
+                </otherwise>
+            </choose>
+        </where>
+        order by id
+    </select>
+    <select id="selectLike" resultType="com.github.pagehelper.model.Country">
+        select * from country where 1=1
+        <if test="countryname!=null and countryname!=''">
+            and lower(countryname) like '%${countryname}%'
+        </if>
+        order by id
+    </select>
+    <select id="selectByMap" resultType="com.github.pagehelper.model.Country">
+        select * from country where 1=1
+        <if test="countryname!=null and countryname !=''">
+            and countryname= #{countryname}
+        </if>
+        <if test="countrycode!=null and countrycode !=''">
+            and countrycode= #{countrycode}
+        </if>
+    </select>
+    <select id="selectByOrder2" resultType="com.github.pagehelper.model.Country">
+        select * from country order by ${order}
+    </select>
 
-  <select id="selectByExample" resultType="com.github.pagehelper.model.Country" parameterType="com.github.pagehelper.model.CountryExample" >
-    select
-    <if test="distinct" >
-      distinct
-    </if>
-    Id, countryname, countrycode
-    from country
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null" >
-      order by ${orderByClause}
-    </if>
-    <if test="orderByClause == null" >
-      order by id
-    </if>
-  </select>
-  <select id="selectDistinct" resultType="com.github.pagehelper.model.Country">
-    select distinct SUBSTRING(countryname,1,1) countryname from country
-  </select>
-  <select id="selectExists" resultType="com.github.pagehelper.model.Country">
-    select * from country a where exists(select 1 from country b where a.id = b.id and b.id >100)
-  </select>
-  <select id="select1" resultType="com.github.pagehelper.model.Country">
-    select * from country a where 1=1
-    <if test="country!=null and country.countryname !=null and country.countryname!=null">
-      and countryname = #{country.countryname}
-    </if>
-  </select>
-  <select id="selectByPageNumSize" resultType="com.github.pagehelper.model.Country">
-    select * from country
-  </select>
-  <select id="selectByPageNumSizeOrderBy" resultType="com.github.pagehelper.model.Country">
-    select * from country
-  </select>
-  <select id="selectByOrderBy" resultType="com.github.pagehelper.model.Country">
-    select * from country
-  </select>
-  <select id="selectByQueryModel" resultType="com.github.pagehelper.model.Country">
-    select * from country
-  </select>
-  <select id="selectPageInfo" resultType="com.github.pagehelper.model.Country">
-    select * from country
-  </select>
+    <select id="selectUnion" resultType="com.github.pagehelper.model.Country">
+        select id,countryname,countrycode from country where id &gt;180
+        union
+        select id,countryname,countrycode from country where id &lt;=10 order by id
+    </select>
+    <select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
+        select a.id,b.countryname,a.countrycode from country a
+        left join country b on a.id = b.id
+        order by a.id
+    </select>
+    <select id="selectWith" resultType="com.github.pagehelper.model.Country">
+        with rs as (select id from country where id>150) select * from country where id in (select * from rs) order by
+        id
+    </select>
+
+    <!--select column中包含参数时-->
+    <select id="selectColumns" resultType="com.github.pagehelper.model.Country">
+        select
+        <if test="columns==null or columns.length == 0">
+            *
+        </if>
+        <if test="columns!=null and columns.length > 0">
+            <foreach collection="columns" item="column" separator=",">
+                ${column}
+            </foreach>
+        </if>
+        from country order by id
+    </select>
+    <select id="selectMULId" resultType="com.github.pagehelper.model.Country">
+        select id * #{mul} as id,countryname,countrycode from country order by id
+    </select>
+
+    <select id="selectGroupBy" resultType="com.github.pagehelper.model.Country">
+        select countryname,countrycode,count(id) id from country group by countryname,countrycode order by
+        countryname,countrycode
+    </select>
+
+    <select id="selectByWhereMap" resultType="com.github.pagehelper.model.Country">
+        select * from country
+        <where>
+            <foreach collection="map" item="val" index="key" separator="and">
+                ${key} = #{val}
+            </foreach>
+        </where>
+        order by id
+    </select>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <select id="selectByExample" resultType="com.github.pagehelper.model.Country"
+            parameterType="com.github.pagehelper.model.CountryExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        Id, countryname, countrycode
+        from country
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <if test="orderByClause == null">
+            order by id
+        </if>
+    </select>
+    <select id="selectDistinct" resultType="com.github.pagehelper.model.Country">
+        select distinct SUBSTRING(countryname,1,1) countryname from country
+    </select>
+    <select id="selectExists" resultType="com.github.pagehelper.model.Country">
+        select * from country a where exists(select 1 from country b where a.id = b.id and b.id >100)
+    </select>
+    <select id="select1" resultType="com.github.pagehelper.model.Country">
+        select * from country a where 1=1
+        <if test="country!=null and country.countryname !=null and country.countryname!=null">
+            and countryname = #{country.countryname}
+        </if>
+    </select>
+    <select id="selectByPageNumSize" resultType="com.github.pagehelper.model.Country">
+        select * from country
+    </select>
+    <select id="selectByPageNumSizeOrderBy" resultType="com.github.pagehelper.model.Country">
+        select * from country
+    </select>
+    <select id="selectByOrderBy" resultType="com.github.pagehelper.model.Country">
+        select * from country
+    </select>
+    <select id="selectByQueryModel" resultType="com.github.pagehelper.model.Country">
+        select * from country
+    </select>
+    <select id="selectPageInfo" resultType="com.github.pagehelper.model.Country">
+        select * from country
+    </select>
 </mapper>
