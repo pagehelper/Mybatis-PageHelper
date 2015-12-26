@@ -47,6 +47,8 @@ public class SqlUtilConfig {
     private boolean supportMethodsArguments = false;
     //参数别名
     private String params;
+    //运行时自动获取dialect
+    private boolean autoRuntimeDialect;
 
     public String getDialect() {
         return dialect;
@@ -110,5 +112,13 @@ public class SqlUtilConfig {
 
     public void setParams(String params) {
         this.params = params;
+    }
+
+    public boolean isAutoRuntimeDialect() {
+        return autoRuntimeDialect;
+    }
+
+    public void setAutoRuntimeDialect(boolean autoRuntimeDialect) {
+        this.autoRuntimeDialect = autoRuntimeDialect;
     }
 }

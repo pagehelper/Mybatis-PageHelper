@@ -27,14 +27,15 @@ package com.github.pagehelper;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Mybatis - 通用分页拦截器
@@ -53,8 +54,18 @@ public class PageHelper implements Interceptor {
     //配置对象方式
     private SqlUtilConfig sqlUtilConfig;
     //自动获取dialect
-    private Boolean autoDialect;
+    private boolean autoDialect;
+    //运行时自动获取dialect
+    private boolean autoRuntimeDialect;
+    //缓存
+    private Map<String, SqlUtil> dialectSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
 
+    /**
+     * 获取任意查询方法的count总数
+     *
+     * @param select
+     * @return
+     */
     public static long count(ISelect select) {
         Page<?> page = startPage(1, -1, true);
         select.doSelect();
@@ -229,8 +240,14 @@ public class PageHelper implements Interceptor {
      * @throws Throwable 抛出异常
      */
     public Object intercept(Invocation invocation) throws Throwable {
-        if (autoDialect) {
-            initSqlUtil(invocation);
+        SqlUtil sqlUtil;
+        if (autoRuntimeDialect) {
+            sqlUtil = getSqlUtil(invocation);
+        } else {
+            if (autoDialect) {
+                initSqlUtil(invocation);
+            }
+            sqlUtil = this.sqlUtil;
         }
         return sqlUtil.processPage(invocation);
     }
@@ -241,22 +258,47 @@ public class PageHelper implements Interceptor {
      * @param invocation
      */
     public synchronized void initSqlUtil(Invocation invocation) {
-        if (sqlUtil == null) {
-            String url;
-            try {
-                MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
-                MetaObject msObject = SystemMetaObject.forObject(ms);
-                DataSource dataSource = (DataSource) msObject.getValue("configuration.environment.dataSource");
-                url = dataSource.getConnection().getMetaData().getURL();
-            } catch (SQLException e) {
-                throw new RuntimeException("分页插件初始化异常:" + e.getMessage());
+        if (this.sqlUtil == null) {
+            this.sqlUtil = getSqlUtil(invocation);
+            if (!autoRuntimeDialect) {
+                properties = null;
+                sqlUtilConfig = null;
             }
-            if (StringUtil.isEmpty(url)) {
-                throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
-            }
-            String dialect = Dialect.fromJdbcUrl(url);
-            if (dialect == null) {
-                throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
+            autoDialect = false;
+        }
+    }
+
+    /**
+     * 根据daatsource创建对应的sqlUtil
+     *
+     * @param invocation
+     */
+    public SqlUtil getSqlUtil(Invocation invocation) {
+        String url;
+        try {
+            MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
+            //TODO 这里能否对dataSource和dialect做映射，或者能否确定所有的DataSource都有url属性?
+            DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
+            url = dataSource.getConnection().getMetaData().getURL();
+        } catch (SQLException e) {
+            throw new RuntimeException("分页插件初始化异常:" + e.getMessage());
+        }
+        if (StringUtil.isEmpty(url)) {
+            throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
+        }
+        String dialect = Dialect.fromJdbcUrl(url);
+        if (dialect == null) {
+            throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
+        }
+        if (dialectSqlUtilMap.containsKey(dialect)) {
+            return dialectSqlUtilMap.get(dialect);
+        }
+        ReentrantLock lock = new ReentrantLock();
+        SqlUtil sqlUtil = null;
+        try {
+            lock.lock();
+            if (dialectSqlUtilMap.containsKey(dialect)) {
+                return dialectSqlUtilMap.get(dialect);
             }
             sqlUtil = new SqlUtil(dialect);
             if (this.properties != null) {
@@ -264,10 +306,11 @@ public class PageHelper implements Interceptor {
             } else if (this.sqlUtilConfig != null) {
                 sqlUtil.setSqlUtilConfig(this.sqlUtilConfig);
             }
-            properties = null;
-            sqlUtilConfig = null;
-            autoDialect = false;
+            dialectSqlUtilMap.put(dialect, sqlUtil);
+        } finally {
+            lock.unlock();
         }
+        return sqlUtil;
     }
 
     /**
@@ -302,7 +345,12 @@ public class PageHelper implements Interceptor {
         checkVersion();
         //数据库方言
         String dialect = p.getProperty("dialect");
-        if (StringUtil.isEmpty(dialect)) {
+        String runtimeDialect = p.getProperty("autoRuntimeDialect");
+        if (StringUtil.isNotEmpty(runtimeDialect) && runtimeDialect.equalsIgnoreCase("TRUE")) {
+            this.autoRuntimeDialect = true;
+            this.autoDialect = false;
+            this.properties = p;
+        } else if (StringUtil.isEmpty(dialect)) {
             autoDialect = true;
             this.properties = p;
         } else {
@@ -319,7 +367,11 @@ public class PageHelper implements Interceptor {
      */
     public void setSqlUtilConfig(SqlUtilConfig config) {
         checkVersion();
-        if (StringUtil.isEmpty(config.getDialect())) {
+        if (config.isAutoRuntimeDialect()) {
+            this.autoRuntimeDialect = true;
+            this.autoDialect = false;
+            this.sqlUtilConfig = config;
+        } else if (StringUtil.isEmpty(config.getDialect())) {
             autoDialect = true;
             this.sqlUtilConfig = config;
         } else {
@@ -327,13 +379,5 @@ public class PageHelper implements Interceptor {
             sqlUtil = new SqlUtil(config.getDialect());
             sqlUtil.setSqlUtilConfig(config);
         }
-    }
-
-    public SqlUtil getSqlUtil() {
-        return sqlUtil;
-    }
-
-    public void setSqlUtil(SqlUtil sqlUtil) {
-        this.sqlUtil = sqlUtil;
     }
 }

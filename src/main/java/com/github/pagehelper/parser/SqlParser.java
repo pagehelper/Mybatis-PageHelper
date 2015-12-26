@@ -74,10 +74,6 @@ public class SqlParser {
         if (CACHE.get(sql) != null) {
             return CACHE.get(sql);
         }
-        //TODO 尝试增加对for update支持
-//        if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
-//            System.out.println("==============");
-//        }
         //解析SQL
         Statement stmt = null;
         try {
