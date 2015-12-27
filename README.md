@@ -56,7 +56,7 @@
  
  - http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
 
-由于使用了sql解析工具，你还需要下载jsqlparser.jar（这个文件完全独立，不依赖其他）：  
+###由于使用了sql解析工具，你还需要下载jsqlparser.jar
 
 ####4.1.0及以后版本需要0.9.4版本
 
