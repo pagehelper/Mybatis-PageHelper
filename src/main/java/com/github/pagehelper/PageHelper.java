@@ -53,12 +53,12 @@ public class PageHelper implements Interceptor {
     private Properties properties;
     //配置对象方式
     private SqlUtilConfig sqlUtilConfig;
-    //自动获取dialect
-    private boolean autoDialect;
+    //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
+    private boolean autoDialect = true;
     //运行时自动获取dialect
     private boolean autoRuntimeDialect;
     //缓存
-    private Map<String, SqlUtil> dialectSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
+    private Map<DataSource, SqlUtil> dataSourceSqlUtilMap = new ConcurrentHashMap<DataSource, SqlUtil>();
 
     /**
      * 获取任意查询方法的count总数
@@ -240,16 +240,15 @@ public class PageHelper implements Interceptor {
      * @throws Throwable 抛出异常
      */
     public Object intercept(Invocation invocation) throws Throwable {
-        SqlUtil sqlUtil;
         if (autoRuntimeDialect) {
-            sqlUtil = getSqlUtil(invocation);
+            SqlUtil sqlUtil = getSqlUtil(invocation);
+            return sqlUtil.processPage(invocation);
         } else {
             if (autoDialect) {
                 initSqlUtil(invocation);
             }
-            sqlUtil = this.sqlUtil;
+            return sqlUtil.processPage(invocation);
         }
-        return sqlUtil.processPage(invocation);
     }
 
     /**
@@ -274,43 +273,39 @@ public class PageHelper implements Interceptor {
      * @param invocation
      */
     public SqlUtil getSqlUtil(Invocation invocation) {
-        String url;
-        try {
-            MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
-            //TODO 这里能否对dataSource和dialect做映射，或者能否确定所有的DataSource都有url属性?
-            DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
-            url = dataSource.getConnection().getMetaData().getURL();
-        } catch (SQLException e) {
-            throw new RuntimeException("分页插件初始化异常:" + e.getMessage());
-        }
-        if (StringUtil.isEmpty(url)) {
-            throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
-        }
-        String dialect = Dialect.fromJdbcUrl(url);
-        if (dialect == null) {
-            throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
-        }
-        if (dialectSqlUtilMap.containsKey(dialect)) {
-            return dialectSqlUtilMap.get(dialect);
+        MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
+        //改为对dataSource做缓存
+        DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
+        if (dataSourceSqlUtilMap.containsKey(dataSource)) {
+            return dataSourceSqlUtilMap.get(dataSource);
         }
         ReentrantLock lock = new ReentrantLock();
-        SqlUtil sqlUtil = null;
         try {
             lock.lock();
-            if (dialectSqlUtilMap.containsKey(dialect)) {
-                return dialectSqlUtilMap.get(dialect);
+            if (dataSourceSqlUtilMap.containsKey(dataSource)) {
+                return dataSourceSqlUtilMap.get(dataSource);
             }
-            sqlUtil = new SqlUtil(dialect);
+            String url = dataSource.getConnection().getMetaData().getURL();
+            if (StringUtil.isEmpty(url)) {
+                throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
+            }
+            String dialect = Dialect.fromJdbcUrl(url);
+            if (dialect == null) {
+                throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
+            }
+            SqlUtil sqlUtil = new SqlUtil(dialect);
             if (this.properties != null) {
                 sqlUtil.setProperties(properties);
             } else if (this.sqlUtilConfig != null) {
                 sqlUtil.setSqlUtilConfig(this.sqlUtilConfig);
             }
-            dialectSqlUtilMap.put(dialect, sqlUtil);
+            dataSourceSqlUtilMap.put(dataSource, sqlUtil);
+            return sqlUtil;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }
-        return sqlUtil;
     }
 
     /**

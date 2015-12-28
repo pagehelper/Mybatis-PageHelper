@@ -36,7 +36,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.0.3
+##分页插件最新版本为4.1.0-SNAPSHOT
 
 ###Maven坐标
 
@@ -44,7 +44,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.0.3</version>
+    <version>4.1.0-SNAPSHOT</version>
 </dependency>
 ```  
 
@@ -68,7 +68,7 @@
 
 ##4.1.0更新日志：
 
-- 增加`autoRuntimeDialect`参数，允许在运行时根据多数据源自动识别对应方言的分页，<b>该参数会先在快照版中进行测试，如果没有收到任何反馈，正式版会取消该参数<b>
+- 增加`autoRuntimeDialect`参数，允许在运行时根据多数据源自动识别对应方言的分页（暂时不支持自动选择`sqlserver2012`，只能使用`sqlserver`）。
 - 去掉了4.0.3版本增加的`returnPageInfo`参数，接口返回值不支持`PageInfo`类型，可以使用下面`ISelect`中演示的方法获取
 - 增加对`SqlServer2012`的支持，需要手动指定`dialect=sqlserver2012`，否则会使用2005的方式进行分页
 - jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
