@@ -44,7 +44,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.1.0</version>
 </dependency>
 ```  
 
@@ -73,7 +73,8 @@
 - 增加对`SqlServer2012`的支持，需要手动指定`dialect=sqlserver2012`，否则会使用2005的方式进行分页
 - jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
 - 增加`ISelect`接口，方便调用，使用方法可以参考`src/test/java/com.github.pagehelper.test.basic.TestISelect`测试。
-  使用该接口可以参考如下用法(返回值为`Page`或`PageInfo`)：
+
+###使用该接口可以参考如下用法(返回值为`Page`或`PageInfo`)：
 
 ```java
 //jdk6,7用法，创建接口

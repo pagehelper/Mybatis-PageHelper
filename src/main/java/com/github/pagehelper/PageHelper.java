@@ -58,7 +58,7 @@ public class PageHelper implements Interceptor {
     //运行时自动获取dialect
     private boolean autoRuntimeDialect;
     //缓存
-    private Map<DataSource, SqlUtil> dataSourceSqlUtilMap = new ConcurrentHashMap<DataSource, SqlUtil>();
+    private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
 
     /**
      * 获取任意查询方法的count总数
@@ -275,17 +275,22 @@ public class PageHelper implements Interceptor {
     public SqlUtil getSqlUtil(Invocation invocation) {
         MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
         //改为对dataSource做缓存
+        String url;
         DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
-        if (dataSourceSqlUtilMap.containsKey(dataSource)) {
-            return dataSourceSqlUtilMap.get(dataSource);
+        try {
+            url = dataSource.getConnection().getMetaData().getURL();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        if (urlSqlUtilMap.containsKey(url)) {
+            return urlSqlUtilMap.get(url);
         }
         ReentrantLock lock = new ReentrantLock();
         try {
             lock.lock();
-            if (dataSourceSqlUtilMap.containsKey(dataSource)) {
-                return dataSourceSqlUtilMap.get(dataSource);
+            if (urlSqlUtilMap.containsKey(url)) {
+                return urlSqlUtilMap.get(url);
             }
-            String url = dataSource.getConnection().getMetaData().getURL();
             if (StringUtil.isEmpty(url)) {
                 throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
             }
@@ -299,10 +304,8 @@ public class PageHelper implements Interceptor {
             } else if (this.sqlUtilConfig != null) {
                 sqlUtil.setSqlUtilConfig(this.sqlUtilConfig);
             }
-            dataSourceSqlUtilMap.put(dataSource, sqlUtil);
+            urlSqlUtilMap.put(url, sqlUtil);
             return sqlUtil;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }
