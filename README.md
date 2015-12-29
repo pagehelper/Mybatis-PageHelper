@@ -74,7 +74,7 @@
 - jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
 - 增加`ISelect`接口，方便调用，使用方法可以参考`src/test/java/com.github.pagehelper.test.basic.TestISelect`测试。
 
-###使用该接口可以参考如下用法(返回值为`Page`或`PageInfo`)：
+###使用`ISelect`接口可以参考如下用法(返回值为`Page`或`PageInfo`)：
 
 ```java
 //jdk6,7用法，创建接口
