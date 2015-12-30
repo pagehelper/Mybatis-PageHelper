@@ -1,6 +1,7 @@
 package com.github.pagehelper.sqlsource;
 
 import com.github.pagehelper.SqlUtil;
+import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.SqlSource;
 
@@ -11,6 +12,13 @@ import org.apache.ibatis.mapping.SqlSource;
  * @since 2015-06-29
  */
 public abstract class PageSqlSource implements SqlSource {
+
+    protected static final ThreadLocal<Parser> localParser = new ThreadLocal<Parser>();
+
+    public void setParser(Parser parser) {
+        localParser.set(parser);
+    }
+
     /**
      * 返回值null - 普通,true - count,false - page
      *
@@ -19,13 +27,6 @@ public abstract class PageSqlSource implements SqlSource {
     protected Boolean getCount() {
         return SqlUtil.getCOUNT();
     }
-
-    /**
-     * 获取原来的sqlSource
-     *
-     * @return
-     */
-    protected abstract SqlSource getOriginal();
 
     /**
      * 获取正常的BoundSql

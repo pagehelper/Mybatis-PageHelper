@@ -58,7 +58,7 @@ public class PageHelper implements Interceptor {
     //运行时自动获取dialect
     private boolean autoRuntimeDialect;
     //缓存
-//    private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
+    private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
 
     /**
      * 获取任意查询方法的count总数
@@ -282,15 +282,15 @@ public class PageHelper implements Interceptor {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-//        if (urlSqlUtilMap.containsKey(url)) {
-//            return urlSqlUtilMap.get(url);
-//        }
+        if (urlSqlUtilMap.containsKey(url)) {
+            return urlSqlUtilMap.get(url);
+        }
         ReentrantLock lock = new ReentrantLock();
         try {
             lock.lock();
-//            if (urlSqlUtilMap.containsKey(url)) {
-//                return urlSqlUtilMap.get(url);
-//            }
+            if (urlSqlUtilMap.containsKey(url)) {
+                return urlSqlUtilMap.get(url);
+            }
             if (StringUtil.isEmpty(url)) {
                 throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
             }
@@ -304,7 +304,7 @@ public class PageHelper implements Interceptor {
             } else if (this.sqlUtilConfig != null) {
                 sqlUtil.setSqlUtilConfig(this.sqlUtilConfig);
             }
-//            urlSqlUtilMap.put(url, sqlUtil);
+            urlSqlUtilMap.put(url, sqlUtil);
             return sqlUtil;
         } finally {
             lock.unlock();

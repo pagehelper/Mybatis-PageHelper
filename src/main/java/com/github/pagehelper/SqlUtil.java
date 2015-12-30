@@ -250,7 +250,7 @@ public class SqlUtil implements Constant {
      * @param ms
      * @return
      */
-    public static boolean isPageSqlSource(MappedStatement ms) {
+    public boolean isPageSqlSource(MappedStatement ms) {
         if (ms.getSqlSource() instanceof PageSqlSource) {
             return true;
         }
@@ -262,7 +262,9 @@ public class SqlUtil implements Constant {
      *
      * @param dialect     数据库类型
      * @param originalSql 原sql
+     * @deprecated 将在5.x版本去掉
      */
+    @Deprecated
     public static void testSql(String dialect, String originalSql) {
         testSql(Dialect.of(dialect), originalSql);
     }
@@ -272,7 +274,9 @@ public class SqlUtil implements Constant {
      *
      * @param dialect     数据库类型
      * @param originalSql 原sql
+     * @deprecated 将在5.x版本去掉
      */
+    @Deprecated
     public static void testSql(Dialect dialect, String originalSql) {
         Parser parser = AbstractParser.newParser(dialect);
         if (dialect == Dialect.sqlserver) {
@@ -291,21 +295,20 @@ public class SqlUtil implements Constant {
      * 修改SqlSource
      *
      * @param ms
-     * @param parser
      * @throws Throwable
      */
-    public void processMappedStatement(MappedStatement ms, Parser parser) throws Throwable {
+    public void processMappedStatement(MappedStatement ms) throws Throwable {
         SqlSource sqlSource = ms.getSqlSource();
         MetaObject msObject = SystemMetaObject.forObject(ms);
         SqlSource pageSqlSource;
         if (sqlSource instanceof StaticSqlSource) {
-            pageSqlSource = new PageStaticSqlSource((StaticSqlSource) sqlSource, parser);
+            pageSqlSource = new PageStaticSqlSource((StaticSqlSource) sqlSource);
         } else if (sqlSource instanceof RawSqlSource) {
-            pageSqlSource = new PageRawSqlSource((RawSqlSource) sqlSource, parser);
+            pageSqlSource = new PageRawSqlSource((RawSqlSource) sqlSource);
         } else if (sqlSource instanceof ProviderSqlSource) {
-            pageSqlSource = new PageProviderSqlSource((ProviderSqlSource) sqlSource, parser);
+            pageSqlSource = new PageProviderSqlSource((ProviderSqlSource) sqlSource);
         } else if (sqlSource instanceof DynamicSqlSource) {
-            pageSqlSource = new PageDynamicSqlSource((DynamicSqlSource) sqlSource, parser);
+            pageSqlSource = new PageDynamicSqlSource((DynamicSqlSource) sqlSource);
         } else {
             throw new RuntimeException("无法处理该类型[" + sqlSource.getClass() + "]的SqlSource");
         }
@@ -455,8 +458,10 @@ public class SqlUtil implements Constant {
         MappedStatement ms = (MappedStatement) args[0];
         //判断并处理为PageSqlSource
         if (!isPageSqlSource(ms)) {
-            processMappedStatement(ms, parser);
+            processMappedStatement(ms);
         }
+        //设置当前的parser，后面每次使用前都会set，ThreadLocal的值不会产生不良影响
+        ((PageSqlSource)ms.getSqlSource()).setParser(parser);
         //忽略RowBounds-否则会进行Mybatis自带的内存分页
         args[2] = RowBounds.DEFAULT;
         //如果只进行排序 或 pageSizeZero的判断

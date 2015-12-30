@@ -25,7 +25,6 @@
 package com.github.pagehelper.sqlsource;
 
 import com.github.pagehelper.Constant;
-import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.builder.StaticSqlSource;
@@ -49,19 +48,15 @@ public class PageProviderSqlSource extends PageSqlSource implements Constant {
     private Class<?> providerType;
     private Method providerMethod;
     private Boolean providerTakesParameterObject;
-    private SqlSource original;
     private Configuration configuration;
-    private Parser parser;
 
-    public PageProviderSqlSource(ProviderSqlSource provider, Parser parser) {
+    public PageProviderSqlSource(ProviderSqlSource provider) {
         MetaObject metaObject = SystemMetaObject.forObject(provider);
         this.sqlSourceParser = (SqlSourceBuilder) metaObject.getValue("sqlSourceParser");
         this.providerType = (Class<?>) metaObject.getValue("providerType");
         this.providerMethod = (Method) metaObject.getValue("providerMethod");
         this.providerTakesParameterObject = (Boolean) metaObject.getValue("providerTakesParameterObject");
         this.configuration = (Configuration) metaObject.getValue("sqlSourceParser.configuration");
-        this.original = provider;
-        this.parser = parser;
     }
 
     private SqlSource createSqlSource(Object parameterObject) {
@@ -95,7 +90,7 @@ public class PageProviderSqlSource extends PageSqlSource implements Constant {
         boundSql = sqlSource.getBoundSql(parameterObject);
         return new BoundSql(
                 configuration,
-                parser.getCountSql(boundSql.getSql()),
+                localParser.get().getCountSql(boundSql.getSql()),
                 boundSql.getParameterMappings(),
                 parameterObject);
     }
@@ -113,12 +108,9 @@ public class PageProviderSqlSource extends PageSqlSource implements Constant {
         }
         return new BoundSql(
                 configuration,
-                parser.getPageSql(boundSql.getSql()),
-                parser.getPageParameterMapping(configuration, boundSql),
+                localParser.get().getPageSql(boundSql.getSql()),
+                localParser.get().getPageParameterMapping(configuration, boundSql),
                 parameterObject);
     }
 
-    public SqlSource getOriginal() {
-        return original;
-    }
 }
