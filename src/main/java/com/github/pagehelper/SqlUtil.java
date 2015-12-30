@@ -24,7 +24,6 @@
 
 package com.github.pagehelper;
 
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.impl.AbstractParser;
 import com.github.pagehelper.sqlsource.*;
@@ -41,7 +40,10 @@ import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.session.RowBounds;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -72,7 +74,7 @@ public class SqlUtil implements Constant {
     }
 
     //缓存count查询的ms
-    private final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
+    private static final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     private boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
@@ -295,19 +297,15 @@ public class SqlUtil implements Constant {
     public void processMappedStatement(MappedStatement ms, Parser parser) throws Throwable {
         SqlSource sqlSource = ms.getSqlSource();
         MetaObject msObject = SystemMetaObject.forObject(ms);
-        SqlSource tempSqlSource = sqlSource;
-        if (sqlSource instanceof OrderBySqlSource) {
-            tempSqlSource = ((OrderBySqlSource) tempSqlSource).getOriginal();
-        }
         SqlSource pageSqlSource;
-        if (tempSqlSource instanceof StaticSqlSource) {
-            pageSqlSource = new PageStaticSqlSource((StaticSqlSource) tempSqlSource, parser);
-        } else if (tempSqlSource instanceof RawSqlSource) {
-            pageSqlSource = new PageRawSqlSource((RawSqlSource) tempSqlSource, parser);
-        } else if (tempSqlSource instanceof ProviderSqlSource) {
-            pageSqlSource = new PageProviderSqlSource((ProviderSqlSource) tempSqlSource, parser);
-        } else if (tempSqlSource instanceof DynamicSqlSource) {
-            pageSqlSource = new PageDynamicSqlSource((DynamicSqlSource) tempSqlSource, parser);
+        if (sqlSource instanceof StaticSqlSource) {
+            pageSqlSource = new PageStaticSqlSource((StaticSqlSource) sqlSource, parser);
+        } else if (sqlSource instanceof RawSqlSource) {
+            pageSqlSource = new PageRawSqlSource((RawSqlSource) sqlSource, parser);
+        } else if (sqlSource instanceof ProviderSqlSource) {
+            pageSqlSource = new PageProviderSqlSource((ProviderSqlSource) sqlSource, parser);
+        } else if (sqlSource instanceof DynamicSqlSource) {
+            pageSqlSource = new PageDynamicSqlSource((DynamicSqlSource) sqlSource, parser);
         } else {
             throw new RuntimeException("无法处理该类型[" + sqlSource.getClass() + "]的SqlSource");
         }

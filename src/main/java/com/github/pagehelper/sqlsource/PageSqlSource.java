@@ -11,7 +11,6 @@ import org.apache.ibatis.mapping.SqlSource;
  * @since 2015-06-29
  */
 public abstract class PageSqlSource implements SqlSource {
-
     /**
      * 返回值null - 普通,true - count,false - page
      *
@@ -20,6 +19,13 @@ public abstract class PageSqlSource implements SqlSource {
     protected Boolean getCount() {
         return SqlUtil.getCOUNT();
     }
+
+    /**
+     * 获取原来的sqlSource
+     *
+     * @return
+     */
+    protected abstract SqlSource getOriginal();
 
     /**
      * 获取正常的BoundSql

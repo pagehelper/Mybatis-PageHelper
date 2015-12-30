@@ -1,8 +1,7 @@
 package com.github.pagehelper.sqlsource;
 
-import com.github.orderbyhelper.OrderByParser;
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.parser.OrderByParser;
 import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
@@ -20,7 +19,7 @@ import java.util.List;
  * @author liuzh
  * @since 2015-06-27
  */
-public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSource {
+public class PageStaticSqlSource extends PageSqlSource {
     private String sql;
     private List<ParameterMapping> parameterMappings;
     private Configuration configuration;

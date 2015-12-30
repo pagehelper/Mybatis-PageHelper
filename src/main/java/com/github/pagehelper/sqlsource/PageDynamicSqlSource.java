@@ -24,8 +24,6 @@
 
 package com.github.pagehelper.sqlsource;
 
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
-import com.github.orderbyhelper.sqlsource.OrderByStaticSqlSource;
 import com.github.pagehelper.Constant;
 import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.SqlSourceBuilder;
@@ -44,7 +42,7 @@ import java.util.Map;
 /**
  * @author liuzh
  */
-public class PageDynamicSqlSource extends PageSqlSource implements OrderBySqlSource, Constant {
+public class PageDynamicSqlSource extends PageSqlSource implements Constant {
     private Configuration configuration;
     private SqlNode rootSqlNode;
     private SqlSource original;

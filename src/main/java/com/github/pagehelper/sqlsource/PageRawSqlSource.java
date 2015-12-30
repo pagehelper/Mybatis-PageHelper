@@ -1,6 +1,5 @@
 package com.github.pagehelper.sqlsource;
 
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
 import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
@@ -15,7 +14,7 @@ import org.apache.ibatis.scripting.defaults.RawSqlSource;
  * @author liuzh
  * @since 2015-06-26
  */
-public class PageRawSqlSource extends PageSqlSource implements OrderBySqlSource {
+public class PageRawSqlSource extends PageSqlSource {
     private PageSqlSource sqlSource;
     private SqlSource original;
 
