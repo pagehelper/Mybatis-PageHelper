@@ -31,6 +31,8 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
@@ -59,6 +61,8 @@ public class PageHelper implements Interceptor {
     private boolean autoRuntimeDialect;
     //缓存
     private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
+    //缓存
+    private Map<DataSource, String> dataSourceUrlMap = new ConcurrentHashMap<DataSource, String>();
 
     /**
      * 获取任意查询方法的count总数
@@ -268,6 +272,46 @@ public class PageHelper implements Interceptor {
     }
 
     /**
+     * 获取url
+     *
+     * @param dataSource
+     * @return
+     */
+    public String getUrl(DataSource dataSource){
+        String url = dataSourceUrlMap.get(dataSource);
+        if(url == null){
+            try {
+                Method method = dataSource.getClass().getMethod("getUrl");
+                url = (String) method.invoke(dataSource);
+                dataSourceUrlMap.put(dataSource, url);
+                return url;
+            } catch (Exception e) {
+                dataSourceUrlMap.put(dataSource, "connection");
+            }
+        } else if(url.contains("jdbc:")){
+            return url;
+        }
+        if(url.equals("connection")){
+            Connection conn = null;
+            try {
+                conn = dataSource.getConnection();
+                url = conn.getMetaData().getURL();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if(conn != null){
+                    try {
+                        conn.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return url;
+    }
+
+    /**
      * 根据daatsource创建对应的sqlUtil
      *
      * @param invocation
@@ -275,13 +319,8 @@ public class PageHelper implements Interceptor {
     public SqlUtil getSqlUtil(Invocation invocation) {
         MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
         //改为对dataSource做缓存
-        String url;
         DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
-        try {
-            url = dataSource.getConnection().getMetaData().getURL();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        String url = getUrl(dataSource);
         if (urlSqlUtilMap.containsKey(url)) {
             return urlSqlUtilMap.get(url);
         }
