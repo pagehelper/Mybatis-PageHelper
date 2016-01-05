@@ -61,8 +61,6 @@ public class PageHelper implements Interceptor {
     private boolean autoRuntimeDialect;
     //缓存
     private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
-    //缓存
-    private Map<DataSource, String> dataSourceUrlMap = new ConcurrentHashMap<DataSource, String>();
 
     /**
      * 获取任意查询方法的count总数
@@ -278,37 +276,21 @@ public class PageHelper implements Interceptor {
      * @return
      */
     public String getUrl(DataSource dataSource){
-        String url = dataSourceUrlMap.get(dataSource);
-        if(url == null){
-            try {
-                Method method = dataSource.getClass().getMethod("getUrl");
-                url = (String) method.invoke(dataSource);
-                dataSourceUrlMap.put(dataSource, url);
-                return url;
-            } catch (Exception e) {
-                dataSourceUrlMap.put(dataSource, "connection");
-            }
-        } else if(url.contains("jdbc:")){
-            return url;
-        }
-        if(url.equals("connection")){
-            Connection conn = null;
-            try {
-                conn = dataSource.getConnection();
-                url = conn.getMetaData().getURL();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } finally {
-                if(conn != null){
-                    try {
-                        conn.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            return conn.getMetaData().getURL();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    //ignore
                 }
             }
         }
-        return url;
     }
 
     /**
