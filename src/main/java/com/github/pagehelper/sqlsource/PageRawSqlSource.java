@@ -1,10 +1,7 @@
 package com.github.pagehelper.sqlsource;
 
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
-import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.defaults.RawSqlSource;
@@ -15,14 +12,12 @@ import org.apache.ibatis.scripting.defaults.RawSqlSource;
  * @author liuzh
  * @since 2015-06-26
  */
-public class PageRawSqlSource extends PageSqlSource implements OrderBySqlSource {
+public class PageRawSqlSource extends PageSqlSource {
     private PageSqlSource sqlSource;
-    private SqlSource original;
 
-    public PageRawSqlSource(RawSqlSource sqlSource, Parser parser) {
+    public PageRawSqlSource(RawSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
-        this.sqlSource = new PageStaticSqlSource((StaticSqlSource) metaObject.getValue("sqlSource"), parser);
-        this.original = sqlSource;
+        this.sqlSource = new PageStaticSqlSource((StaticSqlSource) metaObject.getValue("sqlSource"));
     }
 
     @Override
@@ -38,10 +33,6 @@ public class PageRawSqlSource extends PageSqlSource implements OrderBySqlSource 
     @Override
     protected BoundSql getPageBoundSql(Object parameterObject) {
         return sqlSource.getPageBoundSql(parameterObject);
-    }
-
-    public SqlSource getOriginal() {
-        return original;
     }
 
 }

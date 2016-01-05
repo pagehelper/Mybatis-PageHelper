@@ -24,10 +24,7 @@
 
 package com.github.pagehelper.sqlsource;
 
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
-import com.github.orderbyhelper.sqlsource.OrderByStaticSqlSource;
 import com.github.pagehelper.Constant;
-import com.github.pagehelper.parser.Parser;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
@@ -44,18 +41,14 @@ import java.util.Map;
 /**
  * @author liuzh
  */
-public class PageDynamicSqlSource extends PageSqlSource implements OrderBySqlSource, Constant {
+public class PageDynamicSqlSource extends PageSqlSource implements Constant {
     private Configuration configuration;
     private SqlNode rootSqlNode;
-    private SqlSource original;
-    private Parser parser;
 
-    public PageDynamicSqlSource(DynamicSqlSource sqlSource, Parser parser) {
+    public PageDynamicSqlSource(DynamicSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.configuration = (Configuration) metaObject.getValue("configuration");
         this.rootSqlNode = (SqlNode) metaObject.getValue("rootSqlNode");
-        this.original = sqlSource;
-        this.parser = parser;
     }
 
     @Override
@@ -82,7 +75,7 @@ public class PageDynamicSqlSource extends PageSqlSource implements OrderBySqlSou
         Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
         SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        sqlSource = new StaticSqlSource(configuration, parser.getCountSql(boundSql.getSql()), boundSql.getParameterMappings());
+        sqlSource = new StaticSqlSource(configuration, localParser.get().getCountSql(boundSql.getSql()), boundSql.getParameterMappings());
         boundSql = sqlSource.getBoundSql(parameterObject);
         //设置条件参数
         for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {
@@ -111,7 +104,7 @@ public class PageDynamicSqlSource extends PageSqlSource implements OrderBySqlSou
         SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
         sqlSource = new OrderByStaticSqlSource((StaticSqlSource) sqlSource);
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        sqlSource = new StaticSqlSource(configuration, parser.getPageSql(boundSql.getSql()), parser.getPageParameterMapping(configuration, boundSql));
+        sqlSource = new StaticSqlSource(configuration, localParser.get().getPageSql(boundSql.getSql()), localParser.get().getPageParameterMapping(configuration, boundSql));
         boundSql = sqlSource.getBoundSql(parameterObject);
         //设置条件参数
         for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {
@@ -119,9 +112,4 @@ public class PageDynamicSqlSource extends PageSqlSource implements OrderBySqlSou
         }
         return boundSql;
     }
-
-    public SqlSource getOriginal() {
-        return original;
-    }
-
 }

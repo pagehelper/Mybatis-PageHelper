@@ -31,6 +31,8 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
@@ -268,6 +270,30 @@ public class PageHelper implements Interceptor {
     }
 
     /**
+     * 获取url
+     *
+     * @param dataSource
+     * @return
+     */
+    public String getUrl(DataSource dataSource){
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            return conn.getMetaData().getURL();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    //ignore
+                }
+            }
+        }
+    }
+
+    /**
      * 根据daatsource创建对应的sqlUtil
      *
      * @param invocation
@@ -275,13 +301,8 @@ public class PageHelper implements Interceptor {
     public SqlUtil getSqlUtil(Invocation invocation) {
         MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
         //改为对dataSource做缓存
-        String url;
         DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
-        try {
-            url = dataSource.getConnection().getMetaData().getURL();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        String url = getUrl(dataSource);
         if (urlSqlUtilMap.containsKey(url)) {
             return urlSqlUtilMap.get(url);
         }

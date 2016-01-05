@@ -1,9 +1,7 @@
 package com.github.pagehelper.sqlsource;
 
-import com.github.orderbyhelper.OrderByParser;
-import com.github.orderbyhelper.sqlsource.OrderBySqlSource;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.parser.Parser;
+import com.github.pagehelper.parser.OrderByParser;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -20,21 +18,19 @@ import java.util.List;
  * @author liuzh
  * @since 2015-06-27
  */
-public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSource {
+public class PageStaticSqlSource extends PageSqlSource {
     private String sql;
     private List<ParameterMapping> parameterMappings;
     private Configuration configuration;
-    private Parser parser;
     private SqlSource original;
 
     @SuppressWarnings("unchecked")
-    public PageStaticSqlSource(StaticSqlSource sqlSource, Parser parser) {
+    public PageStaticSqlSource(StaticSqlSource sqlSource) {
         MetaObject metaObject = SystemMetaObject.forObject(sqlSource);
         this.sql = (String) metaObject.getValue("sql");
         this.parameterMappings = (List<ParameterMapping>) metaObject.getValue("parameterMappings");
         this.configuration = (Configuration) metaObject.getValue("configuration");
         this.original = sqlSource;
-        this.parser = parser;
     }
 
     @Override
@@ -49,7 +45,7 @@ public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSour
 
     @Override
     protected BoundSql getCountBoundSql(Object parameterObject) {
-        return new BoundSql(configuration, parser.getCountSql(sql), parameterMappings, parameterObject);
+        return new BoundSql(configuration, localParser.get().getCountSql(sql), parameterMappings, parameterObject);
     }
 
     @Override
@@ -59,11 +55,8 @@ public class PageStaticSqlSource extends PageSqlSource implements OrderBySqlSour
         if (orderBy != null) {
             tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
         }
-        tempSql = parser.getPageSql(tempSql);
-        return new BoundSql(configuration, tempSql, parser.getPageParameterMapping(configuration, original.getBoundSql(parameterObject)), parameterObject);
+        tempSql = localParser.get().getPageSql(tempSql);
+        return new BoundSql(configuration, tempSql, localParser.get().getPageParameterMapping(configuration, original.getBoundSql(parameterObject)), parameterObject);
     }
 
-    public SqlSource getOriginal() {
-        return original;
-    }
 }

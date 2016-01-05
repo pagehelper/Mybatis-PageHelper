@@ -1,4 +1,4 @@
-package com.github.orderbyhelper;
+package com.github.pagehelper.parser;
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
