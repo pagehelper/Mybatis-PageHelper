@@ -47,6 +47,8 @@ public class SqlUtilConfig {
     private String params;
     //运行时自动获取dialect
     private boolean autoRuntimeDialect;
+    //多数据源时，获取jdbcurl后是否关闭数据源
+    private boolean closeConn = true;
 
     public String getDialect() {
         return dialect;
@@ -110,5 +112,13 @@ public class SqlUtilConfig {
 
     public void setAutoRuntimeDialect(boolean autoRuntimeDialect) {
         this.autoRuntimeDialect = autoRuntimeDialect;
+    }
+
+    public boolean isCloseConn() {
+        return closeConn;
+    }
+
+    public void setCloseConn(boolean closeConn) {
+        this.closeConn = closeConn;
     }
 }
