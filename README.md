@@ -36,7 +36,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.1.1
+##分页插件最新版本为4.1.2
 
 ###Maven坐标
 
@@ -44,7 +44,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.1.0</version>
+    <version>4.1.2</version>
 </dependency>
 ```  
 
@@ -65,6 +65,11 @@
 ####4.1.0以前版本需要0.9.1版本
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
+
+##4.1.2更新日志
+
+- 增加可配参数`closeConn`，当使用动态数据源时，分页插件获取jdbcUrl后，控制是否关闭当前连接，默认`true`关闭
+- count查询改为`count(0)`，分库分表情况下的效率可能更高
 
 ##4.1.1更新日志：
 

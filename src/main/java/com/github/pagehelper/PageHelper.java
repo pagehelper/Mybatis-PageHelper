@@ -285,7 +285,9 @@ public class PageHelper implements Interceptor {
         } finally {
             if(conn != null){
                 try {
-                    conn.close();
+                    if(sqlUtil.isCloseConn()){
+                        conn.close();
+                    }
                 } catch (SQLException e) {
                     //ignore
                 }
