@@ -47,7 +47,7 @@ public class SqlParser {
 
     static {
         COUNT_ITEM = new ArrayList<SelectItem>();
-        COUNT_ITEM.add(new SelectExpressionItem(new Column("count(*)")));
+        COUNT_ITEM.add(new SelectExpressionItem(new Column("count(0)")));
 
         TABLE_ALIAS = new Alias("table_count");
         TABLE_ALIAS.setUseAs(false);
@@ -106,7 +106,7 @@ public class SqlParser {
     public String getSimpleCountSql(final String sql) {
         isSupportedSql(sql);
         StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
-        stringBuilder.append("select count(*) from (");
+        stringBuilder.append("select count(0) from (");
         stringBuilder.append(sql);
         stringBuilder.append(") tmp_count");
         return stringBuilder.toString();
