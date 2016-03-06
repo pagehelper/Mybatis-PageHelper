@@ -87,8 +87,6 @@ public class SqlUtil implements Constant {
     private Parser parser;
     //是否支持接口参数来传递分页参数，默认false
     private boolean supportMethodsArguments = false;
-    //多数据源时，获取jdbcurl后是否关闭数据源
-    private boolean closeConn = true;
     /**
      * 构造方法
      *
@@ -525,14 +523,6 @@ public class SqlUtil implements Constant {
         this.supportMethodsArguments = supportMethodsArguments;
     }
 
-    public boolean isCloseConn() {
-        return closeConn;
-    }
-
-    public void setCloseConn(boolean closeConn) {
-        this.closeConn = closeConn;
-    }
-
     public void setParams(String params) {
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
@@ -567,9 +557,6 @@ public class SqlUtil implements Constant {
         //是否支持接口参数来传递分页参数，默认false
         String supportMethodsArguments = p.getProperty("supportMethodsArguments");
         this.supportMethodsArguments = Boolean.parseBoolean(supportMethodsArguments);
-        //多数据源时，获取jdbcurl后是否关闭数据源
-        String closeConn = p.getProperty("closeConn");
-        this.closeConn = Boolean.parseBoolean(closeConn);
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         setParams(p.getProperty("params"));
@@ -581,7 +568,6 @@ public class SqlUtil implements Constant {
         this.pageSizeZero = config.isPageSizeZero();
         this.reasonable = config.isReasonable();
         this.supportMethodsArguments = config.isSupportMethodsArguments();
-        this.closeConn = config.isCloseConn();
         setParams(config.getParams());
     }
 }

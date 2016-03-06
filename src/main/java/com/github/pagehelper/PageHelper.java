@@ -59,6 +59,8 @@ public class PageHelper implements Interceptor {
     private boolean autoDialect = true;
     //运行时自动获取dialect
     private boolean autoRuntimeDialect;
+    //多数据源时，获取jdbcurl后是否关闭数据源
+    private boolean closeConn = true;
     //缓存
     private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
 
@@ -285,7 +287,7 @@ public class PageHelper implements Interceptor {
         } finally {
             if(conn != null){
                 try {
-                    if(sqlUtil.isCloseConn()){
+                    if(closeConn){
                         conn.close();
                     }
                 } catch (SQLException e) {
@@ -364,6 +366,9 @@ public class PageHelper implements Interceptor {
      */
     public void setProperties(Properties p) {
         checkVersion();
+        //多数据源时，获取jdbcurl后是否关闭数据源
+        String closeConn = p.getProperty("closeConn");
+        this.closeConn = Boolean.parseBoolean(closeConn);
         //数据库方言
         String dialect = p.getProperty("dialect");
         String runtimeDialect = p.getProperty("autoRuntimeDialect");
@@ -388,6 +393,8 @@ public class PageHelper implements Interceptor {
      */
     public void setSqlUtilConfig(SqlUtilConfig config) {
         checkVersion();
+        //多数据源时，获取jdbcurl后是否关闭数据源
+        this.closeConn = config.isCloseConn();
         if (config.isAutoRuntimeDialect()) {
             this.autoRuntimeDialect = true;
             this.autoDialect = false;

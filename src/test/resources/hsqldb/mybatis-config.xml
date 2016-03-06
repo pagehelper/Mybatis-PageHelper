@@ -50,6 +50,7 @@
             <property name="autoRuntimeDialect" value="true"/>
             <!-- 运行时自动判断数据库类型，支持多数据源DataSource分页 -->
             <property name="autoRuntimeDialect" value="true"/>
+            <property name="closeConn" value="true"/>
         </plugin>
     </plugins>
 
