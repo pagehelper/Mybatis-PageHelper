@@ -54,23 +54,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SqlServer {
     //缓存结果
-    private static final Map<String, String> CACHE = new ConcurrentHashMap<String, String>();
+    protected static final Map<String, String> CACHE = new ConcurrentHashMap<String, String>();
     //开始行号
-    private static final String START_ROW = String.valueOf(Long.MIN_VALUE);
+    protected static final String START_ROW = String.valueOf(Long.MIN_VALUE);
     //结束行号
-    private static final String PAGE_SIZE = String.valueOf(Long.MAX_VALUE);
+    protected static final String PAGE_SIZE = String.valueOf(Long.MAX_VALUE);
     //外层包装表
-    private static final String WRAP_TABLE = "WRAP_OUTER_TABLE";
+    protected static final String WRAP_TABLE = "WRAP_OUTER_TABLE";
     //表别名名字
-    private static final String PAGE_TABLE_NAME = "PAGE_TABLE_ALIAS";
-    //private
+    protected static final String PAGE_TABLE_NAME = "PAGE_TABLE_ALIAS";
+    //protected
     public static final Alias PAGE_TABLE_ALIAS = new Alias(PAGE_TABLE_NAME);
     //行号
-    private static final String PAGE_ROW_NUMBER = "PAGE_ROW_NUMBER";
+    protected static final String PAGE_ROW_NUMBER = "PAGE_ROW_NUMBER";
     //行号列
-    private static final Column PAGE_ROW_NUMBER_COLUMN = new Column(PAGE_ROW_NUMBER);
+    protected static final Column PAGE_ROW_NUMBER_COLUMN = new Column(PAGE_ROW_NUMBER);
     //TOP 100 PERCENT
-    private static final Top TOP100_PERCENT;
+    protected static final Top TOP100_PERCENT;
 
     //静态方法处理
     static {
@@ -116,7 +116,7 @@ public class SqlServer {
      * @param select
      * @return
      */
-    private Select getPageSelect(Select select) {
+    protected Select getPageSelect(Select select) {
         SelectBody selectBody = select.getSelectBody();
         if (selectBody instanceof SetOperationList) {
             selectBody = wrapSetOperationList((SetOperationList) selectBody);
@@ -171,7 +171,7 @@ public class SqlServer {
      * @param setOperationList
      * @return
      */
-    private SelectBody wrapSetOperationList(SetOperationList setOperationList) {
+    protected SelectBody wrapSetOperationList(SetOperationList setOperationList) {
         //获取最后一个plainSelect
         SelectBody setSelectBody = setOperationList.getSelects().get(setOperationList.getSelects().size() - 1);
         if (!(setSelectBody instanceof PlainSelect)) {
@@ -201,7 +201,7 @@ public class SqlServer {
      * @param plainSelect
      * @return
      */
-    private List<SelectItem> getSelectItems(PlainSelect plainSelect) {
+    protected List<SelectItem> getSelectItems(PlainSelect plainSelect) {
         //设置selectItems
         List<SelectItem> selectItems = new ArrayList<SelectItem>();
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
@@ -240,7 +240,7 @@ public class SqlServer {
      *
      * @param plainSelect
      */
-    private void addRowNumber(PlainSelect plainSelect) {
+    protected void addRowNumber(PlainSelect plainSelect) {
         //增加ROW_NUMBER()
         StringBuilder orderByBuilder = new StringBuilder();
         orderByBuilder.append("ROW_NUMBER() OVER (");
@@ -265,7 +265,7 @@ public class SqlServer {
      *
      * @param selectBody
      */
-    private void processSelectBody(SelectBody selectBody, int level) {
+    protected void processSelectBody(SelectBody selectBody, int level) {
         if (selectBody instanceof PlainSelect) {
             processPlainSelect((PlainSelect) selectBody, level + 1);
         } else if (selectBody instanceof WithItem) {
@@ -289,7 +289,7 @@ public class SqlServer {
      *
      * @param plainSelect
      */
-    private void processPlainSelect(PlainSelect plainSelect, int level) {
+    protected void processPlainSelect(PlainSelect plainSelect, int level) {
         if (level > 1) {
             if (isNotEmptyList(plainSelect.getOrderByElements())) {
                 if (plainSelect.getTop() == null) {
@@ -315,7 +315,7 @@ public class SqlServer {
      *
      * @param fromItem
      */
-    private void processFromItem(FromItem fromItem, int level) {
+    protected void processFromItem(FromItem fromItem, int level) {
         if (fromItem instanceof SubJoin) {
             SubJoin subJoin = (SubJoin) fromItem;
             if (subJoin.getJoin() != null) {
