@@ -68,7 +68,7 @@ public class SqlUtil implements Constant {
             requestClass = Class.forName("javax.servlet.ServletRequest");
             getParameterMap = requestClass.getMethod("getParameterMap", new Class[]{});
             hasRequest = true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             hasRequest = false;
         }
     }
