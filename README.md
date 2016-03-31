@@ -36,7 +36,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.1.2
+##分页插件最新版本为4.1.3
 
 ###Maven坐标
 
@@ -44,7 +44,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.1.2</version>
+    <version>4.1.3</version>
 </dependency>
 ```  
 
@@ -65,6 +65,11 @@
 ####4.1.0以前版本需要0.9.1版本
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
+
+##4.1.3更新日志
+
+- 解决反射类没有完全捕获异常的问题#94
+- 把SqlServer类所有private都改成了protected，方便继承修改#93
 
 ##4.1.2更新日志
 
