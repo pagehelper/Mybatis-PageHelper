@@ -63,6 +63,7 @@ public class PageHelper implements Interceptor {
     private boolean closeConn = true;
     //缓存
     private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
+    private ReentrantLock lock = new ReentrantLock();
 
     /**
      * 获取任意查询方法的count总数
@@ -298,7 +299,7 @@ public class PageHelper implements Interceptor {
     }
 
     /**
-     * 根据daatsource创建对应的sqlUtil
+     * 根据datasource创建对应的sqlUtil
      *
      * @param invocation
      */
@@ -310,7 +311,6 @@ public class PageHelper implements Interceptor {
         if (urlSqlUtilMap.containsKey(url)) {
             return urlSqlUtilMap.get(url);
         }
-        ReentrantLock lock = new ReentrantLock();
         try {
             lock.lock();
             if (urlSqlUtilMap.containsKey(url)) {
