@@ -26,6 +26,7 @@ package com.github.pagehelper.sql;
 
 import com.github.pagehelper.parser.SqlServer;
 import net.sf.jsqlparser.JSQLParserException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,6 +34,13 @@ import org.junit.Test;
  */
 public class SqlServerTest {
     public static final SqlServer sqlServer = new SqlServer();
+
+    @Test
+    @Ignore("暂时不支持")
+    public void testSqlTestWithlock() throws JSQLParserException {
+        String originalSql = "select * from Agency with (NOLOCK) where status=0 order by CreateTime";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
 
     @Test
     public void testSqlTest() throws JSQLParserException {

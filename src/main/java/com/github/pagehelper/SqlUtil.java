@@ -461,44 +461,49 @@ public class SqlUtil implements Constant {
         }
         //设置当前的parser，后面每次使用前都会set，ThreadLocal的值不会产生不良影响
         ((PageSqlSource)ms.getSqlSource()).setParser(parser);
-        //忽略RowBounds-否则会进行Mybatis自带的内存分页
-        args[2] = RowBounds.DEFAULT;
-        //如果只进行排序 或 pageSizeZero的判断
-        if (isQueryOnly(page)) {
-            return doQueryOnly(page, invocation);
+        try {
+            //忽略RowBounds-否则会进行Mybatis自带的内存分页
+            args[2] = RowBounds.DEFAULT;
+            //如果只进行排序 或 pageSizeZero的判断
+            if (isQueryOnly(page)) {
+                return doQueryOnly(page, invocation);
+            }
+
+            //简单的通过total的值来判断是否进行count查询
+            if (page.isCount()) {
+                page.setCountSignal(Boolean.TRUE);
+                //替换MS
+                args[0] = msCountMap.get(ms.getId());
+                //查询总数
+                Object result = invocation.proceed();
+                //还原ms
+                args[0] = ms;
+                //设置总数
+                page.setTotal((Integer) ((List) result).get(0));
+                if (page.getTotal() == 0) {
+                    return page;
+                }
+            } else {
+                page.setTotal(-1l);
+            }
+            //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
+            if (page.getPageSize() > 0 &&
+                    ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
+                            || rowBounds != RowBounds.DEFAULT)) {
+                //将参数中的MappedStatement替换为新的qs
+                page.setCountSignal(null);
+                BoundSql boundSql = ms.getBoundSql(args[1]);
+                args[1] = parser.setPageParameter(ms, args[1], boundSql, page);
+                page.setCountSignal(Boolean.FALSE);
+                //执行分页查询
+                Object result = invocation.proceed();
+                //得到处理结果
+                page.addAll((List) result);
+            }
+        } finally {
+            ((PageSqlSource)ms.getSqlSource()).removeParser();
         }
 
-        //简单的通过total的值来判断是否进行count查询
-        if (page.isCount()) {
-            page.setCountSignal(Boolean.TRUE);
-            //替换MS
-            args[0] = msCountMap.get(ms.getId());
-            //查询总数
-            Object result = invocation.proceed();
-            //还原ms
-            args[0] = ms;
-            //设置总数
-            page.setTotal((Integer) ((List) result).get(0));
-            if (page.getTotal() == 0) {
-                return page;
-            }
-        } else {
-            page.setTotal(-1l);
-        }
-        //pageSize>0的时候执行分页查询，pageSize<=0的时候不执行相当于可能只返回了一个count
-        if (page.getPageSize() > 0 &&
-                ((rowBounds == RowBounds.DEFAULT && page.getPageNum() > 0)
-                        || rowBounds != RowBounds.DEFAULT)) {
-            //将参数中的MappedStatement替换为新的qs
-            page.setCountSignal(null);
-            BoundSql boundSql = ms.getBoundSql(args[1]);
-            args[1] = parser.setPageParameter(ms, args[1], boundSql, page);
-            page.setCountSignal(Boolean.FALSE);
-            //执行分页查询
-            Object result = invocation.proceed();
-            //得到处理结果
-            page.addAll((List) result);
-        }
         //返回结果
         return page;
     }

@@ -368,7 +368,10 @@ public class PageHelper implements Interceptor {
         checkVersion();
         //多数据源时，获取jdbcurl后是否关闭数据源
         String closeConn = p.getProperty("closeConn");
-        this.closeConn = Boolean.parseBoolean(closeConn);
+        //解决#97
+        if(StringUtil.isNotEmpty(closeConn)){
+            this.closeConn = Boolean.parseBoolean(closeConn);
+        }
         //数据库方言
         String dialect = p.getProperty("dialect");
         String runtimeDialect = p.getProperty("autoRuntimeDialect");

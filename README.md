@@ -36,7 +36,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.1.3
+##分页插件最新版本为4.1.4
 
 ###Maven坐标
 
@@ -44,7 +44,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.1.3</version>
+    <version>4.1.4</version>
 </dependency>
 ```  
 
@@ -65,6 +65,12 @@
 ####4.1.0以前版本需要0.9.1版本
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
+
+##4.1.4更新日志
+
+- 解决`closeConn`未设置时，默认值被覆盖变成`false`的问题#97
+- `closeConn`不只对动态数据源有效，当没有设置`dialect`属性自动获取数据库类型的时候同样有效
+- 解决关闭tomcat的时候提示线程安全问题#98，这个问题不会导致内存溢出，已经增加处理
 
 ##4.1.3更新日志
 

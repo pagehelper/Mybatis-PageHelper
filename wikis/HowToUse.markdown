@@ -111,6 +111,8 @@
 
 8. `returnPageInfo`用来支持直接返回`PageInfo`类型，默认值`none`，可选参数always总是返回PageInfo类型,check检查返回类型是否为PageInfo,none返回Page(List)类型。用法和配置参考`com.github.pagehelper.test.basic`包下的`PageInfoTest`，特别要注意接口的返回值和xml中的`resultType`类型。
 
+9. 增加`closeConn`属性，当使用动态数据源或没有设置`dialect`属性自动获取数据库类型时，会自动获取一个数据库连接，通过该属性来设置是否关闭获取的这个连接，默认`true`关闭。
+
 <b>重要提示：</b>
 
 当`offsetAsPageNum=false`的时候，由于PageNum问题，`RowBounds`查询的时候reasonable会强制为false。使用`PageHelper.startPage`方法不受影响。
