@@ -36,7 +36,7 @@
 
 ##分页插件支持MyBatis3.2.0~3.3.0(包含)
 
-##分页插件最新版本为4.1.4
+##分页插件最新版本为4.1.5
 
 ###Maven坐标
 
@@ -44,7 +44,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.1.4</version>
+    <version>4.1.5</version>
 </dependency>
 ```  
 
@@ -58,15 +58,15 @@
 
 ###由于使用了sql解析工具，你还需要下载jsqlparser.jar
 
-####4.1.0及以后版本需要0.9.4版本
+####4.1.0及以后版本需要0.9.5版本
 
- - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.4/
+ - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/
 
 ####4.1.0以前版本需要0.9.1版本
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
 
-##4.1.5-SNAPSHOT更新日志
+##4.1.5更新日志
 
 - 更新`PageProviderSqlSource`，支持3.4.0版本的`Provider`注解方式的分页#102
 - 解决`SqlUtil`未初始化`PARAMS`属性导致的错误
