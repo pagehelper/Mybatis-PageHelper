@@ -32,6 +32,7 @@ import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 
@@ -48,6 +49,7 @@ public class PageProviderSqlSource extends PageSqlSource implements Constant {
     private Class<?> providerType;
     private Method providerMethod;
     private Boolean providerTakesParameterObject;
+    private String[] providerMethodArgumentNames;
     private Configuration configuration;
 
     public PageProviderSqlSource(ProviderSqlSource provider) {
@@ -55,11 +57,31 @@ public class PageProviderSqlSource extends PageSqlSource implements Constant {
         this.sqlSourceParser = (SqlSourceBuilder) metaObject.getValue("sqlSourceParser");
         this.providerType = (Class<?>) metaObject.getValue("providerType");
         this.providerMethod = (Method) metaObject.getValue("providerMethod");
-        this.providerTakesParameterObject = (Boolean) metaObject.getValue("providerTakesParameterObject");
         this.configuration = (Configuration) metaObject.getValue("sqlSourceParser.configuration");
+        try {
+            //先针对3.3.1和之前版本做判断
+            this.providerTakesParameterObject = (Boolean) metaObject.getValue("providerTakesParameterObject");
+        } catch (ReflectionException e) {
+            //3.4.0+版本，解决#102 by Ian Lim
+            providerMethodArgumentNames = (String[]) metaObject.getValue("providerMethodArgumentNames");
+        }
     }
 
     private SqlSource createSqlSource(Object parameterObject) {
+        if(providerTakesParameterObject != null){
+            return createSqlSource331(parameterObject);
+        } else {
+            return createSqlSource340(parameterObject);
+        }
+    }
+
+    /**
+     * 3.3.1版本之前的方法
+     *
+     * @param parameterObject
+     * @return
+     */
+    private SqlSource createSqlSource331(Object parameterObject) {
         try {
             String sql;
             if (providerTakesParameterObject) {
@@ -75,6 +97,53 @@ public class PageProviderSqlSource extends PageSqlSource implements Constant {
                     + providerType.getName() + "." + providerMethod.getName()
                     + ").  Cause: " + e, e);
         }
+    }
+
+    /**
+     * 3.4.0之后的方法
+     *
+     * @param parameterObject
+     * @return
+     */
+    private SqlSource createSqlSource340(Object parameterObject) {
+        try {
+            Class<?>[] parameterTypes = providerMethod.getParameterTypes();
+            String sql;
+            if (parameterTypes.length == 0) {
+                sql = (String) providerMethod.invoke(providerType.newInstance());
+            } else if (parameterTypes.length == 1 &&
+                    (parameterObject == null || parameterTypes[0].isAssignableFrom(parameterObject.getClass()))) {
+                sql = (String) providerMethod.invoke(providerType.newInstance(), parameterObject);
+            } else if (parameterObject instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> params = (Map<String, Object>) parameterObject;
+                sql = (String) providerMethod.invoke(providerType.newInstance(), extractProviderMethodArguments(params, providerMethodArgumentNames));
+            } else {
+                throw new BuilderException("Error invoking SqlProvider method ("
+                        + providerType.getName() + "." + providerMethod.getName()
+                        + "). Cannot invoke a method that holds "
+                        + (parameterTypes.length == 1 ? "named argument(@Param)": "multiple arguments")
+                        + " using a specifying parameterObject. In this case, please specify a 'java.util.Map' object.");
+            }
+            Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+            StaticSqlSource sqlSource = (StaticSqlSource) sqlSourceParser.parse(sql, parameterType, new HashMap<String, Object>());
+            return new OrderByStaticSqlSource(sqlSource);
+            //return sqlSourceParser.parse(sql, parameterType, new HashMap<String, Object>());
+        } catch (BuilderException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BuilderException("Error invoking SqlProvider method ("
+                    + providerType.getName() + "." + providerMethod.getName()
+                    + ").  Cause: " + e, e);
+        }
+    }
+
+    private Object[] extractProviderMethodArguments(Map<String, Object> params, String[] argumentNames) {
+        Object[] args = new Object[argumentNames.length];
+        for (int i = 0; i < args.length; i++) {
+            args[i] = params.get(argumentNames[i]);
+        }
+        return args;
     }
 
     @Override

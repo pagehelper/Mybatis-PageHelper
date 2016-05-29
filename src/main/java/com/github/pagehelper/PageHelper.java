@@ -372,6 +372,8 @@ public class PageHelper implements Interceptor {
         if(StringUtil.isNotEmpty(closeConn)){
             this.closeConn = Boolean.parseBoolean(closeConn);
         }
+        //初始化SqlUtil的PARAMS
+        SqlUtil.setParams(p.getProperty("params"));
         //数据库方言
         String dialect = p.getProperty("dialect");
         String runtimeDialect = p.getProperty("autoRuntimeDialect");
@@ -396,6 +398,8 @@ public class PageHelper implements Interceptor {
      */
     public void setSqlUtilConfig(SqlUtilConfig config) {
         checkVersion();
+        //初始化SqlUtil的PARAMS
+        SqlUtil.setParams(config.getParams());
         //多数据源时，获取jdbcurl后是否关闭数据源
         this.closeConn = config.isCloseConn();
         if (config.isAutoRuntimeDialect()) {

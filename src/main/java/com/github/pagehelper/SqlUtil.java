@@ -528,7 +528,7 @@ public class SqlUtil implements Constant {
         this.supportMethodsArguments = supportMethodsArguments;
     }
 
-    public void setParams(String params) {
+    public static void setParams(String params) {
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
         PARAMS.put("count", "countSql");

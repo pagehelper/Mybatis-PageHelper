@@ -66,6 +66,11 @@
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
 
+##4.1.5-SNAPSHOT更新日志
+
+- 更新`PageProviderSqlSource`，支持3.4.0版本的`Provider`注解方式的分页#102
+- 解决`SqlUtil`未初始化`PARAMS`属性导致的错误
+
 ##4.1.4更新日志
 
 - 解决`closeConn`未设置时，默认值被覆盖变成`false`的问题#97
