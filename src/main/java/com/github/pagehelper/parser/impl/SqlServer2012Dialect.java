@@ -12,6 +12,16 @@ import java.util.Map;
  * in oder for OFFSET .. ROWS to work
  */
 public class SqlServer2012Dialect extends AbstractParser {
+    //with(nolock)
+    protected static final String WITHNOLOCK = ", PAGEWITHNOLOCK";
+
+    @Override
+    public String getCountSql(String sql) {
+        sql = sql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
+        sql = super.getCountSql(sql);
+        sql = sql.replace(WITHNOLOCK, " with(nolock)");
+        return sql;
+    }
 
     @Override
     public String getPageSql(String sql) {

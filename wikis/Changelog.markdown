@@ -1,6 +1,10 @@
 ##更新日志
 
-##4.1.5 - 2016-05-29
+##4.1.6 - 2016-06-05
+
+- 通过间接处理字符串解决SqlServer中不支持`with(nolock)`的问题#86，详情可以看`SqlServerParser`和`SqlServer2012Dialect`
+
+###4.1.5 - 2016-05-29
 
 - 更新`PageProviderSqlSource`，支持3.4.0版本的`Provider`注解方式的分页#102
 - 解决`SqlUtil`未初始化`PARAMS`属性导致的错误

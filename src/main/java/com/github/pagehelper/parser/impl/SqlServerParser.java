@@ -41,6 +41,17 @@ import java.util.Map;
 public class SqlServerParser extends AbstractParser {
     private static final SqlServer pageSql = new SqlServer();
 
+    //with(nolock)
+    protected static final String WITHNOLOCK = ", PAGEWITHNOLOCK";
+
+    @Override
+    public String getCountSql(String sql) {
+        sql = sql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
+        sql = super.getCountSql(sql);
+        sql = sql.replace(WITHNOLOCK, " with(nolock)");
+        return sql;
+    }
+
     @Override
     public boolean isSupportedMappedStatementCache() {
         //由于sqlserver每次分页参数都是直接写入到sql语句中，因此不能缓存MS
@@ -55,7 +66,10 @@ public class SqlServerParser extends AbstractParser {
     @Override
     public String getPageSql(String sql) {
         Page<?> page = SqlUtil.getLocalPage();
-        return pageSql.convertToPageSql(sql, page.getStartRow(), page.getPageSize());
+        sql = sql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
+        sql = pageSql.convertToPageSql(sql, page.getStartRow(), page.getPageSize());
+        sql = sql.replace(WITHNOLOCK, " with(nolock)");
+        return sql;
     }
 
     @Override
