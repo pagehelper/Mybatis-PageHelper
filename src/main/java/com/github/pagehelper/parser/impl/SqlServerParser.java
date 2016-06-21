@@ -48,7 +48,7 @@ public class SqlServerParser extends AbstractParser {
     public String getCountSql(String sql) {
         sql = sql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
         sql = super.getCountSql(sql);
-        sql = sql.replace(WITHNOLOCK, " with(nolock)");
+        sql = sql.replaceAll(WITHNOLOCK, " with(nolock)");
         return sql;
     }
 
@@ -68,7 +68,7 @@ public class SqlServerParser extends AbstractParser {
         Page<?> page = SqlUtil.getLocalPage();
         sql = sql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
         sql = pageSql.convertToPageSql(sql, page.getStartRow(), page.getPageSize());
-        sql = sql.replace(WITHNOLOCK, " with(nolock)");
+        sql = sql.replaceAll(WITHNOLOCK, " with(nolock)");
         return sql;
     }
 
