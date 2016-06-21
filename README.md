@@ -66,6 +66,10 @@
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
 
+##4.1.7-SNAPSHOT
+
+- 解决多个`with(nolock)`时出错的问题
+
 ##4.1.6更新日志
 
 - 通过间接处理字符串解决SqlServer中不支持`with(nolock)`的问题#86，详情可以看`SqlServerParser`和`SqlServer2012Dialect`
