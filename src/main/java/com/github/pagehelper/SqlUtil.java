@@ -450,7 +450,7 @@ public class SqlUtil implements Constant {
      * @return 返回执行结果
      * @throws Throwable 抛出异常
      */
-    private Page doProcessPage(Invocation invocation, Page page, Object[] args) throws Throwable {
+    private List doProcessPage(Invocation invocation, Page page, Object[] args) throws Throwable {
         //保存RowBounds状态
         RowBounds rowBounds = (RowBounds) args[2];
         //获取原始的ms
@@ -471,6 +471,13 @@ public class SqlUtil implements Constant {
 
             //简单的通过total的值来判断是否进行count查询
             if (page.isCount()) {
+                //Count的MS可能被Plugin拦截，需要直接返回而不执行分页和count逻辑，否则会出现NullPointerException
+                Boolean countSignal = page.getCountSignal();
+                //countSignal为count标记
+                if (countSignal != null && countSignal) {
+                    //执行count的MS
+                    return (List)invocation.proceed();
+                }
                 page.setCountSignal(Boolean.TRUE);
                 //替换MS
                 args[0] = msCountMap.get(ms.getId());
