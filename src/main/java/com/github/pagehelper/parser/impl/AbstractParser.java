@@ -27,6 +27,7 @@ package com.github.pagehelper.parser.impl;
 import com.github.pagehelper.Constant;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.Page;
+import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.SqlParser;
 import com.github.pagehelper.sqlsource.PageProviderSqlSource;
@@ -47,10 +48,18 @@ import java.util.Map;
  */
 public abstract class AbstractParser implements Parser, Constant {
     //处理SQL
-    public static final SqlParser sqlParser = new SqlParser();
+    public SqlParser sqlParser;
+
+    public void initSqlParser(String sqlCacheClass){
+        sqlParser = new SqlParser(CacheFactory.createSqlCache(sqlCacheClass));
+    }
 
     public static Parser newParser(Dialect dialect) {
-        Parser parser = null;
+        return newParser(dialect, null);
+    }
+
+    public static Parser newParser(Dialect dialect, String cacheClass) {
+        Parser parser;
         switch (dialect) {
             case mysql:
             case mariadb:
@@ -83,6 +92,9 @@ public abstract class AbstractParser implements Parser, Constant {
                 break;
             default:
                 throw new RuntimeException("分页插件" + dialect + "方言错误!");
+        }
+        if(parser instanceof AbstractParser){
+            ((AbstractParser)parser).initSqlParser(cacheClass);
         }
         return parser;
     }

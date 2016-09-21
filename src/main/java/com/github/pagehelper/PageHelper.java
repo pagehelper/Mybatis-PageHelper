@@ -31,7 +31,6 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
@@ -323,11 +322,13 @@ public class PageHelper implements Interceptor {
             if (dialect == null) {
                 throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
             }
-            SqlUtil sqlUtil = new SqlUtil(dialect);
-            if (this.properties != null) {
+            SqlUtil sqlUtil = null;
+            if (properties != null) {
+                sqlUtil = new SqlUtil(dialect, properties.getProperty("sqlCacheClass"));
                 sqlUtil.setProperties(properties);
-            } else if (this.sqlUtilConfig != null) {
-                sqlUtil.setSqlUtilConfig(this.sqlUtilConfig);
+            } else if (sqlUtilConfig != null) {
+                sqlUtil = new SqlUtil(dialect, sqlUtilConfig.getSqlCacheClass());
+                sqlUtil.setSqlUtilConfig(sqlUtilConfig);
             }
             urlSqlUtilMap.put(url, sqlUtil);
             return sqlUtil;
@@ -386,7 +387,7 @@ public class PageHelper implements Interceptor {
             this.properties = p;
         } else {
             autoDialect = false;
-            sqlUtil = new SqlUtil(dialect);
+            sqlUtil = new SqlUtil(dialect, p.getProperty("sqlCacheClass"));
             sqlUtil.setProperties(p);
         }
     }
@@ -411,7 +412,7 @@ public class PageHelper implements Interceptor {
             this.sqlUtilConfig = config;
         } else {
             autoDialect = false;
-            sqlUtil = new SqlUtil(config.getDialect());
+            sqlUtil = new SqlUtil(config.getDialect(), config.getSqlCacheClass());
             sqlUtil.setSqlUtilConfig(config);
         }
     }

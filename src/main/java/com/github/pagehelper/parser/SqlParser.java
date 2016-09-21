@@ -24,6 +24,8 @@
 
 package com.github.pagehelper.parser;
 
+import com.github.pagehelper.cache.Cache;
+import com.github.pagehelper.cache.CacheFactory;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -33,8 +35,6 @@ import net.sf.jsqlparser.statement.select.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * sql解析类，提供更智能的count查询sql
@@ -54,7 +54,15 @@ public class SqlParser {
     }
 
     //缓存已经修改过的sql
-    private Map<String, String> CACHE = new ConcurrentHashMap<String, String>();
+    private final Cache<String, String> CACHE;
+
+    public SqlParser() {
+        this(CacheFactory.createSqlCache(null));
+    }
+
+    public SqlParser(Cache<String, String> cache) {
+        this.CACHE = cache;
+    }
 
     public void isSupportedSql(String sql) {
         if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {

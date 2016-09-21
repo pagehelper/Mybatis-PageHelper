@@ -49,6 +49,8 @@ public class SqlUtilConfig {
     private boolean autoRuntimeDialect;
     //多数据源时，获取jdbcurl后是否关闭数据源
     private boolean closeConn = true;
+    //cacheClass sql缓存接口
+    private String sqlCacheClass;
 
     public String getDialect() {
         return dialect;
@@ -120,5 +122,13 @@ public class SqlUtilConfig {
 
     public void setCloseConn(boolean closeConn) {
         this.closeConn = closeConn;
+    }
+
+    public String getSqlCacheClass() {
+        return sqlCacheClass;
+    }
+
+    public void setSqlCacheClass(String sqlCacheClass) {
+        this.sqlCacheClass = sqlCacheClass;
     }
 }

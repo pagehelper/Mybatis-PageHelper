@@ -93,13 +93,22 @@ public class SqlUtil implements Constant {
      * @param strDialect
      */
     public SqlUtil(String strDialect) {
+        this(strDialect, null);
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param strDialect
+     */
+    public SqlUtil(String strDialect, String cacheClass) {
         if (strDialect == null || "".equals(strDialect)) {
             throw new IllegalArgumentException("Mybatis分页插件无法获取dialect参数!");
         }
         Exception exception = null;
         try {
             Dialect dialect = Dialect.of(strDialect);
-            parser = AbstractParser.newParser(dialect);
+            parser = AbstractParser.newParser(dialect, cacheClass);
         } catch (Exception e) {
             exception = e;
             //异常的时候尝试反射，允许自己写实现类传递进来
@@ -107,6 +116,9 @@ public class SqlUtil implements Constant {
                 Class<?> parserClass = Class.forName(strDialect);
                 if (Parser.class.isAssignableFrom(parserClass)) {
                     parser = (Parser) parserClass.newInstance();
+                    if(parser instanceof AbstractParser){
+                        ((AbstractParser)parser).initSqlParser(cacheClass);
+                    }
                 }
             } catch (ClassNotFoundException ex) {
                 exception = ex;
