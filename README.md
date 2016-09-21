@@ -69,6 +69,7 @@
 ##4.1.7-SNAPSHOT
 
 - 解决多个`with(nolock)`时出错的问题
+- 新增`sqlCacheClass`参数，该参数可选，可以设置sql缓存实现类，默认为`SimpleCache`，当项目包含guava时，使用`GuavaCache`，也可以通过参数`sqlCacheClass`指定自己的实现类，有关详情看`com.github.pagehelper.cache`包。
 
 ##4.1.6更新日志
 
