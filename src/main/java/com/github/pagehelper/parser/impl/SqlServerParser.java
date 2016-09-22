@@ -72,6 +72,19 @@ public class SqlServerParser extends AbstractParser {
         return sql;
     }
 
+    /**
+     * 该方法针对 CacheParser 提供，返回的 sql 不是最终执行的 sql，需要替换分页参数
+     *
+     * @param sql
+     * @return
+     */
+    public String getPageSqlWithOutPage(String sql) {
+        sql = sql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
+        sql = pageSql.convertToPageSql(sql);
+        sql = sql.replaceAll(WITHNOLOCK, " with(nolock)");
+        return sql;
+    }
+
     @Override
     public Map<String, Object> setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page<?> page) {
         return super.setPageParameter(ms, parameterObject, boundSql, page);

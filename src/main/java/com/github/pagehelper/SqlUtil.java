@@ -26,6 +26,7 @@ package com.github.pagehelper;
 
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.impl.AbstractParser;
+import com.github.pagehelper.parser.impl.CacheParser;
 import com.github.pagehelper.sqlsource.*;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
@@ -116,8 +117,9 @@ public class SqlUtil implements Constant {
                 Class<?> parserClass = Class.forName(strDialect);
                 if (Parser.class.isAssignableFrom(parserClass)) {
                     parser = (Parser) parserClass.newInstance();
-                    if(parser instanceof AbstractParser){
-                        ((AbstractParser)parser).initSqlParser(cacheClass);
+                    //空和不为false时，使用缓存，感谢MoonFruit提供的思路
+                    if(StringUtil.isEmpty(cacheClass) || !cacheClass.equalsIgnoreCase("false")){
+                        parser = new CacheParser(parser, cacheClass);
                     }
                 }
             } catch (ClassNotFoundException ex) {

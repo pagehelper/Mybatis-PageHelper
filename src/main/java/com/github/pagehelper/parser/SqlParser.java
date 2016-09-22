@@ -24,8 +24,6 @@
 
 package com.github.pagehelper.parser;
 
-import com.github.pagehelper.cache.Cache;
-import com.github.pagehelper.cache.CacheFactory;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -53,17 +51,6 @@ public class SqlParser {
         TABLE_ALIAS.setUseAs(false);
     }
 
-    //缓存已经修改过的sql
-    private final Cache<String, String> CACHE;
-
-    public SqlParser() {
-        this(CacheFactory.createSqlCache(null));
-    }
-
-    public SqlParser(Cache<String, String> cache) {
-        this.CACHE = cache;
-    }
-
     public void isSupportedSql(String sql) {
         if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
             throw new RuntimeException("分页插件不支持包含for update的sql");
@@ -79,18 +66,13 @@ public class SqlParser {
     public String getSmartCountSql(String sql) {
         //校验是否支持该sql
         isSupportedSql(sql);
-        if (CACHE.get(sql) != null) {
-            return CACHE.get(sql);
-        }
         //解析SQL
         Statement stmt = null;
         try {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (Throwable e) {
             //无法解析的用一般方法返回count语句
-            String countSql = getSimpleCountSql(sql);
-            CACHE.put(sql, countSql);
-            return countSql;
+            return getSimpleCountSql(sql);
         }
         Select select = (Select) stmt;
         SelectBody selectBody = select.getSelectBody();
@@ -101,7 +83,6 @@ public class SqlParser {
         //处理为count查询
         sqlToCount(select);
         String result = select.toString();
-        CACHE.put(sql, result);
         return result;
     }
 

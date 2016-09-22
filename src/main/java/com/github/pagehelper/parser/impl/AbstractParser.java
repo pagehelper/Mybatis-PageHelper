@@ -27,7 +27,7 @@ package com.github.pagehelper.parser.impl;
 import com.github.pagehelper.Constant;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.cache.CacheFactory;
+import com.github.pagehelper.StringUtil;
 import com.github.pagehelper.parser.Parser;
 import com.github.pagehelper.parser.SqlParser;
 import com.github.pagehelper.sqlsource.PageProviderSqlSource;
@@ -48,11 +48,7 @@ import java.util.Map;
  */
 public abstract class AbstractParser implements Parser, Constant {
     //处理SQL
-    public SqlParser sqlParser;
-
-    public void initSqlParser(String sqlCacheClass){
-        sqlParser = new SqlParser(CacheFactory.createSqlCache(sqlCacheClass));
-    }
+    public static final SqlParser sqlParser = new SqlParser();
 
     public static Parser newParser(Dialect dialect) {
         return newParser(dialect, null);
@@ -93,8 +89,9 @@ public abstract class AbstractParser implements Parser, Constant {
             default:
                 throw new RuntimeException("分页插件" + dialect + "方言错误!");
         }
-        if(parser instanceof AbstractParser){
-            ((AbstractParser)parser).initSqlParser(cacheClass);
+        //空和不为false时，使用缓存，感谢MoonFruit提供的思路
+        if(StringUtil.isEmpty(cacheClass) || !cacheClass.equalsIgnoreCase("false")){
+            parser = new CacheParser(parser, cacheClass);
         }
         return parser;
     }

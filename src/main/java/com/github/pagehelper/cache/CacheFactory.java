@@ -43,29 +43,8 @@ public abstract class CacheFactory {
         if(StringUtil.isEmpty(sqlCacheClass)){
             try {
                 Class.forName("com.google.common.cache.Cache");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("====com.google.common.cache.Cache=====");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
                 return new GuavaCache();
             } catch (Throwable t){
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("========SimpleCache===================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
-                System.out.println("======================================");
                 return new SimpleCache();
             }
         } else {

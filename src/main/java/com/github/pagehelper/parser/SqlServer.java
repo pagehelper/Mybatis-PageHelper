@@ -34,8 +34,6 @@ import net.sf.jsqlparser.statement.select.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 将sqlserver查询语句转换为分页语句<br>
@@ -53,12 +51,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author liuzh
  */
 public class SqlServer {
-    //缓存结果
-    protected static final Map<String, String> CACHE = new ConcurrentHashMap<String, String>();
     //开始行号
-    protected static final String START_ROW = String.valueOf(Long.MIN_VALUE);
+    public static final String START_ROW = String.valueOf(Long.MIN_VALUE);
     //结束行号
-    protected static final String PAGE_SIZE = String.valueOf(Long.MAX_VALUE);
+    public static final String PAGE_SIZE = String.valueOf(Long.MAX_VALUE);
     //外层包装表
     protected static final String WRAP_TABLE = "WRAP_OUTER_TABLE";
     //表别名名字
@@ -83,30 +79,41 @@ public class SqlServer {
      * 转换为分页语句
      *
      * @param sql
+     * @return
+     */
+    public String convertToPageSql(String sql) {
+        return convertToPageSql(sql, null, null);
+    }
+
+    /**
+     * 转换为分页语句
+     *
+     * @param sql
      * @param offset
      * @param limit
      * @return
      */
-    public String convertToPageSql(String sql, int offset, int limit) {
-        String pageSql = CACHE.get(sql);
-        if (pageSql == null) {
-            //解析SQL
-            Statement stmt;
-            try {
-                stmt = CCJSqlParserUtil.parse(sql);
-            } catch (Throwable e) {
-                throw new RuntimeException("不支持该SQL转换为分页查询!");
-            }
-            if (!(stmt instanceof Select)) {
-                throw new RuntimeException("分页语句必须是Select查询!");
-            }
-            //获取分页查询的select
-            Select pageSelect = getPageSelect((Select) stmt);
-            pageSql = pageSelect.toString();
-            CACHE.put(sql, pageSql);
+    public String convertToPageSql(String sql, Integer offset, Integer limit) {
+        //解析SQL
+        Statement stmt;
+        try {
+            stmt = CCJSqlParserUtil.parse(sql);
+        } catch (Throwable e) {
+            throw new RuntimeException("不支持该SQL转换为分页查询!");
         }
-        pageSql = pageSql.replace(START_ROW, String.valueOf(offset));
-        pageSql = pageSql.replace(PAGE_SIZE, String.valueOf(limit));
+        if (!(stmt instanceof Select)) {
+            throw new RuntimeException("分页语句必须是Select查询!");
+        }
+        //获取分页查询的select
+        Select pageSelect = getPageSelect((Select) stmt);
+        String pageSql = pageSelect.toString();
+        //缓存移到外面了，所以不替换参数
+        if(offset != null){
+            pageSql = pageSql.replace(START_ROW, String.valueOf(offset));
+        }
+        if(limit != null){
+            pageSql = pageSql.replace(PAGE_SIZE, String.valueOf(limit));
+        }
         return pageSql;
     }
 
