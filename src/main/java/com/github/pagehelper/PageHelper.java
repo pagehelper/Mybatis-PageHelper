@@ -33,10 +33,12 @@ import org.apache.ibatis.session.RowBounds;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 /**
  * Mybatis - 通用分页拦截器
@@ -199,6 +201,19 @@ public class PageHelper implements Interceptor {
         }
         SqlUtil.setLocalPage(page);
         return page;
+    }
+
+    /*
+    * 分页并返回PageInfo
+    * @param pageNum      页码
+    * @param pageSize     每页显示数量
+    * @action 查询并返回List<E>的 lambda表达式
+    * @since 1.8
+    * */
+    public static <E> PageInfo<E> startPage(final int pageNum, final int pageSize, Supplier<List<E>> action){
+        // 开始分页
+        startPage(pageNum, pageSize);
+        return new PageInfo<E>(action.get());
     }
 
     /**
