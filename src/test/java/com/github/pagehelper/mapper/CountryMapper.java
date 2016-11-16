@@ -24,7 +24,6 @@
 
 package com.github.pagehelper.mapper;
 
-import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.model.CountryExample;
 import com.github.pagehelper.model.CountryQueryModel;
@@ -119,4 +118,8 @@ public interface CountryMapper {
     List<Country> selectByOrderBy(@Param("orderBy") String orderBy);
 
     List<Country> selectByQueryModel(CountryQueryModel queryModel);
+
+    List<Country> selectByIdList(@Param("idList") List<Long> idList);
+
+    List<Country> selectByIdList2(@Param("idList") List<Long> idList);
 }

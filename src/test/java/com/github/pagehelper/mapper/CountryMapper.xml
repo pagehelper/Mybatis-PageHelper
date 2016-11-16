@@ -282,4 +282,18 @@
     <select id="selectByQueryModel" resultType="com.github.pagehelper.model.Country">
         select * from country
     </select>
+    <select id="selectByIdList" resultType="com.github.pagehelper.model.Country">
+        select * from country
+        <if test="idList != null and idList.size()>0">
+            where id in
+            <foreach collection="idList" item="id" open="(" close=")" separator=",">
+              #{id}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectByIdList2" resultType="com.github.pagehelper.model.Country">
+        <foreach collection="idList" item="id" separator="union all">
+            select * from country where id = #{id}
+        </foreach>
+    </select>
 </mapper>
