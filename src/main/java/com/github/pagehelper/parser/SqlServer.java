@@ -25,6 +25,7 @@
 package com.github.pagehelper.parser;
 
 import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -33,7 +34,9 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 将sqlserver查询语句转换为分页语句<br>
@@ -253,7 +256,7 @@ public class SqlServer {
         orderByBuilder.append("ROW_NUMBER() OVER (");
         if (isNotEmptyList(plainSelect.getOrderByElements())) {
             //注意：order by别名的时候有错,由于没法判断一个列是否为别名，所以不能解决
-            orderByBuilder.append(PlainSelect.orderByToString(false, plainSelect.getOrderByElements()));
+            orderByBuilder.append(orderByToString(plainSelect));
         } else {
             throw new RuntimeException("请您在sql中包含order by语句!");
         }
@@ -265,6 +268,63 @@ public class SqlServer {
         orderByBuilder.append(PAGE_ROW_NUMBER);
         Column orderByColumn = new Column(orderByBuilder.toString());
         plainSelect.getSelectItems().add(0, new SelectExpressionItem(orderByColumn));
+    }
+
+    /**
+     * 拼接order by 排序字符串
+     * @param plainSelect
+     * @return
+     */
+    public String orderByToString(PlainSelect plainSelect) {
+        List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
+        if (orderByElements.isEmpty()) {
+            return " ";
+        }
+
+        StringBuilder orderBy = new StringBuilder(50);
+        Map<String, String> aliasMap = getColumnAliasMap(plainSelect);
+        for (OrderByElement element : orderByElements) {
+            if (orderBy.length() == 0) {
+                orderBy.append(" ORDER BY ");
+            }else {
+                orderBy.append(", ");
+            }
+            Column column = (Column) element.getExpression();
+            String columnName = column.getColumnName();
+            orderBy.append(aliasMap.containsKey(columnName) ? aliasMap.get(columnName) : columnName);
+            orderBy.append(element.isAsc() ? " ASC " : " DESC ");
+        }
+
+        return orderBy.toString();
+    }
+
+    /**
+     * 获取查询列字段与别名的对应关系
+     * @param selectBody
+     * @return
+     */
+    public Map<String, String> getColumnAliasMap(PlainSelect selectBody) {
+        Map<String, String> columnAliaMap = new HashMap<String, String>();
+        List<SelectItem> selectItemList = selectBody.getSelectItems();
+        for (SelectItem selectItem : selectItemList) {
+            if (!(selectItem instanceof SelectExpressionItem)) {
+                continue;
+            }
+            SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
+            if (selectExpressionItem.getAlias() == null){
+                //只关联有别名的列
+                continue;
+            }
+            Expression expression = selectExpressionItem.getExpression();
+            if (!(expression instanceof Column)) {
+                continue;
+            }
+            Column column = (Column)selectExpressionItem.getExpression();
+            String aliasName = selectExpressionItem.getAlias().getName();
+            String columnName = column.getTable().getName() + "." + column.getColumnName();
+            columnAliaMap.put(aliasName,columnName);
+        }
+        return columnAliaMap;
     }
 
     /**
