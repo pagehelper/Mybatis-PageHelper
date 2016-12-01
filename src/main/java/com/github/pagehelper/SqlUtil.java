@@ -464,7 +464,18 @@ public class SqlUtil implements Constant {
      * @return 返回执行结果
      * @throws Throwable 抛出异常
      */
-    private Page doProcessPage(Invocation invocation, Page page, Object[] args) throws Throwable {
+    private List doProcessPage(Invocation invocation, Page page, Object[] args) throws Throwable {
+        /*
+         * count或者分页的MS可能被Plugin拦截，会重复执行该方法;
+         * 若以前执行过该方法则需要直接返回；
+         * 防止出现NullPointerException或者导致page重复添加结果
+         */
+        Boolean countSignal = page.getCountSignal();
+        //若以前执行过该方法则需要直接返回，防止重复处理
+        if (countSignal != null) {
+            //执行MS,直接返回
+            return (List)invocation.proceed();
+        }
         //保存RowBounds状态
         RowBounds rowBounds = (RowBounds) args[2];
         //获取原始的ms
@@ -509,6 +520,8 @@ public class SqlUtil implements Constant {
                 BoundSql boundSql = ms.getBoundSql(args[1]);
                 args[1] = parser.setPageParameter(ms, args[1], boundSql, page);
                 page.setCountSignal(Boolean.FALSE);
+                //重新设置LocalPage，防止count ms被代理后clear LocalPage
+                setLocalPage(page);
                 //执行分页查询
                 Object result = invocation.proceed();
                 //得到处理结果
