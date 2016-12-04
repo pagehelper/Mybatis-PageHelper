@@ -34,7 +34,7 @@ public class OrderByStaticSqlSource implements SqlSource {
     }
 
     public BoundSql getBoundSql(Object parameterObject) {
-        String orderBy = PageHelper.getOrderBy();
+        String orderBy = null;//PageHelper.getOrderBy();
         String tempSql = sql;
         if (orderBy != null) {
             tempSql = OrderByParser.converToOrderBySql(sql, orderBy);

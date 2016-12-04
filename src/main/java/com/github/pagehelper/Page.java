@@ -64,7 +64,7 @@ public class Page<E> extends ArrayList<E> {
     /**
      * 包含count查询
      */
-    private boolean count;
+    private boolean count = true;
     /**
      * count信号，3种情况，null的时候执行默认BoundSql,true的时候执行count，false执行分页
      */

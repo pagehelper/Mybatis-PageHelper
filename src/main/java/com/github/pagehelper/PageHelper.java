@@ -30,39 +30,19 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Mybatis - 通用分页拦截器
+ * Mybatis - 通用分页拦截器<br/>
+ * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  *
  * @author liuzh/abel533/isea533
- * @version 3.3.0
- *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
+ * @version 5.0.0
  */
 @SuppressWarnings("rawtypes")
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class PageHelper implements Interceptor {
-    //sql工具类
-    private SqlUtil sqlUtil;
-    //属性参数信息
-    private Properties properties;
-    //配置对象方式
-    private SqlUtilConfig sqlUtilConfig;
-    //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
-    private boolean autoDialect = true;
-    //运行时自动获取dialect
-    private boolean autoRuntimeDialect;
-    //多数据源时，获取jdbcurl后是否关闭数据源
-    private boolean closeConn = true;
-    //缓存
-    private Map<String, SqlUtil> urlSqlUtilMap = new ConcurrentHashMap<String, SqlUtil>();
-    private ReentrantLock lock = new ReentrantLock();
+    private final SqlUtil sqlUtil = new SqlUtil();
 
     /**
      * 获取任意查询方法的count总数
@@ -218,202 +198,18 @@ public class PageHelper implements Interceptor {
         }
     }
 
-    /**
-     * 获取orderBy
-     *
-     * @return
-     */
-    public static String getOrderBy() {
-        Page<?> page = SqlUtil.getLocalPage();
-        if (page != null) {
-            String orderBy = page.getOrderBy();
-            if (StringUtil.isEmpty(orderBy)) {
-                return null;
-            } else {
-                return orderBy;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Mybatis拦截器方法
-     *
-     * @param invocation 拦截器入参
-     * @return 返回执行结果
-     * @throws Throwable 抛出异常
-     */
+    @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        if (autoRuntimeDialect) {
-            SqlUtil sqlUtil = getSqlUtil(invocation);
-            return sqlUtil.processPage(invocation);
-        } else {
-            if (autoDialect) {
-                initSqlUtil(invocation);
-            }
-            return sqlUtil.processPage(invocation);
-        }
+        return sqlUtil.intercept(invocation);
     }
 
-    /**
-     * 初始化sqlUtil
-     *
-     * @param invocation
-     */
-    public synchronized void initSqlUtil(Invocation invocation) {
-        if (this.sqlUtil == null) {
-            this.sqlUtil = getSqlUtil(invocation);
-            if (!autoRuntimeDialect) {
-                properties = null;
-                sqlUtilConfig = null;
-            }
-            autoDialect = false;
-        }
-    }
-
-    /**
-     * 获取url
-     *
-     * @param dataSource
-     * @return
-     */
-    public String getUrl(DataSource dataSource){
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            return conn.getMetaData().getURL();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if(conn != null){
-                try {
-                    if(closeConn){
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    //ignore
-                }
-            }
-        }
-    }
-
-    /**
-     * 根据datasource创建对应的sqlUtil
-     *
-     * @param invocation
-     */
-    public SqlUtil getSqlUtil(Invocation invocation) {
-        MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
-        //改为对dataSource做缓存
-        DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
-        String url = getUrl(dataSource);
-        if (urlSqlUtilMap.containsKey(url)) {
-            return urlSqlUtilMap.get(url);
-        }
-        try {
-            lock.lock();
-            if (urlSqlUtilMap.containsKey(url)) {
-                return urlSqlUtilMap.get(url);
-            }
-            if (StringUtil.isEmpty(url)) {
-                throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
-            }
-            String dialect = Dialect.fromJdbcUrl(url);
-            if (dialect == null) {
-                throw new RuntimeException("无法自动获取数据库类型，请通过dialect参数指定!");
-            }
-            SqlUtil sqlUtil = null;
-            if (properties != null) {
-                sqlUtil = new SqlUtil(dialect, properties.getProperty("sqlCacheClass"));
-                sqlUtil.setProperties(properties);
-            } else if (sqlUtilConfig != null) {
-                sqlUtil = new SqlUtil(dialect, sqlUtilConfig.getSqlCacheClass());
-                sqlUtil.setSqlUtilConfig(sqlUtilConfig);
-            }
-            urlSqlUtilMap.put(url, sqlUtil);
-            return sqlUtil;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * 只拦截Executor
-     *
-     * @param target
-     * @return
-     */
+    @Override
     public Object plugin(Object target) {
-        if (target instanceof Executor) {
-            return Plugin.wrap(target, this);
-        } else {
-            return target;
-        }
+        return Plugin.wrap(target, this);
     }
 
-    private void checkVersion() {
-        //MyBatis3.2.0版本校验
-        try {
-            Class.forName("org.apache.ibatis.scripting.xmltags.SqlNode");//SqlNode是3.2.0之后新增的类
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("您使用的MyBatis版本太低，MyBatis分页插件PageHelper支持MyBatis3.2.0及以上版本!");
-        }
-    }
-
-    /**
-     * 设置属性值
-     *
-     * @param p 属性值
-     */
-    public void setProperties(Properties p) {
-        checkVersion();
-        //多数据源时，获取jdbcurl后是否关闭数据源
-        String closeConn = p.getProperty("closeConn");
-        //解决#97
-        if(StringUtil.isNotEmpty(closeConn)){
-            this.closeConn = Boolean.parseBoolean(closeConn);
-        }
-        //初始化SqlUtil的PARAMS
-        SqlUtil.setParams(p.getProperty("params"));
-        //数据库方言
-        String dialect = p.getProperty("dialect");
-        String runtimeDialect = p.getProperty("autoRuntimeDialect");
-        if (StringUtil.isNotEmpty(runtimeDialect) && runtimeDialect.equalsIgnoreCase("TRUE")) {
-            this.autoRuntimeDialect = true;
-            this.autoDialect = false;
-            this.properties = p;
-        } else if (StringUtil.isEmpty(dialect)) {
-            autoDialect = true;
-            this.properties = p;
-        } else {
-            autoDialect = false;
-            sqlUtil = new SqlUtil(dialect, p.getProperty("sqlCacheClass"));
-            sqlUtil.setProperties(p);
-        }
-    }
-
-    /**
-     * 设置属性值
-     *
-     * @param config
-     */
-    public void setSqlUtilConfig(SqlUtilConfig config) {
-        checkVersion();
-        //初始化SqlUtil的PARAMS
-        SqlUtil.setParams(config.getParams());
-        //多数据源时，获取jdbcurl后是否关闭数据源
-        this.closeConn = config.isCloseConn();
-        if (config.isAutoRuntimeDialect()) {
-            this.autoRuntimeDialect = true;
-            this.autoDialect = false;
-            this.sqlUtilConfig = config;
-        } else if (StringUtil.isEmpty(config.getDialect())) {
-            autoDialect = true;
-            this.sqlUtilConfig = config;
-        } else {
-            autoDialect = false;
-            sqlUtil = new SqlUtil(config.getDialect(), config.getSqlCacheClass());
-            sqlUtil.setSqlUtilConfig(config);
-        }
+    @Override
+    public void setProperties(Properties properties) {
+        sqlUtil.setProperties(properties);
     }
 }

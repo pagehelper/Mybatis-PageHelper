@@ -36,7 +36,7 @@ public class PageStaticSqlSource extends PageSqlSource {
     @Override
     protected BoundSql getDefaultBoundSql(Object parameterObject) {
         String tempSql = sql;
-        String orderBy = PageHelper.getOrderBy();
+        String orderBy = null;//PageHelper.getOrderBy();
         if (orderBy != null) {
             tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
         }
@@ -51,7 +51,7 @@ public class PageStaticSqlSource extends PageSqlSource {
     @Override
     protected BoundSql getPageBoundSql(Object parameterObject) {
         String tempSql = sql;
-        String orderBy = PageHelper.getOrderBy();
+        String orderBy = null;//PageHelper.getOrderBy();
         if (orderBy != null) {
             tempSql = OrderByParser.converToOrderBySql(sql, orderBy);
         }

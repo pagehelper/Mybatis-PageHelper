@@ -24,7 +24,6 @@
 
 package com.github.pagehelper.sql;
 
-import com.github.pagehelper.SqlUtil;
 import com.github.pagehelper.parser.SqlParser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Test;
@@ -33,69 +32,6 @@ import org.junit.Test;
  * @author liuzh
  */
 public class SqlTest {
-
-    @Test
-    public void testSqlTest() throws JSQLParserException {
-        String originalSql = "Select * from sys_user o where abc = ? and exists(select 1 from sys_role r where o.rolieid = r.id) order by id desc , name asc";
-        SqlUtil.testSql("mysql", originalSql);
-        SqlUtil.testSql("hsqldb", originalSql);
-        SqlUtil.testSql("oracle", originalSql);
-        SqlUtil.testSql("postgresql", originalSql);
-        SqlUtil.testSql("sqlserver", originalSql);
-    }
-
-    @Test
-    public void testSqlTest2() throws JSQLParserException {
-        String originalSql = "Select username,usertype,userrole from sys_user o where abc = ? order by id desc , name asc";
-        SqlUtil.testSql("mysql", originalSql);
-        SqlUtil.testSql("hsqldb", originalSql);
-        SqlUtil.testSql("oracle", originalSql);
-        SqlUtil.testSql("postgresql", originalSql);
-        SqlUtil.testSql("sqlserver", originalSql);
-    }
-
-    @Test
-    public void testSqlFunctionTest() throws JSQLParserException {
-        String originalSql = "Select sum(userid) from sys_user o where abc = ? order by id desc , name asc";
-        SqlUtil.testSql("mysql", originalSql);
-        SqlUtil.testSql("hsqldb", originalSql);
-        SqlUtil.testSql("oracle", originalSql);
-        SqlUtil.testSql("postgresql", originalSql);
-        SqlUtil.testSql("sqlserver", originalSql);
-    }
-
-    @Test
-    public void testSqlAs() throws JSQLParserException {
-        String originalSql = "Select id as `id` from sys_user o where abc = ? order by id desc , name asc";
-        SqlUtil.testSql("mysql", originalSql);
-    }
-
-    @Test
-    public void testSelectParameter() throws JSQLParserException {
-        String originalSql = "Select a,b,? as c,? d from sys_user o where abc = ? order by id desc , name asc";
-        SqlUtil.testSql("mysql", originalSql);
-        SqlUtil.testSql("hsqldb", originalSql);
-        SqlUtil.testSql("oracle", originalSql);
-        SqlUtil.testSql("postgresql", originalSql);
-        SqlUtil.testSql("sqlserver", originalSql);
-    }
-
-    @Test
-    public void testSelectParameter2() throws JSQLParserException {
-        String originalSql = "with " +
-                "cr as " +
-                "( " +
-                "    select CountryRegionCode,? name,? as id from person.CountryRegion where Name like 'C%' order by " +
-                "name" +
-                ") " +
-                " " +
-                "select ? name,? as code from person.StateProvince where CountryRegionCode in (select * from cr) order by name";
-        SqlUtil.testSql("mysql", originalSql);
-        SqlUtil.testSql("hsqldb", originalSql);
-        SqlUtil.testSql("oracle", originalSql);
-        SqlUtil.testSql("postgresql", originalSql);
-        SqlUtil.testSql("sqlserver", originalSql);
-    }
 
     @Test
     public void testSqlParser() throws JSQLParserException {
