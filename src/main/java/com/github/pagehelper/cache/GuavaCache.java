@@ -24,24 +24,51 @@
 
 package com.github.pagehelper.cache;
 
+import com.github.pagehelper.util.StringUtil;
 import com.google.common.cache.CacheBuilder;
+
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 简单的Guava缓存，如果想更多自定义配置，可以自己实现这里的 com.github.pagehelper.cache.Cache 接口
  *
  * @author liuzh
  */
-public class GuavaCache implements Cache<String, String> {
+public class GuavaCache<K, V> implements Cache<K, V> {
     //Guava缓存
-    private final com.google.common.cache.Cache<String, String> CACHE = CacheBuilder.newBuilder().maximumSize(1000).build();
+    private final com.google.common.cache.Cache<K, V> CACHE;
+
+    public GuavaCache(Properties properties, String prefix) {
+        CacheBuilder cacheBuilder = CacheBuilder.newBuilder();
+        String maximumSize = properties.getProperty(prefix + ".maximumSize");
+        if(StringUtil.isNotEmpty(maximumSize)){
+            cacheBuilder.maximumSize(Long.parseLong(maximumSize));
+        } else {
+            cacheBuilder.maximumSize(1000);
+        }
+        String expireAfterAccess = properties.getProperty(prefix + ".expireAfterAccess");
+        if(StringUtil.isNotEmpty(expireAfterAccess)){
+            cacheBuilder.expireAfterAccess(Long.parseLong(expireAfterAccess), TimeUnit.MILLISECONDS);
+        }
+        String expireAfterWrite = properties.getProperty(prefix + ".expireAfterWrite");
+        if(StringUtil.isNotEmpty(expireAfterWrite)){
+            cacheBuilder.expireAfterWrite(Long.parseLong(expireAfterWrite), TimeUnit.MILLISECONDS);
+        }
+        String initialCapacity = properties.getProperty(prefix + ".initialCapacity");
+        if(StringUtil.isNotEmpty(initialCapacity)){
+            cacheBuilder.initialCapacity(Integer.parseInt(initialCapacity));
+        }
+        CACHE = cacheBuilder.build();
+    }
 
     @Override
-    public String get(String key) {
+    public V get(K key) {
         return CACHE.getIfPresent(key);
     }
 
     @Override
-    public void put(String key, String value) {
+    public void put(K key, V value) {
         CACHE.put(key, value);
     }
 }

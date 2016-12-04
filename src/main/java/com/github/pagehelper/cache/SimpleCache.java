@@ -24,27 +24,67 @@
 
 package com.github.pagehelper.cache;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.github.pagehelper.util.StringUtil;
+import org.apache.ibatis.cache.decorators.FifoCache;
+import org.apache.ibatis.cache.impl.PerpetualCache;
+import org.apache.ibatis.mapping.CacheBuilder;
+
+import java.util.Properties;
 
 /**
- * 最简单的缓存实现，适用于固定SQL时，SQL使用参数的情况，
- *
- * 如果存在大量拼接或者 ${} 的情况时，建议使用其他缓存实现，避免内存溢出
+ * 使用 MyBatis 的缓存实现
  *
  * @author liuzh
  */
-public class SimpleCache implements Cache<String, String> {
+public class SimpleCache<K, V> implements Cache<K, V> {
 
-    private Map<String, String> CACHE = new ConcurrentHashMap<String, String>();
+    private final org.apache.ibatis.cache.Cache CACHE;
 
-    @Override
-    public String get(String key) {
-        return CACHE.get(key);
+    public SimpleCache(Properties properties, String prefix) {
+        CacheBuilder cacheBuilder = new CacheBuilder("SQL_CACHE");
+        String typeClass = properties.getProperty(prefix + ".typeClass");
+        if(StringUtil.isNotEmpty(typeClass)){
+            try {
+                cacheBuilder.implementation((Class<? extends org.apache.ibatis.cache.Cache>) Class.forName(typeClass));
+            } catch (ClassNotFoundException e) {
+                cacheBuilder.implementation(PerpetualCache.class);
+            }
+        } else {
+            cacheBuilder.implementation(PerpetualCache.class);
+        }
+        String evictionClass = properties.getProperty(prefix + ".evictionClass");
+        if(StringUtil.isNotEmpty(evictionClass)){
+            try {
+                cacheBuilder.addDecorator((Class<? extends org.apache.ibatis.cache.Cache>) Class.forName(evictionClass));
+            } catch (ClassNotFoundException e) {
+                cacheBuilder.addDecorator(FifoCache.class);
+            }
+        } else {
+            cacheBuilder.addDecorator(FifoCache.class);
+        }
+        String flushInterval = properties.getProperty(prefix + ".flushInterval");
+        if(StringUtil.isNotEmpty(flushInterval)){
+            cacheBuilder.clearInterval(Long.parseLong(flushInterval));
+        }
+        String size = properties.getProperty(prefix + ".size");
+        if(StringUtil.isNotEmpty(size)){
+            cacheBuilder.size(Integer.parseInt(size));
+        }
+        cacheBuilder.properties(properties);
+        CACHE = cacheBuilder.build();
     }
 
     @Override
-    public void put(String key, String value) {
-        CACHE.put(key, value);
+    public V get(K key) {
+        Object value = CACHE.getObject(key);
+        if(value != null){
+            return (V)value.toString();
+        }
+        return null;
+    }
+
+    @Override
+    public void put(K key, V value) {
+        CACHE.putObject(key, value);
     }
 }

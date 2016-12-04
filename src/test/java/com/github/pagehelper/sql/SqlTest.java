@@ -24,7 +24,7 @@
 
 package com.github.pagehelper.sql;
 
-import com.github.pagehelper.parser.SqlParser;
+import com.github.pagehelper.parser.CountSqlParser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Test;
 
@@ -35,8 +35,8 @@ public class SqlTest {
 
     @Test
     public void testSqlParser() throws JSQLParserException {
-        SqlParser sqlParser = new SqlParser();
-        System.out.println(sqlParser.getSmartCountSql("with " +
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("with " +
                 "cr as " +
                 "( " +
                 "    select CountryRegionCode from person.CountryRegion where Name like 'C%' order by name" +
@@ -44,30 +44,30 @@ public class SqlTest {
                 " " +
                 "select * from person.StateProvince where CountryRegionCode in (select * from cr)"));
 
-        System.out.println(sqlParser.getSmartCountSql("with cr as " +
+        System.out.println(countSqlParser.getSmartCountSql("with cr as " +
                 " (select aaz093 from aa10 where aaa100 like 'AAB05%' order by aaz093 desc) " +
                 "select count(1) from aa10 where aaz093 in (select * from cr)"));
 
 
-        System.out.println(sqlParser.getSmartCountSql("select a.aac001,a.aac030,b.aaa103 " +
+        System.out.println(countSqlParser.getSmartCountSql("select a.aac001,a.aac030,b.aaa103 " +
                 "  from ac02 a " +
                 "  left join aa10 b " +
                 "    on b.aaa100 = 'AAC031' " +
                 "   and b.aaa102 = a.aac031 " +
                 "   order by a.aac001"));
 
-        System.out.println(sqlParser.getSmartCountSql("select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
+        System.out.println(countSqlParser.getSmartCountSql("select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
                 "union " +
                 "select * from aa10 where aaa100 = 'AAC031'"));
 
-        System.out.println(sqlParser.getSmartCountSql("select * from (select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
+        System.out.println(countSqlParser.getSmartCountSql("select * from (select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
                 "union " +
                 "select * from aa10 where aaa100 = 'AAC031')"));
     }
 
     @Test
     public void testSqlParser2() throws JSQLParserException {
-        SqlParser sqlParser = new SqlParser();
-        System.out.println(sqlParser.getSmartCountSql("select countryname,count(id) from country group by countryname"));
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("select countryname,count(id) from country group by countryname"));
     }
 }

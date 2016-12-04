@@ -59,7 +59,7 @@ public class PageHelperTest {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
-            PageHelper.startPage(1, 10, "id desc");
+            PageHelper.startPage(2, 10, "id desc");
             List<Country> list = countryMapper.selectAll();
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());

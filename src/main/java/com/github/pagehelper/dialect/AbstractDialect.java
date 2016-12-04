@@ -2,7 +2,9 @@ package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.*;
 import com.github.pagehelper.parser.OrderByParser;
-import com.github.pagehelper.parser.SqlParser;
+import com.github.pagehelper.parser.CountSqlParser;
+import com.github.pagehelper.util.SqlUtil;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -22,9 +24,9 @@ import java.util.Properties;
  * @author liuzh
  * @since 2016-12-04 14:32
  */
-public abstract class AbstractDialect implements SqlDialect, Constant {
+public abstract class AbstractDialect implements Dialect, Constant {
     //处理SQL
-    public static final SqlParser sqlParser = new SqlParser();
+    protected CountSqlParser countSqlParser = new CountSqlParser();
     protected SqlUtil sqlUtil;
 
     public AbstractDialect(SqlUtil sqlUtil) {
@@ -32,7 +34,7 @@ public abstract class AbstractDialect implements SqlDialect, Constant {
     }
 
     @Override
-    public boolean skip(String msId, Object parameterObject, RowBounds rowBounds) {
+    public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
         Page page = sqlUtil.getPage(parameterObject, rowBounds);
         if (page == null) {
             return true;
@@ -41,14 +43,14 @@ public abstract class AbstractDialect implements SqlDialect, Constant {
     }
 
     @Override
-    public boolean beforeCount(String msId, Object parameterObject, RowBounds rowBounds) {
+    public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
         Page page = SqlUtil.getLocalPage();
         return !page.isOrderByOnly() && page.isCount();
     }
 
     @Override
-    public String getCountSql(BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
-        return sqlParser.getSmartCountSql(boundSql.getSql());
+    public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
+        return countSqlParser.getSmartCountSql(boundSql.getSql());
     }
 
     @Override
@@ -116,7 +118,7 @@ public abstract class AbstractDialect implements SqlDialect, Constant {
     public abstract Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey);
 
     @Override
-    public boolean beforePage(String msId, Object parameterObject, RowBounds rowBounds) {
+    public boolean beforePage(MappedStatement ms,  Object parameterObject, RowBounds rowBounds) {
         Page page = SqlUtil.getLocalPage();
         if (page.isOrderByOnly()) {
             return true;
@@ -128,7 +130,7 @@ public abstract class AbstractDialect implements SqlDialect, Constant {
     }
 
     @Override
-    public String getPageSql(BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey pageKey) {
+    public String getPageSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey pageKey) {
         String sql = boundSql.getSql();
         Page page = SqlUtil.getLocalPage();
         //支持 order by

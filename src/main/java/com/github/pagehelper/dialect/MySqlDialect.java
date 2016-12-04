@@ -1,7 +1,7 @@
 package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.SqlUtil;
+import com.github.pagehelper.util.SqlUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -17,8 +17,8 @@ import java.util.Map;
 /**
  * @author liuzh
  */
-public class MySqlDialect extends AbstractDialect {
-    public MySqlDialect(SqlUtil sqlUtil) {
+public class MySQLDialect extends AbstractDialect {
+    public MySQLDialect(SqlUtil sqlUtil) {
         super(sqlUtil);
     }
 

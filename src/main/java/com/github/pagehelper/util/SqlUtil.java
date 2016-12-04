@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Mybatis - sql工具，获取分页和count的MappedStatement，设置分页参数
@@ -52,6 +54,8 @@ import java.util.Properties;
 public class SqlUtil extends BaseSqlUtil implements Constant {
     private Dialect dialect;
     private Field additionalParametersField;
+    private Properties properties;
+    private Lock lock = new ReentrantLock();
 
     /**
      * 真正的拦截器方法
@@ -81,7 +85,10 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
         MappedStatement ms = (MappedStatement) args[0];
         Object parameterObject = args[1];
         RowBounds rowBounds = (RowBounds) args[2];
-        List resultList = null;
+        List resultList;
+        if(dialect == null){
+            initDialectByDatabaseId(ms.getDatabaseId());
+        }
         //调用方法判断是否需要进行分页，如果不需要，直接返回结果
         if (!dialect.skip(ms, parameterObject, rowBounds)) {
             ResultHandler resultHandler = (ResultHandler) args[3];
@@ -92,10 +99,15 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
             Map<String, Object> additionalParameters = (Map<String, Object>) additionalParametersField.get(boundSql);
             //判断是否需要进行 count 查询
             if (dialect.beforeCount(ms, parameterObject, rowBounds)) {
-                //根据当前的 ms 创建一个返回值为 Long 类型的 ms
-                MappedStatement countMs = MSUtils.newCountMappedStatement(ms);
                 //创建 count 查询的缓存 key
-                CacheKey countKey = executor.createCacheKey(countMs, parameterObject, RowBounds.DEFAULT, boundSql);
+                CacheKey countKey = executor.createCacheKey(ms, parameterObject, RowBounds.DEFAULT, boundSql);
+                countKey.update("_Count");
+                MappedStatement countMs = msCountMap.get(countKey);
+                if(countMs == null){
+                    //根据当前的 ms 创建一个返回值为 Long 类型的 ms
+                    countMs = MSUtils.newCountMappedStatement(ms);
+                    msCountMap.put(countKey, countMs);
+                }
                 //调用方言获取 count sql
                 String countSql = dialect.getCountSql(ms, boundSql, parameterObject, rowBounds, countKey);
                 BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameterObject);
@@ -139,10 +151,33 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
         return dialect.afterPage(resultList, parameterObject, rowBounds);
     }
 
-    public void setProperties(Properties properties) {
-        //设置 sqlUtil 的属性
-        super.setProperties(properties);
-        String dialectClass = properties.getProperty("dialect");
+    /**
+     * 通过 databaseId 初始化
+     *
+     * @param databaseId
+     */
+    private void initDialectByDatabaseId(String databaseId){
+        if(StringUtil.isEmpty(databaseId)){
+            throw new RuntimeException("当分页插件 PageHelper 不提供 dialect 属性时，必须配置 databaseIdProvider");
+        }
+        try {
+            lock.lock();
+            if(dialect == null){
+                initDialect(databaseId, this.properties);
+                this.properties = null;
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * 初始化 dialect
+     *
+     * @param dialectClass
+     * @param properties
+     */
+    private void initDialect(String dialectClass, Properties properties){
         if(StringUtil.isEmpty(dialectClass)){
             throw new RuntimeException("使用 PageHelper 分页插件时，必须设置 dialect 属性");
         }
@@ -156,9 +191,21 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("初始化 dialect 时出错:" + e.getMessage());
+            throw new RuntimeException("初始化 dialect [" + dialectClass + "]时出错:" + e.getMessage());
         }
         dialect.setProperties(properties);
+    }
+
+    public void setProperties(Properties properties) {
+        //设置 sqlUtil 的属性
+        super.setProperties(properties);
+        //TODO 考虑自动获取，通过 databaseId 方式
+        String dialectClass = properties.getProperty("dialect");
+        if(StringUtil.isEmpty(dialectClass)){
+            this.properties = properties;
+        } else {
+            initDialect(dialectClass, properties);
+        }
         try {
             //反射获取 BoundSql 中的 additionalParameters 属性
             additionalParametersField = BoundSql.class.getDeclaredField("additionalParameters");

@@ -1,11 +1,7 @@
 package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.SqlUtil;
-import com.github.pagehelper.StringUtil;
-import com.github.pagehelper.parser.OrderByParser;
-import com.sun.deploy.ui.AboutDialog;
+import com.github.pagehelper.util.SqlUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -21,8 +17,8 @@ import java.util.Map;
 /**
  * @author liuzh
  */
-public class HsqldbDialect extends AbstractDialect {
-    public HsqldbDialect(SqlUtil sqlUtil) {
+public class HSQLDBDialect extends AbstractDialect {
+    public HSQLDBDialect(SqlUtil sqlUtil) {
         super(sqlUtil);
     }
 

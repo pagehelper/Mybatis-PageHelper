@@ -24,6 +24,8 @@
 
 package com.github.pagehelper;
 
+import com.github.pagehelper.util.SqlUtil;
+import com.github.pagehelper.util.SqlUtilConfig;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
@@ -211,5 +213,9 @@ public class PageHelper implements Interceptor {
     @Override
     public void setProperties(Properties properties) {
         sqlUtil.setProperties(properties);
+    }
+
+    public void setSqlUtilConfig(SqlUtilConfig config) {
+        sqlUtil.setSqlUtilConfig(config);
     }
 }

@@ -1,7 +1,7 @@
 package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.SqlUtil;
+import com.github.pagehelper.util.SqlUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -24,11 +24,11 @@ public class OracleDialect extends AbstractDialect {
 
     @Override
     public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
-        paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
-        paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
+        paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
+        paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
         //处理pageKey
+        pageKey.update(page.getEndRow());
         pageKey.update(page.getStartRow());
-        pageKey.update(page.getPageSize());
         //处理参数配置
         if (boundSql.getParameterMappings() != null) {
             List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
@@ -45,9 +45,10 @@ public class OracleDialect extends AbstractDialect {
 
     @Override
     public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
-        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
+        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
+        sqlBuilder.append("select * from ( select tmp_page.*, rownum row_id from ( ");
         sqlBuilder.append(sql);
-        sqlBuilder.append(" limit ?,?");
+        sqlBuilder.append(" ) tmp_page where rownum <= ? ) where row_id > ?");
         return sqlBuilder.toString();
     }
 

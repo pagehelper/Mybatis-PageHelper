@@ -1,9 +1,10 @@
 package com.github.pagehelper.util;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.cache.Cache;
+import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.dialect.*;
-import com.github.pagehelper.util.SqlUtilConfig;
-import com.github.pagehelper.util.StringUtil;
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -13,20 +14,15 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author liuzh
  */
 public class BaseSqlUtil {
     protected static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
-    //缓存count查询的ms
-    protected static final Map<String, MappedStatement> msCountMap = new ConcurrentHashMap<String, MappedStatement>();
     //params参数映射
     protected static Map<String, String> PARAMS = new HashMap<String, String>(5);
-
     protected static Map<String, Class<?>> dialectAliasMap = new HashMap<String, Class<?>>();
-
     //request获取方法
     protected static Boolean hasRequest;
     protected static Class<?> requestClass;
@@ -56,6 +52,9 @@ public class BaseSqlUtil {
         dialectAliasMap.put("sqlserver", SqlServerDialect.class);
         dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
     }
+
+    //缓存count查询的ms
+    protected Cache<CacheKey, MappedStatement> msCountMap = null;
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     protected boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
@@ -75,7 +74,7 @@ public class BaseSqlUtil {
      * @throws Exception
      */
     public static Class resloveDialectClass(String className) throws Exception {
-        if(dialectAliasMap.containsKey(className.toLowerCase())){
+        if (dialectAliasMap.containsKey(className.toLowerCase())) {
             return dialectAliasMap.get(className.toLowerCase());
         } else {
             return Class.forName(className);
@@ -126,52 +125,6 @@ public class BaseSqlUtil {
             }
         }
         return null;
-    }
-
-    /**
-     * 获取分页参数
-     *
-     * @param parameterObject
-     * @param rowBounds
-     * @return
-     */
-    public Page getPage(Object parameterObject, RowBounds rowBounds) {
-        Page page = getLocalPage();
-        if (page == null || page.isOrderByOnly()) {
-            Page oldPage = page;
-            //这种情况下,page.isOrderByOnly()必然为true，所以不用写到条件中
-            if ((rowBounds == null || rowBounds == RowBounds.DEFAULT) && page != null) {
-                return oldPage;
-            }
-            if (rowBounds != RowBounds.DEFAULT) {
-                if (offsetAsPageNum) {
-                    page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
-                } else {
-                    page = new Page(new int[]{rowBounds.getOffset(), rowBounds.getLimit()}, rowBoundsWithCount);
-                    //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
-                    page.setReasonable(false);
-                }
-            } else {
-                try {
-                    page = getPageFromObject(parameterObject);
-                } catch (Exception e) {
-                    return null;
-                }
-            }
-            if (oldPage != null) {
-                page.setOrderBy(oldPage.getOrderBy());
-            }
-            setLocalPage(page);
-        }
-        //分页合理化
-        if (page.getReasonable() == null) {
-            page.setReasonable(reasonable);
-        }
-        //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
-        if (page.getPageSizeZero() == null) {
-            page.setPageSizeZero(pageSizeZero);
-        }
-        return page;
     }
 
     /**
@@ -286,6 +239,52 @@ public class BaseSqlUtil {
         }
     }
 
+    /**
+     * 获取分页参数
+     *
+     * @param parameterObject
+     * @param rowBounds
+     * @return
+     */
+    public Page getPage(Object parameterObject, RowBounds rowBounds) {
+        Page page = getLocalPage();
+        if (page == null || page.isOrderByOnly()) {
+            Page oldPage = page;
+            //这种情况下,page.isOrderByOnly()必然为true，所以不用写到条件中
+            if ((rowBounds == null || rowBounds == RowBounds.DEFAULT) && page != null) {
+                return oldPage;
+            }
+            if (rowBounds != RowBounds.DEFAULT) {
+                if (offsetAsPageNum) {
+                    page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
+                } else {
+                    page = new Page(new int[]{rowBounds.getOffset(), rowBounds.getLimit()}, rowBoundsWithCount);
+                    //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
+                    page.setReasonable(false);
+                }
+            } else {
+                try {
+                    page = getPageFromObject(parameterObject);
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+            if (oldPage != null) {
+                page.setOrderBy(oldPage.getOrderBy());
+            }
+            setLocalPage(page);
+        }
+        //分页合理化
+        if (page.getReasonable() == null) {
+            page.setReasonable(reasonable);
+        }
+        //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+        if (page.getPageSizeZero() == null) {
+            page.setPageSizeZero(pageSizeZero);
+        }
+        return page;
+    }
+
     public void setOffsetAsPageNum(boolean offsetAsPageNum) {
         this.offsetAsPageNum = offsetAsPageNum;
     }
@@ -307,6 +306,8 @@ public class BaseSqlUtil {
     }
 
     public void setProperties(Properties p) {
+        //缓存 count ms
+        msCountMap = CacheFactory.createSqlCache(p.getProperty("msCountCache"), "ms", p);
         //offset作为PageNum使用
         String offsetAsPageNum = p.getProperty("offsetAsPageNum");
         this.offsetAsPageNum = Boolean.parseBoolean(offsetAsPageNum);

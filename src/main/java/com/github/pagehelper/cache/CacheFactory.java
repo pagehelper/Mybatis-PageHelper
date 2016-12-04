@@ -24,7 +24,10 @@
 
 package com.github.pagehelper.cache;
 
-import com.github.pagehelper.StringUtil;
+import com.github.pagehelper.util.StringUtil;
+
+import java.lang.reflect.Constructor;
+import java.util.Properties;
 
 /**
  * 简单的缓存工厂
@@ -39,17 +42,23 @@ public abstract class CacheFactory {
      * @param sqlCacheClass
      * @return
      */
-    public static Cache<String, String> createSqlCache(String sqlCacheClass){
+    public static <K, V> Cache<K, V> createSqlCache(String sqlCacheClass, String prefix, Properties properties){
         if(StringUtil.isEmpty(sqlCacheClass)){
             try {
                 Class.forName("com.google.common.cache.Cache");
-                return new GuavaCache();
+                return new GuavaCache<K, V>(properties, prefix);
             } catch (Throwable t){
-                return new SimpleCache();
+                return new SimpleCache<K, V>(properties, prefix);
             }
         } else {
             try {
-                return (Cache<String, String>) Class.forName(sqlCacheClass).newInstance();
+                Class<? extends Cache> clazz = (Class<? extends Cache>) Class.forName(sqlCacheClass);
+                try {
+                    Constructor<? extends Cache> constructor = clazz.getConstructor(Properties.class, String.class);
+                    return constructor.newInstance(properties, prefix);
+                } catch (Exception e) {
+                    return clazz.newInstance();
+                }
             } catch (Throwable t) {
                 throw new RuntimeException("创建自定义 Sql 缓存[" + sqlCacheClass + "]失败", t);
             }
