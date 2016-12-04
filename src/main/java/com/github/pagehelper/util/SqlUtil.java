@@ -22,8 +22,10 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper;
+package com.github.pagehelper.util;
 
+import com.github.pagehelper.Constant;
+import com.github.pagehelper.Dialect;
 import com.github.pagehelper.dialect.AbstractDialect;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -48,7 +50,7 @@ import java.util.Properties;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SqlUtil extends BaseSqlUtil implements Constant {
-    private SqlDialect dialect;
+    private Dialect dialect;
     private Field additionalParametersField;
 
     /**
@@ -81,7 +83,7 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
         RowBounds rowBounds = (RowBounds) args[2];
         List resultList = null;
         //调用方法判断是否需要进行分页，如果不需要，直接返回结果
-        if (!dialect.skip(ms.getId(), parameterObject, rowBounds)) {
+        if (!dialect.skip(ms, parameterObject, rowBounds)) {
             ResultHandler resultHandler = (ResultHandler) args[3];
             //当前的目标对象
             Executor executor = (Executor) invocation.getTarget();
@@ -89,13 +91,13 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
             //反射获取动态参数
             Map<String, Object> additionalParameters = (Map<String, Object>) additionalParametersField.get(boundSql);
             //判断是否需要进行 count 查询
-            if (dialect.beforeCount(ms.getId(), parameterObject, rowBounds)) {
+            if (dialect.beforeCount(ms, parameterObject, rowBounds)) {
                 //根据当前的 ms 创建一个返回值为 Long 类型的 ms
                 MappedStatement countMs = MSUtils.newCountMappedStatement(ms);
                 //创建 count 查询的缓存 key
                 CacheKey countKey = executor.createCacheKey(countMs, parameterObject, RowBounds.DEFAULT, boundSql);
                 //调用方言获取 count sql
-                String countSql = dialect.getCountSql(boundSql, parameterObject, rowBounds, countKey);
+                String countSql = dialect.getCountSql(ms, boundSql, parameterObject, rowBounds, countKey);
                 BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameterObject);
                 //当使用动态 SQL 时，可能会产生临时的参数，这些参数需要手动设置到新的 BoundSql 中
                 for (String key : additionalParameters.keySet()) {
@@ -112,13 +114,13 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
                 }
             }
             //判断是否需要进行分页查询
-            if (dialect.beforePage(ms.getId(), parameterObject, rowBounds)) {
+            if (dialect.beforePage(ms, parameterObject, rowBounds)) {
                 //生成分页的缓存 key
                 CacheKey pageKey = executor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
                 //处理参数对象
                 parameterObject = dialect.processParameterObject(ms, parameterObject, boundSql, pageKey);
                 //调用方言获取分页 sql
-                String pageSql = dialect.getPageSql(boundSql, parameterObject, rowBounds, pageKey);
+                String pageSql = dialect.getPageSql(ms, boundSql, parameterObject, rowBounds, pageKey);
                 BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameterObject);
                 //设置动态参数
                 for (String key : additionalParameters.keySet()) {
@@ -147,9 +149,9 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
         try {
             Class sqlDialectClass = resloveDialectClass(dialectClass);
             if(AbstractDialect.class.isAssignableFrom(sqlDialectClass)){
-                dialect = (SqlDialect) sqlDialectClass.getConstructor(SqlUtil.class).newInstance(this);
+                dialect = (Dialect) sqlDialectClass.getConstructor(SqlUtil.class).newInstance(this);
             } else {
-                dialect = (SqlDialect) sqlDialectClass.newInstance();
+                dialect = (Dialect) sqlDialectClass.newInstance();
             }
 
         } catch (Exception e) {

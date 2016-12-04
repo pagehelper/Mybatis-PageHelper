@@ -1,7 +1,9 @@
-package com.github.pagehelper;
+package com.github.pagehelper.util;
 
-import com.github.pagehelper.dialect.HsqldbDialect;
-import com.github.pagehelper.dialect.MySqlDialect;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.dialect.*;
+import com.github.pagehelper.util.SqlUtilConfig;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -39,8 +41,20 @@ public class BaseSqlUtil {
             hasRequest = false;
         }
         //注册别名
-        dialectAliasMap.put("hsqldb", HsqldbDialect.class);
-        dialectAliasMap.put("mysql", MySqlDialect.class);
+        dialectAliasMap.put("hsqldb", HSQLDBDialect.class);
+        dialectAliasMap.put("h2", HSQLDBDialect.class);
+        dialectAliasMap.put("postgreSQL", HSQLDBDialect.class);
+
+        dialectAliasMap.put("mysql", MySQLDialect.class);
+        dialectAliasMap.put("mariadb", MySQLDialect.class);
+        dialectAliasMap.put("sqlite", MySQLDialect.class);
+
+        dialectAliasMap.put("oracle", OracleDialect.class);
+        dialectAliasMap.put("db2", Db2Dialect.class);
+        dialectAliasMap.put("informix", InformixDialect.class);
+
+        dialectAliasMap.put("sqlserver", SqlServerDialect.class);
+        dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
     }
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     protected boolean offsetAsPageNum = false;

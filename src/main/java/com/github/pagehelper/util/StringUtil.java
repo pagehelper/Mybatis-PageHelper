@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 abel533@gmail.com
+ * Copyright (c) 2014-2016 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,31 +22,22 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.parser.impl;
-
-import com.github.pagehelper.Page;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-
-import java.util.Map;
+package com.github.pagehelper.util;
 
 /**
  * @author liuzh
+ * @since 4.1.0
  */
-public class PostgreSQLParser extends AbstractParser {
-    @Override
-    public String getPageSql(String sql) {
-        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
-        sqlBuilder.append(sql);
-        sqlBuilder.append(" limit ? offset ?");
-        return sqlBuilder.toString();
+public class StringUtil {
+
+    public static boolean isEmpty(String str) {
+        if (str == null || str.length() == 0) {
+            return true;
+        }
+        return false;
     }
 
-    @Override
-    public Map<String, Object> setPageParameter(MappedStatement ms, Object parameterObject, BoundSql boundSql, Page<?> page) {
-        Map<String, Object> paramMap = super.setPageParameter(ms, parameterObject, boundSql, page);
-        paramMap.put(PAGEPARAMETER_FIRST, page.getPageSize());
-        paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
-        return paramMap;
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
     }
 }

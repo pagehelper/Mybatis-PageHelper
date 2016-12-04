@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author liuzh
  */
-public class SqlParser {
+public class CountSqlParser {
     private static final List<SelectItem> COUNT_ITEM;
     private static final Alias TABLE_ALIAS;
 
