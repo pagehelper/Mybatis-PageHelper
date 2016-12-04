@@ -1,6 +1,7 @@
 package com.github.pagehelper;
 
 import com.github.pagehelper.dialect.HsqldbDialect;
+import com.github.pagehelper.dialect.MySqlDialect;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -39,6 +40,7 @@ public class BaseSqlUtil {
         }
         //注册别名
         dialectAliasMap.put("hsqldb", HsqldbDialect.class);
+        dialectAliasMap.put("mysql", MySqlDialect.class);
     }
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     protected boolean offsetAsPageNum = false;

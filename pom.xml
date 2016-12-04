@@ -104,11 +104,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>pagehelper-dialect</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.29</version>
+            <scope>test</scope>
         </dependency>
-
         <!--
         <dependency>
           <groupId>com.h2database</groupId>
