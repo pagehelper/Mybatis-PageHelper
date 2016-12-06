@@ -1,13 +1,13 @@
 package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.util.MetaObjectUtil;
 import com.github.pagehelper.util.SqlUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class OracleDialect extends AbstractDialect {
             }
             newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
             newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
-            MetaObject metaObject = SystemMetaObject.forObject(boundSql);
+            MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
             metaObject.setValue("parameterMappings", newParameterMappings);
         }
         return paramMap;

@@ -7,7 +7,6 @@ import com.github.pagehelper.dialect.*;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.RowBounds;
 
 import java.lang.reflect.Method;
@@ -37,13 +36,13 @@ public class BaseSqlUtil {
             hasRequest = false;
         }
         //注册别名
-        dialectAliasMap.put("hsqldb", HSQLDBDialect.class);
-        dialectAliasMap.put("h2", HSQLDBDialect.class);
-        dialectAliasMap.put("postgreSQL", HSQLDBDialect.class);
+        dialectAliasMap.put("hsqldb", HsqldbDialect.class);
+        dialectAliasMap.put("h2", HsqldbDialect.class);
+        dialectAliasMap.put("postgreSQL", HsqldbDialect.class);
 
-        dialectAliasMap.put("mysql", MySQLDialect.class);
-        dialectAliasMap.put("mariadb", MySQLDialect.class);
-        dialectAliasMap.put("sqlite", MySQLDialect.class);
+        dialectAliasMap.put("mysql", MySqlDialect.class);
+        dialectAliasMap.put("mariadb", MySqlDialect.class);
+        dialectAliasMap.put("sqlite", MySqlDialect.class);
 
         dialectAliasMap.put("oracle", OracleDialect.class);
         dialectAliasMap.put("db2", Db2Dialect.class);
@@ -142,12 +141,12 @@ public class BaseSqlUtil {
         }
         if (hasRequest && requestClass.isAssignableFrom(params.getClass())) {
             try {
-                paramsObject = SystemMetaObject.forObject(getParameterMap.invoke(params, new Object[]{}));
+                paramsObject = MetaObjectUtil.forObject(getParameterMap.invoke(params, new Object[]{}));
             } catch (Exception e) {
                 //忽略
             }
         } else {
-            paramsObject = SystemMetaObject.forObject(params);
+            paramsObject = MetaObjectUtil.forObject(params);
         }
         if (paramsObject == null) {
             throw new NullPointerException("分页查询参数处理失败!");

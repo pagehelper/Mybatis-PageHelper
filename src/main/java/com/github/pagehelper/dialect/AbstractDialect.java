@@ -1,8 +1,11 @@
 package com.github.pagehelper.dialect;
 
-import com.github.pagehelper.*;
-import com.github.pagehelper.parser.OrderByParser;
+import com.github.pagehelper.Constant;
+import com.github.pagehelper.Dialect;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.parser.CountSqlParser;
+import com.github.pagehelper.parser.OrderByParser;
+import com.github.pagehelper.util.MetaObjectUtil;
 import com.github.pagehelper.util.SqlUtil;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
@@ -10,7 +13,6 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.HashMap;
@@ -79,7 +81,7 @@ public abstract class AbstractDialect implements Dialect, Constant {
             //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
             //TypeHandlerRegistry可以直接处理的会作为一个直接使用的对象进行处理
             boolean hasTypeHandler = ms.getConfiguration().getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
-            MetaObject metaObject = SystemMetaObject.forObject(parameterObject);
+            MetaObject metaObject = MetaObjectUtil.forObject(parameterObject);
             //需要针对注解形式的MyProviderSqlSource保存原值
             if (!hasTypeHandler) {
                 for (String name : metaObject.getGetterNames()) {
@@ -118,7 +120,7 @@ public abstract class AbstractDialect implements Dialect, Constant {
     public abstract Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey);
 
     @Override
-    public boolean beforePage(MappedStatement ms,  Object parameterObject, RowBounds rowBounds) {
+    public boolean beforePage(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
         Page page = SqlUtil.getLocalPage();
         if (page.isOrderByOnly()) {
             return true;
