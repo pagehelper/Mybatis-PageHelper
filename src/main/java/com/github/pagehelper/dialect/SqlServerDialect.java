@@ -46,11 +46,6 @@ public class SqlServerDialect extends AbstractDialect {
     }
 
     @Override
-    public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
-        return paramMap;
-    }
-
-    @Override
     public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
         //处理pageKey
         pageKey.update(page.getStartRow());

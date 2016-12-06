@@ -26,6 +26,7 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageRowBounds;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisHelper;
@@ -104,7 +105,8 @@ public class PageHelperTest {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
-            List<Country> list = countryMapper.selectAll(new RowBounds(0, 10));
+            PageRowBounds rowBounds = new PageRowBounds(0, 10);
+            List<Country> list = countryMapper.selectAll(rowBounds);
             assertEquals(10, list.size());
             assertEquals(-1, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确

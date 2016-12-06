@@ -76,8 +76,13 @@ public class CountSqlParser {
         }
         Select select = (Select) stmt;
         SelectBody selectBody = select.getSelectBody();
-        //处理body-去order by
-        processSelectBody(selectBody);
+        try {
+            //处理body-去order by
+            processSelectBody(selectBody);
+        } catch (Exception e) {
+            //当 sql 包含 group by 时，不去除 order by
+            return getSimpleCountSql(sql);
+        }
         //处理with-去order by
         processWithItemsList(select.getWithItemsList());
         //处理为count查询
@@ -185,6 +190,9 @@ public class CountSqlParser {
      * @param plainSelect
      */
     public void processPlainSelect(PlainSelect plainSelect) {
+        if(plainSelect.getGroupByColumnReferences() != null && plainSelect.getGroupByColumnReferences().size() > 0){
+            throw new RuntimeException();
+        }
         if (!orderByHashParameters(plainSelect.getOrderByElements())) {
             plainSelect.setOrderByElements(null);
         }
