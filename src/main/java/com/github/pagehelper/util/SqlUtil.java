@@ -35,11 +35,15 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -55,7 +59,18 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
     private Dialect dialect;
     private Field additionalParametersField;
     private Properties properties;
-    private Lock lock = new ReentrantLock();
+
+
+    //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
+    protected boolean autoDialect = true;
+    //运行时自动获取dialect
+    protected boolean autoRuntimeDialect;
+    //多数据源时，获取jdbcurl后是否关闭数据源
+    protected boolean closeConn = true;
+    //缓存
+    private Map<String, Dialect> urlDialectMap = new ConcurrentHashMap<String, Dialect>();
+    private ReentrantLock lock = new ReentrantLock();
+
 
     /**
      * 真正的拦截器方法
@@ -86,11 +101,23 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
         Object parameterObject = args[1];
         RowBounds rowBounds = (RowBounds) args[2];
         List resultList;
-        if(dialect == null){
-            initDialectByDatabaseId(ms.getDatabaseId());
+        if(autoDialect){
+            lock.lock();
+            try{
+                if(autoDialect){
+                    autoDialect = false;
+                    this.dialect = getDialect(ms);
+                }
+            }finally {
+                lock.unlock();
+            }
+        }
+        Dialect runtimeDialect = dialect;
+        if(autoRuntimeDialect){
+            runtimeDialect = getDialect(ms);
         }
         //调用方法判断是否需要进行分页，如果不需要，直接返回结果
-        if (!dialect.skip(ms, parameterObject, rowBounds)) {
+        if (!runtimeDialect.skip(ms, parameterObject, rowBounds)) {
             ResultHandler resultHandler = (ResultHandler) args[3];
             //当前的目标对象
             Executor executor = (Executor) invocation.getTarget();
@@ -98,7 +125,7 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
             //反射获取动态参数
             Map<String, Object> additionalParameters = (Map<String, Object>) additionalParametersField.get(boundSql);
             //判断是否需要进行 count 查询
-            if (dialect.beforeCount(ms, parameterObject, rowBounds)) {
+            if (runtimeDialect.beforeCount(ms, parameterObject, rowBounds)) {
                 //创建 count 查询的缓存 key
                 CacheKey countKey = executor.createCacheKey(ms, parameterObject, RowBounds.DEFAULT, boundSql);
                 countKey.update("_Count");
@@ -109,7 +136,7 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
                     msCountMap.put(countKey, countMs);
                 }
                 //调用方言获取 count sql
-                String countSql = dialect.getCountSql(ms, boundSql, parameterObject, rowBounds, countKey);
+                String countSql = runtimeDialect.getCountSql(ms, boundSql, parameterObject, rowBounds, countKey);
                 BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameterObject);
                 //当使用动态 SQL 时，可能会产生临时的参数，这些参数需要手动设置到新的 BoundSql 中
                 for (String key : additionalParameters.keySet()) {
@@ -119,20 +146,20 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
                 Object countResultList = executor.query(countMs, parameterObject, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
                 Long count = (Long) ((List) countResultList).get(0);
                 //处理查询总数
-                dialect.afterCount(count, parameterObject, rowBounds);
+                runtimeDialect.afterCount(count, parameterObject, rowBounds);
                 if (count == 0L) {
                     //当查询总数为 0 时，直接返回空的结果
-                    return dialect.afterPage(new ArrayList(), parameterObject, rowBounds);
+                    return runtimeDialect.afterPage(new ArrayList(), parameterObject, rowBounds);
                 }
             }
             //判断是否需要进行分页查询
-            if (dialect.beforePage(ms, parameterObject, rowBounds)) {
+            if (runtimeDialect.beforePage(ms, parameterObject, rowBounds)) {
                 //生成分页的缓存 key
                 CacheKey pageKey = executor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
                 //处理参数对象
-                parameterObject = dialect.processParameterObject(ms, parameterObject, boundSql, pageKey);
+                parameterObject = runtimeDialect.processParameterObject(ms, parameterObject, boundSql, pageKey);
                 //调用方言获取分页 sql
-                String pageSql = dialect.getPageSql(ms, boundSql, parameterObject, rowBounds, pageKey);
+                String pageSql = runtimeDialect.getPageSql(ms, boundSql, parameterObject, rowBounds, pageKey);
                 BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameterObject);
                 //设置动态参数
                 for (String key : additionalParameters.keySet()) {
@@ -148,27 +175,7 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
             resultList = (List) invocation.proceed();
         }
         //返回默认查询
-        return dialect.afterPage(resultList, parameterObject, rowBounds);
-    }
-
-    /**
-     * 通过 databaseId 初始化
-     *
-     * @param databaseId
-     */
-    private void initDialectByDatabaseId(String databaseId){
-        if(StringUtil.isEmpty(databaseId)){
-            throw new RuntimeException("当分页插件 PageHelper 不提供 dialect 属性时，必须配置 databaseIdProvider");
-        }
-        try {
-            lock.lock();
-            if(dialect == null){
-                initDialect(databaseId, this.properties);
-                this.properties = null;
-            }
-        } finally {
-            lock.unlock();
-        }
+        return runtimeDialect.afterPage(resultList, parameterObject, rowBounds);
     }
 
     /**
@@ -177,7 +184,8 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
      * @param dialectClass
      * @param properties
      */
-    private void initDialect(String dialectClass, Properties properties){
+    private Dialect initDialect(String dialectClass, Properties properties){
+        Dialect dialect;
         if(StringUtil.isEmpty(dialectClass)){
             throw new RuntimeException("使用 PageHelper 分页插件时，必须设置 dialect 属性");
         }
@@ -194,17 +202,88 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
             throw new RuntimeException("初始化 dialect [" + dialectClass + "]时出错:" + e.getMessage());
         }
         dialect.setProperties(properties);
+        return dialect;
+    }
+
+    /**
+     * 获取url
+     *
+     * @param dataSource
+     * @return
+     */
+    public String getUrl(DataSource dataSource){
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            return conn.getMetaData().getURL();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(conn != null){
+                try {
+                    if(closeConn){
+                        conn.close();
+                    }
+                } catch (SQLException e) {
+                    //ignore
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据datasource创建对应的sqlUtil
+     *
+     * @param ms
+     */
+    public Dialect getDialect(MappedStatement ms) {
+        //改为对dataSource做缓存
+        DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
+        String url = getUrl(dataSource);
+        if (urlDialectMap.containsKey(url)) {
+            return urlDialectMap.get(url);
+        }
+        try {
+            lock.lock();
+            if (urlDialectMap.containsKey(url)) {
+                return urlDialectMap.get(url);
+            }
+            if (StringUtil.isEmpty(url)) {
+                throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
+            }
+            String dialectStr = fromJdbcUrl(url);
+            if (dialectStr == null) {
+                throw new RuntimeException("无法自动获取数据库类型，请通过 dialect 参数指定!");
+            }
+            Dialect dialect = initDialect(dialectStr, properties);
+            urlDialectMap.put(url, dialect);
+            return dialect;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setProperties(Properties properties) {
-        //设置 sqlUtil 的属性
         super.setProperties(properties);
-        //TODO 考虑自动获取，通过 databaseId 方式
-        String dialectClass = properties.getProperty("dialect");
-        if(StringUtil.isEmpty(dialectClass)){
+        //多数据源时，获取jdbcurl后是否关闭数据源
+        String closeConn = properties.getProperty("closeConn");
+        //解决#97
+        if(StringUtil.isNotEmpty(closeConn)){
+            this.closeConn = Boolean.parseBoolean(closeConn);
+        }
+        //数据库方言
+        String dialect = properties.getProperty("dialect");
+        String runtimeDialect = properties.getProperty("autoRuntimeDialect");
+        if (StringUtil.isNotEmpty(runtimeDialect) && runtimeDialect.equalsIgnoreCase("TRUE")) {
+            this.autoRuntimeDialect = true;
+            this.autoDialect = false;
+            this.properties = properties;
+        } else if (StringUtil.isEmpty(dialect)) {
+            autoDialect = true;
             this.properties = properties;
         } else {
-            initDialect(dialectClass, properties);
+            autoDialect = false;
+            this.dialect = initDialect(dialect, properties);
         }
         try {
             //反射获取 BoundSql 中的 additionalParameters 属性

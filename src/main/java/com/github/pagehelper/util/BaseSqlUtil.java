@@ -66,6 +66,15 @@ public class BaseSqlUtil {
     //是否支持接口参数来传递分页参数，默认false
     protected boolean supportMethodsArguments = false;
 
+    public static String fromJdbcUrl(String jdbcUrl) {
+        for (String dialect : dialectAliasMap.keySet()) {
+            if (jdbcUrl.indexOf(":" + dialect + ":") != -1) {
+                return dialect;
+            }
+        }
+        return null;
+    }
+
     /**
      * 反射类
      *
@@ -221,7 +230,7 @@ public class BaseSqlUtil {
         return value;
     }
 
-    public static void setParams(String params) {
+    public void setParams(String params) {
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
         PARAMS.put("count", "countSql");
@@ -262,7 +271,7 @@ public class BaseSqlUtil {
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
                 }
-                if(rowBounds instanceof PageRowBounds){
+                if (rowBounds instanceof PageRowBounds) {
                     page.setCount(true);
                 } else {
                     page.setCount(false);
@@ -331,14 +340,5 @@ public class BaseSqlUtil {
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         setParams(p.getProperty("params"));
-    }
-
-    public void setSqlUtilConfig(SqlUtilConfig config) {
-        this.offsetAsPageNum = config.isOffsetAsPageNum();
-        this.rowBoundsWithCount = config.isRowBoundsWithCount();
-        this.pageSizeZero = config.isPageSizeZero();
-        this.reasonable = config.isReasonable();
-        this.supportMethodsArguments = config.isSupportMethodsArguments();
-        setParams(config.getParams());
     }
 }
