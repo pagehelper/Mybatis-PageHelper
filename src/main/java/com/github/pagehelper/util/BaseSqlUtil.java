@@ -1,7 +1,6 @@
 package com.github.pagehelper.util;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageRowBounds;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.dialect.*;
@@ -270,11 +269,6 @@ public class BaseSqlUtil {
                     page = new Page(new int[]{rowBounds.getOffset(), rowBounds.getLimit()}, rowBoundsWithCount);
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
-                }
-                if (rowBounds instanceof PageRowBounds) {
-                    page.setCount(true);
-                } else {
-                    page.setCount(false);
                 }
             } else {
                 try {
