@@ -259,7 +259,7 @@
         </if>
     </select>
     <select id="selectDistinct" resultType="com.github.pagehelper.model.Country">
-        select distinct SUBSTRING(countryname,1,1) countryname from country
+        select distinct SUBSTR(countryname,1,1) countryname from country
     </select>
     <select id="selectExists" resultType="com.github.pagehelper.model.Country">
         select * from country a where exists(select 1 from country b where a.id = b.id and b.id >100)

@@ -25,6 +25,7 @@
 package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisHelper;
@@ -48,7 +49,6 @@ public class ArgumentsMapTest {
             List<Country> list = countryMapper.selectByPageNumSizeOrderBy(1, 10, "id desc");
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
-
             list = countryMapper.selectByPageNumSize(2, 10);
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());

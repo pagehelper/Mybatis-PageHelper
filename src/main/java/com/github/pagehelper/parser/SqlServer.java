@@ -291,7 +291,7 @@ public class SqlServer {
             }
             Column column = (Column) element.getExpression();
             String columnName = column.getColumnName();
-            orderBy.append(aliasMap.containsKey(columnName) ? aliasMap.get(columnName) : columnName);
+            orderBy.append(aliasMap.containsKey(columnName) ? aliasMap.get(columnName) : column.toString());
             orderBy.append(element.isAsc() ? " ASC " : " DESC ");
         }
 

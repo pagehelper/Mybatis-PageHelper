@@ -57,6 +57,7 @@ public class SqlServerDialect extends AbstractDialect {
         pageKey.update(page.getPageSize());
         String cacheSql = CACHE_PAGESQL.get(sql);
         if(cacheSql == null){
+            cacheSql = sql;
             cacheSql = cacheSql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
             cacheSql = pageSql.convertToPageSql(cacheSql, null, null);
             cacheSql = cacheSql.replaceAll(WITHNOLOCK, " with(nolock)");

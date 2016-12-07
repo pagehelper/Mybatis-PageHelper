@@ -15,25 +15,25 @@ import java.util.Map;
  */
 public class SqlServerTest {
 
-    @Test
-    public void testGetColumnAliasMap() throws JSQLParserException {
-        String sql = "select c.id as c_id, u.id as u_id, u.name from Card c left join User u on c.uid = u.id order by u_id";
-        SqlServer sqlServer = new SqlServer();
-        Statement parse = CCJSqlParserUtil.parse(sql);
-        Select select = (Select) parse;
-        Map<String, String> columnAliaMap = sqlServer.getColumnAliasMap((PlainSelect) select.getSelectBody());
-        Assert.assertEquals("c.id",columnAliaMap.get("c_id"));
-        Assert.assertEquals("u.id",columnAliaMap.get("u_id"));
-        Assert.assertNull(columnAliaMap.get("u_name"));
-    }
-
-    @Test
-    public void orderByToString() throws JSQLParserException {
-        String sql = "select c.id as c_id, u.id as u_id, u.name from Card c left join User u on c.uid = u.id order by u_id desc,c_id";
-        SqlServer sqlServer = new SqlServer();
-        Statement parse = CCJSqlParserUtil.parse(sql);
-        Select select = (Select) parse;
-        String orderByToString = sqlServer.orderByToString((PlainSelect) select.getSelectBody());
-        Assert.assertEquals(" ORDER BY u.id DESC , c.id ASC ",orderByToString);
-    }
+//    @Test
+//    public void testGetColumnAliasMap() throws JSQLParserException {
+//        String sql = "select c.id as c_id, u.id as u_id, u.name from Card c left join User u on c.uid = u.id order by u_id";
+//        SqlServer sqlServer = new SqlServer();
+//        Statement parse = CCJSqlParserUtil.parse(sql);
+//        Select select = (Select) parse;
+//        Map<String, String> columnAliaMap = sqlServer.getColumnAliasMap((PlainSelect) select.getSelectBody());
+//        Assert.assertEquals("c.id",columnAliaMap.get("c_id"));
+//        Assert.assertEquals("u.id",columnAliaMap.get("u_id"));
+//        Assert.assertNull(columnAliaMap.get("u_name"));
+//    }
+//
+//    @Test
+//    public void orderByToString() throws JSQLParserException {
+//        String sql = "select c.id as c_id, u.id as u_id, u.name from Card c left join User u on c.uid = u.id order by u_id desc,c_id";
+//        SqlServer sqlServer = new SqlServer();
+//        Statement parse = CCJSqlParserUtil.parse(sql);
+//        Select select = (Select) parse;
+//        String orderByToString = sqlServer.orderByToString((PlainSelect) select.getSelectBody());
+//        Assert.assertEquals(" ORDER BY u.id DESC , c.id ASC ",orderByToString);
+//    }
 }

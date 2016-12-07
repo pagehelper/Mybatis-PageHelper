@@ -53,9 +53,9 @@
             </transactionManager>
             <dataSource type="UNPOOLED">
                 <property name="driver" value="oracle.jdbc.driver.OracleDriver"/>
-                <property name="url" value=" jdbc:oracle:thin:@//localhost:1521/orcl"/>
-                <property name="username" value="scott"/>
-                <property name="password" value="tiger"/>
+                <property name="url" value="jdbc:oracle:thin:@//192.168.16.137:1521/orcl"/>
+                <property name="username" value="mybatis"/>
+                <property name="password" value="mybatis"/>
             </dataSource>
         </environment>
     </environments>
