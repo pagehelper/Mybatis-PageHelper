@@ -54,8 +54,8 @@
             </transactionManager>
             <dataSource type="UNPOOLED">
                 <property name="driver" value="com.ibm.db2.jcc.DB2Driver"/>
-                <property name="url" value="jdbc:db2://localhost:50000/SAMPLE"/>
-                <property name="username" value="liuzh"/>
+                <property name="url" value="jdbc:db2://192.168.16.141:50000/SAMPLE"/>
+                <property name="username" value="mybatis"/>
                 <property name="password" value="jj"/>
             </dataSource>
         </environment>

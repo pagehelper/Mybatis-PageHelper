@@ -41,7 +41,6 @@
 
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageHelper">
-            <property name="dialect" value="h2"/>
             <property name="reasonable" value="true"/>
         </plugin>
     </plugins>

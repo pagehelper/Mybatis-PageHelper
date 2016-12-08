@@ -41,7 +41,6 @@
 
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageHelper">
-            <property name="dialect" value="db2"/>
             <property name="offsetAsPageNum" value="true"/>
             <property name="rowBoundsWithCount" value="true"/>
             <property name="pageSizeZero" value="true"/>
@@ -54,10 +53,8 @@
                 <property name="" value=""/>
             </transactionManager>
             <dataSource type="UNPOOLED">
-                <property name="driver" value="com.ibm.db2.jcc.DB2Driver"/>
-                <property name="url" value="jdbc:db2://192.168.16.141:50000/SAMPLE"/>
-                <property name="username" value="mybatis"/>
-                <property name="password" value="jj"/>
+                <property name="driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+                <property name="url" value="jdbc:derby:ibderby2;create=true"/>
             </dataSource>
         </environment>
     </environments>

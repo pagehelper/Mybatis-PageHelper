@@ -38,7 +38,7 @@ public class BaseSqlUtil {
         //注册别名
         dialectAliasMap.put("hsqldb", HsqldbDialect.class);
         dialectAliasMap.put("h2", HsqldbDialect.class);
-        dialectAliasMap.put("postgreSQL", HsqldbDialect.class);
+        dialectAliasMap.put("postgresql", HsqldbDialect.class);
 
         dialectAliasMap.put("mysql", MySqlDialect.class);
         dialectAliasMap.put("mariadb", MySqlDialect.class);
@@ -50,6 +50,7 @@ public class BaseSqlUtil {
 
         dialectAliasMap.put("sqlserver", SqlServerDialect.class);
         dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
+        dialectAliasMap.put("derby", SqlServer2012Dialect.class);
     }
 
     //缓存count查询的ms
@@ -67,7 +68,7 @@ public class BaseSqlUtil {
 
     public static String fromJdbcUrl(String jdbcUrl) {
         for (String dialect : dialectAliasMap.keySet()) {
-            if (jdbcUrl.indexOf(":" + dialect + ":") != -1) {
+            if (jdbcUrl.indexOf(":" + dialect.toLowerCase() + ":") != -1) {
                 return dialect;
             }
         }
