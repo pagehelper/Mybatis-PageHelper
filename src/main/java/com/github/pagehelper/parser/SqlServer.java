@@ -258,7 +258,7 @@ public class SqlServer {
             //注意：order by别名的时候有错,由于没法判断一个列是否为别名，所以不能解决
             orderByBuilder.append(orderByToString(plainSelect));
         } else {
-            //#118 by JumpByte
+            //#82 by MoonFruit,#118 by JumpByte
             orderByBuilder.append("ORDER BY RAND()");
         }
         //需要把改orderby清空
