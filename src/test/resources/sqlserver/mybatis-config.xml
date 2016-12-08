@@ -53,7 +53,7 @@
             </transactionManager>
             <dataSource type="UNPOOLED">
                 <property name="driver" value="net.sourceforge.jtds.jdbc.Driver"/>
-                <property name="url" value="jdbc:jtds:sqlserver://192.168.16.148:1433/master"/>
+                <property name="url" value="jdbc:jtds:sqlserver://192.168.16.137:1433/master"/>
                 <property name="username" value="sa"/>
                 <property name="password" value="jj"/>
             </dataSource>
