@@ -195,8 +195,9 @@
     </select>
 
     <select id="selectGroupBy" resultType="com.github.pagehelper.model.Country">
-        select countryname,countrycode,count(id) id from country group by countryname,countrycode order by
-        countryname,countrycode
+        /*keep orderby*/select countryname,countrycode,count(id) id from country
+        group by countryname,countrycode
+        order by countryname,countrycode
     </select>
 
     <select id="selectByWhereMap" resultType="com.github.pagehelper.model.Country">

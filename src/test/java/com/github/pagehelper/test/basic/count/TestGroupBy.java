@@ -44,7 +44,6 @@ public class TestGroupBy {
         try {
             //获取第1页，10条内容，默认查询总数count
             Page<Country> page = PageHelper.startPage(1, 10);
-            ;
             countryMapper.selectGroupBy();
             //1,'Angola','AO'
             assertEquals(1, page.get(0).getId());
