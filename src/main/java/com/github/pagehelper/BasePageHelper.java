@@ -180,4 +180,11 @@ public abstract class BasePageHelper {
             SqlUtil.setLocalPage(page);
         }
     }
+
+    /**
+     * 手动清空分页参数
+     */
+    public static void clearPage(){
+        SqlUtil.clearLocalPage();
+    }
 }

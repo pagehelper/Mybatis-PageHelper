@@ -21,10 +21,11 @@
  9. `Informix`
  10. `H2`
  11. `SqlServer2012`
+ 12. `Derby`
 
 配置`dialect`属性时，可以使用小写形式：
 
-`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`
+`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`,`derby`
 
 在4.0.0版本以后，`dialect`参数可以不配置，系统能自动识别这里提到的所有数据库。
 
@@ -34,9 +35,9 @@
 
 ##MyBatis工具网站:[http://mybatis.tk](http://www.mybatis.tk)
 
-##分页插件支持MyBatis3.2.0~3.3.0(包含)
+##分页插件支持MyBatis3.1.0+(支持最新版本)
 
-##分页插件最新版本为4.1.6
+##分页插件最新版本为4.2.0
 
 ###Maven坐标
 
@@ -44,7 +45,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.1.6</version>
+    <version>4.2.0</version>
 </dependency>
 ```  
 
@@ -66,10 +67,20 @@
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
 
-##4.1.7-SNAPSHOT
+##4.2.0
 
-- 解决多个`with(nolock)`时出错的问题
+- 使用新的方式进行分页，4.2版本是从5.0版本分离出来的一个特殊版本，这个版本兼容4.x的所有功能，5.0版本时为了简化分页逻辑，会去掉部分功能，所以4.2是4.x的最后一个版本。
+- 支持 MyBatis 3.1.0+ 版本
+- 增加对 Derby 数据库的支持
+- 对除 informix 外的全部数据库进行测试，全部通过
+- PageHelper增加手动清除方法`clearPage()`
+- 解决 SqlServer 多个`with(nolock)`时出错的问题
+- 对CountMappedStatement 进行缓存，配置方式见BaseSqlUtil 319行
+- 由于SqlServer的sql处理特殊，因此增加了两个SQL缓存，具体配置参考SqlServerDialect类
+- 添加 sqlserver 别名进行排序功能，在解析sql时，会自动将使用的别名转换成列名 by panmingzhi
 - 新增`sqlCacheClass`参数，该参数可选，可以设置sql缓存实现类，默认为`SimpleCache`，当项目包含guava时，使用`GuavaCache`，也可以通过参数`sqlCacheClass`指定自己的实现类，有关详情看`com.github.pagehelper.cache`包。
+- 解决#135，增加/*keep orderby*/注解，SQL中包含该注释时，count查询时不会移出order by
+- sqlserver没有orderby时，使用`order by rand()` #82 #118
 
 ##4.1.6更新日志
 

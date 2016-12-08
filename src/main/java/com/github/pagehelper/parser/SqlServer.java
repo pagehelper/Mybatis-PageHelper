@@ -258,7 +258,8 @@ public class SqlServer {
             //注意：order by别名的时候有错,由于没法判断一个列是否为别名，所以不能解决
             orderByBuilder.append(orderByToString(plainSelect));
         } else {
-            throw new RuntimeException("请您在sql中包含order by语句!");
+            //#82 by MoonFruit,#118 by JumpByte
+            orderByBuilder.append("ORDER BY RAND()");
         }
         //需要把改orderby清空
         if (isNotEmptyList(plainSelect.getOrderByElements())) {
@@ -291,7 +292,7 @@ public class SqlServer {
             }
             Column column = (Column) element.getExpression();
             String columnName = column.getColumnName();
-            orderBy.append(aliasMap.containsKey(columnName) ? aliasMap.get(columnName) : columnName);
+            orderBy.append(aliasMap.containsKey(columnName) ? aliasMap.get(columnName) : column.toString());
             orderBy.append(element.isAsc() ? " ASC " : " DESC ");
         }
 

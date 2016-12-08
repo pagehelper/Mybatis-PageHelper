@@ -40,6 +40,7 @@ import java.util.List;
  * @author liuzh
  */
 public class CountSqlParser {
+    public static final String KEEP_ORDERBY = "/*keep orderby*/";
     private static final List<SelectItem> COUNT_ITEM;
     private static final Alias TABLE_ALIAS;
 
@@ -68,6 +69,10 @@ public class CountSqlParser {
         isSupportedSql(sql);
         //解析SQL
         Statement stmt = null;
+        //特殊sql不需要去掉order by时，使用注释前缀
+        if(sql.indexOf(KEEP_ORDERBY) >= 0){
+            return getSimpleCountSql(sql);
+        }
         try {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (Throwable e) {
@@ -190,9 +195,6 @@ public class CountSqlParser {
      * @param plainSelect
      */
     public void processPlainSelect(PlainSelect plainSelect) {
-        if(plainSelect.getGroupByColumnReferences() != null && plainSelect.getGroupByColumnReferences().size() > 0){
-            throw new RuntimeException();
-        }
         if (!orderByHashParameters(plainSelect.getOrderByElements())) {
             plainSelect.setOrderByElements(null);
         }
