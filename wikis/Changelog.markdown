@@ -1,6 +1,21 @@
 ##更新日志
 
-##4.1.6 - 2016-06-05
+##4.2.0 - 2016-12-09
+
+- 使用新的方式进行分页，4.2版本是从5.0版本分离出来的一个特殊版本，这个版本兼容4.x的所有功能，5.0版本时为了简化分页逻辑，会去掉部分功能，所以4.2是4.x的最后一个版本。
+- 支持 MyBatis 3.1.0+ 版本
+- 增加对 Derby 数据库的支持
+- 对除 informix 外的全部数据库进行测试，全部通过
+- PageHelper增加手动清除方法`clearPage()`
+- 解决 SqlServer 多个`with(nolock)`时出错的问题
+- 对CountMappedStatement 进行缓存，配置方式见BaseSqlUtil 319行
+- 由于SqlServer的sql处理特殊，因此增加了两个SQL缓存，具体配置参考SqlServerDialect类
+- 添加 sqlserver 别名进行排序功能，在解析sql时，会自动将使用的别名转换成列名 by panmingzhi
+- 新增`sqlCacheClass`参数，该参数可选，可以设置sql缓存实现类，默认为`SimpleCache`，当项目包含guava时，使用`GuavaCache`，也可以通过参数`sqlCacheClass`指定自己的实现类，有关详情看`com.github.pagehelper.cache`包。
+- 解决#135，增加/*keep orderby*/注解，SQL中包含该注释时，count查询时不会移出order by
+- sqlserver没有orderby时，使用`order by rand()` #82 #118
+
+###4.1.6 - 2016-06-05
 
 - 通过间接处理字符串解决SqlServer中不支持`with(nolock)`的问题#86，详情可以看`SqlServerParser`和`SqlServer2012Dialect`
 
