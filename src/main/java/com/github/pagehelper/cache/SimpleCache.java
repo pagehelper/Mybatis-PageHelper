@@ -78,7 +78,7 @@ public class SimpleCache<K, V> implements Cache<K, V> {
     public V get(K key) {
         Object value = CACHE.getObject(key);
         if(value != null){
-            return (V)value.toString();
+            return (V)value;
         }
         return null;
     }
