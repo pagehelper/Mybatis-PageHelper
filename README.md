@@ -37,7 +37,7 @@
 
 ##分页插件支持MyBatis3.1.0+(支持最新版本)
 
-##分页插件最新版本为4.2.0
+##分页插件最新版本为4.2.1
 
 ###Maven坐标
 
@@ -45,7 +45,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.1</version>
 </dependency>
 ```  
 
