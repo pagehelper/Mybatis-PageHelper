@@ -24,6 +24,8 @@
 
 package com.github.pagehelper.parser;
 
+import java.util.*;
+
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -32,11 +34,6 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 将sqlserver查询语句转换为分页语句<br>
@@ -70,6 +67,8 @@ public class SqlServer {
     protected static final Column PAGE_ROW_NUMBER_COLUMN = new Column(PAGE_ROW_NUMBER);
     //TOP 100 PERCENT
     protected static final Top TOP100_PERCENT;
+    //别名前缀
+    protected static final String PAGE_COLUMN_ALIAS_PREFIX = "ROW_ALIAS_";
 
     //静态方法处理
     static {
@@ -138,9 +137,23 @@ public class SqlServer {
         //获取查询列
         List<SelectItem> selectItems = getSelectItems((PlainSelect) selectBody);
         //对一层的SQL增加ROW_NUMBER()
-        addRowNumber((PlainSelect) selectBody);
+        List<SelectItem> autoItems = new ArrayList<SelectItem>();
+        SelectItem orderByColumn = addRowNumber((PlainSelect) selectBody, autoItems);
+        //加入自动生成列
+        ((PlainSelect) selectBody).addSelectItems(autoItems.toArray(new SelectItem[autoItems.size()]));
         //处理子语句中的order by
         processSelectBody(selectBody, 0);
+
+        //中层子查询
+        PlainSelect innerSelectBody = new PlainSelect();
+        //PAGE_ROW_NUMBER
+        innerSelectBody.addSelectItems(orderByColumn);
+        innerSelectBody.addSelectItems(selectItems.toArray(new SelectItem[selectItems.size()]));
+        //将原始查询作为内层子查询
+        SubSelect fromInnerItem = new SubSelect();
+        fromInnerItem.setSelectBody(selectBody);
+        fromInnerItem.setAlias(PAGE_TABLE_ALIAS);
+        innerSelectBody.setFromItem(fromInnerItem);
 
         //新建一个select
         Select newSelect = new Select();
@@ -164,7 +177,7 @@ public class SqlServer {
         newSelectBody.setSelectItems(selectItems);
         //设置fromIterm
         SubSelect fromItem = new SubSelect();
-        fromItem.setSelectBody(selectBody);
+        fromItem.setSelectBody(innerSelectBody); //中层子查询
         fromItem.setAlias(PAGE_TABLE_ALIAS);
         newSelectBody.setFromItem(fromItem);
 
@@ -246,86 +259,26 @@ public class SqlServer {
     }
 
     /**
-     * 最外层的SQL查询需要增加ROW_NUMBER()
-     *
-     * @param plainSelect
+     * 获取 ROW_NUMBER() 列
+     * @param plainSelect 原查询
+     * @param autoItems   自动生成的查询列
+     * @return ROW_NUMBER() 列
      */
-    protected void addRowNumber(PlainSelect plainSelect) {
+    protected SelectItem addRowNumber(PlainSelect plainSelect, List<SelectItem> autoItems) {
         //增加ROW_NUMBER()
         StringBuilder orderByBuilder = new StringBuilder();
         orderByBuilder.append("ROW_NUMBER() OVER (");
         if (isNotEmptyList(plainSelect.getOrderByElements())) {
-            //注意：order by别名的时候有错,由于没法判断一个列是否为别名，所以不能解决
-            orderByBuilder.append(orderByToString(plainSelect));
-        } else {
-            //#82 by MoonFruit,#118 by JumpByte
-            orderByBuilder.append("ORDER BY RAND()");
-        }
-        //需要把改orderby清空
-        if (isNotEmptyList(plainSelect.getOrderByElements())) {
+            orderByBuilder.append(PlainSelect.orderByToString(
+                    getOrderByElements(plainSelect, autoItems)).substring(1));
+            //清空排序列表
             plainSelect.setOrderByElements(null);
+        } else {
+            orderByBuilder.append("ORDER BY RAND()");
         }
         orderByBuilder.append(") ");
         orderByBuilder.append(PAGE_ROW_NUMBER);
-        Column orderByColumn = new Column(orderByBuilder.toString());
-        plainSelect.getSelectItems().add(0, new SelectExpressionItem(orderByColumn));
-    }
-
-    /**
-     * 拼接order by 排序字符串
-     * @param plainSelect
-     * @return
-     */
-    public String orderByToString(PlainSelect plainSelect) {
-        List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
-        if (orderByElements.isEmpty()) {
-            return " ";
-        }
-
-        StringBuilder orderBy = new StringBuilder(50);
-        Map<String, String> aliasMap = getColumnAliasMap(plainSelect);
-        for (OrderByElement element : orderByElements) {
-            if (orderBy.length() == 0) {
-                orderBy.append(" ORDER BY ");
-            }else {
-                orderBy.append(", ");
-            }
-            Column column = (Column) element.getExpression();
-            String columnName = column.getColumnName();
-            orderBy.append(aliasMap.containsKey(columnName) ? aliasMap.get(columnName) : column.toString());
-            orderBy.append(element.isAsc() ? " ASC " : " DESC ");
-        }
-
-        return orderBy.toString();
-    }
-
-    /**
-     * 获取查询列字段与别名的对应关系
-     * @param selectBody
-     * @return
-     */
-    public Map<String, String> getColumnAliasMap(PlainSelect selectBody) {
-        Map<String, String> columnAliaMap = new HashMap<String, String>();
-        List<SelectItem> selectItemList = selectBody.getSelectItems();
-        for (SelectItem selectItem : selectItemList) {
-            if (!(selectItem instanceof SelectExpressionItem)) {
-                continue;
-            }
-            SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
-            if (selectExpressionItem.getAlias() == null){
-                //只关联有别名的列
-                continue;
-            }
-            Expression expression = selectExpressionItem.getExpression();
-            if (!(expression instanceof Column)) {
-                continue;
-            }
-            Column column = (Column)selectExpressionItem.getExpression();
-            String aliasName = selectExpressionItem.getAlias().getName();
-            String columnName = column.getTable().getName() + "." + column.getColumnName();
-            columnAliaMap.put(aliasName,columnName);
-        }
-        return columnAliaMap;
+        return new SelectExpressionItem(new Column(orderByBuilder.toString()));
     }
 
     /**
@@ -424,5 +377,137 @@ public class SqlServer {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 复制 OrderByElement
+     *
+     * @param orig  原 OrderByElement
+     * @param alias 新 OrderByElement 的排序要素
+     * @return 复制的新 OrderByElement
+     */
+    protected OrderByElement cloneOrderByElement(OrderByElement orig, String alias) {
+        return cloneOrderByElement(orig, new Column(alias));
+    }
+
+    /**
+     * 复制 OrderByElement
+     *
+     * @param orig       原 OrderByElement
+     * @param expression 新 OrderByElement 的排序要素
+     * @return 复制的新 OrderByElement
+     */
+    protected OrderByElement cloneOrderByElement(OrderByElement orig, Expression expression) {
+        OrderByElement element = new OrderByElement();
+        element.setAsc(orig.isAsc());
+        element.setAscDescPresent(orig.isAscDescPresent());
+        element.setNullOrdering(orig.getNullOrdering());
+        element.setExpression(expression);
+        return element;
+    }
+
+    /**
+     * 获取新的排序列表
+     *
+     * @param plainSelect 原始查询
+     * @param autoItems   生成的新查询要素
+     * @return 新的排序列表
+     */
+    protected List<OrderByElement> getOrderByElements(PlainSelect plainSelect,
+                                                      List<SelectItem> autoItems) {
+        List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
+        ListIterator<OrderByElement> iterator = orderByElements.listIterator();
+        OrderByElement orderByElement;
+
+        // 非 `*` 且 非 `t.*` 查询列集合
+        Map<String, SelectExpressionItem> selectMap = new HashMap<String, SelectExpressionItem>();
+        // 别名集合
+        Set<String> aliases = new HashSet<String>();
+        // 是否包含 `*` 查询列
+        boolean allColumns = false;
+        // `t.*` 查询列的表名集合
+        Set<String> allColumnsTables = new HashSet<String>();
+
+        for (SelectItem item : plainSelect.getSelectItems()) {
+            if (item instanceof SelectExpressionItem) {
+                SelectExpressionItem expItem = (SelectExpressionItem) item;
+                selectMap.put(expItem.getExpression().toString(), expItem);
+
+                Alias alias = expItem.getAlias();
+                if (alias != null) {
+                    aliases.add(alias.getName());
+                }
+
+            } else if (item instanceof AllColumns) {
+                allColumns = true;
+
+            } else if (item instanceof AllTableColumns) {
+                allColumnsTables.add(((AllTableColumns) item).getTable().getName());
+            }
+        }
+
+        // 开始遍历 OrderByElement 列表
+        int aliasNo = 1;
+        while (iterator.hasNext()) {
+            orderByElement = iterator.next();
+            Expression expression = orderByElement.getExpression();
+            SelectExpressionItem selectExpressionItem = selectMap.get(expression.toString());
+            if (selectExpressionItem != null) { // OrderByElement 在查询列表中
+                Alias alias = selectExpressionItem.getAlias();
+                if (alias != null) { // 查询列含有别名时用查询列别名
+                    iterator.set(cloneOrderByElement(orderByElement, alias.getName()));
+
+                } else { // 查询列不包含别名
+                    if (expression instanceof Column) {
+                        // 查询列为普通列，这时因为列在嵌套查询外时名称中不包含表名，故去除排序列的表名引用
+                        // 例（仅为解释此处逻辑，不代表最终分页结果）：
+                        // SELECT TEST.A FROM TEST ORDER BY TEST.A
+                        // -->
+                        // SELECT A FROM (SELECT TEST.A FROM TEST) ORDER BY A
+                        ((Column) expression).setTable(null);
+
+                    } else {
+                        // 查询列不为普通列时（例如函数列）不支持分页
+                        // 此种情况比较难预测，简单的增加新列容易产生不可预料的结果
+                        // 而为列增加别名是非常简单的，故此要求排序复杂列必须使用别名
+                        throw new RuntimeException("列 \"" + expression + "\" 需要定义别名");
+                    }
+                }
+
+            } else { // OrderByElement 不在查询列表中，需要自动生成一个查询列
+                if (expression instanceof Column) { // OrderByElement 为普通列
+                    String table = ((Column) expression).getTable().getName();
+                    if (table == null) { // 表名为空
+                        if (allColumns ||
+                                (allColumnsTables.size() == 1 && plainSelect.getJoins() == null) ||
+                                aliases.contains(((Column) expression).getColumnName())) {
+                            // 包含`*`查询列 或者 只有一个 `t.*`列且为单表查询 或者 其实排序列是一个别名
+                            // 此时排序列其实已经包含在查询列表中了，不需做任何操作
+                            continue;
+                        }
+
+                    } else { //表名不为空
+                        if (allColumns || allColumnsTables.contains(table)) {
+                            // 包含`*`查询列 或者 包含特定的`t.*`列
+                            // 此时排序列其实已经包含在查询列表中了，只需去除排序列的表名引
+                            ((Column) expression).setTable(null);
+                            continue;
+                        }
+                    }
+                }
+
+                // 将排序列加入查询列中
+                String aliasName = PAGE_COLUMN_ALIAS_PREFIX + aliasNo++;
+
+                SelectExpressionItem item = new SelectExpressionItem();
+                item.setExpression(expression);
+                item.setAlias(new Alias(aliasName));
+                autoItems.add(item);
+
+                iterator.set(cloneOrderByElement(orderByElement, aliasName));
+            }
+        }
+
+        return orderByElements;
     }
 }
