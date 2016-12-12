@@ -255,6 +255,16 @@ public class SqlServer {
                 selectItems.add(selectItem);
             }
         }
+        // SELECT *, 1 AS alias FROM TEST
+        // 应该为
+        // SELECT * FROM (SELECT *, 1 AS alias FROM TEST)
+        // 不应该为
+        // SELECT *, alias FROM (SELECT *, 1 AS alias FROM TEST)
+        for (SelectItem selectItem : selectItems) {
+            if (selectItem instanceof AllColumns) {
+                return Collections.singletonList(selectItem);
+            }
+        }
         return selectItems;
     }
 
