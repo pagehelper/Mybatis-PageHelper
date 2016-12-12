@@ -169,4 +169,10 @@ public class SqlServerTest {
         String originalSql = "select t.countrycode, t.countryname from country t order by t.countrycode";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
+
+    @Test
+    public void testSqlStar() throws JSQLParserException {
+        String originalSql = "select t.*, 1 alias from country t order by t.countrycode";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
 }
