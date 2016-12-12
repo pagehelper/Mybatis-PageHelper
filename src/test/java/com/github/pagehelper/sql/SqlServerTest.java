@@ -151,4 +151,22 @@ public class SqlServerTest {
                 "order by code";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
+
+    @Test
+    public void testSqlOrderByFunctionAlias() throws JSQLParserException {
+        String originalSql = "select countrycode code, func() func_alias from country order by func()";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
+
+    @Test
+    public void testSqlOrderByUnknown() throws JSQLParserException {
+        String originalSql = "select countryname from country order by countrycode";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
+
+    @Test
+    public void testSqlOrderByTable() throws JSQLParserException {
+        String originalSql = "select t.countrycode, t.countryname from country t order by t.countrycode";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
 }
