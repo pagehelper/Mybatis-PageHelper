@@ -1,17 +1,15 @@
-package com.github.pagehelper.dialect;
+package com.github.pagehelper.helper.dialect;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.util.SqlUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.helper.HelperDialect;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.session.RowBounds;
 
 /**
  * @author liuzh
  */
-public class Db2Dialect extends AbstractDialect {
-    public Db2Dialect(SqlUtil sqlUtil) {
-        super(sqlUtil);
-    }
+public class Db2Dialect extends HelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {

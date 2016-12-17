@@ -1,12 +1,8 @@
-package com.github.pagehelper.dialect;
+package com.github.pagehelper.helper;
 
-import com.github.pagehelper.Constant;
-import com.github.pagehelper.Dialect;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageRowBounds;
+import com.github.pagehelper.*;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.OrderByParser;
-import com.github.pagehelper.util.SqlUtil;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
@@ -22,27 +18,19 @@ import java.util.Properties;
  * @author liuzh
  * @since 2016-12-04 14:32
  */
-public abstract class AbstractDialect implements Dialect, Constant {
+public abstract class HelperDialect implements Dialect, Constant {
     //处理SQL
     protected CountSqlParser countSqlParser = new CountSqlParser();
-    protected SqlUtil sqlUtil;
-
-    public AbstractDialect(SqlUtil sqlUtil) {
-        this.sqlUtil = sqlUtil;
-    }
 
     @Override
     public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        Page page = sqlUtil.getPage(parameterObject, rowBounds);
-        if (page == null) {
-            return true;
-        }
-        return (page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0;
+        //该方法不会被调用
+        return true;
     }
 
     @Override
     public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        Page page = SqlUtil.getLocalPage();
+        Page page = PageHelper.getLocalPage();
         return !page.isOrderByOnly() && page.isCount();
     }
 
@@ -53,10 +41,10 @@ public abstract class AbstractDialect implements Dialect, Constant {
 
     @Override
     public void afterCount(long count, Object parameterObject, RowBounds rowBounds) {
-        Page page = SqlUtil.getLocalPage();
+        Page page = PageHelper.getLocalPage();
         page.setTotal(count);
-        if(rowBounds instanceof PageRowBounds){
-            ((PageRowBounds)rowBounds).setTotal(count);
+        if (rowBounds instanceof PageRowBounds) {
+            ((PageRowBounds) rowBounds).setTotal(count);
         }
     }
 
@@ -67,7 +55,7 @@ public abstract class AbstractDialect implements Dialect, Constant {
 
     @Override
     public boolean beforePage(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        Page page = SqlUtil.getLocalPage();
+        Page page = PageHelper.getLocalPage();
         if (page.isOrderByOnly()) {
             return true;
         }
@@ -80,7 +68,7 @@ public abstract class AbstractDialect implements Dialect, Constant {
     @Override
     public String getPageSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey pageKey) {
         String sql = boundSql.getSql();
-        Page page = SqlUtil.getLocalPage();
+        Page page = PageHelper.getLocalPage();
         //支持 order by
         String orderBy = page.getOrderBy();
         if (StringUtil.isNotEmpty(orderBy)) {
@@ -106,7 +94,7 @@ public abstract class AbstractDialect implements Dialect, Constant {
 
     @Override
     public Object afterPage(List pageList, Object parameterObject, RowBounds rowBounds) {
-        Page page = SqlUtil.getLocalPage();
+        Page page = PageHelper.getLocalPage();
         if (page == null) {
             return pageList;
         }
@@ -119,6 +107,11 @@ public abstract class AbstractDialect implements Dialect, Constant {
             page.setTotal(pageList.size());
         }
         return page;
+    }
+
+    @Override
+    public void afterAll() {
+
     }
 
     @Override

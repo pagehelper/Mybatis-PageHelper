@@ -1,7 +1,8 @@
-package com.github.pagehelper.dialect;
+package com.github.pagehelper.helper.dialect;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.util.SqlUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.helper.HelperDialect;
 import com.github.pagehelper.util.StringUtil;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
@@ -11,23 +12,18 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.Map;
 import java.util.Properties;
 
 /**
  * @author liuzh
  */
-public class SqlServerDialect extends AbstractDialect {
+public class SqlServerDialect extends HelperDialect {
     protected SqlServer pageSql = new SqlServer();
     protected Cache<String, String> CACHE_COUNTSQL;
     protected Cache<String, String> CACHE_PAGESQL;
 
     //with(nolock)
     protected String WITHNOLOCK = ", PAGEWITHNOLOCK";
-
-    public SqlServerDialect(SqlUtil sqlUtil) {
-        super(sqlUtil);
-    }
 
     @Override
     public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {

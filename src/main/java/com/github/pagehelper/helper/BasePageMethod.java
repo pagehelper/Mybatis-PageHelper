@@ -1,32 +1,21 @@
-/*
- * The MIT License (MIT)
+package com.github.pagehelper.helper;
+
+import com.github.pagehelper.ISelect;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.util.MetaObjectUtil;
+import org.apache.ibatis.reflection.MetaObject;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 基础分页方法
  *
- * Copyright (c) 2014 abel533@gmail.com
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * @author liuzh
  */
+public abstract class BasePageMethod extends BasePage {
 
-package com.github.pagehelper;
-
-import com.github.pagehelper.util.SqlUtil;
-
-public abstract class BasePageHelper {
     /**
      * 获取任意查询方法的count总数
      *
@@ -93,11 +82,11 @@ public abstract class BasePageHelper {
     public static <E> Page<E> offsetPage(int offset, int limit, boolean count) {
         Page<E> page = new Page<E>(new int[]{offset, limit}, count);
         //当已经执行过orderBy的时候
-        Page<E> oldPage = SqlUtil.getLocalPage();
+        Page<E> oldPage = getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
-        SqlUtil.setLocalPage(page);
+        setLocalPage(page);
         return page;
     }
 
@@ -140,11 +129,11 @@ public abstract class BasePageHelper {
         page.setReasonable(reasonable);
         page.setPageSizeZero(pageSizeZero);
         //当已经执行过orderBy的时候
-        Page<E> oldPage = SqlUtil.getLocalPage();
+        Page<E> oldPage = getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
-        SqlUtil.setLocalPage(page);
+        setLocalPage(page);
         return page;
     }
 
@@ -154,13 +143,13 @@ public abstract class BasePageHelper {
      * @param params
      */
     public static <E> Page<E> startPage(Object params) {
-        Page<E> page = SqlUtil.getPageFromObject(params);
+        Page<E> page = getPageFromObject(params);
         //当已经执行过orderBy的时候
-        Page<E> oldPage = SqlUtil.getLocalPage();
+        Page<E> oldPage = getLocalPage();
         if (oldPage != null && oldPage.isOrderByOnly()) {
             page.setOrderBy(oldPage.getOrderBy());
         }
-        SqlUtil.setLocalPage(page);
+        setLocalPage(page);
         return page;
     }
 
@@ -170,21 +159,15 @@ public abstract class BasePageHelper {
      * @param orderBy
      */
     public static void orderBy(String orderBy) {
-        Page<?> page = SqlUtil.getLocalPage();
+        Page<?> page = getLocalPage();
         if (page != null) {
             page.setOrderBy(orderBy);
         } else {
             page = new Page();
             page.setOrderBy(orderBy);
             page.setOrderByOnly(true);
-            SqlUtil.setLocalPage(page);
+            setLocalPage(page);
         }
     }
 
-    /**
-     * 手动清空分页参数
-     */
-    public static void clearPage(){
-        SqlUtil.clearLocalPage();
-    }
 }

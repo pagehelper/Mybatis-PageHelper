@@ -8,9 +8,6 @@ import org.apache.ibatis.session.RowBounds;
 public class PageRowBounds extends RowBounds {
   private Long total;
 
-  public PageRowBounds() {
-  }
-
   public PageRowBounds(int offset, int limit) {
     super(offset, limit);
   }

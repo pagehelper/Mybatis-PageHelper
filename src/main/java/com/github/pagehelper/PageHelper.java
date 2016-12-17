@@ -24,14 +24,13 @@
 
 package com.github.pagehelper;
 
-import com.github.pagehelper.util.SqlUtil;
-import org.apache.ibatis.executor.Executor;
+import com.github.pagehelper.helper.BaseAutoDialect;
+import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.*;
-import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.Properties;
+import java.util.List;
 
 /**
  * Mybatis - 通用分页拦截器<br/>
@@ -40,23 +39,64 @@ import java.util.Properties;
  * @author liuzh/abel533/isea533
  * @version 5.0.0
  */
-@SuppressWarnings("rawtypes")
-@Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
-public class PageHelper extends BasePageHelper implements Interceptor {
-    private final SqlUtil sqlUtil = new SqlUtil();
+public class PageHelper extends BaseAutoDialect implements Dialect {
 
     @Override
-    public Object intercept(Invocation invocation) throws Throwable {
-        return sqlUtil.intercept(invocation);
+    public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
+        Page page = getPage(parameterObject, rowBounds);
+        if (page == null) {
+            return true;
+        }
+        boolean skip = (page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0;
+        if(!skip){
+            initDelegate(ms);
+        }
+        return skip;
     }
 
     @Override
-    public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
+    public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
+        return getDelegate().beforeCount(ms, parameterObject, rowBounds);
     }
 
     @Override
-    public void setProperties(Properties properties) {
-        sqlUtil.setProperties(properties);
+    public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
+        return getDelegate().getCountSql(ms, boundSql, parameterObject, rowBounds, countKey);
+    }
+
+    @Override
+    public void afterCount(long count, Object parameterObject, RowBounds rowBounds) {
+        getDelegate().afterCount(count, parameterObject, rowBounds);
+    }
+
+    @Override
+    public Object processParameterObject(MappedStatement ms, Object parameterObject, BoundSql boundSql, CacheKey pageKey) {
+        return getDelegate().processParameterObject(ms, parameterObject, boundSql, pageKey);
+    }
+
+    @Override
+    public boolean beforePage(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
+        return getDelegate().beforePage(ms, parameterObject, rowBounds);
+    }
+
+    @Override
+    public String getPageSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey pageKey) {
+        return getDelegate().getPageSql(ms, boundSql, parameterObject, rowBounds, pageKey);
+    }
+
+    public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
+        return getDelegate().getPageSql(sql, page, rowBounds, pageKey);
+    }
+
+    @Override
+    public Object afterPage(List pageList, Object parameterObject, RowBounds rowBounds) {
+        return getDelegate().afterPage(pageList, parameterObject, rowBounds);
+    }
+
+    @Override
+    public void afterAll() {
+        getDelegate().afterAll();
+        clearDelegate();
+        clearPage();
     }
 }

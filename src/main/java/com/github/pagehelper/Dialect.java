@@ -100,6 +100,11 @@ public interface Dialect {
 	Object afterPage(List pageList, Object parameterObject, RowBounds rowBounds);
 
 	/**
+	 * 完成所有任务后
+	 */
+	void afterAll();
+
+	/**
 	 * 设置参数
 	 *
 	 * @param properties 插件属性
