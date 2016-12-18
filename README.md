@@ -5,7 +5,7 @@
 If you are using MyBatis, it is recommended to try this pagination plugin. 
 This must be the **Most Convenient** pagination plugin.
 
-PageHelper supports any single table, multiple tables of complex pagination.
+PageHelper support any complex single-table, multi-table queries.
 Some special cases please see the [**Important note**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md).
 
 Want to use PageHelper? 
