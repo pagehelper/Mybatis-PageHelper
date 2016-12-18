@@ -2,9 +2,9 @@
 
 如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。
 
-分页插件支持任何复杂的单表、多表分页，部分特殊情况请看[重要提示](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Important.markdown)。
+分页插件支持任何复杂的单表、多表分页，部分特殊情况请看[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)。
 
-想要使用分页插件？请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)。
+想要使用分页插件？请看[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)。
 
 ##物理分页
 
@@ -69,10 +69,6 @@
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/
 
-####4.1.0以前版本需要0.9.1版本
-
- - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
-
 ##4.2.1
 
 - 解决`SimpleCache`类遗留问题导致的错误 [#143](http://git.oschina.net/free/Mybatis_PageHelper/issues/143) fix by [dhhua](https://github.com/dhhua)
@@ -94,7 +90,7 @@
 
 ##项目文档[wiki](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)：  
 
-###[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)
+###[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)
 
 如果要使用分页插件，这篇文档一定要看，看完肯定没有问题。
 
@@ -108,23 +104,22 @@
 
 这两个集成框架集成了MyBatis分页插件和MyBatis通用Mapper。
 
-###[更新日志](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Changelog.markdown)
+###[更新日志](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Changelog.md)
 
 包含全部的详细的更新日志。
 
-###[重要提示](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Important.markdown)
+###[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
 
 提示很重要，建议一定看一遍！
 
+###[提交(git)BUG](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
 ###[提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
 ##相关链接
 
-对应于oschub的项目地址：http://git.oschina.net/free/Mybatis_PageHelper
+本项目在 gitosc 的项目地址：http://git.oschina.net/free/Mybatis_PageHelper
 
-对应于github的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
-
-Mybatis-Sample（分页插件测试项目）：[http://git.oschina.net/free/Mybatis-Sample](http://git.oschina.net/free/Mybatis-Sample)
+本项目在 github 的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
 
 Mybatis项目：https://github.com/mybatis/mybatis-3
 

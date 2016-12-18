@@ -186,7 +186,7 @@
 
 ###5. 如何在代码中使用  
 
-阅读前后请注意看[重要提示](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Important.markdown)
+阅读前后请注意看[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
 
 首先该分页插件支持以下两种调用方式：  
 
