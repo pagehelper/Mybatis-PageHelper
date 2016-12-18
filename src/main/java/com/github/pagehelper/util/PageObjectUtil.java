@@ -1,7 +1,6 @@
-package com.github.pagehelper.dialect.helper;
+package com.github.pagehelper.util;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.util.MetaObjectUtil;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.lang.reflect.Method;
@@ -9,13 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 基础分页信息
+ * 分页参数对象工具类
  *
  * @author liuzh
  */
-public abstract class BasePage {
-    protected static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
-
+public abstract class PageObjectUtil {
     //request获取方法
     protected static Boolean hasRequest;
     protected static Class<?> requestClass;
@@ -38,38 +35,12 @@ public abstract class BasePage {
     }
 
     /**
-     * 获取 Page 参数
-     *
-     * @return
-     */
-    protected static <T> Page<T> getLocalPage() {
-        return LOCAL_PAGE.get();
-    }
-
-    /**
-     * 设置 Page 参数
-     *
-     * @param page
-     */
-    protected static void setLocalPage(Page page) {
-        LOCAL_PAGE.set(page);
-    }
-
-    /**
-     * 移除本地变量
-     */
-    public static void clearPage() {
-        LOCAL_PAGE.remove();
-    }
-
-
-    /**
      * 对象中获取分页参数
      *
      * @param params
      * @return
      */
-    protected static <T> Page<T> getPageFromObject(Object params, boolean required) {
+    public static <T> Page<T> getPageFromObject(Object params, boolean required) {
         int pageNum;
         int pageSize;
         MetaObject paramsObject = null;
@@ -143,6 +114,18 @@ public abstract class BasePage {
             throw new RuntimeException("分页查询缺少必要的参数:" + PARAMS.get(paramName));
         }
         return value;
+    }
+
+    public static void setParams(String params) {
+        if (StringUtil.isNotEmpty(params)) {
+            String[] ps = params.split("[;|,|&]");
+            for (String s : ps) {
+                String[] ss = s.split("[=|:]");
+                if (ss.length == 2) {
+                    PARAMS.put(ss[0], ss[1]);
+                }
+            }
+        }
     }
 
 }

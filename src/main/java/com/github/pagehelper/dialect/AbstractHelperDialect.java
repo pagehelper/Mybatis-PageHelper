@@ -1,4 +1,4 @@
-package com.github.pagehelper.dialect.helper;
+package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.*;
 import com.github.pagehelper.dialect.AbstractDialect;
@@ -17,7 +17,17 @@ import java.util.Properties;
  * @author liuzh
  * @since 2016-12-04 14:32
  */
-public abstract class HelperDialect extends AbstractDialect {
+public abstract class AbstractHelperDialect extends AbstractDialect {
+
+    /**
+     * 获取分页参数
+     *
+     * @param <T>
+     * @return
+     */
+    public <T> Page<T> getLocalPage() {
+        return PageHelper.getLocalPage();
+    }
 
     @Override
     public final boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
@@ -27,13 +37,13 @@ public abstract class HelperDialect extends AbstractDialect {
 
     @Override
     public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        Page page = PageHelper.getLocalPage();
+        Page page = getLocalPage();
         return page.isCount();
     }
 
     @Override
     public boolean afterCount(long count, Object parameterObject, RowBounds rowBounds) {
-        Page page = PageHelper.getLocalPage();
+        Page page = getLocalPage();
         page.setTotal(count);
         if (rowBounds instanceof PageRowBounds) {
             ((PageRowBounds) rowBounds).setTotal(count);
@@ -53,7 +63,7 @@ public abstract class HelperDialect extends AbstractDialect {
 
     @Override
     public boolean beforePage(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        Page page = PageHelper.getLocalPage();
+        Page page = getLocalPage();
         if (page.getPageSize() > 0) {
             return true;
         }
@@ -63,7 +73,7 @@ public abstract class HelperDialect extends AbstractDialect {
     @Override
     public String getPageSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey pageKey) {
         String sql = boundSql.getSql();
-        Page page = PageHelper.getLocalPage();
+        Page page = getLocalPage();
         return getPageSql(sql, page, pageKey);
     }
 
@@ -79,7 +89,7 @@ public abstract class HelperDialect extends AbstractDialect {
 
     @Override
     public Object afterPage(List pageList, Object parameterObject, RowBounds rowBounds) {
-        Page page = PageHelper.getLocalPage();
+        Page page = getLocalPage();
         if (page == null) {
             return pageList;
         }

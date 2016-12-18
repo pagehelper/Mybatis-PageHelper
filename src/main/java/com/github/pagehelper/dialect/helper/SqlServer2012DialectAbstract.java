@@ -1,13 +1,12 @@
-package com.github.pagehelper.dialect.helper.impl;
+package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
 import org.apache.ibatis.cache.CacheKey;
-import org.apache.ibatis.session.RowBounds;
 
 /**
  * @author liuzh
  */
-public class SqlServer2012Dialect extends SqlServerDialect {
+public class SqlServer2012DialectAbstract extends SqlServerDialectAbstract {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {

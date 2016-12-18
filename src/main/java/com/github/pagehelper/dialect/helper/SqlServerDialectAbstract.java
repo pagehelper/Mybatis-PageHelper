@@ -1,9 +1,9 @@
-package com.github.pagehelper.dialect.helper.impl;
+package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
-import com.github.pagehelper.dialect.helper.HelperDialect;
+import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.parser.SqlServerParser;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * @author liuzh
  */
-public class SqlServerDialect extends HelperDialect {
+public class SqlServerDialectAbstract extends AbstractHelperDialect {
     protected SqlServerParser pageSql = new SqlServerParser();
     protected Cache<String, String> CACHE_COUNTSQL;
     protected Cache<String, String> CACHE_PAGESQL;

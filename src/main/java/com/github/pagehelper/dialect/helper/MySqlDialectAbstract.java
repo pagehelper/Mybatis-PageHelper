@@ -1,14 +1,13 @@
-package com.github.pagehelper.dialect.helper.impl;
+package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.dialect.helper.HelperDialect;
+import com.github.pagehelper.dialect.AbstractHelperDialect;
 import org.apache.ibatis.cache.CacheKey;
-import org.apache.ibatis.session.RowBounds;
 
 /**
  * @author liuzh
  */
-public class MySqlDialect extends HelperDialect {
+public class MySqlDialectAbstract extends AbstractHelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {

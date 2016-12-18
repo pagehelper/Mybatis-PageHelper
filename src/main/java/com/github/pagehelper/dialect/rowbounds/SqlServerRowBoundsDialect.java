@@ -1,5 +1,6 @@
 package com.github.pagehelper.dialect.rowbounds;
 
+import com.github.pagehelper.dialect.AbstractRowBoundsDialect;
 import com.github.pagehelper.parser.SqlServerParser;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;

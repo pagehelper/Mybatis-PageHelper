@@ -1,13 +1,13 @@
-package com.github.pagehelper.dialect.helper.impl;
+package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.dialect.helper.HelperDialect;
+import com.github.pagehelper.dialect.AbstractHelperDialect;
 import org.apache.ibatis.cache.CacheKey;
 
 /**
  * @author liuzh
  */
-public class Db2Dialect extends HelperDialect {
+public class Db2DialectAbstract extends AbstractHelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {

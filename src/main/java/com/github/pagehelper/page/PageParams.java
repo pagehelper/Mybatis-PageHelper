@@ -1,17 +1,18 @@
-package com.github.pagehelper.dialect.helper;
+package com.github.pagehelper.page;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.util.StringUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.util.PageObjectUtil;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Properties;
 
 /**
- * 基础参数信息
+ * Page 参数信息
  *
  * @author liuzh
  */
-public abstract class BaseParams extends BasePageMethod {
+public class PageParams {
     //RowBounds参数offset作为PageNum使用 - 默认不使用
     protected boolean offsetAsPageNum = false;
     //RowBounds是否进行count查询 - 默认不查询
@@ -23,18 +24,6 @@ public abstract class BaseParams extends BasePageMethod {
     //是否支持接口参数来传递分页参数，默认false
     protected boolean supportMethodsArguments = false;
 
-    public void setParams(String params) {
-        if (StringUtil.isNotEmpty(params)) {
-            String[] ps = params.split("[;|,|&]");
-            for (String s : ps) {
-                String[] ss = s.split("[=|:]");
-                if (ss.length == 2) {
-                    PARAMS.put(ss[0], ss[1]);
-                }
-            }
-        }
-    }
-
     /**
      * 获取分页参数
      *
@@ -43,7 +32,7 @@ public abstract class BaseParams extends BasePageMethod {
      * @return
      */
     public Page getPage(Object parameterObject, RowBounds rowBounds) {
-        Page page = getLocalPage();
+        Page page = PageHelper.getLocalPage();
         if (page == null) {
             if (rowBounds != RowBounds.DEFAULT) {
                 if (offsetAsPageNum) {
@@ -55,12 +44,12 @@ public abstract class BaseParams extends BasePageMethod {
                 }
             } else {
                 try {
-                    page = getPageFromObject(parameterObject, false);
+                    page = PageObjectUtil.getPageFromObject(parameterObject, false);
                 } catch (Exception e) {
                     return null;
                 }
             }
-            setLocalPage(page);
+            PageHelper.setLocalPage(page);
         }
         //分页合理化
         if (page.getReasonable() == null) {
@@ -91,6 +80,6 @@ public abstract class BaseParams extends BasePageMethod {
         this.supportMethodsArguments = Boolean.parseBoolean(supportMethodsArguments);
         //当offsetAsPageNum=false的时候，不能
         //参数映射
-        setParams(properties.getProperty("params"));
+        PageObjectUtil.setParams(properties.getProperty("params"));
     }
 }

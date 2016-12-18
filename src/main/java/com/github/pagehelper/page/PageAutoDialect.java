@@ -1,7 +1,8 @@
-package com.github.pagehelper.dialect.helper;
+package com.github.pagehelper.page;
 
 import com.github.pagehelper.PageException;
-import com.github.pagehelper.dialect.helper.impl.*;
+import com.github.pagehelper.dialect.AbstractHelperDialect;
+import com.github.pagehelper.dialect.helper.*;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.mapping.MappedStatement;
 
@@ -19,28 +20,28 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author liuzh
  */
-public abstract class BaseAutoDialect extends BaseParams {
+public class PageAutoDialect {
 
     private static Map<String, Class<?>> dialectAliasMap = new HashMap<String, Class<?>>();
 
     static {
         //注册别名
-        dialectAliasMap.put("hsqldb", HsqldbDialect.class);
-        dialectAliasMap.put("h2", HsqldbDialect.class);
-        dialectAliasMap.put("postgresql", HsqldbDialect.class);
+        dialectAliasMap.put("hsqldb", HsqldbDialectAbstract.class);
+        dialectAliasMap.put("h2", HsqldbDialectAbstract.class);
+        dialectAliasMap.put("postgresql", HsqldbDialectAbstract.class);
 
-        dialectAliasMap.put("mysql", MySqlDialect.class);
-        dialectAliasMap.put("mariadb", MySqlDialect.class);
-        dialectAliasMap.put("sqlite", MySqlDialect.class);
+        dialectAliasMap.put("mysql", MySqlDialectAbstract.class);
+        dialectAliasMap.put("mariadb", MySqlDialectAbstract.class);
+        dialectAliasMap.put("sqlite", MySqlDialectAbstract.class);
 
-        dialectAliasMap.put("oracle", OracleDialect.class);
-        dialectAliasMap.put("db2", Db2Dialect.class);
-        dialectAliasMap.put("informix", InformixDialect.class);
+        dialectAliasMap.put("oracle", OracleDialectAbstract.class);
+        dialectAliasMap.put("db2", Db2DialectAbstract.class);
+        dialectAliasMap.put("informix", InformixDialectAbstract.class);
 
-        dialectAliasMap.put("sqlserver", SqlServerDialect.class);
-        dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
+        dialectAliasMap.put("sqlserver", SqlServerDialectAbstract.class);
+        dialectAliasMap.put("sqlserver2012", SqlServer2012DialectAbstract.class);
 
-        dialectAliasMap.put("derby", SqlServer2012Dialect.class);
+        dialectAliasMap.put("derby", SqlServer2012DialectAbstract.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
@@ -50,13 +51,13 @@ public abstract class BaseAutoDialect extends BaseParams {
     //属性配置
     private Properties properties;
     //缓存
-    private Map<String, HelperDialect> urlDialectMap = new ConcurrentHashMap<String, HelperDialect>();
+    private Map<String, AbstractHelperDialect> urlDialectMap = new ConcurrentHashMap<String, AbstractHelperDialect>();
     private ReentrantLock lock = new ReentrantLock();
-    private HelperDialect delegate;
-    private ThreadLocal<HelperDialect> dialectThreadLocal = new ThreadLocal<HelperDialect>();
+    private AbstractHelperDialect delegate;
+    private ThreadLocal<AbstractHelperDialect> dialectThreadLocal = new ThreadLocal<AbstractHelperDialect>();
 
     //多数据动态获取时，每次需要初始化
-    protected void initDelegateDialect(MappedStatement ms) {
+    public void initDelegateDialect(MappedStatement ms) {
         if (delegate == null) {
             if (autoDialect) {
                 this.delegate = getDialect(ms);
@@ -67,7 +68,7 @@ public abstract class BaseAutoDialect extends BaseParams {
     }
 
     //获取当前的代理对象
-    protected HelperDialect getDelegate() {
+    public AbstractHelperDialect getDelegate() {
         if (delegate != null) {
             return delegate;
         }
@@ -75,7 +76,7 @@ public abstract class BaseAutoDialect extends BaseParams {
     }
 
     //移除代理对象
-    protected void clearDelegate() {
+    public void clearDelegate() {
         dialectThreadLocal.remove();
     }
 
@@ -109,17 +110,17 @@ public abstract class BaseAutoDialect extends BaseParams {
      * @param dialectClass
      * @param properties
      */
-    private HelperDialect initDialect(String dialectClass, Properties properties) {
-        HelperDialect dialect;
+    private AbstractHelperDialect initDialect(String dialectClass, Properties properties) {
+        AbstractHelperDialect dialect;
         if (StringUtil.isEmpty(dialectClass)) {
             throw new RuntimeException("使用 PageHelper 分页插件时，必须设置 helper 属性");
         }
         try {
             Class sqlDialectClass = resloveDialectClass(dialectClass);
-            if (HelperDialect.class.isAssignableFrom(sqlDialectClass)) {
-                dialect = (HelperDialect) sqlDialectClass.newInstance();
+            if (AbstractHelperDialect.class.isAssignableFrom(sqlDialectClass)) {
+                dialect = (AbstractHelperDialect) sqlDialectClass.newInstance();
             } else {
-                throw new PageException("使用 PageHelper 时，方言必须是实现 " + HelperDialect.class.getCanonicalName() + " 接口的实现类!");
+                throw new PageException("使用 PageHelper 时，方言必须是实现 " + AbstractHelperDialect.class.getCanonicalName() + " 接口的实现类!");
             }
         } catch (Exception e) {
             throw new PageException("初始化 helper [" + dialectClass + "]时出错:" + e.getMessage(), e);
@@ -160,7 +161,7 @@ public abstract class BaseAutoDialect extends BaseParams {
      * @param ms
      * @return
      */
-    private HelperDialect getDialect(MappedStatement ms) {
+    private AbstractHelperDialect getDialect(MappedStatement ms) {
         //改为对dataSource做缓存
         DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
         String url = getUrl(dataSource);
@@ -179,7 +180,7 @@ public abstract class BaseAutoDialect extends BaseParams {
             if (dialectStr == null) {
                 throw new RuntimeException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
             }
-            HelperDialect dialect = initDialect(dialectStr, properties);
+            AbstractHelperDialect dialect = initDialect(dialectStr, properties);
             urlDialectMap.put(url, dialect);
             return dialect;
         } finally {
@@ -188,7 +189,6 @@ public abstract class BaseAutoDialect extends BaseParams {
     }
 
     public void setProperties(Properties properties) {
-        super.setProperties(properties);
         //多数据源时，获取 jdbcurl 后是否关闭数据源
         String closeConn = properties.getProperty("closeConn");
         if (StringUtil.isNotEmpty(closeConn)) {

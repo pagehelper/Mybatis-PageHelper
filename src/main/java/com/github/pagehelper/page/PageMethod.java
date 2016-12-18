@@ -1,14 +1,41 @@
-package com.github.pagehelper.dialect.helper;
+package com.github.pagehelper.page;
 
 import com.github.pagehelper.ISelect;
 import com.github.pagehelper.Page;
+import com.github.pagehelper.util.PageObjectUtil;
 
 /**
  * 基础分页方法
  *
  * @author liuzh
  */
-public abstract class BasePageMethod extends BasePage {
+public abstract class PageMethod {
+    protected static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
+
+    /**
+     * 设置 Page 参数
+     *
+     * @param page
+     */
+    protected static void setLocalPage(Page page) {
+        LOCAL_PAGE.set(page);
+    }
+
+    /**
+     * 获取 Page 参数
+     *
+     * @return
+     */
+    public static <T> Page<T> getLocalPage() {
+        return LOCAL_PAGE.get();
+    }
+
+    /**
+     * 移除本地变量
+     */
+    public static void clearPage() {
+        LOCAL_PAGE.remove();
+    }
 
     /**
      * 获取任意查询方法的count总数
@@ -74,7 +101,7 @@ public abstract class BasePageMethod extends BasePage {
      * @param params
      */
     public static <E> Page<E> startPage(Object params) {
-        Page<E> page = getPageFromObject(params, true);
+        Page<E> page = PageObjectUtil.getPageFromObject(params, true);
         setLocalPage(page);
         return page;
     }

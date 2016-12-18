@@ -1,5 +1,6 @@
 package com.github.pagehelper.dialect.rowbounds;
 
+import com.github.pagehelper.dialect.AbstractRowBoundsDialect;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.session.RowBounds;
 

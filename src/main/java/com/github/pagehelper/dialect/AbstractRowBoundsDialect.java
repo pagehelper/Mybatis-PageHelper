@@ -1,4 +1,4 @@
-package com.github.pagehelper.dialect.rowbounds;
+package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageRowBounds;
