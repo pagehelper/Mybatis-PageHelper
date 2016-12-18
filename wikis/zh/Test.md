@@ -20,9 +20,9 @@
 #oracle
 #postgresql
 #sqlserver
-#db2 - 由于maven中没有db2，因此本项目中不包含db2，如果需要测试，请自行添加db2依赖
-#informix - 不包含informix的配置，不支持测试
+#db2
 #h2
+#derby
 database = hsqldb
 ```  
 各种数据库对应的sql文件都在对应的目录中。

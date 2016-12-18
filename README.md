@@ -6,10 +6,10 @@ If you are using MyBatis, it is recommended to try this pagination plugin.
 This must be the **Most Convenient** pagination plugin.
 
 PageHelper supports any single table, multiple tables of complex pagination.
-Some special cases please see the [**Important note**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md).
+Some special cases please see the [**Important note**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md).
 
 Want to use PageHelper? 
-Please see [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md).
+Please see [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md).
 
 ##Physical Paging
 
@@ -89,7 +89,7 @@ If you are using Maven just add the following dependency to your pom.xml:
 
 ##Documentation  
 
-###[How to use the PageHelper](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)
+###[How to use the PageHelper](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md)
 
 If you are unfamiliar with Spring integration, 
 you can refer to the following two MyBatis and Spring Integration Framework:
@@ -105,9 +105,9 @@ The two Integrated Framework integrates PageHelper and [Common Mapper](https://g
 - helperDialect style
 - dialect style
 
-##[Changelog](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Changelog.md)
+##[Changelog](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Changelog.md)
 
-##[Important note](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
+##[Important note](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md)
 
 ##Submit BUG
 
