@@ -33,7 +33,7 @@ import org.apache.ibatis.session.RowBounds;
  *
  * @author liuzh
  */
-public class Db2RowDialect extends AbstractRowBoundsDialect {
+public class Db2RowBoundsDialect extends AbstractRowBoundsDialect {
 
     @Override
     public String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey) {
