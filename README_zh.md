@@ -57,6 +57,19 @@
 
 ##最近的更新日志
 
+###5.0.0-SNAPSHOT
+
+- 使用更好的方式处理分页逻辑
+- 新的分页插件拦截器为 `com.github.pagehelper.PageInterceptor`
+- 新的 `PageHelper` 是一个特殊的 `Dialect` 实现类，以更友好的方式实现了以前的功能
+- 新的分页插件仅有 `dialect` 一个参数，默认的 `dialect` 实现类为 `PageHelper` 
+- `PageHelper` 仍然支持以前提供的参数，在最新的使用文档中已经全部更新
+- `PageHelper` 的 `helperDialect` 参数和以前的 `dialect` 功能一样，具体可以看文档的参数说明
+- 增加了基于纯 `RowBounds` 和 `PageRowBounds` 的分页实现，在 `com.github.pagehelper.dialect.rowbounds` 包中，这是用于作为 `dialect` 参数示例的实现，后面会补充更详细的文档
+- 去掉了不适合出现在分页插件中的 orderby 功能，以后会提供单独的排序插件
+- 去掉了 `PageHelper` 中不常用的方法
+- 新的文档，更新历来更新日志中提到的重要内容，提供英文版本文档
+
 ###4.2.1
 
 - 解决`SimpleCache`类遗留问题导致的错误 [#143](http://git.oschina.net/free/Mybatis_PageHelper/issues/143) fix by [dhhua](https://github.com/dhhua)

@@ -52,9 +52,11 @@ so the master branch is 5.X version.
 version 4.2 exists as a branch, 
 if you have PR for 4.2, please submitted to the branch.
 
-##Latest SNAPSHOT: 5.0.0-SNAPSHOT
+##Latest Release 5.0.0-beta
 
-##Latest Release 4.2.1
+To use PageHelper you just need to include the 
+[pagehelper-x.x.x.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 
+and [jsqlparser-0.9.5.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/) file in the classpath.
 
 If you are using Maven just add the following dependency to your pom.xml:
 
@@ -62,30 +64,25 @@ If you are using Maven just add the following dependency to your pom.xml:
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.2.1</version>
+    <version>5.0.0-beta</version>
 </dependency>
 ```  
 
 ##Latest Changelog
 
-###4.2.1
+###5.0.0-SNAPSHOT
 
-- 解决`SimpleCache`类遗留问题导致的错误 [#143](http://git.oschina.net/free/Mybatis_PageHelper/issues/143) fix by [dhhua](https://github.com/dhhua)
-
-###4.2.0
-
-- 使用新的方式进行分页，4.2版本是从5.0版本分离出来的一个特殊版本，这个版本兼容4.x的所有功能，5.0版本时为了简化分页逻辑，会去掉部分功能，所以4.2是4.x的最后一个版本。
-- 支持 MyBatis 3.1.0+ 版本
-- 增加对 Derby 数据库的支持
-- 对除 informix 外的全部数据库进行测试，全部通过
-- PageHelper增加手动清除方法`clearPage()`
-- 解决 SqlServer 多个`with(nolock)`时出错的问题
-- 对CountMappedStatement 进行缓存，配置方式见BaseSqlUtil 319行
-- 由于SqlServer的sql处理特殊，因此增加了两个SQL缓存，具体配置参考SqlServerDialect类
-- 添加 sqlserver 别名进行排序功能，在解析sql时，会自动将使用的别名转换成列名 by panmingzhi
-- 新增`sqlCacheClass`参数，该参数可选，可以设置sql缓存实现类，默认为`SimpleCache`，当项目包含guava时，使用`GuavaCache`，也可以通过参数`sqlCacheClass`指定自己的实现类，有关详情看`com.github.pagehelper.cache`包。
-- 解决#135，增加/*keep orderby*/注解，SQL中包含该注释时，count查询时不会移出order by
-- sqlserver没有orderby时，使用`order by rand()` #82 #118
+- Use a better way to handle paging logic
+- New pagination plugin interceptor `com.github.pagehelper.PageInterceptor`
+- New `Dialect` `PageHelper` is a special implementation class, the previous function is implemented in more user-friendly ways
+- New pagination plugin only a `dialect` parameter, the default `dialect` is `PageHelper`
+- `PageHelper` continue to support previously provided parameters, Among the latest to use the document has been fully updated
+- `PageHelper` has a `helperDialect` parameter which is the same functional as the previous `dialect`
+- Added paging implementation based on pure `RowBounds` and `PageRowBounds`, 
+in `com.github. pagehelper. dialect. rowbounds` package, it is used as `dialect` Parameter sample implementation, more detailed documentation will be added later
+- Removed inappropriate orderby functions that appear in pagination plugin. It will provide a separate sort plug-ins in the future
+- Remove `PageHelper` are less commonly used methods
+- A new document, an important part of the update has been mentioned in the changelog, provides the English version of this document
 
 ##Documentation  
 
