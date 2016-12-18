@@ -27,7 +27,7 @@ public abstract class BaseAutoDialect extends BaseParams {
         //注册别名
         dialectAliasMap.put("hsqldb", HsqldbDialect.class);
         dialectAliasMap.put("h2", HsqldbDialect.class);
-        dialectAliasMap.put("postgreSQL", HsqldbDialect.class);
+        dialectAliasMap.put("postgresql", HsqldbDialect.class);
 
         dialectAliasMap.put("mysql", MySqlDialect.class);
         dialectAliasMap.put("mariadb", MySqlDialect.class);
@@ -39,6 +39,8 @@ public abstract class BaseAutoDialect extends BaseParams {
 
         dialectAliasMap.put("sqlserver", SqlServerDialect.class);
         dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
+
+        dialectAliasMap.put("derby", SqlServer2012Dialect.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
@@ -175,7 +177,7 @@ public abstract class BaseAutoDialect extends BaseParams {
             }
             String dialectStr = fromJdbcUrl(url);
             if (dialectStr == null) {
-                throw new RuntimeException("无法自动获取数据库类型，请通过 helper 参数指定!");
+                throw new RuntimeException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
             }
             HelperDialect dialect = initDialect(dialectStr, properties);
             urlDialectMap.put(url, dialect);
