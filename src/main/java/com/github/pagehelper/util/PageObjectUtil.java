@@ -25,6 +25,7 @@
 package com.github.pagehelper.util;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageException;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.lang.reflect.Method;
@@ -69,7 +70,7 @@ public abstract class PageObjectUtil {
         int pageSize;
         MetaObject paramsObject = null;
         if (params == null) {
-            throw new NullPointerException("无法获取分页查询参数!");
+            throw new PageException("无法获取分页查询参数!");
         }
         if (hasRequest && requestClass.isAssignableFrom(params.getClass())) {
             try {
@@ -81,7 +82,7 @@ public abstract class PageObjectUtil {
             paramsObject = MetaObjectUtil.forObject(params);
         }
         if (paramsObject == null) {
-            throw new NullPointerException("分页查询参数处理失败!");
+            throw new PageException("分页查询参数处理失败!");
         }
         try {
             Object _pageNum = getParamValue(paramsObject, "pageNum", required);
@@ -92,7 +93,7 @@ public abstract class PageObjectUtil {
             pageNum = Integer.parseInt(String.valueOf(_pageNum));
             pageSize = Integer.parseInt(String.valueOf(_pageSize));
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("分页参数不是合法的数字类型!");
+            throw new PageException("分页参数不是合法的数字类型!");
         }
         Page page = new Page(pageNum, pageSize);
         //count查询
@@ -135,7 +136,7 @@ public abstract class PageObjectUtil {
             }
         }
         if (required && value == null) {
-            throw new RuntimeException("分页查询缺少必要的参数:" + PARAMS.get(paramName));
+            throw new PageException("分页查询缺少必要的参数:" + PARAMS.get(paramName));
         }
         return value;
     }

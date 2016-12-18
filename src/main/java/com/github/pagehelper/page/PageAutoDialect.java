@@ -137,7 +137,7 @@ public class PageAutoDialect {
     private AbstractHelperDialect initDialect(String dialectClass, Properties properties) {
         AbstractHelperDialect dialect;
         if (StringUtil.isEmpty(dialectClass)) {
-            throw new RuntimeException("使用 PageHelper 分页插件时，必须设置 helper 属性");
+            throw new PageException("使用 PageHelper 分页插件时，必须设置 helper 属性");
         }
         try {
             Class sqlDialectClass = resloveDialectClass(dialectClass);
@@ -165,7 +165,7 @@ public class PageAutoDialect {
             conn = dataSource.getConnection();
             return conn.getMetaData().getURL();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PageException(e);
         } finally {
             if (conn != null) {
                 try {
@@ -198,11 +198,11 @@ public class PageAutoDialect {
                 return urlDialectMap.get(url);
             }
             if (StringUtil.isEmpty(url)) {
-                throw new RuntimeException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
+                throw new PageException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
             }
             String dialectStr = fromJdbcUrl(url);
             if (dialectStr == null) {
-                throw new RuntimeException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
+                throw new PageException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
             }
             AbstractHelperDialect dialect = initDialect(dialectStr, properties);
             urlDialectMap.put(url, dialect);

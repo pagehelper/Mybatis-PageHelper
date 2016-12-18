@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.parser;
 
+import com.github.pagehelper.PageException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -101,10 +102,10 @@ public class SqlServerParser {
         try {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (Throwable e) {
-            throw new RuntimeException("不支持该SQL转换为分页查询!");
+            throw new PageException("不支持该SQL转换为分页查询!");
         }
         if (!(stmt instanceof Select)) {
-            throw new RuntimeException("分页语句必须是Select查询!");
+            throw new PageException("分页语句必须是Select查询!");
         }
         //获取分页查询的select
         Select pageSelect = getPageSelect((Select) stmt);
@@ -132,7 +133,7 @@ public class SqlServerParser {
         }
         //这里的selectBody一定是PlainSelect
         if (((PlainSelect) selectBody).getTop() != null) {
-            throw new RuntimeException("被分页的语句已经包含了Top，不能再通过分页插件进行分页查询!");
+            throw new PageException("被分页的语句已经包含了Top，不能再通过分页插件进行分页查询!");
         }
         //获取查询列
         List<SelectItem> selectItems = getSelectItems((PlainSelect) selectBody);
@@ -198,7 +199,7 @@ public class SqlServerParser {
         //获取最后一个plainSelect
         SelectBody setSelectBody = setOperationList.getSelects().get(setOperationList.getSelects().size() - 1);
         if (!(setSelectBody instanceof PlainSelect)) {
-            throw new RuntimeException("目前无法处理该SQL，您可以将该SQL发送给abel533@gmail.com协助作者解决!");
+            throw new PageException("目前无法处理该SQL，您可以将该SQL发送给abel533@gmail.com协助作者解决!");
         }
         PlainSelect plainSelect = (PlainSelect) setSelectBody;
         PlainSelect selectBody = new PlainSelect();
@@ -481,7 +482,7 @@ public class SqlServerParser {
                         // 查询列不为普通列时（例如函数列）不支持分页
                         // 此种情况比较难预测，简单的增加新列容易产生不可预料的结果
                         // 而为列增加别名是非常简单的，故此要求排序复杂列必须使用别名
-                        throw new RuntimeException("列 \"" + expression + "\" 需要定义别名");
+                        throw new PageException("列 \"" + expression + "\" 需要定义别名");
                     }
                 }
 

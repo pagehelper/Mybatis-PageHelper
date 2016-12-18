@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.parser;
 
+import com.github.pagehelper.PageException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -54,7 +55,7 @@ public class CountSqlParser {
 
     public void isSupportedSql(String sql) {
         if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
-            throw new RuntimeException("分页插件不支持包含for update的sql");
+            throw new PageException("分页插件不支持包含for update的sql");
         }
     }
 

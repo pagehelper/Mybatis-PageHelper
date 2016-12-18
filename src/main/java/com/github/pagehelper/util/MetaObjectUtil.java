@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.util;
 
+import com.github.pagehelper.PageException;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.lang.reflect.Method;
@@ -43,7 +44,7 @@ public class MetaObjectUtil {
                 Class<?> metaClass = Class.forName("org.apache.ibatis.reflection.MetaObject");
                 method = metaClass.getDeclaredMethod("forObject", Object.class);
             } catch (Exception e2) {
-                throw new RuntimeException(e2);
+                throw new PageException(e2);
             }
         }
 
@@ -53,7 +54,7 @@ public class MetaObjectUtil {
         try {
             return (MetaObject) method.invoke(null, object);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new PageException(e);
         }
     }
 

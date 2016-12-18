@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.cache;
 
+import com.github.pagehelper.PageException;
 import com.github.pagehelper.util.StringUtil;
 
 import java.lang.reflect.Constructor;
@@ -60,7 +61,7 @@ public abstract class CacheFactory {
                     return clazz.newInstance();
                 }
             } catch (Throwable t) {
-                throw new RuntimeException("创建自定义 Sql 缓存[" + sqlCacheClass + "]失败", t);
+                throw new PageException("创建自定义 Sql 缓存[" + sqlCacheClass + "]失败", t);
             }
         }
     }
