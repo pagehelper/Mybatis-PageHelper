@@ -1,6 +1,7 @@
-package com.github.pagehelper.helper;
+package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.*;
+import com.github.pagehelper.dialect.AbstractDialect;
 import com.github.pagehelper.parser.CountSqlParser;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
@@ -16,9 +17,7 @@ import java.util.Properties;
  * @author liuzh
  * @since 2016-12-04 14:32
  */
-public abstract class HelperDialect implements Dialect {
-    //处理SQL
-    protected CountSqlParser countSqlParser = new CountSqlParser();
+public abstract class HelperDialect extends AbstractDialect {
 
     @Override
     public final boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
@@ -30,11 +29,6 @@ public abstract class HelperDialect implements Dialect {
     public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
         Page page = PageHelper.getLocalPage();
         return page.isCount();
-    }
-
-    @Override
-    public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
-        return countSqlParser.getSmartCountSql(boundSql.getSql());
     }
 
     @Override

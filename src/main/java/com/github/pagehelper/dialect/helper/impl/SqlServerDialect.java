@@ -1,9 +1,9 @@
-package com.github.pagehelper.helper.dialect;
+package com.github.pagehelper.dialect.helper.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
-import com.github.pagehelper.helper.HelperDialect;
+import com.github.pagehelper.dialect.helper.HelperDialect;
 import com.github.pagehelper.parser.SqlServerParser;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;

@@ -1,7 +1,7 @@
-package com.github.pagehelper.helper;
+package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.PageException;
-import com.github.pagehelper.helper.dialect.*;
+import com.github.pagehelper.dialect.helper.impl.*;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.mapping.MappedStatement;
 
@@ -192,7 +192,7 @@ public abstract class BaseAutoDialect extends BaseParams {
         if (StringUtil.isNotEmpty(closeConn)) {
             this.closeConn = Boolean.parseBoolean(closeConn);
         }
-        //指定的 Helper 数据库方言，和 dialect 不同
+        //指定的 Helper 数据库方言，和 impl 不同
         String dialect = properties.getProperty("helperDialect");
         //运行时获取数据源
         String runtimeDialect = properties.getProperty("autoRuntimeDialect");

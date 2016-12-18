@@ -13,7 +13,6 @@ import java.util.Properties;
  *
  * @author liuzh
  */
-@SuppressWarnings("rawtypes")
 public interface Dialect {
     /**
      * 跳过 count 和 分页查询

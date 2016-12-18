@@ -1,7 +1,7 @@
-package com.github.pagehelper.helper.dialect;
+package com.github.pagehelper.dialect.helper.impl;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.helper.HelperDialect;
+import com.github.pagehelper.dialect.helper.HelperDialect;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.session.RowBounds;
 

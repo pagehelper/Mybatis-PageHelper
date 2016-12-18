@@ -24,8 +24,8 @@
 
 package com.github.pagehelper;
 
-import com.github.pagehelper.helper.BaseAutoDialect;
-import com.github.pagehelper.helper.HelperDialect;
+import com.github.pagehelper.dialect.helper.BaseAutoDialect;
+import com.github.pagehelper.dialect.helper.HelperDialect;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;

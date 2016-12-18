@@ -1,4 +1,4 @@
-package com.github.pagehelper.helper;
+package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.util.StringUtil;
