@@ -37,7 +37,13 @@
 
 ##分页插件支持MyBatis3.1.0+(支持最新版本)
 
-##分页插件最新版本为4.2.0
+##分页插件5.0
+
+由于分页插件5.0版本和4.2.x实现完全不同，所以master分支为5.x版本，4.2.x 作为一个分支存在，如果有针对 4.2.x 的 PR，请注意提交到分支版本。
+
+##分页插件最新快照版本为5.0.0-SNAPSHOT
+
+##分页插件最新版本为4.2.1
 
 ###Maven坐标
 
@@ -45,7 +51,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.1</version>
 </dependency>
 ```  
 
@@ -67,6 +73,10 @@
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.1/
 
+##4.2.1
+
+- 解决`SimpleCache`类遗留问题导致的错误 [#143](http://git.oschina.net/free/Mybatis_PageHelper/issues/143) fix by [dhhua](https://github.com/dhhua)
+
 ##4.2.0
 
 - 使用新的方式进行分页，4.2版本是从5.0版本分离出来的一个特殊版本，这个版本兼容4.x的所有功能，5.0版本时为了简化分页逻辑，会去掉部分功能，所以4.2是4.x的最后一个版本。
@@ -82,44 +92,6 @@
 - 解决#135，增加/*keep orderby*/注解，SQL中包含该注释时，count查询时不会移出order by
 - sqlserver没有orderby时，使用`order by rand()` #82 #118
 
-##4.1.6更新日志
-
-- 通过间接处理字符串解决SqlServer中不支持`with(nolock)`的问题#86，详情可以看`SqlServerParser`和`SqlServer2012Dialect`
-
-##4.1.5更新日志
-
-- 更新`PageProviderSqlSource`，支持3.4.0版本的`Provider`注解方式的分页#102
-- 解决`SqlUtil`未初始化`PARAMS`属性导致的错误
-
-##4.1.4更新日志
-
-- 解决`closeConn`未设置时，默认值被覆盖变成`false`的问题#97
-- `closeConn`不只对动态数据源有效，当没有设置`dialect`属性自动获取数据库类型的时候同样有效
-- 解决关闭tomcat的时候提示线程安全问题#98，这个问题不会导致内存溢出，已经增加处理
-
-##4.1.3更新日志
-
-- 解决反射类没有完全捕获异常的问题#94
-- 把SqlServer类所有private都改成了protected，方便继承修改#93
-
-##4.1.2更新日志
-
-- 增加可配参数`closeConn`，当使用动态数据源时，分页插件获取jdbcUrl后，控制是否关闭当前连接，默认`true`关闭
-- count查询改为`count(0)`，分库分表情况下的效率可能更高
-
-##4.1.1更新日志：
-
-- 解决动态数据源时获取连接后未关闭的严重bug#80
-- 解决动态数据源时SqlSource和parser绑定导致不能切换方言的问题
-
-##4.1.0更新日志：
-
-- 增加`autoRuntimeDialect`参数，允许在运行时根据多数据源自动识别对应方言的分页（暂时不支持自动选择`sqlserver2012`，只能使用`sqlserver`）。
-- 去掉了4.0.3版本增加的`returnPageInfo`参数，接口返回值不支持`PageInfo`类型，可以使用下面`ISelect`中演示的方法获取
-- 增加对`SqlServer2012`的支持，需要手动指定`dialect=sqlserver2012`，否则会使用2005的方式进行分页
-- jsqlparser升级到0.9.4版本，使用jar包时必须用最新的0.9.4版本，使用Maven会自动依赖0.9.4
-- 增加`ISelect`接口，方便调用，使用方法可以参考`src/test/java/com.github.pagehelper.test.basic.TestISelect`测试。
-
 ##项目文档[wiki](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)：  
 
 ###[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)
@@ -130,13 +102,11 @@
 
 <b>只有基础的配置信息，没有任何现成的功能，作为新手入门搭建框架的基础</b>
 
-- [集成Spring3.x](https://github.com/abel533/Mybatis-Spring)
+- [集成Spring3.x](https://github.com/abel533/Mybatis-Spring/tree/spring3.x)
 
-- [集成Spring4.x](https://github.com/abel533/Mybatis-Spring/tree/spring4)
+- [集成Spring4.x](https://github.com/abel533/Mybatis-Spring)
 
 这两个集成框架集成了MyBatis分页插件和MyBatis通用Mapper。
-
-###[如何使用排序插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/UseOrderBy.md)
 
 ###[更新日志](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Changelog.markdown)
 
