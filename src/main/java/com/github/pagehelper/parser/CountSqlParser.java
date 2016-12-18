@@ -70,7 +70,7 @@ public class CountSqlParser {
         //解析SQL
         Statement stmt = null;
         //特殊sql不需要去掉order by时，使用注释前缀
-        if(sql.indexOf(KEEP_ORDERBY) >= 0){
+        if (sql.indexOf(KEEP_ORDERBY) >= 0) {
             return getSimpleCountSql(sql);
         }
         try {
@@ -195,11 +195,6 @@ public class CountSqlParser {
      * @param plainSelect
      */
     public void processPlainSelect(PlainSelect plainSelect) {
-        //如果当前层有 group by，那么内层的 order by 不能去掉，当前层的可以去掉
-        if(plainSelect.getGroupByColumnReferences() != null && plainSelect.getGroupByColumnReferences().size() > 0){
-            //缺少必要的示例，暂时不管group by
-            //throw new RuntimeException();
-        }
         if (!orderByHashParameters(plainSelect.getOrderByElements())) {
             plainSelect.setOrderByElements(null);
         }

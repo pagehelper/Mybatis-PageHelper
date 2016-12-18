@@ -51,7 +51,7 @@ public class PageSizeLessThenOrEqualZeroTest {
             PageHelper.startPage(1, 0);
             List<Country> list = countryMapper.selectAll();
             PageInfo<Country> page = new PageInfo<Country>(list);
-            assertEquals(0, list.size());
+            assertEquals(183, list.size());
             assertEquals(183, page.getTotal());
 
             //limit<0的时候同上
@@ -75,16 +75,16 @@ public class PageSizeLessThenOrEqualZeroTest {
         CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
             //limit=0,这时候相当于用分页插件求count,但是前提必须是配置rounbounds方式求count，否则都是-1
-            List<Country> list = countryMapper.selectAll(new RowBounds(1, 0));
+            List<Country> list = countryMapper.selectAll(new RowBounds(1, -1));
             PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(0, list.size());
-            assertEquals(-1, page.getTotal());
+            assertEquals(183, page.getTotal());
 
             //limit<0的时候同上
             list = countryMapper.selectAll(new RowBounds(1, -100));
             page = new PageInfo<Country>(list);
             assertEquals(0, list.size());
-            assertEquals(-1, page.getTotal());
+            assertEquals(183, page.getTotal());
         } finally {
             sqlSession.close();
         }

@@ -56,10 +56,6 @@ public class ArgumentsMapTest {
             list = countryMapper.selectByPageNumSize(3, 20);
             assertEquals(20, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
-
-            list = countryMapper.selectByOrderBy("id desc");
-            assertEquals(183, list.size());
-            assertEquals(183, list.get(0).getId());
         } finally {
             sqlSession.close();
         }

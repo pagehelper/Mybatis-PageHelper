@@ -46,7 +46,7 @@ public class TestISelect {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         final CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
         try {
-            Page<Country> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(new ISelect() {
+            Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(new ISelect() {
                 @Override
                 public void doSelect() {
                     countryMapper.selectGroupBy();
@@ -63,7 +63,7 @@ public class TestISelect {
             System.out.println(pageInfo);
 
 
-            pageInfo = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPageInfo(new ISelect() {
+            pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(new ISelect() {
                 @Override
                 public void doSelect() {
                     countryMapper.selectGroupBy();

@@ -42,12 +42,12 @@ public abstract class CacheFactory {
      * @param sqlCacheClass
      * @return
      */
-    public static <K, V> Cache<K, V> createSqlCache(String sqlCacheClass, String prefix, Properties properties){
-        if(StringUtil.isEmpty(sqlCacheClass)){
+    public static <K, V> Cache<K, V> createSqlCache(String sqlCacheClass, String prefix, Properties properties) {
+        if (StringUtil.isEmpty(sqlCacheClass)) {
             try {
                 Class.forName("com.google.common.cache.Cache");
                 return new GuavaCache<K, V>(properties, prefix);
-            } catch (Throwable t){
+            } catch (Throwable t) {
                 return new SimpleCache<K, V>(properties, prefix);
             }
         } else {

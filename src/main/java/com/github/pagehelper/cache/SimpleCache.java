@@ -43,7 +43,7 @@ public class SimpleCache<K, V> implements Cache<K, V> {
     public SimpleCache(Properties properties, String prefix) {
         CacheBuilder cacheBuilder = new CacheBuilder("SQL_CACHE");
         String typeClass = properties.getProperty(prefix + ".typeClass");
-        if(StringUtil.isNotEmpty(typeClass)){
+        if (StringUtil.isNotEmpty(typeClass)) {
             try {
                 cacheBuilder.implementation((Class<? extends org.apache.ibatis.cache.Cache>) Class.forName(typeClass));
             } catch (ClassNotFoundException e) {
@@ -53,7 +53,7 @@ public class SimpleCache<K, V> implements Cache<K, V> {
             cacheBuilder.implementation(PerpetualCache.class);
         }
         String evictionClass = properties.getProperty(prefix + ".evictionClass");
-        if(StringUtil.isNotEmpty(evictionClass)){
+        if (StringUtil.isNotEmpty(evictionClass)) {
             try {
                 cacheBuilder.addDecorator((Class<? extends org.apache.ibatis.cache.Cache>) Class.forName(evictionClass));
             } catch (ClassNotFoundException e) {
@@ -63,11 +63,11 @@ public class SimpleCache<K, V> implements Cache<K, V> {
             cacheBuilder.addDecorator(FifoCache.class);
         }
         String flushInterval = properties.getProperty(prefix + ".flushInterval");
-        if(StringUtil.isNotEmpty(flushInterval)){
+        if (StringUtil.isNotEmpty(flushInterval)) {
             cacheBuilder.clearInterval(Long.parseLong(flushInterval));
         }
         String size = properties.getProperty(prefix + ".size");
-        if(StringUtil.isNotEmpty(size)){
+        if (StringUtil.isNotEmpty(size)) {
             cacheBuilder.size(Integer.parseInt(size));
         }
         cacheBuilder.properties(properties);
@@ -77,8 +77,8 @@ public class SimpleCache<K, V> implements Cache<K, V> {
     @Override
     public V get(K key) {
         Object value = CACHE.getObject(key);
-        if(value != null){
-            return (V)value;
+        if (value != null) {
+            return (V) value;
         }
         return null;
     }

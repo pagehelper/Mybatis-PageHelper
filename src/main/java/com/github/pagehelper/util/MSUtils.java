@@ -24,7 +24,6 @@
 
 package com.github.pagehelper.util;
 
-import com.github.pagehelper.Constant;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
@@ -37,7 +36,7 @@ import java.util.List;
  *
  * @author liuzh
  */
-public class MSUtils implements Constant {
+public class MSUtils {
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
     /**

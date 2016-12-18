@@ -66,18 +66,6 @@ public class Page<E> extends ArrayList<E> {
      */
     private boolean count = true;
     /**
-     * count信号，3种情况，null的时候执行默认BoundSql,true的时候执行count，false执行分页
-     */
-    private Boolean countSignal;
-    /**
-     * 排序
-     */
-    private String orderBy;
-    /**
-     * 只增加排序
-     */
-    private boolean orderByOnly;
-    /**
      * 分页合理化
      */
     private Boolean reasonable;
@@ -247,33 +235,6 @@ public class Page<E> extends ArrayList<E> {
         return this;
     }
 
-    public String getOrderBy() {
-        return orderBy;
-    }
-
-    public <E> Page<E> setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
-        return (Page<E>) this;
-    }
-
-    public boolean isOrderByOnly() {
-        return orderByOnly;
-    }
-
-    public void setOrderByOnly(boolean orderByOnly) {
-        this.orderByOnly = orderByOnly;
-    }
-
-    public Boolean getCountSignal() {
-        return countSignal;
-    }
-
-    public void setCountSignal(Boolean countSignal) {
-        this.countSignal = countSignal;
-    }
-
-    //增加链式调用方法
-
     /**
      * 设置页码
      *
@@ -368,9 +329,6 @@ public class Page<E> extends ArrayList<E> {
                 ", endRow=" + endRow +
                 ", total=" + total +
                 ", pages=" + pages +
-                ", countSignal=" + countSignal +
-                ", orderBy='" + orderBy + '\'' +
-                ", orderByOnly=" + orderByOnly +
                 ", reasonable=" + reasonable +
                 ", pageSizeZero=" + pageSizeZero +
                 '}';

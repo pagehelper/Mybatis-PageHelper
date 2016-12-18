@@ -24,7 +24,7 @@
 
 package com.github.pagehelper.sql;
 
-import com.github.pagehelper.parser.SqlServer;
+import com.github.pagehelper.parser.SqlServerParser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import org.junit.Test;
  * @author liuzh
  */
 public class SqlServerTest {
-    public static final SqlServer sqlServer = new SqlServer();
+    public static final SqlServerParser sqlServer = new SqlServerParser();
 
     @Test
     @Ignore("暂时不支持")

@@ -97,7 +97,7 @@ total = PageHelper.count(()->countryMapper.selectLike(country));
 
  - `PageHelper`新增3个`offsetPage`方法，参数主要是`offset`和`limit`，允许不规则分页
 
- - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`（该参数在4.1.0版本去掉），具体含义和用法请看[如何使用分页插件](http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/HowToUse.markdown)中的参数介绍
+ - 新增两个可配参数`supportMethodsArguments`和`returnPageInfo`（该参数在4.1.0版本去掉），具体含义和用法请看[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)中的参数介绍
 
 ###4.0.2 - 2015-11-02
 
