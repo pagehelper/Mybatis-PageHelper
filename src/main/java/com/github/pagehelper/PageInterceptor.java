@@ -117,7 +117,7 @@ public class PageInterceptor implements Interceptor {
     public void setProperties(Properties properties) {
         //缓存 count ms
         msCountMap = CacheFactory.createCache(properties.getProperty("msCountCache"), "ms", properties);
-        String dialectClass = properties.getProperty("impl");
+        String dialectClass = properties.getProperty("dialect");
         if (StringUtil.isEmpty(dialectClass)) {
             dialectClass = default_dialect_class;
         }
