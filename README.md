@@ -70,7 +70,7 @@ If you are using Maven just add the following dependency to your pom.xml:
 
 ##Latest Changelog
 
-###5.0.0-SNAPSHOT
+###5.0.0-beta
 
 - Use a better way to handle paging logic
 - New pagination plugin interceptor `com.github.pagehelper.PageInterceptor`

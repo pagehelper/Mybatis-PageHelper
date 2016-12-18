@@ -41,23 +41,23 @@
 
 由于分页插件 5.0 版本和 4.2.x 实现完全不同，所以 master 分支为 5.x 版本，4.2 作为一个分支存在，如果有针对 4.2 的 PR，请注意提交到分支版本。
 
-##分页插件最新快照版本为 5.0.0-SNAPSHOT
+##分页插件最新版本为 5.0.0-beta
+使用 PageHelper 你只需要在 classpath 中包含 
+[pagehelper-x.x.x.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 
+和 [jsqlparser-0.9.5.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/)。
 
-##分页插件最新版本为 4.2.1
-
-###Maven 坐标
-
+如果你使用 Maven，你只需要在 pom.xml 中添加下面的依赖：
 ```xml  
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>4.2.1</version>
+    <version>5.0.0-beta</version>
 </dependency>
 ```  
 
 ##最近的更新日志
 
-###5.0.0-SNAPSHOT
+###5.0.0-beta
 
 - 使用更好的方式处理分页逻辑
 - 新的分页插件拦截器为 `com.github.pagehelper.PageInterceptor`
