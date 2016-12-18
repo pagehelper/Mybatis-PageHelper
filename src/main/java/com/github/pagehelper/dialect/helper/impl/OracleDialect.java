@@ -11,7 +11,7 @@ import org.apache.ibatis.session.RowBounds;
 public class OracleDialect extends HelperDialect {
 
     @Override
-    public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
+    public String getPageSql(String sql, Page page, CacheKey pageKey) {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
         if (page.getStartRow() > 0) {
             sqlBuilder.append("SELECT * FROM ( ");

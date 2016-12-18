@@ -11,7 +11,7 @@ import org.apache.ibatis.session.RowBounds;
 public class InformixDialect extends HelperDialect {
 
     @Override
-    public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
+    public String getPageSql(String sql, Page page, CacheKey pageKey) {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 40);
         sqlBuilder.append("SELECT ");
         if (page.getStartRow() > 0) {

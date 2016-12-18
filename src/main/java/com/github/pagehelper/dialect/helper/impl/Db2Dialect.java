@@ -3,7 +3,6 @@ package com.github.pagehelper.dialect.helper.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.dialect.helper.HelperDialect;
 import org.apache.ibatis.cache.CacheKey;
-import org.apache.ibatis.session.RowBounds;
 
 /**
  * @author liuzh
@@ -11,7 +10,7 @@ import org.apache.ibatis.session.RowBounds;
 public class Db2Dialect extends HelperDialect {
 
     @Override
-    public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
+    public String getPageSql(String sql, Page page, CacheKey pageKey) {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
         sqlBuilder.append("SELECT * FROM (SELECT TMP_PAGE.*,ROWNUMBER() OVER() AS ROW_ID FROM ( ");
         sqlBuilder.append(sql);

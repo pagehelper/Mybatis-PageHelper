@@ -48,7 +48,7 @@ public class PageHelper extends BaseAutoDialect implements Dialect {
         if (page == null) {
             return true;
         } else {
-            initDelegate(ms);
+            initDelegateDialect(ms);
             return false;
         }
     }
@@ -84,7 +84,7 @@ public class PageHelper extends BaseAutoDialect implements Dialect {
     }
 
     public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
-        return getDelegate().getPageSql(sql, page, rowBounds, pageKey);
+        return getDelegate().getPageSql(sql, page, pageKey);
     }
 
     @Override

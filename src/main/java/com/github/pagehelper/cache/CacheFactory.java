@@ -30,7 +30,7 @@ import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 /**
- * 简单的缓存工厂
+ * CacheFactory
  *
  * @author liuzh
  */
@@ -42,7 +42,7 @@ public abstract class CacheFactory {
      * @param sqlCacheClass
      * @return
      */
-    public static <K, V> Cache<K, V> createSqlCache(String sqlCacheClass, String prefix, Properties properties) {
+    public static <K, V> Cache<K, V> createCache(String sqlCacheClass, String prefix, Properties properties) {
         if (StringUtil.isEmpty(sqlCacheClass)) {
             try {
                 Class.forName("com.google.common.cache.Cache");

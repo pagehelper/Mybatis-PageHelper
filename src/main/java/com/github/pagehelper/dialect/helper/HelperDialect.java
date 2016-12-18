@@ -64,7 +64,7 @@ public abstract class HelperDialect extends AbstractDialect {
     public String getPageSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey pageKey) {
         String sql = boundSql.getSql();
         Page page = PageHelper.getLocalPage();
-        return getPageSql(sql, page, rowBounds, pageKey);
+        return getPageSql(sql, page, pageKey);
     }
 
     /**
@@ -72,11 +72,10 @@ public abstract class HelperDialect extends AbstractDialect {
      *
      * @param sql
      * @param page
-     * @param rowBounds
      * @param pageKey
      * @return
      */
-    public abstract String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey);
+    public abstract String getPageSql(String sql, Page page, CacheKey pageKey);
 
     @Override
     public Object afterPage(List pageList, Object parameterObject, RowBounds rowBounds) {

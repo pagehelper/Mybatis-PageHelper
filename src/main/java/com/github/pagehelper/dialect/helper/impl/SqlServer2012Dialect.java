@@ -10,7 +10,7 @@ import org.apache.ibatis.session.RowBounds;
 public class SqlServer2012Dialect extends SqlServerDialect {
 
     @Override
-    public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
+    public String getPageSql(String sql, Page page, CacheKey pageKey) {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
         sqlBuilder.append(sql);
         if (page.getStartRow() > 0) {

@@ -41,7 +41,7 @@ public class SqlServerDialect extends HelperDialect {
     }
 
     @Override
-    public String getPageSql(String sql, Page page, RowBounds rowBounds, CacheKey pageKey) {
+    public String getPageSql(String sql, Page page, CacheKey pageKey) {
         //处理pageKey
         pageKey.update(page.getStartRow());
         pageKey.update(page.getPageSize());
@@ -63,11 +63,11 @@ public class SqlServerDialect extends HelperDialect {
         super.setProperties(properties);
         String sqlCacheClass = properties.getProperty("sqlCacheClass");
         if (StringUtil.isNotEmpty(sqlCacheClass) && !sqlCacheClass.equalsIgnoreCase("false")) {
-            CACHE_COUNTSQL = CacheFactory.createSqlCache(sqlCacheClass, "count", properties);
-            CACHE_PAGESQL = CacheFactory.createSqlCache(sqlCacheClass, "page", properties);
+            CACHE_COUNTSQL = CacheFactory.createCache(sqlCacheClass, "count", properties);
+            CACHE_PAGESQL = CacheFactory.createCache(sqlCacheClass, "page", properties);
         } else {
-            CACHE_COUNTSQL = CacheFactory.createSqlCache(null, "count", properties);
-            CACHE_PAGESQL = CacheFactory.createSqlCache(null, "page", properties);
+            CACHE_COUNTSQL = CacheFactory.createCache(null, "count", properties);
+            CACHE_PAGESQL = CacheFactory.createCache(null, "page", properties);
         }
     }
 }

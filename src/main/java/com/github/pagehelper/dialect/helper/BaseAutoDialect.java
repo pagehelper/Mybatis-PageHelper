@@ -56,7 +56,7 @@ public abstract class BaseAutoDialect extends BaseParams {
     private ThreadLocal<HelperDialect> dialectThreadLocal = new ThreadLocal<HelperDialect>();
 
     //多数据动态获取时，每次需要初始化
-    protected void initDelegate(MappedStatement ms) {
+    protected void initDelegateDialect(MappedStatement ms) {
         if (delegate == null) {
             if (autoDialect) {
                 this.delegate = getDialect(ms);
@@ -194,7 +194,7 @@ public abstract class BaseAutoDialect extends BaseParams {
         if (StringUtil.isNotEmpty(closeConn)) {
             this.closeConn = Boolean.parseBoolean(closeConn);
         }
-        //指定的 Helper 数据库方言，和 impl 不同
+        //指定的 Helper 数据库方言，和  不同
         String dialect = properties.getProperty("helperDialect");
         //运行时获取数据源
         String runtimeDialect = properties.getProperty("autoRuntimeDialect");
