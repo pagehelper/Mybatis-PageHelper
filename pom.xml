@@ -150,17 +150,6 @@
         -->
     </dependencies>
 
-    <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-            <testResource>
-                <directory>src/test/java</directory>
-            </testResource>
-        </testResources>
-    </build>
-
     <profiles>
         <profile>
             <id>release</id>
