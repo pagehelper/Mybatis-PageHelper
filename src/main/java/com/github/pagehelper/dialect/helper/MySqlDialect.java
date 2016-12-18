@@ -31,25 +31,23 @@ import org.apache.ibatis.cache.CacheKey;
 /**
  * @author liuzh
  */
-public class InformixDialectAbstract extends AbstractHelperDialect {
+public class MySqlDialect extends AbstractHelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
-        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 40);
-        sqlBuilder.append("SELECT ");
-        if (page.getStartRow() > 0) {
-            sqlBuilder.append(" SKIP ");
+        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
+        sqlBuilder.append(sql);
+        if (page.getStartRow() == 0) {
+            sqlBuilder.append(" LIMIT ");
+            sqlBuilder.append(page.getPageSize());
+        } else {
+            sqlBuilder.append(" LIMIT ");
             sqlBuilder.append(page.getStartRow());
+            sqlBuilder.append(",");
+            sqlBuilder.append(page.getPageSize());
             pageKey.update(page.getStartRow());
         }
-        if (page.getPageSize() > 0) {
-            sqlBuilder.append(" FIRST ");
-            sqlBuilder.append(page.getPageSize());
-            pageKey.update(page.getPageSize());
-        }
-        sqlBuilder.append(" * FROM ( ");
-        sqlBuilder.append(sql);
-        sqlBuilder.append(" ) TEMP_T");
+        pageKey.update(page.getPageSize());
         return sqlBuilder.toString();
     }
 

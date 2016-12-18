@@ -31,28 +31,25 @@ import org.apache.ibatis.cache.CacheKey;
 /**
  * @author liuzh
  */
-public class OracleDialectAbstract extends AbstractHelperDialect {
+public class InformixDialect extends AbstractHelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
-        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
+        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 40);
+        sqlBuilder.append("SELECT ");
         if (page.getStartRow() > 0) {
-            sqlBuilder.append("SELECT * FROM ( ");
-        }
-        if (page.getEndRow() > 0) {
-            sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( ");
-        }
-        sqlBuilder.append(sql);
-        if (page.getEndRow() > 0) {
-            sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ");
-            sqlBuilder.append(page.getEndRow());
-            pageKey.update(page.getEndRow());
-        }
-        if (page.getStartRow() > 0) {
-            sqlBuilder.append(" ) WHERE ROW_ID > ");
+            sqlBuilder.append(" SKIP ");
             sqlBuilder.append(page.getStartRow());
             pageKey.update(page.getStartRow());
         }
+        if (page.getPageSize() > 0) {
+            sqlBuilder.append(" FIRST ");
+            sqlBuilder.append(page.getPageSize());
+            pageKey.update(page.getPageSize());
+        }
+        sqlBuilder.append(" * FROM ( ");
+        sqlBuilder.append(sql);
+        sqlBuilder.append(" ) TEMP_T");
         return sqlBuilder.toString();
     }
 

@@ -40,7 +40,7 @@ import java.util.Properties;
 /**
  * @author liuzh
  */
-public class SqlServerDialectAbstract extends AbstractHelperDialect {
+public class SqlServerDialect extends AbstractHelperDialect {
     protected SqlServerParser pageSql = new SqlServerParser();
     protected Cache<String, String> CACHE_COUNTSQL;
     protected Cache<String, String> CACHE_PAGESQL;

@@ -50,22 +50,22 @@ public class PageAutoDialect {
 
     static {
         //注册别名
-        dialectAliasMap.put("hsqldb", HsqldbDialectAbstract.class);
-        dialectAliasMap.put("h2", HsqldbDialectAbstract.class);
-        dialectAliasMap.put("postgresql", HsqldbDialectAbstract.class);
+        dialectAliasMap.put("hsqldb", HsqldbDialect.class);
+        dialectAliasMap.put("h2", HsqldbDialect.class);
+        dialectAliasMap.put("postgresql", HsqldbDialect.class);
 
-        dialectAliasMap.put("mysql", MySqlDialectAbstract.class);
-        dialectAliasMap.put("mariadb", MySqlDialectAbstract.class);
-        dialectAliasMap.put("sqlite", MySqlDialectAbstract.class);
+        dialectAliasMap.put("mysql", MySqlDialect.class);
+        dialectAliasMap.put("mariadb", MySqlDialect.class);
+        dialectAliasMap.put("sqlite", MySqlDialect.class);
 
-        dialectAliasMap.put("oracle", OracleDialectAbstract.class);
-        dialectAliasMap.put("db2", Db2DialectAbstract.class);
-        dialectAliasMap.put("informix", InformixDialectAbstract.class);
+        dialectAliasMap.put("oracle", OracleDialect.class);
+        dialectAliasMap.put("db2", Db2Dialect.class);
+        dialectAliasMap.put("informix", InformixDialect.class);
 
-        dialectAliasMap.put("sqlserver", SqlServerDialectAbstract.class);
-        dialectAliasMap.put("sqlserver2012", SqlServer2012DialectAbstract.class);
+        dialectAliasMap.put("sqlserver", SqlServerDialect.class);
+        dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
 
-        dialectAliasMap.put("derby", SqlServer2012DialectAbstract.class);
+        dialectAliasMap.put("derby", SqlServer2012Dialect.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行

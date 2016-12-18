@@ -25,29 +25,25 @@
 package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.dialect.AbstractHelperDialect;
 import org.apache.ibatis.cache.CacheKey;
 
 /**
  * @author liuzh
  */
-public class SqlServer2012DialectAbstract extends SqlServerDialectAbstract {
+public class Db2Dialect extends AbstractHelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
-        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
+        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
+        sqlBuilder.append("SELECT * FROM (SELECT TMP_PAGE.*,ROWNUMBER() OVER() AS ROW_ID FROM ( ");
         sqlBuilder.append(sql);
-        if (page.getStartRow() > 0) {
-            sqlBuilder.append(" OFFSET ");
-            sqlBuilder.append(page.getStartRow());
-            sqlBuilder.append(" ROWS ");
-            pageKey.update(page.getStartRow());
-        }
-        if (page.getPageSize() > 0) {
-            sqlBuilder.append(" FETCH NEXT ");
-            sqlBuilder.append(page.getPageSize());
-            sqlBuilder.append(" ROWS ONLY");
-            pageKey.update(page.getPageSize());
-        }
+        sqlBuilder.append(" ) AS TMP_PAGE) WHERE ROW_ID BETWEEN ");
+        sqlBuilder.append(page.getStartRow() + 1);
+        sqlBuilder.append(" AND ");
+        sqlBuilder.append(page.getEndRow());
+        pageKey.update(page.getStartRow() + 1);
+        pageKey.update(page.getEndRow());
         return sqlBuilder.toString();
     }
 
