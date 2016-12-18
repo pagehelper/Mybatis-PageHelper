@@ -1,14 +1,19 @@
-#Mybatis分页插件 - PageHelper
+#MyBatis Pagination - PageHelper
 
-如果你也在用Mybatis，建议尝试该分页插件，这一定是<b>最方便</b>使用的分页插件。
+[中文版文档](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/README_zh.md)
 
-分页插件支持任何复杂的单表、多表分页，部分特殊情况请看[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)。
+If you are using MyBatis, it is recommended to try this pagination plugin. 
+This must be the **Most Convenient** pagination plugin.
 
-想要使用分页插件？请看[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)。
+PageHelper supports any single table, multiple tables of complex pagination.
+Some special cases please see the [**Important note**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md).
 
-##物理分页
+Want to use PageHelper? 
+Please see [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md).
 
-该插件目前支持以下数据库的<b>物理分页</b>:
+##Physical Paging
+
+PageHelper supports the following databases:
 
  1. `Oracle`
  2. `Mysql`
@@ -23,29 +28,35 @@
  11. `SqlServer2012`
  12. `Derby`
 
-配置`dialect`属性时，可以使用小写形式：
+PageHelper will detect the current database url by default, 
+automatically select the corresponding database dialect.
 
-`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`,`derby`
+You can configure `helperDialect` Property to specify the dialect.
+You can use the following abbreviations :
 
-在4.0.0版本以后，`dialect`参数可以不配置，系统能自动识别这里提到的所有数据库。
+`oracle`, `mysql`, `mariadb`, `sqlite`, `hsqldb`, `postgresql`,
+`db2`, `sqlserver`, `informix`, `h2`, `sqlserver2012`, `derby`
 
-对于不支持的数据库，可以实现`com.github.pagehelper.parser.Parser`接口，然后配置到`dialect`参数中(4.0.2版本增加)。
+Or You can use the dialect full name, such as `com.github.pagehelper.dialect.helper.MySqlDialect`.
 
-<b>特别注意：</b>使用SqlServer2012数据库时，需要手动指定`sqlserver2012`，否则会使用2005的方式进行分页。
+**Special note :** When using the SqlServer2012 database,
+you need to manually specify for `sqlserver2012`, otherwise it will use the SqlServer2005 for paging.
 
-##MyBatis工具网站:[http://mybatis.tk](http://www.mybatis.tk)
+##MyBatis Tools:[http://mybatis.tk](http://www.mybatis.tk)
+##mybatis-3 https://github.com/mybatis/mybatis-3 
+##Support MyBatis 3.1.0+
 
-##分页插件支持MyBatis3.1.0+(支持最新版本)
+##PageHelper 5.0
+Due to pagination plugin version 5.0 and 4.2. X completely different,
+so the master branch is 5.X version.
+version 4.2 exists as a branch, 
+if you have PR for 4.2, please submitted to the branch.
 
-##分页插件5.0
+##Latest SNAPSHOT: 5.0.0-SNAPSHOT
 
-由于分页插件5.0版本和4.2.x实现完全不同，所以master分支为5.x版本，4.2.x 作为一个分支存在，如果有针对 4.2.x 的 PR，请注意提交到分支版本。
+##Latest Release 4.2.1
 
-##分页插件最新快照版本为5.0.0-SNAPSHOT
-
-##分页插件最新版本为4.2.1
-
-###Maven坐标
+If you are using Maven just add the following dependency to your pom.xml:
 
 ```xml  
 <dependency>
@@ -55,25 +66,13 @@
 </dependency>
 ```  
 
-###下载JAR包
+##Latest Changelog
 
-分页插件pagehelper.jar： 
-
- - https://oss.sonatype.org/content/repositories/releases/com/github/pagehelper/pagehelper/
- 
- - http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
-
-###由于使用了sql解析工具，你还需要下载jsqlparser.jar
-
-####4.1.0及以后版本需要0.9.5版本
-
- - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/
-
-##4.2.1
+###4.2.1
 
 - 解决`SimpleCache`类遗留问题导致的错误 [#143](http://git.oschina.net/free/Mybatis_PageHelper/issues/143) fix by [dhhua](https://github.com/dhhua)
 
-##4.2.0
+###4.2.0
 
 - 使用新的方式进行分页，4.2版本是从5.0版本分离出来的一个特殊版本，这个版本兼容4.x的所有功能，5.0版本时为了简化分页逻辑，会去掉部分功能，所以4.2是4.x的最后一个版本。
 - 支持 MyBatis 3.1.0+ 版本
@@ -88,55 +87,41 @@
 - 解决#135，增加/*keep orderby*/注解，SQL中包含该注释时，count查询时不会移出order by
 - sqlserver没有orderby时，使用`order by rand()` #82 #118
 
-##项目文档[wiki](http://git.oschina.net/free/Mybatis_PageHelper/wikis/home)：  
+##Documentation  
 
-###[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)
+###[How to use the PageHelper](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)
 
-如果要使用分页插件，这篇文档一定要看，看完肯定没有问题。
+If you are unfamiliar with Spring integration, 
+you can refer to the following two MyBatis and Spring Integration Framework:
 
-如果和Spring集成不熟悉，可以参考下面两个MyBatis和Spring集成的框架
+- [Integration Spring 3.x](https://github.com/abel533/Mybatis-Spring/tree/spring3.x)
+- [Integration Spring 4.x](https://github.com/abel533/Mybatis-Spring)
 
-<b>只有基础的配置信息，没有任何现成的功能，作为新手入门搭建框架的基础</b>
+The two Integrated Framework integrates PageHelper and [Common Mapper](https://github.com/abel533/Mapper)。
 
-- [集成Spring3.x](https://github.com/abel533/Mybatis-Spring/tree/spring3.x)
+###How to use in simple RowBounds style
 
-- [集成Spring4.x](https://github.com/abel533/Mybatis-Spring)
+###Implement your own pagination plugin
+- helperDialect style
+- dialect style
 
-这两个集成框架集成了MyBatis分页插件和MyBatis通用Mapper。
+##[Changelog](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Changelog.md)
 
-###[更新日志](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Changelog.md)
+##[Important note](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
 
-包含全部的详细的更新日志。
+##Submit BUG
 
-###[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
+- [Submit to github](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
+- [Submit to gitosc](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
-提示很重要，建议一定看一遍！
+##Author Info
 
-###[提交(git)BUG](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
-###[提交(gitosc)BUG](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
+Blog:http://blog.csdn.net/isea533
 
-##相关链接
+Email: abel533@gmail.com  
 
-本项目在 gitosc 的项目地址：http://git.oschina.net/free/Mybatis_PageHelper
+QQ Group: <a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=29e4cce8ac3c65d14a1dc40c9ba5c8e71304f143f3ad759ac0b05146e0952044"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="MyBatis" title="MyBatis"></a>
 
-本项目在 github 的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
+PageHelper on github:https://github.com/pagehelper/Mybatis-PageHelper
 
-Mybatis项目：https://github.com/mybatis/mybatis-3
-
-Mybatis文档：http://mybatis.github.io/mybatis-3/zh/index.html  
-
-Mybatis专栏： 
-
-- [Mybatis示例](http://blog.csdn.net/column/details/mybatis-sample.html)
-
-- [Mybatis问题集](http://blog.csdn.net/column/details/mybatisqa.html)  
-
-作者博客：  
-
-- http://my.oschina.net/flags/blog
-
-- http://blog.csdn.net/isea533   
-
-作者邮箱： abel533@gmail.com  
-
-Mybatis工具群： <a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=29e4cce8ac3c65d14a1dc40c9ba5c8e71304f143f3ad759ac0b05146e0952044"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="Mybatis工具" title="Mybatis工具"></a>
+PageHelper on gitosc:http://git.oschina.net/free/Mybatis_PageHelper
