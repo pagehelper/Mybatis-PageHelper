@@ -24,8 +24,6 @@
 
 package com.github.pagehelper.parser;
 
-import java.util.*;
-
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -34,6 +32,8 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
+
+import java.util.*;
 
 /**
  * 将sqlserver查询语句转换为分页语句<br>
@@ -50,7 +50,7 @@ import net.sf.jsqlparser.statement.select.*;
  *
  * @author liuzh
  */
-public class SqlServer {
+public class SqlServerParser {
     //开始行号
     public static final String START_ROW = String.valueOf(Long.MIN_VALUE);
     //结束行号
@@ -110,10 +110,10 @@ public class SqlServer {
         Select pageSelect = getPageSelect((Select) stmt);
         String pageSql = pageSelect.toString();
         //缓存移到外面了，所以不替换参数
-        if(offset != null){
+        if (offset != null) {
             pageSql = pageSql.replace(START_ROW, String.valueOf(offset));
         }
-        if(limit != null){
+        if (limit != null) {
             pageSql = pageSql.replace(PAGE_SIZE, String.valueOf(limit));
         }
         return pageSql;
@@ -270,6 +270,7 @@ public class SqlServer {
 
     /**
      * 获取 ROW_NUMBER() 列
+     *
      * @param plainSelect 原查询
      * @param autoItems   自动生成的查询列
      * @return ROW_NUMBER() 列

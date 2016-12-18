@@ -1,7 +1,6 @@
 package com.github.pagehelper.helper;
 
 import com.github.pagehelper.PageException;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.helper.dialect.*;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -56,8 +55,8 @@ public abstract class BaseAutoDialect extends BaseParams {
 
     //多数据动态获取时，每次需要初始化
     protected void initDelegate(MappedStatement ms) {
-        if(delegate == null){
-            if(autoDialect){
+        if (delegate == null) {
+            if (autoDialect) {
                 this.delegate = getDialect(ms);
             } else {
                 dialectThreadLocal.set(getDialect(ms));
@@ -67,14 +66,14 @@ public abstract class BaseAutoDialect extends BaseParams {
 
     //获取当前的代理对象
     protected HelperDialect getDelegate() {
-        if(delegate != null){
+        if (delegate != null) {
             return delegate;
         }
         return dialectThreadLocal.get();
     }
 
     //移除代理对象
-    protected void clearDelegate(){
+    protected void clearDelegate() {
         dialectThreadLocal.remove();
     }
 
@@ -108,14 +107,14 @@ public abstract class BaseAutoDialect extends BaseParams {
      * @param dialectClass
      * @param properties
      */
-    private HelperDialect initDialect(String dialectClass, Properties properties){
+    private HelperDialect initDialect(String dialectClass, Properties properties) {
         HelperDialect dialect;
-        if(StringUtil.isEmpty(dialectClass)){
+        if (StringUtil.isEmpty(dialectClass)) {
             throw new RuntimeException("使用 PageHelper 分页插件时，必须设置 helper 属性");
         }
         try {
             Class sqlDialectClass = resloveDialectClass(dialectClass);
-            if(HelperDialect.class.isAssignableFrom(sqlDialectClass)){
+            if (HelperDialect.class.isAssignableFrom(sqlDialectClass)) {
                 dialect = (HelperDialect) sqlDialectClass.newInstance();
             } else {
                 throw new PageException("使用 PageHelper 时，方言必须是实现 " + HelperDialect.class.getCanonicalName() + " 接口的实现类!");
@@ -133,7 +132,7 @@ public abstract class BaseAutoDialect extends BaseParams {
      * @param dataSource
      * @return
      */
-    private String getUrl(DataSource dataSource){
+    private String getUrl(DataSource dataSource) {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -141,9 +140,9 @@ public abstract class BaseAutoDialect extends BaseParams {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            if(conn != null){
+            if (conn != null) {
                 try {
-                    if(closeConn){
+                    if (closeConn) {
                         conn.close();
                     }
                 } catch (SQLException e) {
@@ -190,7 +189,7 @@ public abstract class BaseAutoDialect extends BaseParams {
         super.setProperties(properties);
         //多数据源时，获取 jdbcurl 后是否关闭数据源
         String closeConn = properties.getProperty("closeConn");
-        if(StringUtil.isNotEmpty(closeConn)){
+        if (StringUtil.isNotEmpty(closeConn)) {
             this.closeConn = Boolean.parseBoolean(closeConn);
         }
         //指定的 Helper 数据库方言，和 dialect 不同

@@ -65,13 +65,6 @@ public class ArgumentsObjTest {
             list = countryMapper.selectByQueryModel(queryModel);
             assertEquals(20, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
-
-            queryModel.setPageNum(null);
-            queryModel.setPageSize(null);
-            queryModel.setOrderBy("id desc");
-            list = countryMapper.selectByQueryModel(queryModel);
-            assertEquals(183, list.size());
-            assertEquals(183, list.get(0).getId());
         } finally {
             sqlSession.close();
         }

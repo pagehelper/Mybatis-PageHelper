@@ -1,6 +1,5 @@
 package com.github.pagehelper.helper;
 
-import com.github.pagehelper.ISelect;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.util.MetaObjectUtil;
 import org.apache.ibatis.reflection.MetaObject;
@@ -34,7 +33,6 @@ public abstract class BasePage {
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
         PARAMS.put("count", "countSql");
-        PARAMS.put("orderBy", "orderBy");
         PARAMS.put("reasonable", "reasonable");
         PARAMS.put("pageSizeZero", "pageSizeZero");
     }
@@ -50,6 +48,7 @@ public abstract class BasePage {
 
     /**
      * 设置 Page 参数
+     *
      * @param page
      */
     protected static void setLocalPage(Page page) {
@@ -70,7 +69,7 @@ public abstract class BasePage {
      * @param params
      * @return
      */
-    protected static <T> Page<T> getPageFromObject(Object params) {
+    protected static <T> Page<T> getPageFromObject(Object params, boolean required) {
         int pageNum;
         int pageSize;
         MetaObject paramsObject = null;
@@ -89,19 +88,11 @@ public abstract class BasePage {
         if (paramsObject == null) {
             throw new NullPointerException("分页查询参数处理失败!");
         }
-        Object orderBy = getParamValue(paramsObject, "orderBy", false);
-        boolean hasOrderBy = false;
-        if (orderBy != null && orderBy.toString().length() > 0) {
-            hasOrderBy = true;
-        }
         try {
-            Object _pageNum = getParamValue(paramsObject, "pageNum", hasOrderBy ? false : true);
-            Object _pageSize = getParamValue(paramsObject, "pageSize", hasOrderBy ? false : true);
+            Object _pageNum = getParamValue(paramsObject, "pageNum", required);
+            Object _pageSize = getParamValue(paramsObject, "pageSize", required);
             if (_pageNum == null || _pageSize == null) {
-                Page page = new Page();
-                page.setOrderBy(orderBy.toString());
-                page.setOrderByOnly(true);
-                return page;
+                return null;
             }
             pageNum = Integer.parseInt(String.valueOf(_pageNum));
             pageSize = Integer.parseInt(String.valueOf(_pageSize));
@@ -113,10 +104,6 @@ public abstract class BasePage {
         Object _count = getParamValue(paramsObject, "count", false);
         if (_count != null) {
             page.setCount(Boolean.valueOf(String.valueOf(_count)));
-        }
-        //排序
-        if (hasOrderBy) {
-            page.setOrderBy(orderBy.toString());
         }
         //分页合理化
         Object reasonable = getParamValue(paramsObject, "reasonable", false);

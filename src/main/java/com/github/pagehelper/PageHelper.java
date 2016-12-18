@@ -25,6 +25,7 @@
 package com.github.pagehelper;
 
 import com.github.pagehelper.helper.BaseAutoDialect;
+import com.github.pagehelper.helper.HelperDialect;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -46,12 +47,10 @@ public class PageHelper extends BaseAutoDialect implements Dialect {
         Page page = getPage(parameterObject, rowBounds);
         if (page == null) {
             return true;
-        }
-        boolean skip = (page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0;
-        if(!skip){
+        } else {
             initDelegate(ms);
+            return false;
         }
-        return skip;
     }
 
     @Override
@@ -65,8 +64,8 @@ public class PageHelper extends BaseAutoDialect implements Dialect {
     }
 
     @Override
-    public void afterCount(long count, Object parameterObject, RowBounds rowBounds) {
-        getDelegate().afterCount(count, parameterObject, rowBounds);
+    public boolean afterCount(long count, Object parameterObject, RowBounds rowBounds) {
+        return getDelegate().afterCount(count, parameterObject, rowBounds);
     }
 
     @Override
@@ -90,13 +89,22 @@ public class PageHelper extends BaseAutoDialect implements Dialect {
 
     @Override
     public Object afterPage(List pageList, Object parameterObject, RowBounds rowBounds) {
-        return getDelegate().afterPage(pageList, parameterObject, rowBounds);
+        //这个方法即使不分页也会被执行，所以要判断 null
+        HelperDialect delegate = getDelegate();
+        if(delegate != null){
+            return delegate.afterPage(pageList, parameterObject, rowBounds);
+        }
+        return pageList;
     }
 
     @Override
     public void afterAll() {
-        getDelegate().afterAll();
-        clearDelegate();
+        //这个方法即使不分页也会被执行，所以要判断 null
+        HelperDialect delegate = getDelegate();
+        if (delegate != null) {
+            delegate.afterAll();
+            clearDelegate();
+        }
         clearPage();
     }
 }

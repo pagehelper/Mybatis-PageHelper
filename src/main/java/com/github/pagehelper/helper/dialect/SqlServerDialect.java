@@ -1,12 +1,11 @@
 package com.github.pagehelper.helper.dialect;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.helper.HelperDialect;
-import com.github.pagehelper.util.StringUtil;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
-import com.github.pagehelper.parser.SqlServer;
+import com.github.pagehelper.helper.HelperDialect;
+import com.github.pagehelper.parser.SqlServerParser;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -18,7 +17,7 @@ import java.util.Properties;
  * @author liuzh
  */
 public class SqlServerDialect extends HelperDialect {
-    protected SqlServer pageSql = new SqlServer();
+    protected SqlServerParser pageSql = new SqlServerParser();
     protected Cache<String, String> CACHE_COUNTSQL;
     protected Cache<String, String> CACHE_PAGESQL;
 
@@ -29,7 +28,7 @@ public class SqlServerDialect extends HelperDialect {
     public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
         String sql = boundSql.getSql();
         String cacheSql = CACHE_COUNTSQL.get(sql);
-        if(cacheSql != null){
+        if (cacheSql != null) {
             return cacheSql;
         } else {
             cacheSql = sql;
@@ -47,7 +46,7 @@ public class SqlServerDialect extends HelperDialect {
         pageKey.update(page.getStartRow());
         pageKey.update(page.getPageSize());
         String cacheSql = CACHE_PAGESQL.get(sql);
-        if(cacheSql == null){
+        if (cacheSql == null) {
             cacheSql = sql;
             cacheSql = cacheSql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
             cacheSql = pageSql.convertToPageSql(cacheSql, null, null);
@@ -63,7 +62,7 @@ public class SqlServerDialect extends HelperDialect {
     public void setProperties(Properties properties) {
         super.setProperties(properties);
         String sqlCacheClass = properties.getProperty("sqlCacheClass");
-        if(StringUtil.isNotEmpty(sqlCacheClass) && !sqlCacheClass.equalsIgnoreCase("false")){
+        if (StringUtil.isNotEmpty(sqlCacheClass) && !sqlCacheClass.equalsIgnoreCase("false")) {
             CACHE_COUNTSQL = CacheFactory.createSqlCache(sqlCacheClass, "count", properties);
             CACHE_PAGESQL = CacheFactory.createSqlCache(sqlCacheClass, "page", properties);
         } else {

@@ -6,17 +6,17 @@ import org.apache.ibatis.session.RowBounds;
  * @author liuzenghui
  */
 public class PageRowBounds extends RowBounds {
-  private Long total;
+    private Long total;
 
-  public PageRowBounds(int offset, int limit) {
-    super(offset, limit);
-  }
+    public PageRowBounds(int offset, int limit) {
+        super(offset, limit);
+    }
 
-  public Long getTotal() {
-    return total;
-  }
+    public Long getTotal() {
+        return total;
+    }
 
-  public void setTotal(Long total) {
-    this.total = total;
-  }
+    public void setTotal(Long total) {
+        this.total = total;
+    }
 }

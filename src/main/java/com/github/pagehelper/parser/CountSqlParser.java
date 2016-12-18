@@ -70,7 +70,7 @@ public class CountSqlParser {
         //解析SQL
         Statement stmt = null;
         //特殊sql不需要去掉order by时，使用注释前缀
-        if(sql.indexOf(KEEP_ORDERBY) >= 0){
+        if (sql.indexOf(KEEP_ORDERBY) >= 0) {
             return getSimpleCountSql(sql);
         }
         try {

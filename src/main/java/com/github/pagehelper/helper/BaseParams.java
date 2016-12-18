@@ -44,12 +44,7 @@ public abstract class BaseParams extends BasePageMethod {
      */
     public Page getPage(Object parameterObject, RowBounds rowBounds) {
         Page page = getLocalPage();
-        if (page == null || page.isOrderByOnly()) {
-            Page oldPage = page;
-            //这种情况下,page.isOrderByOnly()必然为true，所以不用写到条件中
-            if ((rowBounds == null || rowBounds == RowBounds.DEFAULT) && page != null) {
-                return oldPage;
-            }
+        if (page == null) {
             if (rowBounds != RowBounds.DEFAULT) {
                 if (offsetAsPageNum) {
                     page = new Page(rowBounds.getOffset(), rowBounds.getLimit(), rowBoundsWithCount);
@@ -60,13 +55,10 @@ public abstract class BaseParams extends BasePageMethod {
                 }
             } else {
                 try {
-                    page = getPageFromObject(parameterObject);
+                    page = getPageFromObject(parameterObject, false);
                 } catch (Exception e) {
                     return null;
                 }
-            }
-            if (oldPage != null) {
-                page.setOrderBy(oldPage.getOrderBy());
             }
             setLocalPage(page);
         }
