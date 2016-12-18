@@ -40,8 +40,7 @@
     </typeAliases>
 
     <plugins>
-        <plugin interceptor="com.github.pagehelper.PageHelper">
-            <property name="dialect" value="oracle"/>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
             <property name="offsetAsPageNum" value="true"/>
             <property name="rowBoundsWithCount" value="true"/>
         </plugin>

@@ -40,9 +40,9 @@
     </typeAliases>
 
     <plugins>
-        <plugin interceptor="com.github.pagehelper.PageHelper">
-            <!-- 支持通过Mapper接口参数来传递分页参数 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
             <property name="supportMethodsArguments" value="true"/>
+            <property name="rowBoundsWithCount" value="true"/>
         </plugin>
     </plugins>
 

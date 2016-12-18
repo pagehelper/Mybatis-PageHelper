@@ -32,7 +32,6 @@
         <setting name="cacheEnabled" value="true"/>
         <setting name="lazyLoadingEnabled" value="false"/>
         <setting name="aggressiveLazyLoading" value="true"/>
-        <!--<setting name="logImpl" value="LOG4J"/>-->
     </settings>
 
     <typeAliases>
@@ -40,8 +39,7 @@
     </typeAliases>
 
     <plugins>
-        <plugin interceptor="com.github.pagehelper.PageHelper">
-            <property name="dialect" value="sqlserver"/>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
             <property name="offsetAsPageNum" value="true"/>
             <property name="rowBoundsWithCount" value="true"/>
             <property name="pageSizeZero" value="true"/>

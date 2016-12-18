@@ -40,8 +40,7 @@
     </typeAliases>
 
     <plugins>
-        <plugin interceptor="com.github.pagehelper.PageHelper">
-            <property name="dialect" value="mariadb"/>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
             <property name="reasonable" value="true"/>
         </plugin>
     </plugins>
