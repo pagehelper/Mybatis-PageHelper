@@ -152,7 +152,7 @@
 
 阅读前请注意看[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
 
-首先分页插件支持以下两种调用方式：  
+分页插件支持以下几种调用方式：  
 
 ```java
 //第一种，RowBounds方式的调用
@@ -161,9 +161,72 @@ List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(0
 //第二种，Mapper接口方式的调用，推荐这种使用方式。
 PageHelper.startPage(1, 10);
 List<Country> list = countryMapper.selectIf(1);
+
+//第三种，Mapper接口方式的调用，推荐这种使用方式。
+PageHelper.offsetPage(1, 10);
+List<Country> list = countryMapper.selectIf(1);
+
+//第四种，参数方法调用
+//存在以下 Mapper 接口方法，你不需要在 xml 处理后两个参数
+public interface CountryMapper {
+    List<Country> selectByPageNumSize(
+            @Param("user") User user,
+            @Param("pageNumKey") int pageNum, 
+            @Param("pageSizeKey") int pageSize);
+}
+//配置supportMethodsArguments=true
+//在代码中直接调用：
+List<Country> list = countryMapper.selectByPageNumSize(user, 1, 10);
+
+//第五种，参数对象
+//如果 pageNum 和 pageSize 存在于 User 对象中，只要参数有值，也会被分页
+//有如下 User 对象
+public class User {
+    //其他fields
+    //下面两个参数名和 params 配置的名字一致
+    private Integer pageNumKey;
+    private Integer pageSizeKey;
+}
+//存在以下 Mapper 接口方法，你不需要在 xml 处理后两个参数
+public interface CountryMapper {
+    List<Country> selectByPageNumSize(User user);
+}
+//当 user 中的 pageNumKey!= null && pageSizeKey!= null 时，会自动分页
+List<Country> list = countryMapper.selectByPageNumSize(user);
+
+//第六种，ISelect 接口方式
+//jdk6,7用法，创建接口
+Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(new ISelect() {
+    @Override
+    public void doSelect() {
+        countryMapper.selectGroupBy();
+    }
+});
+//jdk8 lambda用法
+Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(()-> countryMapper.selectGroupBy());
+
+//也可以直接返回PageInfo，注意doSelectPageInfo方法和doSelectPage
+pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(new ISelect() {
+    @Override
+    public void doSelect() {
+        countryMapper.selectGroupBy();
+    }
+});
+//对应的lambda用法
+pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(() -> countryMapper.selectGroupBy());
+
+//count查询，返回一个查询语句的count数
+long total = PageHelper.count(new ISelect() {
+    @Override
+    public void doSelect() {
+        countryMapper.selectLike(country);
+    }
+});
+//lambda
+total = PageHelper.count(()->countryMapper.selectLike(country));
 ```  
 
-下面分别对这两种方式进行详细介绍
+下面对最常用的方式进行详细介绍
 
 ####1). RowBounds方式的调用   
 
@@ -206,8 +269,9 @@ assertEquals(182, ((Page) list).getTotal());
 
 #####例二：
 ```java
-//获取第1页，10条内容，默认查询总数count
-PageHelper.startPage(1, 10);
+//request: url?pageNum=1&pageSize=10
+//支持 ServletRequest,Map,POJO 对象，需要配合 params 参数
+PageHelper.startPage(request);
 //紧跟着的第一个select方法会被分页
 List<Country> list = countryMapper.selectIf(1);
 
@@ -247,14 +311,7 @@ assertEquals(false, page.isLastPage());
 assertEquals(false, page.isHasPreviousPage());
 assertEquals(true, page.isHasNextPage());
 ```
-
-除了这几种常见的用法外，在下面的安全调用中，也有一些特殊的用法。
-
-####3). `PageHelper` 安全调用
-
-#####1.使用 `RowBounds` 和 `PageRowBounds` 参数方式是极其安全的。
-
-#####2.使用参数方式是极其安全的
+####3). 使用参数方式
 想要使用参数方式，需要配置 `supportMethodsArguments` 参数为 `true`，同时要配置 `params` 参数。
 例如下面的配置：
 ```xml
@@ -269,7 +326,7 @@ assertEquals(true, page.isHasNextPage());
 ```
 在 MyBatis 方法中：
 ```java
-List<Country> selectByPageNumSizeOrderBy(
+List<Country> selectByPageNumSize(
         @Param("user") User user,
         @Param("pageNumKey") int pageNum, 
         @Param("pageSizeKey") int pageSize);
@@ -278,18 +335,35 @@ List<Country> selectByPageNumSizeOrderBy(
 
 除了上面这种方式外，如果 User 对象中包含这两个参数值，也可以有下面的方法：
 ```java
-List<Country> selectByPageNumSizeOrderBy(User user);
+List<Country> selectByPageNumSize(User user);
 ```
 当从 User 中同时发现了 `pageNumKey` 和 `pageSizeKey` 参数，这个方法就会被分页。
 
 注意：`pageNum` 和 `pageSize` 两个属性同时存在才会触发分页操作，在这个前提下，其他的分页参数才会生效。
 
-#####3.手动调用 `PageHelper.clearPage()`
+
+####3). `PageHelper` 安全调用
+
+#####1. 使用 `RowBounds` 和 `PageRowBounds` 参数方式是极其安全的
+
+#####2. 使用参数方式是极其安全的
+
+#####3. 使用 ISelect 接口调用是极其安全的
+
+ISelect 接口方式除了可以保证安全外，还特别实现了将查询转换为单纯的 count 查询方式，这个方法可以将任意的查询方法，变成一个 `select count(*)` 的查询方法。
+
+使用接口匿名类编程时，查询需要参数需要设置为 final，这样也不是很方便。
+
+这里说的安全，是指在不注意 PageHelper.startPage 类似方法出现的位置时。当按照要求紧跟在查询方法前调用时，是非常安全的！
+
+#####4. 什么时候会导致不安全的分页？
+
 `PageHelper` 方法使用了静态的 `ThreadLocal` 参数，分页参数和线程是绑定的。
 
 只要你可以保证在 `PageHelper` 方法调用后紧跟 MyBatis 查询方法，这就是安全的。因为 `PageHelper` 在 `finally` 代码段中自动清除了 `ThreadLocal` 存储的对象。
 
-如果代码在进入 `Executor` 前发生异常，就会导致线程不可用，这属于人为的 Bug，而不是运行时的问题，这种情况由于线程不可用，也不会导致 `ThreadLocal` 参数被错误的使用。
+如果代码在进入 `Executor` 前发生异常，就会导致线程不可用，这属于人为的 Bug（例如接口方法和 XML 中的不匹配，导致找不到 `MappedStatement` 时），
+这种情况由于线程不可用，也不会导致 `ThreadLocal` 参数被错误的使用。
 
 但是如果你写出下面这样的代码，就是不安全的用法：
 ```java
@@ -330,46 +404,6 @@ if(param1 != null){
 }
 ```
 这么写很不好看，而且没有必要。
-
-#####4. 使用 ISelect 接口调用
-
-用法如下：
-```java
-//jdk6,7用法，创建接口
-Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(new ISelect() {
-    @Override
-    public void doSelect() {
-        countryMapper.selectGroupBy();
-    }
-});
-//jdk8 lambda用法
-Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(()-> countryMapper.selectGroupBy());
-//为了说明可以链式使用，上面是单独setOrderBy("id desc")，也可以直接如下
-Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(()-> countryMapper.selectGroupBy());
-
-//也可以直接返回PageInfo，注意doSelectPageInfo方法和doSelectPage
-pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(new ISelect() {
-    @Override
-    public void doSelect() {
-        countryMapper.selectGroupBy();
-    }
-});
-//对应的lambda用法
-pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(() -> countryMapper.selectGroupBy());
-
-//count查询，返回一个查询语句的count数
-long total = PageHelper.count(new ISelect() {
-    @Override
-    public void doSelect() {
-        countryMapper.selectLike(country);
-    }
-});
-//lambda
-total = PageHelper.count(()->countryMapper.selectLike(country));
-```
-除了可以保证安全外，还特别实现了将查询转换为单纯的 count 查询方式，这个方法可以将任意的查询方法，变成一个 `select count(*)` 的查询方法。
-
-使用接口匿名类编程时，查询需要参数需要设置为 final，这样也不是很方便。
 
 ###4. MyBatis 和 Spring 集成示例
 
