@@ -108,6 +108,9 @@
 - helperDialect 方式
 - dialect 方式
 
+###4. SQL 缓存配置
+- count sql 缓存，SqlServer 的缓存。
+
 ##[更新日志](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Changelog.md)
 
 包含全部的详细的更新日志。

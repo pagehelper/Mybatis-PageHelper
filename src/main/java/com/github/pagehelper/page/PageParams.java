@@ -73,6 +73,9 @@ public class PageParams {
                     return null;
                 }
             }
+            if(page == null){
+                return null;
+            }
             PageHelper.setLocalPage(page);
         }
         //分页合理化
