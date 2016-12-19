@@ -31,12 +31,12 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 简单的Guava缓存，如果想更多自定义配置，可以自己实现这里的 com.github.pagehelper.cache.Cache 接口
+ * Simple Guava Cache
  *
  * @author liuzh
  */
 public class GuavaCache<K, V> implements Cache<K, V> {
-    //Guava缓存
+
     private final com.google.common.cache.Cache<K, V> CACHE;
 
     public GuavaCache(Properties properties, String prefix) {

@@ -32,7 +32,7 @@ import org.apache.ibatis.mapping.CacheBuilder;
 import java.util.Properties;
 
 /**
- * 使用 MyBatis 的缓存实现
+ * Simple MyBatis Cache
  *
  * @author liuzh
  */

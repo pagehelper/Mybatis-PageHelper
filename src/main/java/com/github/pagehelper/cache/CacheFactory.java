@@ -61,7 +61,7 @@ public abstract class CacheFactory {
                     return clazz.newInstance();
                 }
             } catch (Throwable t) {
-                throw new PageException("创建自定义 Sql 缓存[" + sqlCacheClass + "]失败", t);
+                throw new PageException("Created Sql Cache [" + sqlCacheClass + "] Error", t);
             }
         }
     }
