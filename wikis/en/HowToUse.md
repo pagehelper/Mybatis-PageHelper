@@ -193,7 +193,7 @@ public class User {
 public interface CountryMapper {
     List<Country> selectByPageNumSize(User user);
 }
-//When the pageNumKey! = null && pageSizeKey! = null in the user, this method will be automatically pagination
+//When the pageNum! = null && pageSize! = null in the user instance, this method will be automatically pagination
 List<Country> list = countryMapper.selectByPageNumSize(user);
 
 //6. ISelect interface

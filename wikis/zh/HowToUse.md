@@ -171,8 +171,8 @@ List<Country> list = countryMapper.selectIf(1);
 public interface CountryMapper {
     List<Country> selectByPageNumSize(
             @Param("user") User user,
-            @Param("pageNumKey") int pageNum, 
-            @Param("pageSizeKey") int pageSize);
+            @Param("pageNum") int pageNum, 
+            @Param("pageSize") int pageSize);
 }
 //配置supportMethodsArguments=true
 //在代码中直接调用：
@@ -184,14 +184,14 @@ List<Country> list = countryMapper.selectByPageNumSize(user, 1, 10);
 public class User {
     //其他fields
     //下面两个参数名和 params 配置的名字一致
-    private Integer pageNumKey;
-    private Integer pageSizeKey;
+    private Integer pageNum;
+    private Integer pageSize;
 }
 //存在以下 Mapper 接口方法，你不需要在 xml 处理后两个参数
 public interface CountryMapper {
     List<Country> selectByPageNumSize(User user);
 }
-//当 user 中的 pageNumKey!= null && pageSizeKey!= null 时，会自动分页
+//当 user 中的 pageNum!= null && pageSize!= null 时，会自动分页
 List<Country> list = countryMapper.selectByPageNumSize(user);
 
 //第六种，ISelect 接口方式
