@@ -70,6 +70,13 @@ If you are using Maven just add the following dependency to your pom.xml:
 
 ##Latest Changelog
 
+###5.0.0-rc
+
+- fix bug [#149](http://git.oschina.net/free/Mybatis_PageHelper/issues/149)
+- renamed Db2RowDialect to Db2RowBoundsDialect
+- All thrown exceptions being replaced by PageException
+- Update Tutorials
+
 ###5.0.0-beta
 
 - Use a better way to handle paging logic

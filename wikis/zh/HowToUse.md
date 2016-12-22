@@ -352,10 +352,6 @@ List<Country> selectByPageNumSize(User user);
 
 ISelect 接口方式除了可以保证安全外，还特别实现了将查询转换为单纯的 count 查询方式，这个方法可以将任意的查询方法，变成一个 `select count(*)` 的查询方法。
 
-使用接口匿名类编程时，查询需要参数需要设置为 final，这样也不是很方便。
-
-这里说的安全，是指在不注意 PageHelper.startPage 类似方法出现的位置时。当按照要求紧跟在查询方法前调用时，是非常安全的！
-
 #####4. 什么时候会导致不安全的分页？
 
 `PageHelper` 方法使用了静态的 `ThreadLocal` 参数，分页参数和线程是绑定的。

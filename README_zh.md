@@ -55,6 +55,13 @@
 
 ##最近的更新日志
 
+###5.0.0-rc
+
+- 解决 bug [#149](http://git.oschina.net/free/Mybatis_PageHelper/issues/149)
+- 将 Db2RowDialect 改为 Db2RowBoundsDialect
+- 所有分页插件抛出的异常改为 PageException
+- 更新使用文档
+
 ###5.0.0-beta
 
 - 使用更好的方式处理分页逻辑
