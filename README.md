@@ -52,7 +52,7 @@ so the master branch is 5.X version.
 version 4.2 exists as a branch, 
 if you have PR for 4.2, please submitted to the branch.
 
-##Latest Release 5.0.0-beta
+##Latest Release 5.0.0-rc
 
 To use PageHelper you just need to include the 
 [pagehelper-x.x.x.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 
@@ -64,7 +64,7 @@ If you are using Maven just add the following dependency to your pom.xml:
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>5.0.0-beta</version>
+    <version>5.0.0-rc</version>
 </dependency>
 ```  
 
