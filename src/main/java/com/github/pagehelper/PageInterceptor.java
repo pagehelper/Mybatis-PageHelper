@@ -50,7 +50,12 @@ import java.util.Properties;
  * @version 5.0.0
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-@Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
+@Intercepts(
+    {
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
+    }
+)
 public class PageInterceptor implements Interceptor {
     //缓存count查询的ms
     protected Cache<CacheKey, MappedStatement> msCountMap = null;
@@ -61,22 +66,29 @@ public class PageInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         try {
-            //获取拦截方法的参数
+            Executor executor = (Executor) invocation.getTarget();
             Object[] args = invocation.getArgs();
             MappedStatement ms = (MappedStatement) args[0];
             Object parameterObject = args[1];
             RowBounds rowBounds = (RowBounds) args[2];
-            args[2] = RowBounds.DEFAULT;
+            ResultHandler resultHandler = (ResultHandler) args[3];
+            CacheKey cacheKey;
+            BoundSql boundSql;
+            //由于逻辑关系，只会进入一次，针对这种用法写篇博客作为文档之一，参考 QueryInterceptor 中的注释，从动态代理根本原理讲起。
+            if(args.length == 4){
+                //4 个参数时
+                boundSql = ms.getBoundSql(parameterObject);
+                cacheKey = executor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+            } else {
+                //6 个参数时
+                cacheKey = (CacheKey) args[4];
+                boundSql = (BoundSql) args[5];
+            }
             List resultList;
             //调用方法判断是否需要进行分页，如果不需要，直接返回结果
             if (!dialect.skip(ms, parameterObject, rowBounds)) {
-                Executor executor = (Executor) invocation.getTarget();
-                ResultHandler resultHandler = (ResultHandler) args[3];
-
-                BoundSql boundSql = ms.getBoundSql(parameterObject);
                 //反射获取动态参数
                 Map<String, Object> additionalParameters = (Map<String, Object>) additionalParametersField.get(boundSql);
-
                 //判断是否需要进行 count 查询
                 if (dialect.beforeCount(ms, parameterObject, rowBounds)) {
                     //创建 count 查询的缓存 key
@@ -108,7 +120,7 @@ public class PageInterceptor implements Interceptor {
                 //判断是否需要进行分页查询
                 if (dialect.beforePage(ms, parameterObject, rowBounds)) {
                     //生成分页的缓存 key
-                    CacheKey pageKey = executor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+                    CacheKey pageKey = cacheKey;
                     //处理参数对象
                     parameterObject = dialect.processParameterObject(ms, parameterObject, boundSql, pageKey);
                     //调用方言获取分页 sql
@@ -121,10 +133,12 @@ public class PageInterceptor implements Interceptor {
                     //执行分页查询
                     resultList = executor.query(ms, parameterObject, RowBounds.DEFAULT, resultHandler, pageKey, pageBoundSql);
                 } else {
-                    resultList = (List) invocation.proceed();
+                    //不执行分页的情况下，也不执行内存分页
+                    resultList = executor.query(ms, parameterObject, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
                 }
             } else {
-                resultList = (List) invocation.proceed();
+                //rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
+                resultList = executor.query(ms, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
             }
             return dialect.afterPage(resultList, parameterObject, rowBounds);
         } finally {
