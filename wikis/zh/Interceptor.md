@@ -145,14 +145,14 @@ Object result = Interceptor2..query(4个参数方法);
 Interceptor3 后续处理   
 return result;
 ```
-对于 Interceptor2.invoke 方法也是相同的逻辑：
+对于 Interceptor2.query 方法也是相同的逻辑：
 ```
 Interceptor2 前置处理      
 Object result = Interceptor1..query(4个参数方法);     
 Interceptor2 后续处理   
 return result;
 ```
-同理 Interceptor1.invoke ：
+同理 Interceptor1.query ：
 ```
 Interceptor1 前置处理      
 Object result = executor.query(4个参数方法);     
@@ -252,7 +252,7 @@ Object result = QueryInterceptor.query(4个参数方法);
 Interceptor3 后续处理   
 return result;
 ```
-QueryInterceptor.invoke 执行逻辑如下：
+QueryInterceptor.query 执行逻辑如下：
 ```
 Interceptor2 前置处理      
 Object result = executor.query(6个参数方法);     
@@ -293,7 +293,7 @@ public class QueryInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
         MappedStatement ms = (MappedStatement) args[0];
-        Object parameterObject = args[1];
+        Object parameter = args[1];
         RowBounds rowBounds = (RowBounds) args[2];
         ResultHandler resultHandler = (ResultHandler) args[3];
         Executor executor = (Executor) invocation.getTarget();
@@ -302,8 +302,8 @@ public class QueryInterceptor implements Interceptor {
         //由于逻辑关系，只会进入一次
         if(args.length == 4){
             //4 个参数时
-            boundSql = ms.getBoundSql(parameterObject);
-            cacheKey = executor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+            boundSql = ms.getBoundSql(parameter);
+            cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
         } else {
             //6 个参数时
             cacheKey = (CacheKey) args[4];
@@ -311,7 +311,7 @@ public class QueryInterceptor implements Interceptor {
         }
         //TODO 自己要进行的各种处理
         //注：下面的方法可以根据自己的逻辑调用多次，在分页插件中，count 和 page 各调用了一次
-        return executor.query(ms, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
+        return executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
     }
 
     @Override

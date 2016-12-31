@@ -66,19 +66,19 @@ public class PageInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         try {
-            Executor executor = (Executor) invocation.getTarget();
             Object[] args = invocation.getArgs();
             MappedStatement ms = (MappedStatement) args[0];
-            Object parameterObject = args[1];
+            Object parameter = args[1];
             RowBounds rowBounds = (RowBounds) args[2];
             ResultHandler resultHandler = (ResultHandler) args[3];
+            Executor executor = (Executor) invocation.getTarget();
             CacheKey cacheKey;
             BoundSql boundSql;
-            //由于逻辑关系，只会进入一次，针对这种用法写篇博客作为文档之一，参考 QueryInterceptor 中的注释，从动态代理根本原理讲起。
+            //由于逻辑关系，只会进入一次
             if(args.length == 4){
                 //4 个参数时
-                boundSql = ms.getBoundSql(parameterObject);
-                cacheKey = executor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+                boundSql = ms.getBoundSql(parameter);
+                cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
             } else {
                 //6 个参数时
                 cacheKey = (CacheKey) args[4];
@@ -86,13 +86,13 @@ public class PageInterceptor implements Interceptor {
             }
             List resultList;
             //调用方法判断是否需要进行分页，如果不需要，直接返回结果
-            if (!dialect.skip(ms, parameterObject, rowBounds)) {
+            if (!dialect.skip(ms, parameter, rowBounds)) {
                 //反射获取动态参数
                 Map<String, Object> additionalParameters = (Map<String, Object>) additionalParametersField.get(boundSql);
                 //判断是否需要进行 count 查询
-                if (dialect.beforeCount(ms, parameterObject, rowBounds)) {
+                if (dialect.beforeCount(ms, parameter, rowBounds)) {
                     //创建 count 查询的缓存 key
-                    CacheKey countKey = executor.createCacheKey(ms, parameterObject, RowBounds.DEFAULT, boundSql);
+                    CacheKey countKey = executor.createCacheKey(ms, parameter, RowBounds.DEFAULT, boundSql);
                     countKey.update("_Count");
                     MappedStatement countMs = msCountMap.get(countKey);
                     if (countMs == null) {
@@ -101,46 +101,46 @@ public class PageInterceptor implements Interceptor {
                         msCountMap.put(countKey, countMs);
                     }
                     //调用方言获取 count sql
-                    String countSql = dialect.getCountSql(ms, boundSql, parameterObject, rowBounds, countKey);
-                    BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameterObject);
+                    String countSql = dialect.getCountSql(ms, boundSql, parameter, rowBounds, countKey);
+                    BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameter);
                     //当使用动态 SQL 时，可能会产生临时的参数，这些参数需要手动设置到新的 BoundSql 中
                     for (String key : additionalParameters.keySet()) {
                         countBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
                     }
                     //执行 count 查询
-                    Object countResultList = executor.query(countMs, parameterObject, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
+                    Object countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
                     Long count = (Long) ((List) countResultList).get(0);
                     //处理查询总数
                     //返回 true 时继续分页查询，false 时直接返回
-                    if (!dialect.afterCount(count, parameterObject, rowBounds)) {
+                    if (!dialect.afterCount(count, parameter, rowBounds)) {
                         //当查询总数为 0 时，直接返回空的结果
-                        return dialect.afterPage(new ArrayList(), parameterObject, rowBounds);
+                        return dialect.afterPage(new ArrayList(), parameter, rowBounds);
                     }
                 }
                 //判断是否需要进行分页查询
-                if (dialect.beforePage(ms, parameterObject, rowBounds)) {
+                if (dialect.beforePage(ms, parameter, rowBounds)) {
                     //生成分页的缓存 key
                     CacheKey pageKey = cacheKey;
                     //处理参数对象
-                    parameterObject = dialect.processParameterObject(ms, parameterObject, boundSql, pageKey);
+                    parameter = dialect.processParameterObject(ms, parameter, boundSql, pageKey);
                     //调用方言获取分页 sql
-                    String pageSql = dialect.getPageSql(ms, boundSql, parameterObject, rowBounds, pageKey);
-                    BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameterObject);
+                    String pageSql = dialect.getPageSql(ms, boundSql, parameter, rowBounds, pageKey);
+                    BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameter);
                     //设置动态参数
                     for (String key : additionalParameters.keySet()) {
                         pageBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
                     }
                     //执行分页查询
-                    resultList = executor.query(ms, parameterObject, RowBounds.DEFAULT, resultHandler, pageKey, pageBoundSql);
+                    resultList = executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, pageKey, pageBoundSql);
                 } else {
                     //不执行分页的情况下，也不执行内存分页
-                    resultList = executor.query(ms, parameterObject, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
+                    resultList = executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
                 }
             } else {
                 //rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
-                resultList = executor.query(ms, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
+                resultList = executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
             }
-            return dialect.afterPage(resultList, parameterObject, rowBounds);
+            return dialect.afterPage(resultList, parameter, rowBounds);
         } finally {
             dialect.afterAll();
         }
