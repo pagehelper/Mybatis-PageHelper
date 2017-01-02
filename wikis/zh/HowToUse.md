@@ -81,8 +81,11 @@
 
 **下面几个参数都是针对默认 dialect 情况下的参数。使用自定义 dialect 实现时，下面的参数没有任何作用。**
 
-1. `helperDialect`：分页插件会自动检测当前的数据库链接，自动选择合适的分页方式。你也可以实现 `AbstractHelperDialect`(`com.github.pagehelper.dialect.AbstractHelperDialect`)，
-然后配置该属性为实现类的全限定名称即可使用自定义的实现方法。
+1. `helperDialect`：分页插件会自动检测当前的数据库链接，自动选择合适的分页方式。
+你可以配置`helperDialect`属性来指定分页插件使用哪种方言。配置时，可以使用下面的缩写值：  
+`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`,`derby`  
+<b>特别注意：</b>使用 SqlServer2012 数据库时，需要手动指定为 `sqlserver2012`，否则会使用 SqlServer2005 的方式进行分页。  
+你也可以实现 `AbstractHelperDialect`，然后配置该属性为实现类的全限定名称即可使用自定义的实现方法。
 
 2. `offsetAsPageNum`：默认值为 `false`，该参数对使用 `RowBounds` 作为分页参数时有效。
 当该参数设置为 `true` 时，会将 `RowBounds` 中的 `offset` 参数当成 `pageNum` 使用，可以用页码和页面大小两个参数进行分页。

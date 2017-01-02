@@ -1,4 +1,4 @@
-#MyBatis Pagination - PageHelper
+# MyBatis Pagination - PageHelper
 
 [中文版文档](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/README_zh.md)
 
@@ -11,7 +11,8 @@ Some special cases please see the [**Important note**](https://github.com/pagehe
 Want to use PageHelper? 
 Please see [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md).
 
-##Physical Paging
+## Support [MyBatis 3.1.0+](https://github.com/mybatis/mybatis-3)
+## Physical Paging
 
 PageHelper supports the following databases:
 
@@ -28,31 +29,9 @@ PageHelper supports the following databases:
  11. `SqlServer2012`
  12. `Derby`
 
-PageHelper will detect the current database url by default, 
-automatically select the corresponding database dialect.
+## Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 
-You can configure `helperDialect` Property to specify the dialect.
-You can use the following abbreviations :
-
-`oracle`, `mysql`, `mariadb`, `sqlite`, `hsqldb`, `postgresql`,
-`db2`, `sqlserver`, `informix`, `h2`, `sqlserver2012`, `derby`
-
-Or You can use the dialect full name, such as `com.github.pagehelper.dialect.helper.MySqlDialect`.
-
-**Special note :** When using the SqlServer2012 database,
-you need to manually specify for `sqlserver2012`, otherwise it will use the SqlServer2005 for paging.
-
-##MyBatis Tools:[http://mybatis.tk](http://www.mybatis.tk)
-##mybatis-3 https://github.com/mybatis/mybatis-3 
-##Support MyBatis 3.1.0+
-
-##PageHelper 5.0
-Due to pagination plugin version 5.0 and 4.2. X completely different,
-so the master branch is 5.X version.
-version 4.2 exists as a branch, 
-if you have PR for 4.2, please submitted to the branch.
-
-##Latest Release 5.0.0-rc
+## Installation
 
 To use PageHelper you just need to include the 
 [pagehelper-x.x.x.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 
@@ -68,59 +47,28 @@ If you are using Maven just add the following dependency to your pom.xml:
 </dependency>
 ```  
 
-##Latest Changelog
+If you are using Spring Boot, You can refer to [pagehelper-spring-boot-starter](https://github.com/pagehelper/pagehelper-spring-boot)
 
-###5.0.0-rc
+[Read More...](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md)
 
-- fix bug [#149](http://git.oschina.net/free/Mybatis_PageHelper/issues/149)
-- renamed Db2RowDialect to Db2RowBoundsDialect
-- All thrown exceptions being replaced by PageException
-- Update Tutorials
+## Documentation  
+- [How to use the PageHelper](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md)
+- [Changelog](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Changelog.md)
+- [Important note](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md)
 
-###5.0.0-beta
-
-- Use a better way to handle paging logic
-- New pagination plugin interceptor `com.github.pagehelper.PageInterceptor`
-- New `Dialect` `PageHelper` is a special implementation class, the previous function is implemented in more user-friendly ways
-- New pagination plugin only a `dialect` parameter, the default `dialect` is `PageHelper`
-- `PageHelper` continue to support previously provided parameters, Among the latest to use the document has been fully updated
-- `PageHelper` has a `helperDialect` parameter which is the same functional as the previous `dialect`
-- Added paging implementation based on pure `RowBounds` and `PageRowBounds`, 
-in `com.github. pagehelper. dialect. rowbounds` package, it is used as `dialect` Parameter sample implementation, more detailed documentation will be added later
-- Removed inappropriate orderby functions that appear in pagination plugin. It will provide a separate sort plug-ins in the future
-- Remove `PageHelper` are less commonly used methods
-- A new document, an important part of the update has been mentioned in the changelog, provides the English version of this document
-
-##Documentation  
-
-###[How to use the PageHelper](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md)
-
-If you are unfamiliar with Spring integration, 
-you can refer to the following two MyBatis and Spring Integration Framework:
-
+## Spring integration sample
 - [Integration Spring 3.x](https://github.com/abel533/Mybatis-Spring/tree/spring3.x)
 - [Integration Spring 4.x](https://github.com/abel533/Mybatis-Spring)
+- [Integration Spring Boot](https://github.com/abel533/MyBatis-Spring-Boot)
 
-The two Integrated Framework integrates PageHelper and [Common Mapper](https://github.com/abel533/Mapper)。
-
-###How to use in simple RowBounds style
-
-###Implement your own pagination plugin
-- helperDialect style
-- dialect style
-
-##[Changelog](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Changelog.md)
-
-##[Important note](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md)
-
-##Submit BUG
-
+## Submit BUG
 - [Submit to github](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
 - [Submit to gitosc](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
-##Author Info
+## Author Info
+Web: http://www.mybatis.tk
 
-Blog:http://blog.csdn.net/isea533
+Blog: http://blog.csdn.net/isea533
 
 Email: abel533@gmail.com  
 

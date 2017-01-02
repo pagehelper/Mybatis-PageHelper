@@ -46,7 +46,7 @@ config `org.mybatis.spring.SqlSessionFactoryBean` as following:
         <property name="properties">
           <!-- config params as the following -->
           <value>
-            params=value1
+            param1=value1
           </value>
         </property>
       </bean>
@@ -67,10 +67,14 @@ interface, and then configure the attribute to the fully qualified name of the i
 **The following parameters are the parameters for the default dialect case. 
 When implemented using a custom dialect, the following parameter has no effect.**
 
-1. `helperDialect`: PageHelper automatically detects your current database links, 
-automatically select the appropriate paging. 
-You can also implement `AbstractHelperDialect`(`com.github.pagehelper.dialect.AbstractHelperDialect`), 
-and then configure the attribute to achieve the fully qualified class name.
+1. `helperDialect`: PageHelper will detect the current database url by default, automatically select the corresponding database dialect.
+You can configure `helperDialect` Property to specify the dialect. You can use the following abbreviations :  
+`oracle`, `mysql`, `mariadb`, `sqlite`, `hsqldb`, `postgresql`,
+`db2`, `sqlserver`, `informix`, `h2`, `sqlserver2012`, `derby`.  
+You can also implement `AbstractHelperDialect`, 
+and then configure the attribute to achieve the fully qualified class name.  
+**Special note :** When using the SqlServer2012 database,
+you need to manually specify for `sqlserver2012`, otherwise it will use the SqlServer2005 for paging.
 
 2. `offsetAsPageNum`: Default value is `false`, This parameter is valid for `RowBounds` as a pagination parameter.
 When this parameter is set to `true`, the` offset` parameter in `RowBounds` is used as` pageNum`.
