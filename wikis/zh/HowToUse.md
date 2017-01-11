@@ -91,7 +91,7 @@
 当该参数设置为 `true` 时，会将 `RowBounds` 中的 `offset` 参数当成 `pageNum` 使用，可以用页码和页面大小两个参数进行分页。
 
 3. `rowBoundsWithCount`：默认值为`false`，该参数对使用 `RowBounds` 作为分页参数时有效。
-当该参数设置为`true`时，使用 `RowBounds` 分页会进行 count 查询（使用 `PageRowBounds` 时一定会进行 count 查询，不受该参数影响）。
+当该参数设置为`true`时，使用 `RowBounds` 分页会进行 count 查询。
 
 4. `pageSizeZero`：默认值为 `false`，当该参数设置为 `true` 时，如果 `pageSize=0` 或者 `RowBounds.limit = 0` 就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是 `Page` 类型）。
 
@@ -125,7 +125,7 @@
 分页插件对`RowBounds`支持和 MyBatis 默认的方式是一致，默认情况下不会进行 count 查询，如果你想在分页查询时进行 count 查询，
 以及使用更强大的 `PageInfo` 类，你需要设置该参数为 `true`。
 
-除此之外，另一种推荐的方式就是使用 `PageRowBounds`，使用这个类型作为分页参数时，会将查询的 count 结果存入 `PageRowBounds` 的 `total` 属性中。
+**注：** `PageRowBounds` 想要查询总数也需要配置该属性为 `true`。
 
 #####场景二
 

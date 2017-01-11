@@ -80,7 +80,7 @@ you need to manually specify for `sqlserver2012`, otherwise it will use the SqlS
 When this parameter is set to `true`, the` offset` parameter in `RowBounds` is used as` pageNum`.
 
 3. `rowBoundsWithCount`: Default value is `false`, When this parameter is set to `true`, 
-PageHelper will execute count query(`PageRowBounds` not affected by this parameter).
+PageHelper will execute count query.
 
 4. `pageSizeZero`: Default value is `false`, When this parameter is set to `true`, 
 if `pageSize=0` or `RowBounds.Limit = 0` will query all the results (the equivalent of a Paged query did not execute, 
@@ -117,8 +117,7 @@ Here are a few examples for some of the parameters may be used.
 If you are still in with a way to call a namespace like iBATIS, you might use `rowBoundsWithCount`.
 If you want to count when the paging query query, you need to set this parameter to `true`.
 
-In addition, another recommended way is to use the `PageRowBounds`, the use of this type as a paging parameter, the query will count the results into `PageRowBounds` in the `total` attribute.
-
+** Note: ** `PageRowBounds` also need `true`.
 #####Scene 2
 
 If you are still in with a way to call a namespace like iBATIS, If  you think `RowBounds` in the two parameters` offset, limit` not as good as `pageNum, pageSize` easy to understand.
