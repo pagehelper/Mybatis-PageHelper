@@ -37,6 +37,7 @@ import java.util.List;
  * @author liuzh
  */
 public class MSUtils {
+    public static final String COUNT = "_COUNT";
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
     /**
@@ -46,7 +47,7 @@ public class MSUtils {
      * @return
      */
     public static MappedStatement newCountMappedStatement(MappedStatement ms) {
-        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + "_COUNT", ms.getSqlSource(), ms.getSqlCommandType());
+        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + COUNT, ms.getSqlSource(), ms.getSqlCommandType());
         builder.resource(ms.getResource());
         builder.fetchSize(ms.getFetchSize());
         builder.statementType(ms.getStatementType());

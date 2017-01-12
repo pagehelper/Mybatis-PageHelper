@@ -93,7 +93,7 @@ public class PageInterceptor implements Interceptor {
                 if (dialect.beforeCount(ms, parameter, rowBounds)) {
                     //创建 count 查询的缓存 key
                     CacheKey countKey = executor.createCacheKey(ms, parameter, RowBounds.DEFAULT, boundSql);
-                    countKey.update("_Count");
+                    countKey.update(MSUtils.COUNT);
                     MappedStatement countMs = msCountMap.get(countKey);
                     if (countMs == null) {
                         //根据当前的 ms 创建一个返回值为 Long 类型的 ms
