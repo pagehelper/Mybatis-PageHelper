@@ -1,10 +1,10 @@
-##使用方法  
+## 使用方法  
 
-###1. 引入分页插件  
+### 1. 引入分页插件  
 
 引入分页插件有下面2种方式，推荐使用 Maven 方式。  
 
-####1). 引入 Jar 包  
+#### 1). 引入 Jar 包  
 
 你可以从下面的地址中下载最新版本的 jar 包 
 
@@ -16,7 +16,7 @@
 
  - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/
 
-####2). 使用 Maven  
+#### 2). 使用 Maven  
   
 在 pom.xml 中添加如下依赖：  
 
@@ -29,11 +29,11 @@
 ```  
 最新版本号可以从首页查看。
 
-###2. 配置拦截器插件
+### 2. 配置拦截器插件
 特别注意，新版拦截器是 `com.github.pagehelper.PageInterceptor`。
 `com.github.pagehelper.PageHelper` 现在是一个特殊的 `dialect` 实现类，是分页插件的默认实现类，提供了和以前相同的用法。
 
-####1. 在 MyBatis 配置 xml 中配置拦截器插件
+#### 1. 在 MyBatis 配置 xml 中配置拦截器插件
 ```xml
 <!-- 
     plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下:
@@ -51,7 +51,7 @@
 	</plugin>
 </plugins>
 ```
-####2. 在 Spring 配置文件中配置拦截器插件
+#### 2. 在 Spring 配置文件中配置拦截器插件
 使用 spring 的属性配置方式，可以使用 `plugins` 属性像下面这样配置：    
 
 ```xml
@@ -71,7 +71,7 @@
   </property>
 </bean>
 ```   
-####3. 分页插件参数介绍    
+#### 3. 分页插件参数介绍    
 分页插件提供了多个可选参数，这些参数使用时，按照上面两种配置方式中的示例配置即可。
 
 分页插件可选参数如下：
@@ -115,11 +115,11 @@
 
 当 `offsetAsPageNum=false` 的时候，由于 `PageNum` 问题，`RowBounds`查询的时候 `reasonable` 会强制为 `false`。使用 `PageHelper.startPage` 方法不受影响。
 
-####4. 如何选择配置这些参数
+#### 4. 如何选择配置这些参数
 
 单独看每个参数的说明可能是一件让人不爽的事情，这里列举一些可能会用到某些参数的情况。
 
-#####场景一
+##### 场景一
 
 如果你仍然在用类似ibatis式的命名空间调用方式，你也许会用到`rowBoundsWithCount`，
 分页插件对`RowBounds`支持和 MyBatis 默认的方式是一致，默认情况下不会进行 count 查询，如果你想在分页查询时进行 count 查询，
@@ -127,23 +127,23 @@
 
 **注：** `PageRowBounds` 想要查询总数也需要配置该属性为 `true`。
 
-#####场景二
+##### 场景二
 
 如果你仍然在用类似ibatis式的命名空间调用方式，你觉得 `RowBounds` 中的两个参数 `offset,limit` 不如 `pageNum,pageSize` 容易理解，
 你可以使用 `offsetAsPageNum` 参数，将该参数设置为 `true` 后，`offset`会当成 `pageNum` 使用，`limit` 和 `pageSize` 含义相同。
 
-#####场景三
+##### 场景三
  
 如果觉得某个地方使用分页后，你仍然想通过控制参数查询全部的结果，你可以配置 `pageSizeZero` 为 `true`，
 配置后，当 `pageSize=0` 或者 `RowBounds.limit = 0` 就会查询出全部的结果。
 
-#####场景四
+##### 场景四
 
 如果你分页插件使用于类似分页查看列表式的数据，如新闻列表，软件列表，
 你希望用户输入的页数不在合法范围（第一页到最后一页之外）时能够正确的响应到正确的结果页面，
 那么你可以配置 `reasonable` 为 `true`，这时如果 `pageNum<=0` 会查询第一页，如果 `pageNum>总页数` 会查询最后一页。
 
-#####场景五
+##### 场景五
 
 如果你在 Spring 中配置了动态数据源，并且连接不同类型的数据库，这时你可以配置 `autoRuntimeDialect` 为 `true`，这样在使用不同数据源时，会使用匹配的分页进行查询。
 这种情况下，你还需要特别注意 `closeConn` 参数，由于获取数据源类型会获取一个数据库连接，所以需要通过这个参数来控制获取连接后，是否关闭该连接。
@@ -151,7 +151,7 @@
 
 当不使用动态数据源而只是自动获取 `helperDialect` 时，数据库连接只会获取一次，所以不需要担心占用的这一个连接是否会导致数据库出错，但是最好也根据数据源的特性选择是否关闭连接。
 
-###3. 如何在代码中使用  
+### 3. 如何在代码中使用  
 
 阅读前请注意看[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
 
@@ -231,7 +231,7 @@ total = PageHelper.count(()->countryMapper.selectLike(country));
 
 下面对最常用的方式进行详细介绍
 
-####1). RowBounds方式的调用   
+#### 1). RowBounds方式的调用   
 
 ```java
 List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1, 10));
@@ -252,12 +252,12 @@ List<Country> selectAll(RowBounds rowBounds);
 **注意：** 由于默认情况下的 `RowBounds` 无法获取查询总数，分页插件提供了一个继承自 `RowBounds` 的 `PageRowBounds`，这个对象中增加了 `total` 属性，执行分页查询后，可以从该属性得到查询总数。
 
 
-####2). `PageHelper.startPage` 静态方法调用
+#### 2). `PageHelper.startPage` 静态方法调用
 除了 `PageHelper.startPage` 方法外，还提供了类似用法的 `PageHelper.offsetPage` 方法。
 
 在你需要进行分页的 MyBatis 查询方法前调用 `PageHelper.startPage` 静态方法即可，紧跟在这个方法后的第一个**MyBatis 查询方法**会被进行分页。  
 
-#####例一：  
+##### 例一：  
 
 ```java
 //获取第1页，10条内容，默认查询总数count
@@ -270,7 +270,7 @@ assertEquals(10, list.size());
 assertEquals(182, ((Page) list).getTotal());
 ```
 
-#####例二：
+##### 例二：
 ```java
 //request: url?pageNum=1&pageSize=10
 //支持 ServletRequest,Map,POJO 对象，需要配合 params 参数
@@ -291,7 +291,7 @@ assertEquals(1, list2.get(0).getId());
 assertEquals(182, list2.size());
 ```  
 
-#####例三，使用`PageInfo`的用法：  
+##### 例三，使用`PageInfo`的用法：  
 
 ```java
 //获取第1页，10条内容，默认查询总数count
@@ -314,7 +314,7 @@ assertEquals(false, page.isLastPage());
 assertEquals(false, page.isHasPreviousPage());
 assertEquals(true, page.isHasNextPage());
 ```
-####3). 使用参数方式
+#### 3). 使用参数方式
 想要使用参数方式，需要配置 `supportMethodsArguments` 参数为 `true`，同时要配置 `params` 参数。
 例如下面的配置：
 ```xml
@@ -345,17 +345,17 @@ List<Country> selectByPageNumSize(User user);
 注意：`pageNum` 和 `pageSize` 两个属性同时存在才会触发分页操作，在这个前提下，其他的分页参数才会生效。
 
 
-####3). `PageHelper` 安全调用
+#### 3). `PageHelper` 安全调用
 
-#####1. 使用 `RowBounds` 和 `PageRowBounds` 参数方式是极其安全的
+##### 1. 使用 `RowBounds` 和 `PageRowBounds` 参数方式是极其安全的
 
-#####2. 使用参数方式是极其安全的
+##### 2. 使用参数方式是极其安全的
 
-#####3. 使用 ISelect 接口调用是极其安全的
+##### 3. 使用 ISelect 接口调用是极其安全的
 
 ISelect 接口方式除了可以保证安全外，还特别实现了将查询转换为单纯的 count 查询方式，这个方法可以将任意的查询方法，变成一个 `select count(*)` 的查询方法。
 
-#####4. 什么时候会导致不安全的分页？
+##### 4. 什么时候会导致不安全的分页？
 
 `PageHelper` 方法使用了静态的 `ThreadLocal` 参数，分页参数和线程是绑定的。
 
@@ -404,7 +404,7 @@ if(param1 != null){
 ```
 这么写很不好看，而且没有必要。
 
-###4. MyBatis 和 Spring 集成示例
+### 4. MyBatis 和 Spring 集成示例
 
 如果和Spring集成不熟悉，可以参考下面两个
 
@@ -415,4 +415,4 @@ if(param1 != null){
 
 这两个集成框架集成了 PageHelper 和 [通用 Mapper](https://github.com/abel533/Mapper)。
 
-###5. Spring Boot 待定
+### 5. Spring Boot 待定
