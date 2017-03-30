@@ -64,7 +64,7 @@ Optional parameters as follows:
 if you want to implement your own page logic, you can implement `Dialect`(`com.github.pagehelper.Dialect`) 
 interface, and then configure the attribute to the fully qualified name of the implementing class.
 
-** The following parameters are the parameters for the default dialect case. 
+**The following parameters are the parameters for the default dialect case. 
 When implemented using a custom dialect, the following parameter has no effect.**
 
 1. `helperDialect`: PageHelper will detect the current database url by default, automatically select the corresponding database dialect.
