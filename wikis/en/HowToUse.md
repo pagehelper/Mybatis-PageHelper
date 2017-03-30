@@ -117,7 +117,7 @@ Here are a few examples for some of the parameters may be used.
 If you are still in with a way to call a namespace like iBATIS, you might use `rowBoundsWithCount`.
 If you want to count when the paging query query, you need to set this parameter to `true`.
 
-** Note: ** `PageRowBounds` also need `true`.
+**Note:** `PageRowBounds` also need `true`.
 ##### Scene 2
 
 If you are still in with a way to call a namespace like iBATIS, If  you think `RowBounds` in the two parameters` offset, limit` not as good as `pageNum, pageSize` easy to understand.
@@ -251,7 +251,7 @@ List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1
 List<Country> selectAll(RowBounds rowBounds);  
 ```
 
-** 注意：** 由于默认情况下的 `RowBounds` 无法获取查询总数，分页插件提供了一个继承自 `RowBounds` 的 `PageRowBounds`，这个对象中增加了 `total` 属性，执行分页查询后，可以从该属性得到查询总数。
+**注意：** 由于默认情况下的 `RowBounds` 无法获取查询总数，分页插件提供了一个继承自 `RowBounds` 的 `PageRowBounds`，这个对象中增加了 `total` 属性，执行分页查询后，可以从该属性得到查询总数。
 
 
 #### 2). `PageHelper.startPage` 静态方法调用
