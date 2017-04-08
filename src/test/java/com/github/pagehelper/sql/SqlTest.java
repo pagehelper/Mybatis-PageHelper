@@ -70,4 +70,14 @@ public class SqlTest {
         CountSqlParser countSqlParser = new CountSqlParser();
         System.out.println(countSqlParser.getSmartCountSql("select countryname,count(id) from country group by countryname"));
     }
+    @Test
+    public void testSqlParser3() throws JSQLParserException {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("SELECT *\n" +
+                "    FROM vwdatasearch\n" +
+                "    WHERE ComId = ?\n" +
+                "    AND (\n" +
+                "      Title1 %% ?\n" +
+                "    )\n"));
+    }
 }

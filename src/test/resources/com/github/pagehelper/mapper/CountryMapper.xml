@@ -297,4 +297,8 @@
             select * from country where id = #{id}
         </foreach>
     </select>
+
+    <select id="execute" resultType="map">
+        ${sql}
+    </select>
 </mapper>

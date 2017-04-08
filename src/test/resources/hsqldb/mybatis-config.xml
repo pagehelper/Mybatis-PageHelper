@@ -54,6 +54,7 @@
             <!-- 该参数可选，可以设置sql缓存实现类，默认为SimpleCache，当项目包含guava时，使用GuavaCache，
                  也可以通过参数 sqlCacheClass 指定自己的实现类 -->
             <property name="sqlCacheClass" value="com.github.pagehelper.cache.SimpleCache"/>
+            <property name="countColumn" value="1"/>
         </plugin>
     </plugins>
 

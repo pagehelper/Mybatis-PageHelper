@@ -122,4 +122,6 @@ public interface CountryMapper {
     List<Country> selectByIdList(@Param("idList") List<Long> idList);
 
     List<Country> selectByIdList2(@Param("idList") List<Long> idList);
+
+    List<Map<String, Object>> execute(@Param("sql") String sql);
 }
