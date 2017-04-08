@@ -42,13 +42,9 @@ import java.util.List;
  */
 public class CountSqlParser {
     public static final String KEEP_ORDERBY = "/*keep orderby*/";
-    private static final List<SelectItem> COUNT_ITEM;
     private static final Alias TABLE_ALIAS;
 
     static {
-        COUNT_ITEM = new ArrayList<SelectItem>();
-        COUNT_ITEM.add(new SelectExpressionItem(new Column("count(0)")));
-
         TABLE_ALIAS = new Alias("table_count");
         TABLE_ALIAS.setUseAs(false);
     }
@@ -66,6 +62,17 @@ public class CountSqlParser {
      * @return
      */
     public String getSmartCountSql(String sql) {
+        return getSmartCountSql(sql, "0");
+    }
+
+    /**
+     * 获取智能的countSql
+     *
+     * @param sql
+     * @param name 列名，默认 0
+     * @return
+     */
+    public String getSmartCountSql(String sql, String name) {
         //校验是否支持该sql
         isSupportedSql(sql);
         //解析SQL
@@ -92,7 +99,7 @@ public class CountSqlParser {
         //处理with-去order by
         processWithItemsList(select.getWithItemsList());
         //处理为count查询
-        sqlToCount(select);
+        sqlToCount(select, name);
         String result = select.toString();
         return result;
     }
@@ -104,9 +111,21 @@ public class CountSqlParser {
      * @return 返回count查询sql
      */
     public String getSimpleCountSql(final String sql) {
+        return getSimpleCountSql(sql, "0");
+    }
+
+    /**
+     * 获取普通的Count-sql
+     *
+     * @param sql 原查询sql
+     * @return 返回count查询sql
+     */
+    public String getSimpleCountSql(final String sql, String name) {
         isSupportedSql(sql);
         StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
-        stringBuilder.append("select count(0) from (");
+        stringBuilder.append("select count(");
+        stringBuilder.append(name);
+        stringBuilder.append(") from (");
         stringBuilder.append(sql);
         stringBuilder.append(") tmp_count");
         return stringBuilder.toString();
@@ -117,9 +136,11 @@ public class CountSqlParser {
      *
      * @param select
      */
-    public void sqlToCount(Select select) {
+    public void sqlToCount(Select select, String name) {
         SelectBody selectBody = select.getSelectBody();
         // 是否能简化count查询
+        List<SelectItem> COUNT_ITEM = new ArrayList<SelectItem>();
+        COUNT_ITEM.add(new SelectExpressionItem(new Column("count(" + name +")")));
         if (selectBody instanceof PlainSelect && isSimpleCount((PlainSelect) selectBody)) {
             ((PlainSelect) selectBody).setSelectItems(COUNT_ITEM);
         } else {

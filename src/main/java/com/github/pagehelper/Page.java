@@ -74,6 +74,11 @@ public class Page<E> extends ArrayList<E> {
      */
     private Boolean pageSizeZero;
 
+    /**
+     * 进行count查询的列名
+     */
+    private String countColumn;
+
     public Page() {
         super();
     }
@@ -293,6 +298,18 @@ public class Page<E> extends ArrayList<E> {
     }
 
     /**
+     * 指定 count 查询列
+     *
+     * @param columnName
+     * @return
+     */
+    public Page<E> countColumn(String columnName) {
+        this.countColumn = columnName;
+        return this;
+    }
+
+
+    /**
      * 转换为PageInfo
      *
      * @return
@@ -317,6 +334,14 @@ public class Page<E> extends ArrayList<E> {
         this.pageSize = 0;
         select.doSelect();
         return this.total;
+    }
+
+    public String getCountColumn() {
+        return countColumn;
+    }
+
+    public void setCountColumn(String countColumn) {
+        this.countColumn = countColumn;
     }
 
     @Override

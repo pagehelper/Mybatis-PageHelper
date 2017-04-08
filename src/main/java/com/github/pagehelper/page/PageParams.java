@@ -27,6 +27,7 @@ package com.github.pagehelper.page;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.util.PageObjectUtil;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Properties;
@@ -47,6 +48,8 @@ public class PageParams {
     protected boolean reasonable = false;
     //是否支持接口参数来传递分页参数，默认false
     protected boolean supportMethodsArguments = false;
+    //默认count(0)
+    protected String countColumn = "0";
 
     /**
      * 获取分页参数
@@ -105,8 +108,37 @@ public class PageParams {
         //是否支持接口参数来传递分页参数，默认false
         String supportMethodsArguments = properties.getProperty("supportMethodsArguments");
         this.supportMethodsArguments = Boolean.parseBoolean(supportMethodsArguments);
+        //默认count列
+        String countColumn = properties.getProperty("countColumn");
+        if(StringUtil.isNotEmpty(countColumn)){
+            this.countColumn = countColumn;
+        }
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         PageObjectUtil.setParams(properties.getProperty("params"));
+    }
+
+    public boolean isOffsetAsPageNum() {
+        return offsetAsPageNum;
+    }
+
+    public boolean isRowBoundsWithCount() {
+        return rowBoundsWithCount;
+    }
+
+    public boolean isPageSizeZero() {
+        return pageSizeZero;
+    }
+
+    public boolean isReasonable() {
+        return reasonable;
+    }
+
+    public boolean isSupportMethodsArguments() {
+        return supportMethodsArguments;
+    }
+
+    public String getCountColumn() {
+        return countColumn;
     }
 }

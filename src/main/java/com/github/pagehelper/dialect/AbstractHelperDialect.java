@@ -24,9 +24,10 @@
 
 package com.github.pagehelper.dialect;
 
-import com.github.pagehelper.*;
-import com.github.pagehelper.dialect.AbstractDialect;
-import com.github.pagehelper.parser.CountSqlParser;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageRowBounds;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -63,6 +64,16 @@ public abstract class AbstractHelperDialect extends AbstractDialect {
     public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
         Page page = getLocalPage();
         return page.isCount();
+    }
+
+    @Override
+    public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
+        Page<Object> page = getLocalPage();
+        String countColumn = page.getCountColumn();
+        if (StringUtil.isNotEmpty(countColumn)) {
+            return countSqlParser.getSmartCountSql(boundSql.getSql(), countColumn);
+        }
+        return countSqlParser.getSmartCountSql(boundSql.getSql());
     }
 
     @Override

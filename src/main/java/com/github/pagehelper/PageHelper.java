@@ -29,6 +29,7 @@ import com.github.pagehelper.page.PageAutoDialect;
 import com.github.pagehelper.page.PageMethod;
 import com.github.pagehelper.page.PageParams;
 import com.github.pagehelper.util.MSUtils;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -57,6 +58,10 @@ public class PageHelper extends PageMethod implements Dialect {
         if (page == null) {
             return true;
         } else {
+            //设置默认的 count 列
+            if(StringUtil.isEmpty(page.getCountColumn())){
+                page.setCountColumn(pageParams.getCountColumn());
+            }
             autoDialect.initDelegateDialect(ms);
             return false;
         }

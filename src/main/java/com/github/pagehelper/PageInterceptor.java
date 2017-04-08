@@ -102,6 +102,7 @@ public class PageInterceptor implements Interceptor {
                     }
                     //调用方言获取 count sql
                     String countSql = dialect.getCountSql(ms, boundSql, parameter, rowBounds, countKey);
+                    countKey.update(countSql);
                     BoundSql countBoundSql = new BoundSql(ms.getConfiguration(), countSql, boundSql.getParameterMappings(), parameter);
                     //当使用动态 SQL 时，可能会产生临时的参数，这些参数需要手动设置到新的 BoundSql 中
                     for (String key : additionalParameters.keySet()) {
@@ -148,6 +149,8 @@ public class PageInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
+        //TODO Spring bean 方式配置时，如果没有配置属性就不会执行下面的 setProperties 方法，就不会初始化，因此考虑在这个方法中做一次判断和初始化
+        //TODO https://github.com/pagehelper/Mybatis-PageHelper/issues/26
         return Plugin.wrap(target, this);
     }
 
