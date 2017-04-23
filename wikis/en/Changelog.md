@@ -1,5 +1,11 @@
 ## Changelog
 
+### 5.0.1 - 2017-04-23
+- Add the new parameter `countColumn` used to configure the automatic count column, the default value `0`, that is, `count(0).
+- The `Page` class is also added with the `countColumn` parameter, which can be configured for a specific query.
+- Modify the document display problem, by liumian* [PR #30](https://github.com/pagehelper/Mybatis-PageHelper/pull/30)
+- Resolved sqlserver2012 paging error [42](https://github.com/pagehelper/Mybatis-PageHelper/issues/42)
+
 ### 5.0.0 - 2017-01-02
 
 - Use Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) to handle paging logic
