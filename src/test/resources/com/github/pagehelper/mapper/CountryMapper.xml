@@ -301,4 +301,13 @@
     <select id="execute" resultType="map">
         ${sql}
     </select>
+    
+    <resultMap id="collectionMap" type="com.github.pagehelper.model.Country">
+        <id column="id" property="id"/>
+        <collection property="countries" column="countryname" ofType="com.github.pagehelper.model.Country" select="selectAll"/>
+    </resultMap>
+    
+    <select id="selectCollectionMap" resultMap="collectionMap">
+        select * from country
+    </select>
 </mapper>

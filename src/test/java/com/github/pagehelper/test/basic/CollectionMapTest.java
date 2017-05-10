@@ -22,54 +22,35 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.model;
+package com.github.pagehelper.test.basic;
 
-import java.io.Serializable;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.mapper.CountryMapper;
+import com.github.pagehelper.model.Country;
+import com.github.pagehelper.util.MybatisHelper;
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.junit.Test;
+
 import java.util.List;
 
-/**
- * Description: Country
- * Author: liuzh
- * Update: liuzh(2014-06-06 13:38)
- */
-public class Country implements Serializable {
-    private static final long serialVersionUID = 6569081236403751407L;
+import static org.junit.Assert.assertEquals;
 
-    private int id;
-    private String countryname;
-    private String countrycode;
+public class CollectionMapTest {
 
-    List<Country> countries;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getCountryname() {
-        return countryname;
-    }
-
-    public void setCountryname(String countryname) {
-        this.countryname = countryname;
-    }
-
-    public String getCountrycode() {
-        return countrycode;
-    }
-
-    public void setCountrycode(String countrycode) {
-        this.countrycode = countrycode;
-    }
-
-    public List<Country> getCountries() {
-        return countries;
-    }
-
-    public void setCountries(List<Country> countries) {
-        this.countries = countries;
+    @Test
+    public void test() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 5);
+            List<Country> list = countryMapper.selectCollectionMap();
+            assertEquals(5, list.size());
+            assertEquals(183, ((Page<?>) list).getTotal());
+        } finally {
+            sqlSession.close();
+        }
     }
 }
