@@ -125,7 +125,7 @@ public class PageInfo<T> implements Serializable {
             this.pageNum = 1;
             this.pageSize = list.size();
 
-            this.pages = 1;
+            this.pages = this.pageSize > 0 ? 1 : 0;
             this.list = list;
             this.size = list.size();
             this.total = list.size();
@@ -200,7 +200,7 @@ public class PageInfo<T> implements Serializable {
      */
     private void judgePageBoudary() {
         isFirstPage = pageNum == 1;
-        isLastPage = pageNum == pages;
+        isLastPage = pageNum == pages || pages == 0;;
         hasPreviousPage = pageNum > 1;
         hasNextPage = pageNum < pages;
     }
