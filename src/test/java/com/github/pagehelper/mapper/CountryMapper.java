@@ -24,9 +24,7 @@
 
 package com.github.pagehelper.mapper;
 
-import com.github.pagehelper.model.Country;
-import com.github.pagehelper.model.CountryExample;
-import com.github.pagehelper.model.CountryQueryModel;
+import com.github.pagehelper.model.*;
 import com.github.pagehelper.test.basic.dynamic.Where;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -127,4 +125,6 @@ public interface CountryMapper {
     List<Country> selectByIdList2(@Param("idList") List<Long> idList);
 
     List<Map<String, Object>> execute(@Param("sql") String sql);
+
+    List<CountryCode> selectByCode(Code code);
 }
