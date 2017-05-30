@@ -304,7 +304,7 @@
     
     <resultMap id="collectionMap" type="com.github.pagehelper.model.Country">
         <id column="id" property="id"/>
-        <collection property="countries" column="countryname" ofType="com.github.pagehelper.model.Country" select="selectAll"/>
+        <collection property="countries" column="{id=id}" ofType="com.github.pagehelper.model.Country" select="selectGreterThanId"/>
     </resultMap>
     
     <select id="selectCollectionMap" resultMap="collectionMap">

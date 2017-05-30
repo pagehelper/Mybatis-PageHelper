@@ -46,9 +46,13 @@ public class CollectionMapTest {
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 5);
-            List<Country> list = countryMapper.selectCollectionMap();
-            assertEquals(5, list.size());
-            assertEquals(183, ((Page<?>) list).getTotal());
+            List<Country> list1 = countryMapper.selectGreterThanId(1);
+
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 5);
+            List<Country> list2 = countryMapper.selectCollectionMap();
+            assertEquals(5, list2.size());
+            assertEquals(183, ((Page<?>) list2).getTotal());
         } finally {
             sqlSession.close();
         }
