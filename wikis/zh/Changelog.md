@@ -1,9 +1,13 @@
 ## 更新日志
 
+### 5.0.2-beta2 - 2017-05-30
+
+- `Page<E>` 继承 `Closeable` 接口，在 JDK7+中可以使用 `try()`方式调用，自动调用`PageHelper.clearPage();`[#58](https://github.com/pagehelper/Mybatis-PageHelper/issues/58)。
+
 ### 5.0.2-beta - 2017-05-10
 
-- 解决：DB2分页时必须要指定子查询的别名,不然会发生异常 #52
-- 解决：分页取数据时，如果数据一条都没有返回, pageInfo.isIsLastPage(); 返回false #50
+- 解决：DB2分页时必须要指定子查询的别名,不然会发生异常 [#52](https://github.com/pagehelper/Mybatis-PageHelper/issues/52)
+- 解决：分页取数据时，如果数据一条都没有返回, pageInfo.isIsLastPage(); 返回false [#50](https://github.com/pagehelper/Mybatis-PageHelper/issues/50)
 
 ### 5.0.1 - 2017-04-23
 
