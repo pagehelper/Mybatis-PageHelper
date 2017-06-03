@@ -1,5 +1,8 @@
 # MyBatis Pagination - PageHelper
 
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper)
+[![Dependency Status](https://www.versioneye.com/user/projects/5932123f22f278003c5f851e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5932123f22f278003c5f851e)
+
 [中文版文档](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/README_zh.md)
 
 If you are using MyBatis, it is recommended to try this pagination plugin. 
@@ -43,7 +46,7 @@ If you are using Maven just add the following dependency to your pom.xml:
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>5.0.1</version>
+    <version>5.0.2</version>
 </dependency>
 ```  
 

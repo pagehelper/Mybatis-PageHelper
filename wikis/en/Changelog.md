@@ -1,5 +1,12 @@
 ## Changelog
 
+### 5.0.2 - 2017-05-30
+
+- `Page<E>` implements `Closeable` interface, in JDK7+ which can use the in `try ()` call, it will automatically call `PageHelper.clearPage ();`[#58](https://github.com/pagehelper/Mybatis-PageHelper/issues/58)。
+- fixed: DB2 paging must be specified sub-query alias, or an exception will occur [#52](https://github.com/pagehelper/Mybatis-PageHelper/issues/52)
+- fixed：if `page.size() == 0` then `pageInfo.isIsLastPage()` is `false` [#50](https://github.com/pagehelper/Mybatis-PageHelper/issues/50)
+
+
 ### 5.0.1 - 2017-04-23
 - Add the new parameter `countColumn` used to configure the automatic count column, the default value `0`, that is, `count(0).
 - The `Page` class is also added with the `countColumn` parameter, which can be configured for a specific query.
