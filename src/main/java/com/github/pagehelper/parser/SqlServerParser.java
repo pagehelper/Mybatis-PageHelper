@@ -74,7 +74,8 @@ public class SqlServerParser {
     //静态方法处理
     static {
         TOP100_PERCENT = new Top();
-        TOP100_PERCENT.setRowCount(100);
+        TOP100_PERCENT.setExpression(new LongValue(100));
+        TOP100_PERCENT.setPercentage(true);
         TOP100_PERCENT.setPercentage(true);
     }
 
@@ -161,7 +162,7 @@ public class SqlServerParser {
         PlainSelect newSelectBody = new PlainSelect();
         //设置top
         Top top = new Top();
-        top.setRowCount(Long.MAX_VALUE);
+        top.setExpression(new LongValue(Long.MAX_VALUE));
         newSelectBody.setTop(top);
         //设置order by
         List<OrderByElement> orderByElements = new ArrayList<OrderByElement>();

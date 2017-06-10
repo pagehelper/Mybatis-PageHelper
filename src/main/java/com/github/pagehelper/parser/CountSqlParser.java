@@ -49,12 +49,6 @@ public class CountSqlParser {
         TABLE_ALIAS.setUseAs(false);
     }
 
-    public void isSupportedSql(String sql) {
-        if (sql.trim().toUpperCase().endsWith("FOR UPDATE")) {
-            throw new PageException("分页插件不支持包含for update的sql");
-        }
-    }
-
     /**
      * 获取智能的countSql
      *
@@ -73,12 +67,10 @@ public class CountSqlParser {
      * @return
      */
     public String getSmartCountSql(String sql, String name) {
-        //校验是否支持该sql
-        isSupportedSql(sql);
         //解析SQL
         Statement stmt = null;
         //特殊sql不需要去掉order by时，使用注释前缀
-        if (sql.indexOf(KEEP_ORDERBY) >= 0) {
+        if(sql.indexOf(KEEP_ORDERBY) >= 0){
             return getSimpleCountSql(sql);
         }
         try {
@@ -121,7 +113,6 @@ public class CountSqlParser {
      * @return 返回count查询sql
      */
     public String getSimpleCountSql(final String sql, String name) {
-        isSupportedSql(sql);
         StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
         stringBuilder.append("select count(");
         stringBuilder.append(name);
