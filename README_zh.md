@@ -45,7 +45,7 @@
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>5.0.2</version>
+    <version>最新版本</version>
 </dependency>
 ```  
 

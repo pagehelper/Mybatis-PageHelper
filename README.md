@@ -47,7 +47,7 @@ If you are using Maven just add the following dependency to your pom.xml:
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>5.0.2</version>
+    <version>latest version</version>
 </dependency>
 ```  
 

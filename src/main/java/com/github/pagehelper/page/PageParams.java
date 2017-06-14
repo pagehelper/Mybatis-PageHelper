@@ -69,7 +69,7 @@ public class PageParams {
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
                 }
-            } else {
+            } else if(supportMethodsArguments){
                 try {
                     page = PageObjectUtil.getPageFromObject(parameterObject, false);
                 } catch (Exception e) {

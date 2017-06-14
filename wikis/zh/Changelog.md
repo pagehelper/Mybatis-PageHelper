@@ -1,5 +1,9 @@
 ## 更新日志
 
+### 5.0.3-beta -2017-06-14
+
+- 解决`supportMethodsArguments`参数不起作用的问题，由于之前默认为`false`，不起作用后效果为`true`，建议升级到最新版本。
+
 ### 5.0.2 - 2017-05-30
 
 - `Page<E>` 继承 `Closeable` 接口，在 JDK7+中可以使用 `try()`方式调用，自动调用`PageHelper.clearPage();`[#58](https://github.com/pagehelper/Mybatis-PageHelper/issues/58)。
