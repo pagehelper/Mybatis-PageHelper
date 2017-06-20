@@ -1,5 +1,9 @@
 ## Changelog
 
+### 5.0.3 -2017-06-20
+
+- Solve the `supportMethodsArguments` parameter problem. It is recommended to upgrade to the latest version.
+
 ### 5.0.2 - 2017-05-30
 
 - `Page<E>` implements `Closeable` interface, in JDK7+ which can use the in `try ()` call, it will automatically call `PageHelper.clearPage ();`[#58](https://github.com/pagehelper/Mybatis-PageHelper/issues/58)。
