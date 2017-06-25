@@ -12,6 +12,13 @@
 
 想要使用分页插件？请看[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)。
 
+## 新书《MyBatis 从入门到精通》
+
+![MyBatis 从入门到精通](https://github.com/mybatis-book/book/raw/master/book.png)
+
+预售地址：[京东](https://item.jd.com/12103309.html)，[当当](http://product.dangdang.com/25098208.html)，[亚马逊](https://www.amazon.cn/MyBatis从入门到精通-刘增辉/dp/B072RC11DM/ref=sr_1_18?ie=UTF8&qid=1498007125&sr=8-18&keywords=mybatis)
+
+
 ## 支持 [MyBatis 3.1.0+](https://github.com/mybatis/mybatis-3)
 ## 物理分页
 
