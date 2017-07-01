@@ -41,13 +41,14 @@ public class MSUtils {
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
     /**
-     * 新建count查询和分页查询的MappedStatement
+     * 新建count查询的MappedStatement
      *
      * @param ms
+     * @param newMsId
      * @return
      */
-    public static MappedStatement newCountMappedStatement(MappedStatement ms) {
-        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + COUNT, ms.getSqlSource(), ms.getSqlCommandType());
+    public static MappedStatement newCountMappedStatement(MappedStatement ms, String newMsId) {
+        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), newMsId, ms.getSqlSource(), ms.getSqlCommandType());
         builder.resource(ms.getResource());
         builder.fetchSize(ms.getFetchSize());
         builder.statementType(ms.getStatementType());
@@ -73,5 +74,15 @@ public class MSUtils {
         builder.useCache(ms.isUseCache());
 
         return builder.build();
+    }
+
+    /**
+     * 新建count查询的MappedStatement
+     *
+     * @param ms
+     * @return
+     */
+    public static MappedStatement newCountMappedStatement(MappedStatement ms) {
+        return newCountMappedStatement(ms, ms.getId() + COUNT);
     }
 }
