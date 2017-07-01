@@ -1,5 +1,48 @@
 ## 更新日志
 
+### 5.0.4-beta - 2017-07-01
+
+- count 查询的缓存 `msCountMap` key 改为 `String` 类型，key 为 count 查询的 `MappedStatement` 的 id（下面简称 msId）。
+- 增加 `countSuffix` count 查询后缀配置参数，该参数是针对 `PageInterceptor` 配置的，默认值为 `_COUNT`。
+- 增加手写 count 查询支持，详情看下面介绍。
+
+#### 增加手写 count 查询支持
+增加 `countSuffix` count 查询后缀配置参数，该参数是针对 `PageInterceptor` 配置的，默认值为 `_COUNT`。
+分页插件会优先通过当前查询的 msId + `countSuffix` 查找手写的分页查询。
+如果存在就使用手写的 count 查询，如果不存在，仍然使用之前的方式自动创建 count 查询。
+
+例如，如果存在下面两个查询：
+```xml
+<select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
+    select a.id,b.countryname,a.countrycode from country a
+    left join country b on a.id = b.id
+    order by a.id
+</select>
+<select id="selectLeftjoin_COUNT" resultType="Long">
+    select count(distinct a.id) from country a
+    left join country b on a.id = b.id
+</select>
+```
+上面的 `countSuffix` 使用的默认值 `_COUNT`，分页插件会自动获取到 `selectLeftjoin_COUNT` 查询，这个查询需要自己保证结果数正确。
+返回值的类型必须是`resultType="Long"`，入参使用的和 `selectLeftjoin` 查询相同的参数，所以在 SQL 中要按照 `selectLeftjoin` 的入参来使用。
+因为 `selectLeftjoin_COUNT` 方法是自动调用的，所以不需要在接口提供相应的方法，如果需要单独调用，也可以提供。
+
+上面方法执行输出的部分日志如下：
+```
+DEBUG [main] - ==>  Preparing: select count(distinct a.id) from country a left join country b on a.id = b.id 
+DEBUG [main] - ==> Parameters: 
+TRACE [main] - <==    Columns: C1
+TRACE [main] - <==        Row: 183
+DEBUG [main] - <==      Total: 1
+DEBUG [main] - Cache Hit Ratio [com.github.pagehelper.mapper.CountryMapper]: 0.0
+DEBUG [main] - ==>  Preparing: select a.id,b.countryname,a.countrycode from country a left join country b on a.id = b.id order by a.id LIMIT 10 
+DEBUG [main] - ==> Parameters: 
+TRACE [main] - <==    Columns: ID, COUNTRYNAME, COUNTRYCODE
+TRACE [main] - <==        Row: 1, Angola, AO
+TRACE [main] - <==        Row: 2, Afghanistan, AF
+TRACE [main] - <==        Row: 3, Albania, AL
+```
+
 ### 5.0.3 -2017-06-20
 
 - 解决`supportMethodsArguments`参数不起作用的问题，由于之前默认为`false`，不起作用后效果为`true`，建议升级到最新版本。
