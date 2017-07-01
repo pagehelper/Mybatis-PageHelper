@@ -32,26 +32,47 @@
     <select id="selectAll" resultType="Country">
         select * from country order by id
     </select>
+    <select id="selectAll_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
 
     <select id="selectGreterThanId" resultType="Country">
         select * from country where id &gt;#{id} order by id
+    </select>
+    <select id="selectGreterThanId_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where id &gt;#{id}
     </select>
 
     <select id="selectGreterThanIdAndNotEquelContryname" resultType="Country">
         select a.* from country a left join country b on a.id = b.id where a.id &gt;#{id} and b.countryname &lt;&gt;
         #{countryname} order by a.id
     </select>
+    <select id="selectGreterThanIdAndNotEquelContryname_TESTCOUNT" resultType="Long">
+        select count(distinct a.id) from country a left join country b on a.id = b.id where a.id &gt;#{id} and b.countryname &lt;&gt;
+        #{countryname}
+    </select>
 
     <select id="selectAllOrderby" resultType="com.github.pagehelper.model.Country">
         select * from country order by countrycode desc
+    </select>
+    <select id="selectAllOrderby_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
     </select>
 
     <select id="selectAllOrderByParams" resultType="com.github.pagehelper.model.Country">
         select * from country order by ${order1} desc,${order2} asc
     </select>
+    <select id="selectAllOrderByParams_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
+
     <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.Country">
         select * from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2} order by id
     </select>
+    <select id="selectAllOrderByMap_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2}
+    </select>
+
     <select id="selectAllOrderByList" resultType="com.github.pagehelper.model.Country">
         select * from country where id not in
         <foreach collection="list" item="par" separator="," open="(" close=")">
@@ -59,6 +80,13 @@
         </foreach>
         order by id
     </select>
+    <select id="selectAllOrderByList_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where id not in
+        <foreach collection="list" item="par" separator="," open="(" close=")">
+            #{par}
+        </foreach>
+    </select>
+
     <select id="selectAllOrderByArray" resultType="com.github.pagehelper.model.Country">
         select * from country where id not in
         <foreach collection="array" item="par" separator="," open="(" close=")">
@@ -66,6 +94,13 @@
         </foreach>
         order by id
     </select>
+    <select id="selectAllOrderByArray_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where id not in
+        <foreach collection="array" item="par" separator="," open="(" close=")">
+            #{par}
+        </foreach>
+    </select>
+
     <select id="selectIf" resultType="com.github.pagehelper.model.Country">
         select * from country
         <if test="@Ognl@isNotNull(id)">
@@ -74,6 +109,14 @@
         </if>
         order by id
     </select>
+    <select id="selectIf_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+        <if test="@Ognl@isNotNull(id)">
+            <!--<if test="id!=null">-->
+            where id &gt; #{id}
+        </if>
+    </select>
+
     <select id="selectIf3" parameterType="Country" resultType="com.github.pagehelper.model.Country">
         select * from country
         <if test="id > 0">
@@ -81,12 +124,26 @@
         </if>
         order by id
     </select>
+    <select id="selectIf3_TESTCOUNT" parameterType="Country" resultType="Long">
+        select count(distinct id) from country
+        <if test="id > 0">
+            where id &gt; #{id}
+        </if>
+    </select>
+
     <select id="selectIf2" resultType="com.github.pagehelper.model.Country">
         select * from country where id &gt; #{id1}
         <if test="id2!=null">
             and id &gt; #{id2}
         </if>
     </select>
+    <select id="selectIf2_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where id &gt; #{id1}
+        <if test="id2!=null">
+            and id &gt; #{id2}
+        </if>
+    </select>
+
     <select id="selectIf2List" resultType="com.github.pagehelper.model.Country">
         select * from country
         <where>
@@ -105,6 +162,24 @@
         </where>
         order by id
     </select>
+    <select id="selectIf2List_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+        <where>
+            <if test="id1!=null and id1.size>0">
+                id not in
+                <foreach collection="id1" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="id2!=null and id2.size>0">
+                and id not in
+                <foreach collection="id2" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <select id="selectIf2ListAndOrder" resultType="com.github.pagehelper.model.Country">
         select * from country
         <where>
@@ -128,6 +203,24 @@
             order by id
         </if>
     </select>
+    <select id="selectIf2ListAndOrder_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+        <where>
+            <if test="id1!=null and id1.size>0">
+                id not in
+                <foreach collection="id1" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="id2!=null and id2.size>0">
+                and id not in
+                <foreach collection="id2" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <select id="selectChoose" resultType="com.github.pagehelper.model.Country">
         select * from country
         <where>
@@ -142,6 +235,20 @@
         </where>
         order by id
     </select>
+    <select id="selectChoose_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+        <where>
+            <choose>
+                <when test="id1!=null">
+                    id &lt;&gt; #{id1}
+                </when>
+                <otherwise>
+                    and id &lt;&gt; #{id2}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
     <select id="selectLike" resultType="com.github.pagehelper.model.Country">
         select * from country where 1=1
         <if test="countryname!=null and countryname!=''">
@@ -149,6 +256,13 @@
         </if>
         order by id
     </select>
+    <select id="selectLike_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where 1=1
+        <if test="countryname!=null and countryname!=''">
+            and lower(countryname) like '%${countryname}%'
+        </if>
+    </select>
+
     <select id="selectByMap" resultType="com.github.pagehelper.model.Country">
         select * from country where 1=1
         <if test="countryname!=null and countryname !=''">
@@ -158,8 +272,21 @@
             and countrycode= #{countrycode}
         </if>
     </select>
+    <select id="selectByMap_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where 1=1
+        <if test="countryname!=null and countryname !=''">
+            and countryname= #{countryname}
+        </if>
+        <if test="countrycode!=null and countrycode !=''">
+            and countrycode= #{countrycode}
+        </if>
+    </select>
+
     <select id="selectByOrder2" resultType="com.github.pagehelper.model.Country">
         select * from country order by ${order}
+    </select>
+    <select id="selectByOrder2_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
     </select>
 
     <select id="selectUnion" resultType="com.github.pagehelper.model.Country">
@@ -167,14 +294,29 @@
         union
         select id,countryname,countrycode from country where id &lt;=10 order by id
     </select>
+    <select id="selectUnion_TESTCOUNT" resultType="Long">
+        select count(distinct id) from (
+        select id,countryname,countrycode from country where id &gt;180
+        union
+        select id,countryname,countrycode from country where id &lt;=10) temp
+    </select>
+
     <select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
         select a.id,b.countryname,a.countrycode from country a
         left join country b on a.id = b.id
         order by a.id
     </select>
+    <select id="selectLeftjoin_TESTCOUNT" resultType="Long">
+        select count(distinct a.id) from country a
+        left join country b on a.id = b.id
+    </select>
+
     <select id="selectWith" resultType="com.github.pagehelper.model.Country">
         with rs as (select id from country where id>150) select * from country where id in (select * from rs) order by
         id
+    </select>
+    <select id="selectWith_TESTCOUNT" resultType="Long">
+        with rs as (select id from country where id>150) select count(distinct id) from country where id in (select * from rs)
     </select>
 
     <!--select column中包含参数时-->
@@ -190,14 +332,28 @@
         </if>
         from country order by id
     </select>
+    <!--select column中包含参数时-->
+    <select id="selectColumns_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
+
     <select id="selectMULId" resultType="com.github.pagehelper.model.Country">
         select id * #{mul} as id,countryname,countrycode from country order by id
+    </select>
+    <select id="selectMULId_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
     </select>
 
     <select id="selectGroupBy" resultType="com.github.pagehelper.model.Country">
         /*keep orderby*/select countryname,countrycode,count(id) id from country
         group by countryname,countrycode
         order by countryname,countrycode
+    </select>
+    <select id="selectGroupBy_TESTCOUNT" resultType="Long">
+        select count(distinct countryname) from (
+        select countryname,countrycode,count(id) id from country
+        group by countryname,countrycode
+        order by countryname,countrycode) as temp
     </select>
 
     <select id="selectByWhereMap" resultType="com.github.pagehelper.model.Country">
@@ -208,6 +364,14 @@
             </foreach>
         </where>
         order by id
+    </select>
+    <select id="selectByWhereMap_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+        <where>
+            <foreach collection="map" item="val" index="key" separator="and">
+                ${key} = #{val}
+            </foreach>
+        </where>
     </select>
 
     <sql id="Example_Where_Clause">
@@ -259,30 +423,75 @@
             order by id
         </if>
     </select>
+    <select id="selectByExample_TESTCOUNT" resultType="Long"
+            parameterType="com.github.pagehelper.model.CountryExample">
+        select
+        count(
+        <if test="distinct">
+            distinct
+        </if>
+        Id)
+        from country
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+
     <select id="selectDistinct" resultType="com.github.pagehelper.model.Country">
         select distinct SUBSTR(countryname,1,1) countryname from country
     </select>
+    <select id="selectDistinct_TESTCOUNT" resultType="Long">
+        select count(distinct SUBSTR(countryname,1,1)) from country
+    </select>
+
     <select id="selectExists" resultType="com.github.pagehelper.model.Country">
         select * from country a where exists(select 1 from country b where a.id = b.id and b.id >100)
     </select>
+    <select id="selectExists_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country a where exists(select 1 from country b where a.id = b.id and b.id >100)
+    </select>
+
     <select id="select1" resultType="com.github.pagehelper.model.Country">
         select * from country a where 1=1
         <if test="country!=null and country.countryname !=null and country.countryname!=null">
             and countryname = #{country.countryname}
         </if>
     </select>
+    <select id="select1_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country a where 1=1
+        <if test="country!=null and country.countryname !=null and country.countryname!=null">
+            and countryname = #{country.countryname}
+        </if>
+    </select>
+
     <select id="selectByPageNumSize" resultType="com.github.pagehelper.model.Country">
         select * from country
     </select>
+    <select id="selectByPageNumSize_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
+
     <select id="selectByPageNumSizeOrderBy" resultType="com.github.pagehelper.model.Country">
         select * from country
     </select>
+    <select id="selectByPageNumSizeOrderBy_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
+
     <select id="selectByOrderBy" resultType="com.github.pagehelper.model.Country">
         select * from country
     </select>
+    <select id="selectByOrderBy_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
+
     <select id="selectByQueryModel" resultType="com.github.pagehelper.model.Country">
         select * from country
     </select>
+    <select id="selectByQueryModel_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
+
     <select id="selectByIdList" resultType="com.github.pagehelper.model.Country">
         select * from country
         <if test="idList != null and idList.size()>0">
@@ -292,10 +501,27 @@
             </foreach>
         </if>
     </select>
+    <select id="selectByIdList_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+        <if test="idList != null and idList.size()>0">
+            where id in
+            <foreach collection="idList" item="id" open="(" close=")" separator=",">
+              #{id}
+            </foreach>
+        </if>
+    </select>
+
     <select id="selectByIdList2" resultType="com.github.pagehelper.model.Country">
         <foreach collection="idList" item="id" separator="union all">
             select * from country where id = #{id}
         </foreach>
+    </select>
+    <select id="selectByIdList2_TESTCOUNT" resultType="Long">
+        select count(distinct id) from(
+        <foreach collection="idList" item="id" separator="union all">
+            select * from country where id = #{id}
+        </foreach>
+        ) temp
     </select>
 
     <select id="execute" resultType="map">
@@ -310,6 +536,9 @@
     <select id="selectCollectionMap" resultMap="collectionMap">
         select * from country
     </select>
+    <select id="selectCollectionMap_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country
+    </select>
 
     <resultMap id="codeMap" type="com.github.pagehelper.model.CountryCode">
         <id column="id" property="id"/>
@@ -318,5 +547,8 @@
 
     <select id="selectByCode" resultMap="codeMap">
         select * from country where countrycode = #{code, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+    </select>
+    <select id="selectByCode_TESTCOUNT" resultType="Long">
+        select count(distinct id) from country where countrycode = #{code, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
     </select>
 </mapper>
