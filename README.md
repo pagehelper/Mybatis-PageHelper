@@ -42,6 +42,7 @@ PageHelper supports the following databases:
  10. `H2`
  11. `SqlServer2012`
  12. `Derby`
+ 13. `Phoenix`
 
 ## Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 

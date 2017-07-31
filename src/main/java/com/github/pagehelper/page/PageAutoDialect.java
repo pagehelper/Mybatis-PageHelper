@@ -53,6 +53,7 @@ public class PageAutoDialect {
         dialectAliasMap.put("hsqldb", HsqldbDialect.class);
         dialectAliasMap.put("h2", HsqldbDialect.class);
         dialectAliasMap.put("postgresql", HsqldbDialect.class);
+        dialectAliasMap.put("phoenix", HsqldbDialect.class);
 
         dialectAliasMap.put("mysql", MySqlDialect.class);
         dialectAliasMap.put("mariadb", MySqlDialect.class);
