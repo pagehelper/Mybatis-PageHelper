@@ -389,8 +389,8 @@ public class PageInfo<T> implements Serializable {
         sb.append(", hasPreviousPage=").append(hasPreviousPage);
         sb.append(", hasNextPage=").append(hasNextPage);
         sb.append(", navigatePages=").append(navigatePages);
-        sb.append(", navigateFirstPage").append(navigateFirstPage);
-        sb.append(", navigateLastPage").append(navigateLastPage);
+        sb.append(", navigateFirstPage=").append(navigateFirstPage);
+        sb.append(", navigateLastPage=").append(navigateLastPage);
         sb.append(", navigatepageNums=");
         if (navigatepageNums == null) sb.append("null");
         else {
