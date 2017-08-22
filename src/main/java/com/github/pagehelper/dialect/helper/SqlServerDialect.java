@@ -35,6 +35,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.RowBounds;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -62,6 +63,11 @@ public class SqlServerDialect extends AbstractHelperDialect {
         cacheSql = cacheSql.replaceAll(WITHNOLOCK, " with(nolock)");
         CACHE_COUNTSQL.put(sql, cacheSql);
         return cacheSql;
+    }
+
+    @Override
+    public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
+        return paramMap;
     }
 
     @Override

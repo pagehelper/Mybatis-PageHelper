@@ -65,4 +65,25 @@ public class TestLike {
             sqlSession.close();
         }
     }
+
+    /**
+     * 使用Mapper接口调用时，使用PageHelper.startPage效果更好，不需要添加Mapper接口参数
+     */
+    @Test
+    public void testMapperWithStartPage_OrderBy() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.orderBy("id desc");
+            Country country = new Country();
+            country.setCountryname("c");
+            List<Country> list = countryMapper.selectLike(country);
+            assertEquals(30, list.get(0).getId());
+            assertEquals(39, list.size());
+            assertEquals(39, ((Page<?>) list).getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

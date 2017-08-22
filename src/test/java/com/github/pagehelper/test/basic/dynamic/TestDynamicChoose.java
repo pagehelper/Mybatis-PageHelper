@@ -63,4 +63,30 @@ public class TestDynamicChoose {
             sqlSession.close();
         }
     }
+
+    /**
+     * 使用Mapper接口调用时，使用PageHelper.startPage效果更好，不需要添加Mapper接口参数
+     */
+    @Test
+    public void testMapperWithStartPage_OrderBy() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 10, "id desc");
+            List<Country> list = countryMapper.selectChoose(183, 2);
+            assertEquals(182, list.get(0).getId());
+            assertEquals(10, list.size());
+            assertEquals(182, ((Page<?>) list).getTotal());
+
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 10, "id desc");
+            list = countryMapper.selectChoose(183, 2);
+            assertEquals(182, list.get(0).getId());
+            assertEquals(10, list.size());
+            assertEquals(182, ((Page<?>) list).getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

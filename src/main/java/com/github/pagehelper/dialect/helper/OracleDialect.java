@@ -26,12 +26,46 @@ package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
+import com.github.pagehelper.util.MetaObjectUtil;
 import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.reflection.MetaObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author liuzh
  */
 public class OracleDialect extends AbstractHelperDialect {
+
+    @Override
+    public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
+        paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
+        paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+        //处理pageKey
+        pageKey.update(page.getEndRow());
+        pageKey.update(page.getStartRow());
+        //处理参数配置
+        if (boundSql.getParameterMappings() != null) {
+            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+            if (boundSql != null && boundSql.getParameterMappings() != null) {
+                newParameterMappings.addAll(boundSql.getParameterMappings());
+            }
+            if (page.getEndRow() > 0) {
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
+            }
+            if (page.getStartRow() > 0) {
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
+            }
+            MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
+            metaObject.setValue("parameterMappings", newParameterMappings);
+        }
+        return paramMap;
+    }
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
@@ -44,14 +78,10 @@ public class OracleDialect extends AbstractHelperDialect {
         }
         sqlBuilder.append(sql);
         if (page.getEndRow() > 0) {
-            sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ");
-            sqlBuilder.append(page.getEndRow());
-            pageKey.update(page.getEndRow());
+            sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ? ");
         }
         if (page.getStartRow() > 0) {
-            sqlBuilder.append(" ) WHERE ROW_ID > ");
-            sqlBuilder.append(page.getStartRow());
-            pageKey.update(page.getStartRow());
+            sqlBuilder.append(" ) WHERE ROW_ID > ? ");
         }
         return sqlBuilder.toString();
     }

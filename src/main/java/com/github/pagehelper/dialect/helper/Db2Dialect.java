@@ -26,7 +26,16 @@ package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
+import com.github.pagehelper.util.MetaObjectUtil;
 import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.reflection.MetaObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author liuzh
@@ -34,16 +43,32 @@ import org.apache.ibatis.cache.CacheKey;
 public class Db2Dialect extends AbstractHelperDialect {
 
     @Override
-    public String getPageSql(String sql, Page page, CacheKey pageKey) {
-        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
-        sqlBuilder.append("SELECT * FROM (SELECT TMP_PAGE.*,ROWNUMBER() OVER() AS ROW_ID FROM ( ");
-        sqlBuilder.append(sql);
-        sqlBuilder.append(" ) AS TMP_PAGE) TMP_PAGE WHERE ROW_ID BETWEEN ");
-        sqlBuilder.append(page.getStartRow() + 1);
-        sqlBuilder.append(" AND ");
-        sqlBuilder.append(page.getEndRow());
+    public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
+        paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow() + 1);
+        paramMap.put(PAGEPARAMETER_SECOND, page.getEndRow());
+        //处理pageKey
         pageKey.update(page.getStartRow() + 1);
         pageKey.update(page.getEndRow());
+        //处理参数配置
+        if (boundSql.getParameterMappings() != null) {
+            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>();
+            if (boundSql != null && boundSql.getParameterMappings() != null) {
+                newParameterMappings.addAll(boundSql.getParameterMappings());
+            }
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
+            MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
+            metaObject.setValue("parameterMappings", newParameterMappings);
+        }
+        return paramMap;
+    }
+
+    @Override
+    public String getPageSql(String sql, Page page, CacheKey pageKey) {
+        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 140);
+        sqlBuilder.append("SELECT * FROM (SELECT TMP_PAGE.*,ROWNUMBER() OVER() AS ROW_ID FROM ( ");
+        sqlBuilder.append(sql);
+        sqlBuilder.append(" ) AS TMP_PAGE) TMP_PAGE WHERE ROW_ID BETWEEN ? AND ?");
         return sqlBuilder.toString();
     }
 

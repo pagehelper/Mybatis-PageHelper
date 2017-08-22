@@ -74,11 +74,18 @@ public class Page<E> extends ArrayList<E> implements Closeable {
      * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
      */
     private Boolean pageSizeZero;
-
     /**
      * 进行count查询的列名
      */
     private String countColumn;
+    /**
+     * 排序
+     */
+    private String orderBy;
+    /**
+     * 只增加排序
+     */
+    private boolean orderByOnly;
 
     public Page() {
         super();
@@ -222,6 +229,22 @@ public class Page<E> extends ArrayList<E> implements Closeable {
             this.pageSizeZero = pageSizeZero;
         }
         return this;
+    }
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public <E> Page<E> setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+        return (Page<E>) this;
+    }
+
+    public boolean isOrderByOnly() {
+        return orderByOnly;
+    }
+
+    public void setOrderByOnly(boolean orderByOnly) {
+        this.orderByOnly = orderByOnly;
     }
 
     /**

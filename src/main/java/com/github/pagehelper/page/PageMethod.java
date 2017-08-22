@@ -76,6 +76,22 @@ public abstract class PageMethod {
     /**
      * 开始分页
      *
+     * @param params
+     */
+    public static <E> Page<E> startPage(Object params) {
+        Page<E> page = PageObjectUtil.getPageFromObject(params, true);
+        //当已经执行过orderBy的时候
+        Page<E> oldPage = getLocalPage();
+        if (oldPage != null && oldPage.isOrderByOnly()) {
+            page.setOrderBy(oldPage.getOrderBy());
+        }
+        setLocalPage(page);
+        return page;
+    }
+
+    /**
+     * 开始分页
+     *
      * @param pageNum  页码
      * @param pageSize 每页显示数量
      */
@@ -91,7 +107,40 @@ public abstract class PageMethod {
      * @param count    是否进行count查询
      */
     public static <E> Page<E> startPage(int pageNum, int pageSize, boolean count) {
+        return startPage(pageNum, pageSize, count, null, null);
+    }
+
+    /**
+     * 开始分页
+     *
+     * @param pageNum  页码
+     * @param pageSize 每页显示数量
+     * @param orderBy  排序
+     */
+    public static <E> Page<E> startPage(int pageNum, int pageSize, String orderBy) {
+        Page<E> page = startPage(pageNum, pageSize);
+        page.setOrderBy(orderBy);
+        return page;
+    }
+
+    /**
+     * 开始分页
+     *
+     * @param pageNum      页码
+     * @param pageSize     每页显示数量
+     * @param count        是否进行count查询
+     * @param reasonable   分页合理化,null时用默认配置
+     * @param pageSizeZero true且pageSize=0时返回全部结果，false时分页,null时用默认配置
+     */
+    public static <E> Page<E> startPage(int pageNum, int pageSize, boolean count, Boolean reasonable, Boolean pageSizeZero) {
         Page<E> page = new Page<E>(pageNum, pageSize, count);
+        page.setReasonable(reasonable);
+        page.setPageSizeZero(pageSizeZero);
+        //当已经执行过orderBy的时候
+        Page<E> oldPage = getLocalPage();
+        if (oldPage != null && oldPage.isOrderByOnly()) {
+            page.setOrderBy(oldPage.getOrderBy());
+        }
         setLocalPage(page);
         return page;
     }
@@ -115,19 +164,31 @@ public abstract class PageMethod {
      */
     public static <E> Page<E> offsetPage(int offset, int limit, boolean count) {
         Page<E> page = new Page<E>(new int[]{offset, limit}, count);
+        //当已经执行过orderBy的时候
+        Page<E> oldPage = getLocalPage();
+        if (oldPage != null && oldPage.isOrderByOnly()) {
+            page.setOrderBy(oldPage.getOrderBy());
+        }
         setLocalPage(page);
         return page;
     }
 
     /**
-     * 开始分页
+     * 排序
      *
-     * @param params
+     * @param orderBy
      */
-    public static <E> Page<E> startPage(Object params) {
-        Page<E> page = PageObjectUtil.getPageFromObject(params, true);
-        setLocalPage(page);
-        return page;
+    public static void orderBy(String orderBy) {
+        Page<?> page = getLocalPage();
+        if (page != null) {
+            page.setOrderBy(orderBy);
+        } else {
+            page = new Page();
+            page.setOrderBy(orderBy);
+            page.setOrderByOnly(true);
+            setLocalPage(page);
+        }
     }
+
 
 }
