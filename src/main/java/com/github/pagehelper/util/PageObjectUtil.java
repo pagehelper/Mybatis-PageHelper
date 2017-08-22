@@ -55,6 +55,7 @@ public abstract class PageObjectUtil {
         PARAMS.put("pageNum", "pageNum");
         PARAMS.put("pageSize", "pageSize");
         PARAMS.put("count", "countSql");
+        PARAMS.put("orderBy", "orderBy");
         PARAMS.put("reasonable", "reasonable");
         PARAMS.put("pageSizeZero", "pageSizeZero");
     }
@@ -84,10 +85,21 @@ public abstract class PageObjectUtil {
         if (paramsObject == null) {
             throw new PageException("分页查询参数处理失败!");
         }
+        Object orderBy = getParamValue(paramsObject, "orderBy", false);
+        boolean hasOrderBy = false;
+        if (orderBy != null && orderBy.toString().length() > 0) {
+            hasOrderBy = true;
+        }
         try {
             Object _pageNum = getParamValue(paramsObject, "pageNum", required);
             Object _pageSize = getParamValue(paramsObject, "pageSize", required);
             if (_pageNum == null || _pageSize == null) {
+                if(hasOrderBy){
+                    Page page = new Page();
+                    page.setOrderBy(orderBy.toString());
+                    page.setOrderByOnly(true);
+                    return page;
+                }
                 return null;
             }
             pageNum = Integer.parseInt(String.valueOf(_pageNum));
@@ -100,6 +112,10 @@ public abstract class PageObjectUtil {
         Object _count = getParamValue(paramsObject, "count", false);
         if (_count != null) {
             page.setCount(Boolean.valueOf(String.valueOf(_count)));
+        }
+        //排序
+        if (hasOrderBy) {
+            page.setOrderBy(orderBy.toString());
         }
         //分页合理化
         Object reasonable = getParamValue(paramsObject, "reasonable", false);
