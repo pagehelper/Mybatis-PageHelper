@@ -1,5 +1,10 @@
 ## 更新日志
 
+### 5.1.0-beta2 - 2017-08-23
+
+- 增加 `ReplaceSql` 接口用于处理 sqlServer 的 `with(nolock)` 问题，增加了针对性的 `replaceSql` 参数，可选值为 `simple` 和 `regex`，或者是实现了ReplaceSql接口的全限定类名。默认值为
+`simple`，仍然使用原来的方式处理，新的 `regex` 会将如 `table with(nolock)` 处理为 `table_PAGEWITHNOLOCK`。
+
 ### 5.1.0-beta - 2017-08-22
 
 - 增加 4.x 以前版本包含的排序功能，用法一致（PageHelper增加了几个排序相关的方法）。
