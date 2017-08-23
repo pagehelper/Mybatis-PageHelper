@@ -76,7 +76,6 @@ public class SqlServerParser {
         TOP100_PERCENT = new Top();
         TOP100_PERCENT.setExpression(new LongValue(100));
         TOP100_PERCENT.setPercentage(true);
-        TOP100_PERCENT.setPercentage(true);
     }
 
     /**
