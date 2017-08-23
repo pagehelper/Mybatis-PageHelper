@@ -26,6 +26,10 @@ package com.github.pagehelper.sql;
 
 import com.github.pagehelper.parser.CountSqlParser;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import org.junit.Test;
 
 /**
@@ -79,5 +83,28 @@ public class SqlTest {
                 "    AND (\n" +
                 "      Title1 %% ?\n" +
                 "    )\n"));
+    }
+
+    @Test
+    public void testWithNolock(){
+        String sql = "SELECT * FROM A WITH(NOLOCK) INNER JOIN B WITH(NOLOCK) ON A.TypeId = B.Id";
+        System.out.println(sql);
+        sql = sql.replaceAll("((?i)\\s*(\\w?)\\s*with\\s*\\(nolock\\))", " $2_PAGEWITHNOLOCK");
+        System.out.println(sql);
+        //解析SQL
+        Statement stmt = null;
+        try {
+            stmt = CCJSqlParserUtil.parse(sql);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return;
+        }
+        Select select = (Select) stmt;
+        SelectBody selectBody = select.getSelectBody();
+        sql = selectBody.toString();
+
+        sql = sql.replaceAll("\\s*(\\w*?)_PAGEWITHNOLOCK", " $1 WITH(NOLOCK)");
+
+        System.out.println(sql);
     }
 }
