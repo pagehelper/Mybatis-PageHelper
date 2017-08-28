@@ -31,6 +31,7 @@ import org.apache.ibatis.session.RowBounds;
  */
 public class PageRowBounds extends RowBounds {
     private Long total;
+    private Boolean count;
 
     public PageRowBounds(int offset, int limit) {
         super(offset, limit);
@@ -42,5 +43,13 @@ public class PageRowBounds extends RowBounds {
 
     public void setTotal(Long total) {
         this.total = total;
+    }
+
+    public Boolean getCount() {
+        return count;
+    }
+
+    public void setCount(Boolean count) {
+        this.count = count;
     }
 }

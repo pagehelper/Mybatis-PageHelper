@@ -26,6 +26,7 @@ package com.github.pagehelper.page;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageRowBounds;
 import com.github.pagehelper.util.PageObjectUtil;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.session.RowBounds;
@@ -68,6 +69,10 @@ public class PageParams {
                     page = new Page(new int[]{rowBounds.getOffset(), rowBounds.getLimit()}, rowBoundsWithCount);
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
+                }
+                if(rowBounds instanceof PageRowBounds){
+                    PageRowBounds pageRowBounds = (PageRowBounds)rowBounds;
+                    page.setCount(pageRowBounds.getCount() == null || pageRowBounds.getCount());
                 }
             } else if(supportMethodsArguments){
                 try {
