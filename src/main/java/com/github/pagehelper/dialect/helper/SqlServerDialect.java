@@ -30,6 +30,7 @@ import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
+import com.github.pagehelper.dialect.replace.SimpleWithNolockReplaceSql;
 import com.github.pagehelper.parser.SqlServerParser;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
@@ -93,7 +94,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
         super.setProperties(properties);
         String replaceSql = properties.getProperty("replaceSql");
         if(StringUtil.isEmpty(replaceSql) || "simple".equalsIgnoreCase(replaceSql)){
-            this.replaceSql = new RegexWithNolockReplaceSql();
+            this.replaceSql = new SimpleWithNolockReplaceSql();
         } else if("regex".equalsIgnoreCase(replaceSql)){
             this.replaceSql = new RegexWithNolockReplaceSql();
         } else {

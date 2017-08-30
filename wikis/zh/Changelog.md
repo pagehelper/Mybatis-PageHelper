@@ -1,5 +1,12 @@
 ## 更新日志
 
+### 5.1.1 - 2017-08-30
+
+- 此次更新解决的问题只和 SqlServer 2005,2008 有关
+- 解决 `RegexWithNolockReplaceSql` 中正则 `w?` 错误的问题，应该是 `w+`。
+- 解决 `SqlServerDialect` 中没有初始化默认 `SimpleWithNolockReplaceSql` 的错误。
+- `SqlServerRowBoundsDialect` 增加对 `replaceSql` 参数的支持。
+
 ### 5.1.0 - 2017-08-28
 
 - 增加 4.x 以前版本包含的排序功能，用法一致（PageHelper增加了几个排序相关的方法）。
