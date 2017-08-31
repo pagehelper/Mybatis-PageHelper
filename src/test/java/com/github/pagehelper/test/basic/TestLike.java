@@ -79,7 +79,7 @@ public class TestLike {
             Country country = new Country();
             country.setCountryname("c");
             List<Country> list = countryMapper.selectLike(country);
-            assertEquals(30, list.get(0).getId());
+            assertEquals(174, list.get(0).getId());
             assertEquals(39, list.size());
             assertEquals(39, ((Page<?>) list).getTotal());
         } finally {

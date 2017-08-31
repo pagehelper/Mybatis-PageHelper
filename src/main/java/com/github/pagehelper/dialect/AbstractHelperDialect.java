@@ -70,7 +70,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
     @Override
     public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
         Page page = getLocalPage();
-        return page.isCount();
+        return !page.isOrderByOnly() && page.isCount();
     }
 
     @Override
@@ -159,7 +159,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
     @Override
     public boolean beforePage(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
         Page page = getLocalPage();
-        if (page.getPageSize() > 0) {
+        if (page.isOrderByOnly() || page.getPageSize() > 0) {
             return true;
         }
         return false;
@@ -201,6 +201,8 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         if (!page.isCount()) {
             page.setTotal(-1);
         } else if ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0) {
+            page.setTotal(pageList.size());
+        } else if(page.isOrderByOnly()){
             page.setTotal(pageList.size());
         }
         return page;
