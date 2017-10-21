@@ -62,6 +62,8 @@ public class PageAutoDialect {
         dialectAliasMap.put("oracle", OracleDialect.class);
         dialectAliasMap.put("db2", Db2Dialect.class);
         dialectAliasMap.put("informix", InformixDialect.class);
+        //解决 informix-sqli #129，仍然保留上面的
+        dialectAliasMap.put("informix-sqli", InformixDialect.class);
 
         dialectAliasMap.put("sqlserver", SqlServerDialect.class);
         dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
@@ -224,7 +226,7 @@ public class PageAutoDialect {
         //运行时获取数据源
         String runtimeDialect = properties.getProperty("autoRuntimeDialect");
         //1.动态多数据源
-        if (StringUtil.isNotEmpty(runtimeDialect) && runtimeDialect.equalsIgnoreCase("TRUE")) {
+        if (StringUtil.isNotEmpty(runtimeDialect) && "TRUE".equalsIgnoreCase(runtimeDialect)) {
             this.autoDialect = false;
             this.properties = properties;
         }
