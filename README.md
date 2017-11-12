@@ -87,8 +87,6 @@ Blog: http://blog.csdn.net/isea533
 
 Email: abel533@gmail.com  
 
-QQ Group: <a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=7c2f018e4cddc7d4aad04fc312b2d69361a0a896a4f59219a7914953a57bffc2"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="Mybatis工具群(2)" title="Mybatis工具群(2)"></a>
-
 PageHelper on github:https://github.com/pagehelper/Mybatis-PageHelper
 
 PageHelper on gitosc:http://git.oschina.net/free/Mybatis_PageHelper
