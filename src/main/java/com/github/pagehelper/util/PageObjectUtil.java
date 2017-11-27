@@ -42,7 +42,7 @@ public abstract class PageObjectUtil {
     protected static Boolean hasRequest;
     protected static Class<?> requestClass;
     protected static Method getParameterMap;
-    protected static Map<String, String> PARAMS = new HashMap<String, String>(5);
+    protected static Map<String, String> PARAMS = new HashMap<String, String>(5,1);
 
     static {
         try {
