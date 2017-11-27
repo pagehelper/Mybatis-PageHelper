@@ -373,7 +373,7 @@ public class PageInfo<T> implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("PageInfo{");
+        final StringBuilder sb = new StringBuilder("PageInfo{");
         sb.append("pageNum=").append(pageNum);
         sb.append(", pageSize=").append(pageSize);
         sb.append(", size=").append(size);
