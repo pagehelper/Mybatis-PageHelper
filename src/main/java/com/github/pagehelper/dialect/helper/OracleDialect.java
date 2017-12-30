@@ -55,12 +55,8 @@ public class OracleDialect extends AbstractHelperDialect {
             if (boundSql != null && boundSql.getParameterMappings() != null) {
                 newParameterMappings.addAll(boundSql.getParameterMappings());
             }
-            if (page.getEndRow() > 0) {
-                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
-            }
-            if (page.getStartRow() > 0) {
-                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
-            }
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
             MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
             metaObject.setValue("parameterMappings", newParameterMappings);
         }
@@ -70,19 +66,11 @@ public class OracleDialect extends AbstractHelperDialect {
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
-        if (page.getStartRow() > 0) {
-            sqlBuilder.append("SELECT * FROM ( ");
-        }
-        if (page.getEndRow() > 0) {
-            sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( ");
-        }
+        sqlBuilder.append("SELECT * FROM ( ");
+        sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( ");
         sqlBuilder.append(sql);
-        if (page.getEndRow() > 0) {
-            sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ? ");
-        }
-        if (page.getStartRow() > 0) {
-            sqlBuilder.append(" ) WHERE ROW_ID > ? ");
-        }
+        sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ? ");
+        sqlBuilder.append(" ) WHERE ROW_ID > ? ");
         return sqlBuilder.toString();
     }
 
