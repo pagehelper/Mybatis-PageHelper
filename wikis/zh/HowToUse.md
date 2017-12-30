@@ -415,4 +415,6 @@ if(param1 != null){
 
 这两个集成框架集成了 PageHelper 和 [通用 Mapper](https://github.com/abel533/Mapper)。
 
-### 5. Spring Boot 待定
+### 5. Spring Boot 集成示例
+
+- https://github.com/abel533/MyBatis-Spring-Boot
