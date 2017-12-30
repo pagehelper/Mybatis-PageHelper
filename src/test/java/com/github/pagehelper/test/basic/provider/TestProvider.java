@@ -83,4 +83,19 @@ public class TestProvider {
             sqlSession.close();
         }
     }
+
+    @Test
+    public void testCountrySelect() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        Country country = new Country();
+        country.setId(100);
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            PageHelper.startPage(1, 10);
+            List<Map<String, Object>> countryList = countryMapper.selectBySelect();
+            System.out.println(countryList.size());
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

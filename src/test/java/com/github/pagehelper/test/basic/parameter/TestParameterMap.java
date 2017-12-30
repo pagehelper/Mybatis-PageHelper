@@ -52,8 +52,16 @@ public class TestParameterMap {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("order1", 1);
             map.put("order2", 2);
+            map.put("tableName", "country");
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectAllOrderByMap(map);
+            assertEquals(3, list.get(0).getId());
+            assertEquals(10, list.size());
+            assertEquals(181, ((Page<?>) list).getTotal());
+
+            map.put("tableName", "country a");
+            PageHelper.startPage(1, 10);
+            list = countryMapper.selectAllOrderByMap(map);
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(181, ((Page<?>) list).getTotal());

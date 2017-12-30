@@ -47,6 +47,9 @@ public interface CountryMapper {
     @SelectProvider(type = ProviderMethod.class, method = "selectCountry")
     List<Country> selectByCountryProvider(Country country);
 
+    @Select("Select * from country")
+    List<Map<String, Object>> selectBySelect();
+
     List<Country> selectByOrder2(@Param("order") String order);
 
     List<Country> selectAll();

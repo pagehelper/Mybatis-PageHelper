@@ -67,7 +67,7 @@
     </select>
 
     <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.Country">
-        select * from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2} order by id
+        select * from ${tableName} where id &lt;&gt; #{order1} and id &lt;&gt; #{order2} order by id
     </select>
     <select id="selectAllOrderByMap_TESTCOUNT" resultType="Long">
         select count(distinct id) from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2}
