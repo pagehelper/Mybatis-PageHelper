@@ -105,8 +105,8 @@ public class SqlUtil extends BaseSqlUtil implements Constant {
             lock.lock();
             try{
                 if(autoDialect){
-                    autoDialect = false;
                     this.dialect = getDialect(ms);
+                    autoDialect = false;//ensure dialect is set corrected
                 }
             }finally {
                 lock.unlock();
