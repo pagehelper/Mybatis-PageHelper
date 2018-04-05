@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.page;
 
+import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageException;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.dialect.helper.*;
@@ -46,29 +47,33 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PageAutoDialect {
 
-    private static Map<String, Class<?>> dialectAliasMap = new HashMap<String, Class<?>>();
+    private static Map<String, Class<? extends Dialect>> dialectAliasMap = new HashMap<String, Class<? extends Dialect>>();
+
+    public static void registerDialectAlias(String alias, Class<? extends Dialect> dialectClass){
+        dialectAliasMap.put(alias, dialectClass);
+    }
 
     static {
         //注册别名
-        dialectAliasMap.put("hsqldb", HsqldbDialect.class);
-        dialectAliasMap.put("h2", HsqldbDialect.class);
-        dialectAliasMap.put("postgresql", HsqldbDialect.class);
-        dialectAliasMap.put("phoenix", HsqldbDialect.class);
+        registerDialectAlias("hsqldb", HsqldbDialect.class);
+        registerDialectAlias("h2", HsqldbDialect.class);
+        registerDialectAlias("postgresql", HsqldbDialect.class);
+        registerDialectAlias("phoenix", HsqldbDialect.class);
 
-        dialectAliasMap.put("mysql", MySqlDialect.class);
-        dialectAliasMap.put("mariadb", MySqlDialect.class);
-        dialectAliasMap.put("sqlite", MySqlDialect.class);
+        registerDialectAlias("mysql", MySqlDialect.class);
+        registerDialectAlias("mariadb", MySqlDialect.class);
+        registerDialectAlias("sqlite", MySqlDialect.class);
 
-        dialectAliasMap.put("oracle", OracleDialect.class);
-        dialectAliasMap.put("db2", Db2Dialect.class);
-        dialectAliasMap.put("informix", InformixDialect.class);
+        registerDialectAlias("oracle", OracleDialect.class);
+        registerDialectAlias("db2", Db2Dialect.class);
+        registerDialectAlias("informix", InformixDialect.class);
         //解决 informix-sqli #129，仍然保留上面的
-        dialectAliasMap.put("informix-sqli", InformixDialect.class);
+        registerDialectAlias("informix-sqli", InformixDialect.class);
 
-        dialectAliasMap.put("sqlserver", SqlServerDialect.class);
-        dialectAliasMap.put("sqlserver2012", SqlServer2012Dialect.class);
+        registerDialectAlias("sqlserver", SqlServerDialect.class);
+        registerDialectAlias("sqlserver2012", SqlServer2012Dialect.class);
 
-        dialectAliasMap.put("derby", SqlServer2012Dialect.class);
+        registerDialectAlias("derby", SqlServer2012Dialect.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
@@ -220,6 +225,26 @@ public class PageAutoDialect {
         String closeConn = properties.getProperty("closeConn");
         if (StringUtil.isNotEmpty(closeConn)) {
             this.closeConn = Boolean.parseBoolean(closeConn);
+        }
+        String dialectAlias = properties.getProperty("dialectAlias");
+        if (StringUtil.isNotEmpty(dialectAlias)) {
+            String[] alias = dialectAlias.split(";");
+            for (int i = 0; i < alias.length; i++) {
+                String[] kv = alias[i].split("=");
+                if(kv.length != 2){
+                    throw new IllegalArgumentException("dialectAlias 参数配置错误，" +
+                            "请按照 alias1=xx.dialectClass;alias2=dialectClass2 的形式进行配置!");
+                }
+                for (int j = 0; j < kv.length; j++) {
+                    try {
+                        Class<? extends Dialect> diallectClass = (Class<? extends Dialect>) Class.forName(kv[1]);
+                        //允许覆盖已有的实现
+                        registerDialectAlias(kv[0], diallectClass);
+                    } catch (ClassNotFoundException e) {
+                        throw new IllegalArgumentException("请确保 dialectAlias 配置的 Dialect 实现类存在!", e);
+                    }
+                }
+            }
         }
         //指定的 Helper 数据库方言，和  不同
         String dialect = properties.getProperty("helperDialect");
