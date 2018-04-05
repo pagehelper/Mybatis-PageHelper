@@ -124,6 +124,7 @@ public class PageHelper extends PageMethod implements Dialect {
 
     @Override
     public void setProperties(Properties properties) {
+        setStaticProperties(properties);
         pageParams = new PageParams();
         autoDialect = new PageAutoDialect();
         pageParams.setProperties(properties);

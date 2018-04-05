@@ -28,6 +28,8 @@ import com.github.pagehelper.ISelect;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.util.PageObjectUtil;
 
+import java.util.Properties;
+
 /**
  * 基础分页方法
  *
@@ -35,6 +37,7 @@ import com.github.pagehelper.util.PageObjectUtil;
  */
 public abstract class PageMethod {
     protected static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
+    protected static boolean DEFAULT_COUNT = true;
 
     /**
      * 设置 Page 参数
@@ -96,7 +99,7 @@ public abstract class PageMethod {
      * @param pageSize 每页显示数量
      */
     public static <E> Page<E> startPage(int pageNum, int pageSize) {
-        return startPage(pageNum, pageSize, true);
+        return startPage(pageNum, pageSize, DEFAULT_COUNT);
     }
 
     /**
@@ -152,7 +155,7 @@ public abstract class PageMethod {
      * @param limit  每页显示数量
      */
     public static <E> Page<E> offsetPage(int offset, int limit) {
-        return offsetPage(offset, limit, true);
+        return offsetPage(offset, limit, DEFAULT_COUNT);
     }
 
     /**
@@ -190,5 +193,16 @@ public abstract class PageMethod {
         }
     }
 
+    /**
+     * 设置参数
+     *
+     * @param properties 插件属性
+     */
+    protected static void setStaticProperties(Properties properties){
+        //defaultCount，这是一个全局生效的参数，多数据源时也是统一的行为
+        if(properties != null){
+            DEFAULT_COUNT = Boolean.valueOf(properties.getProperty("defaultCount", "true"));
+        }
+    }
 
 }
