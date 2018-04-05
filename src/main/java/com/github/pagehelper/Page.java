@@ -380,7 +380,7 @@ public class Page<E> extends ArrayList<E> implements Closeable {
                 ", pages=" + pages +
                 ", reasonable=" + reasonable +
                 ", pageSizeZero=" + pageSizeZero +
-                '}';
+                '}' + super.toString();
     }
 
     @Override
