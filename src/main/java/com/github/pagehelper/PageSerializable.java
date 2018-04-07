@@ -22,64 +22,58 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.model;
+package com.github.pagehelper;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * Description: Country
- * Author: liuzh
- * Update: liuzh(2014-06-06 13:38)
+ * @author liuzh
  */
-public class Country implements Serializable {
-    private static final long serialVersionUID = 6569081236403751407L;
+public class PageSerializable<T> implements Serializable {
+    private static final long serialVersionUID = 1L;
+    //总记录数
+    protected long    total;
+    //结果集
+    protected List<T> list;
 
-    private int id;
-    private String countryname;
-    private String countrycode;
-
-    List<Country> countries;
-
-    public int getId() {
-        return id;
+    public PageSerializable() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public PageSerializable(List<T> list) {
+        this.list = list;
+        if(list instanceof Page){
+            this.total = ((Page)list).getTotal();
+        } else {
+            this.total = list.size();
+        }
     }
 
-    public String getCountryname() {
-        return countryname;
+    public static <T> PageSerializable<T> of(List<T> list){
+        return new PageSerializable<T>(list);
     }
 
-    public void setCountryname(String countryname) {
-        this.countryname = countryname;
+    public long getTotal() {
+        return total;
     }
 
-    public String getCountrycode() {
-        return countrycode;
+    public void setTotal(long total) {
+        this.total = total;
     }
 
-    public void setCountrycode(String countrycode) {
-        this.countrycode = countrycode;
+    public List<T> getList() {
+        return list;
     }
 
-    public List<Country> getCountries() {
-        return countries;
-    }
-
-    public void setCountries(List<Country> countries) {
-        this.countries = countries;
+    public void setList(List<T> list) {
+        this.list = list;
     }
 
     @Override
     public String toString() {
-        return "Country{" +
-                "id=" + id +
-                ", countryname='" + countryname + '\'' +
-                ", countrycode='" + countrycode + '\'' +
-                ", countries=" + countries +
+        return "PageSerializable{" +
+                "total=" + total +
+                ", list=" + list +
                 '}';
     }
 }

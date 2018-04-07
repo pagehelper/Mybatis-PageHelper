@@ -55,6 +55,7 @@
                  也可以通过参数 sqlCacheClass 指定自己的实现类 -->
             <property name="sqlCacheClass" value="com.github.pagehelper.cache.SimpleCache"/>
             <property name="countColumn" value="1"/>
+            <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
         </plugin>
     </plugins>
 

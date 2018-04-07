@@ -332,15 +332,14 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         return this;
     }
 
-
-    /**
-     * 转换为PageInfo
-     *
-     * @return
-     */
     public PageInfo<E> toPageInfo() {
         PageInfo<E> pageInfo = new PageInfo<E>(this);
         return pageInfo;
+    }
+
+    public PageSerializable<E> toPageSerializable() {
+        PageSerializable<E> serializable = new PageSerializable<E>(this);
+        return serializable;
     }
 
     public <E> Page<E> doSelectPage(ISelect select) {
@@ -351,6 +350,11 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     public <E> PageInfo<E> doSelectPageInfo(ISelect select) {
         select.doSelect();
         return (PageInfo<E>) this.toPageInfo();
+    }
+
+    public <E> PageSerializable<E> doSelectPageSerializable(ISelect select) {
+        select.doSelect();
+        return (PageSerializable<E>) this.toPageSerializable();
     }
 
     public long doCount(ISelect select) {
