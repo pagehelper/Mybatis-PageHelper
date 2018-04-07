@@ -67,6 +67,29 @@ public class SqlTest {
         System.out.println(countSqlParser.getSmartCountSql("select * from (select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
                 "union " +
                 "select * from aa10 where aaa100 = 'AAC031')"));
+
+        System.out.println(countSqlParser.getSmartCountSql("select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email,so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids,so.phone,so.remarks,so.type,so.zip_code from sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) where suo.user_id = ? group by so.id LIMIT ? "));
+    }
+
+
+    @Test
+    public void testSqlParser11() throws JSQLParserException {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql(
+                "select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email," +
+                        "so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids," +
+                        "so.phone,so.remarks,so.type,so.zip_code " +
+                        "from sys_organization so " +
+                        "LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) " +
+                        "where suo.user_id = ? group by so.id LIMIT ? "));
+
+        System.out.println(countSqlParser.getSmartCountSql(
+                "select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email," +
+                        "so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids," +
+                        "so.phone,so.remarks,so.type,so.zip_code " +
+                        "from sys_organization so " +
+                        "LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) " +
+                        "where suo.user_id = ?"));
     }
 
     @Test
