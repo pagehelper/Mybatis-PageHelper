@@ -1,5 +1,15 @@
 ## Changelog
 
+### 5.1.3 - 2018-04-07
+
+- `Page` `toString` method adds `super.toString()`. The final output form is `Page{Attribute}[Collection]`.
+- New `defaultCount` parameter is used to control whether to perform count query in the default method without count query. By default, `true` will execute count query. This is a globally valid parameter, and it is a uniform behavior when multiple data sources are used.
+- New `dialogAlias` parameter that allows you to configure aliases for custom implementations. it can be used to automatically obtain corresponding implementations based on JDBC URL. it allows you to overwrite existing implementations in this way. configuration examples are ( Separate multiple configurations with semicolons ):
+  ```xml
+  <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+  ```
+- The new `PageSerializable` class, a simplified version of the `PageInfo` class, is recommended to use or refer to this class when it does not require much information.
+
 ### 5.1.2 - 2017-09-18
 
 - Solve the problem  when using the `PageHelper.orderBy` method alone #110;

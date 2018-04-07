@@ -1,5 +1,15 @@
 ## 更新日志
 
+### 5.1.3 - 2018-04-07
+
+- `Page` 的 `toString` 方法增加 `super.toString()`。最终输出形式如 `Page{属性}[集合]`。
+- 增加 `defaultCount` 参数，用于控制默认不带 count 查询的方法中，是否执行 count 查询，默认 true 会执行 count 查询，这是一个全局生效的参数，多数据源时也是统一的行为。
+- 增加 `dialectAlias` 参数，允许配置自定义实现的 别名，可以用于根据 JDBCURL 自动获取对应实现，允许通过此种方式覆盖已有的实现，配置示例如（多个时分号隔开）： 
+  ```xml
+  <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+  ```
+- 增加 `PageSerializable`，简化版的 `PageInfo` 类，不需要那么多信息时，推荐使用或者参考这个类实现。
+
 ### 5.1.2 - 2017-09-18
 
 - 解决单独使用 `PageHelper.orderBy` 方法时的问题 #110;
