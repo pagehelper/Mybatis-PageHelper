@@ -74,6 +74,8 @@ public class PageAutoDialect {
         registerDialectAlias("sqlserver2012", SqlServer2012Dialect.class);
 
         registerDialectAlias("derby", SqlServer2012Dialect.class);
+        //达梦数据库,https://github.com/mybatis-book/book/issues/43
+        registerDialectAlias("dm", OracleDialect.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
