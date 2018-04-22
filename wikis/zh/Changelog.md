@@ -1,5 +1,9 @@
 ## 更新日志
 
+### 5.1.4 - 2018-04-22
+
+- 默认增加达梦数据库(dm)，可以自动根据 jdbcurl 使用Oracle方式进行分页。如果想换 SqlServer 可以参考 5.1.3 更新日志中的 `dialectAlias` 参数。
+
 ### 5.1.3 - 2018-04-07
 
 - `Page` 的 `toString` 方法增加 `super.toString()`。最终输出形式如 `Page{属性}[集合]`。

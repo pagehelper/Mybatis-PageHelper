@@ -1,5 +1,9 @@
 ## Changelog
 
+### 5.1.4 - 2018-04-22
+
+- Add the DaMeng Database (dm) to page using Oracle. If you want to change SqlServer, you can refer to the `dialectAlias` parameter in the 5.1.3 update log.
+
 ### 5.1.3 - 2018-04-07
 
 - `Page` `toString` method adds `super.toString()`. The final output form is `Page{Attribute}[Collection]`.
