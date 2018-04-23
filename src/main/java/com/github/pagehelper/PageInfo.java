@@ -25,6 +25,7 @@
 package com.github.pagehelper;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -90,7 +91,56 @@ public class PageInfo<T> extends PageSerializable<T> {
     public PageInfo(List<T> list) {
         this(list, 8);
     }
+    /**
+     * 对{@link PageInfo#list}进行转换，转换方式使用function
+     *
+     * @param pageInfo 原pageInfo，用于提取除list以外的所有信息
+     * @param function 转换逻辑
+     */
+    public <F> PageInfo(PageInfo<F> pageInfo, final Function<? super F, ? extends T> function) {
+        setPageInfoFields(pageInfo);
+        List<T> list = new ArrayList<T>();
+        for (F originalItem : pageInfo.getList()) {
+            list.add(function.apply(originalItem));
+        }
+        this.setList(list);
+    }
 
+    /**
+     * 对{@link PageInfo#list}进行转换，直接替换为入参list
+     *
+     * @param pageInfo 原pageInfo，用于提取除list以外的所有信息
+     * @param list 新list
+     */
+    public <F> PageInfo(PageInfo<F> pageInfo, List<T> list) {
+        setPageInfoFields(pageInfo);
+        this.setList(list);
+    }
+
+    /**
+     * 设置除list以外的所有信息
+     *
+     * @param pageInfo 原pageInfo
+     */
+    private <F> void setPageInfoFields(PageInfo<F> pageInfo) {
+        this.setPageNum(pageInfo.getPageNum());
+        this.setPageSize(pageInfo.getPageSize());
+        this.setPages(pageInfo.getPages());
+        this.setSize(pageInfo.getSize());
+        this.setTotal(pageInfo.getTotal());
+        this.setStartRow(pageInfo.getStartRow());
+        this.setEndRow(pageInfo.getEndRow());
+        this.setPrePage(pageInfo.getPrePage());
+        this.setNextPage(pageInfo.getNextPage());
+        this.setIsFirstPage(pageInfo.isIsFirstPage());
+        this.setIsLastPage(pageInfo.isIsLastPage());
+        this.setHasPreviousPage(pageInfo.isHasPreviousPage());
+        this.setHasNextPage(pageInfo.isHasNextPage());
+        this.setNavigatePages(pageInfo.getNavigatePages());
+        this.setNavigatepageNums(pageInfo.getNavigatepageNums());
+        this.setNavigateFirstPage(pageInfo.getNavigateFirstPage());
+        this.setNavigateLastPage(pageInfo.getNavigateLastPage());
+    }
     /**
      * 包装Page对象
      *
