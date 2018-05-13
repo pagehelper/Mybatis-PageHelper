@@ -24,10 +24,7 @@
 
 package com.github.pagehelper.dialect;
 
-import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageRowBounds;
-import com.github.pagehelper.dialect.AbstractDialect;
-import com.github.pagehelper.parser.CountSqlParser;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -50,7 +47,11 @@ public abstract class AbstractRowBoundsDialect extends AbstractDialect {
 
     @Override
     public boolean beforeCount(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        return rowBounds instanceof PageRowBounds;
+        if(rowBounds instanceof PageRowBounds){
+            PageRowBounds pageRowBounds = (PageRowBounds)rowBounds;
+            return pageRowBounds.getCount() == null || pageRowBounds.getCount();
+        }
+        return false;
     }
 
     @Override

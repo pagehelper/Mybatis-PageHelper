@@ -22,34 +22,36 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper;
+package com.github.pagehelper.test.basic;
 
-import org.apache.ibatis.session.RowBounds;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.mapper.CountryMapper;
+import com.github.pagehelper.model.Country;
+import com.github.pagehelper.util.MybatisHelper;
+import org.apache.ibatis.session.SqlSession;
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * @author liuzenghui
- */
-public class PageRowBounds extends RowBounds {
-    private Long total;
-    private Boolean count;
+import java.util.List;
+import java.util.Map;
 
-    public PageRowBounds(int offset, int limit) {
-        super(offset, limit);
-    }
+public class TestExecute {
 
-    public Long getTotal() {
-        return total;
-    }
-
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
-    public Boolean getCount() {
-        return count;
-    }
-
-    public void setCount(Boolean count) {
-        this.count = count;
+    @Test
+    public void test() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 10);
+            List<Map<String, Object>> mapList = countryMapper.execute("select * from country");
+            Assert.assertEquals(10, mapList.size());
+            mapList = countryMapper.execute("select * from country");
+            Assert.assertEquals(183, mapList.size());
+            List<Country> countryList = countryMapper.selectAll();
+            Assert.assertEquals(183, countryList.size());
+        } finally {
+            sqlSession.close();
+        }
     }
 }

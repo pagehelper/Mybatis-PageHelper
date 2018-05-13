@@ -22,34 +22,39 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper;
+package com.github.pagehelper.test.basic;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.mapper.CountryMapper;
+import com.github.pagehelper.model.Country;
+import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.junit.Test;
 
-/**
- * @author liuzenghui
- */
-public class PageRowBounds extends RowBounds {
-    private Long total;
-    private Boolean count;
+import java.util.List;
 
-    public PageRowBounds(int offset, int limit) {
-        super(offset, limit);
-    }
+import static org.junit.Assert.assertEquals;
 
-    public Long getTotal() {
-        return total;
-    }
+public class CollectionMapTest {
 
-    public void setTotal(Long total) {
-        this.total = total;
-    }
+    @Test
+    public void test() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 5);
+            List<Country> list1 = countryMapper.selectGreterThanId(1);
 
-    public Boolean getCount() {
-        return count;
-    }
-
-    public void setCount(Boolean count) {
-        this.count = count;
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 5);
+            List<Country> list2 = countryMapper.selectCollectionMap();
+            assertEquals(5, list2.size());
+            assertEquals(183, ((Page<?>) list2).getTotal());
+        } finally {
+            sqlSession.close();
+        }
     }
 }

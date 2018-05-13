@@ -22,34 +22,30 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper;
-
-import org.apache.ibatis.session.RowBounds;
+package com.github.pagehelper.dialect;
 
 /**
- * @author liuzenghui
+ * 替换和还原 SQL
+ *
+ * @author liuzh
+ * @since 2017/8/23.
  */
-public class PageRowBounds extends RowBounds {
-    private Long total;
-    private Boolean count;
+public interface ReplaceSql {
 
-    public PageRowBounds(int offset, int limit) {
-        super(offset, limit);
-    }
+    /**
+     * 临时替换后用于 jsqlparser 解析
+     *
+     * @param sql
+     * @return
+     */
+    String replace(String sql);
 
-    public Long getTotal() {
-        return total;
-    }
+    /**
+     * 还原经过解析后的 sql
+     *
+     * @param sql
+     * @return
+     */
+    String restore(String sql);
 
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
-    public Boolean getCount() {
-        return count;
-    }
-
-    public void setCount(Boolean count) {
-        this.count = count;
-    }
 }

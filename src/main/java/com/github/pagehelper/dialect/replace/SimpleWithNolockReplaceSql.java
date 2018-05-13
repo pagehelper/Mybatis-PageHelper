@@ -22,34 +22,29 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper;
+package com.github.pagehelper.dialect.replace;
 
-import org.apache.ibatis.session.RowBounds;
+import com.github.pagehelper.dialect.ReplaceSql;
 
 /**
- * @author liuzenghui
+ * 简单处理 with(nolock)
+ *
+ * @author liuzh
+ * @since 2017/8/23.
  */
-public class PageRowBounds extends RowBounds {
-    private Long total;
-    private Boolean count;
+public class SimpleWithNolockReplaceSql implements ReplaceSql {
 
-    public PageRowBounds(int offset, int limit) {
-        super(offset, limit);
+    //with(nolock)
+    protected String WITHNOLOCK = ", PAGEWITHNOLOCK";
+
+    @Override
+    public String replace(String sql) {
+        return sql.replaceAll("((?i)with\\s*\\(nolock\\))", WITHNOLOCK);
     }
 
-    public Long getTotal() {
-        return total;
+    @Override
+    public String restore(String sql) {
+        return sql.replaceAll(WITHNOLOCK, " with(nolock)");
     }
 
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
-    public Boolean getCount() {
-        return count;
-    }
-
-    public void setCount(Boolean count) {
-        this.count = count;
-    }
 }

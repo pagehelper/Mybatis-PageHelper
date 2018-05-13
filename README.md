@@ -1,5 +1,9 @@
 # MyBatis Pagination - PageHelper
 
+[![Build Status](https://travis-ci.org/pagehelper/Mybatis-PageHelper.svg?branch=master)](https://travis-ci.org/pagehelper/Mybatis-PageHelper)
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper)
+[![Dependency Status](https://www.versioneye.com/user/projects/5932123f22f278003c5f851e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5932123f22f278003c5f851e)
+
 [中文版文档](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/README_zh.md)
 
 If you are using MyBatis, it is recommended to try this pagination plugin. 
@@ -10,6 +14,16 @@ Some special cases please see the [**Important note**](https://github.com/pagehe
 
 Want to use PageHelper? 
 Please see [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md).
+
+## 新书《MyBatis 从入门到精通》
+
+![MyBatis 从入门到精通](https://github.com/mybatis-book/book/raw/master/book.png)
+
+预售地址：[京东](https://item.jd.com/12103309.html)，[当当](http://product.dangdang.com/25098208.html)，[亚马逊](https://www.amazon.cn/MyBatis从入门到精通-刘增辉/dp/B072RC11DM/ref=sr_1_18?ie=UTF8&qid=1498007125&sr=8-18&keywords=mybatis)
+
+CSDN博客：http://blog.csdn.net/isea533/article/details/73555400
+
+GitHub项目：https://github.com/mybatis-book/book
 
 ## Support [MyBatis 3.1.0+](https://github.com/mybatis/mybatis-3)
 ## Physical Paging
@@ -28,6 +42,7 @@ PageHelper supports the following databases:
  10. `H2`
  11. `SqlServer2012`
  12. `Derby`
+ 13. `Phoenix`
 
 ## Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 
@@ -43,7 +58,7 @@ If you are using Maven just add the following dependency to your pom.xml:
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>5.0.0</version>
+    <version>latest version</version>
 </dependency>
 ```  
 
@@ -71,8 +86,6 @@ Web: http://www.mybatis.tk
 Blog: http://blog.csdn.net/isea533
 
 Email: abel533@gmail.com  
-
-QQ Group: <a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=29e4cce8ac3c65d14a1dc40c9ba5c8e71304f143f3ad759ac0b05146e0952044"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="MyBatis" title="MyBatis"></a>
 
 PageHelper on github:https://github.com/pagehelper/Mybatis-PageHelper
 

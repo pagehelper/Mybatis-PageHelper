@@ -25,6 +25,7 @@
 package com.github.pagehelper.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Description: Country
@@ -37,6 +38,8 @@ public class Country implements Serializable {
     private int id;
     private String countryname;
     private String countrycode;
+
+    List<Country> countries;
 
     public int getId() {
         return id;
@@ -60,5 +63,23 @@ public class Country implements Serializable {
 
     public void setCountrycode(String countrycode) {
         this.countrycode = countrycode;
+    }
+
+    public List<Country> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<Country> countries) {
+        this.countries = countries;
+    }
+
+    @Override
+    public String toString() {
+        return "Country{" +
+                "id=" + id +
+                ", countryname='" + countryname + '\'' +
+                ", countrycode='" + countrycode + '\'' +
+                ", countries=" + countries +
+                '}';
     }
 }

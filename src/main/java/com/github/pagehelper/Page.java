@@ -24,6 +24,7 @@
 
 package com.github.pagehelper;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ import java.util.List;
  * @version 3.6.0
  *          项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  */
-public class Page<E> extends ArrayList<E> {
+public class Page<E> extends ArrayList<E> implements Closeable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -73,6 +74,18 @@ public class Page<E> extends ArrayList<E> {
      * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
      */
     private Boolean pageSizeZero;
+    /**
+     * 进行count查询的列名
+     */
+    private String countColumn;
+    /**
+     * 排序
+     */
+    private String orderBy;
+    /**
+     * 只增加排序
+     */
+    private boolean orderByOnly;
 
     public Page() {
         super();
@@ -217,6 +230,22 @@ public class Page<E> extends ArrayList<E> {
         }
         return this;
     }
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public <E> Page<E> setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+        return (Page<E>) this;
+    }
+
+    public boolean isOrderByOnly() {
+        return orderByOnly;
+    }
+
+    public void setOrderByOnly(boolean orderByOnly) {
+        this.orderByOnly = orderByOnly;
+    }
 
     /**
      * 计算起止行号
@@ -293,13 +322,24 @@ public class Page<E> extends ArrayList<E> {
     }
 
     /**
-     * 转换为PageInfo
+     * 指定 count 查询列
      *
+     * @param columnName
      * @return
      */
+    public Page<E> countColumn(String columnName) {
+        this.countColumn = columnName;
+        return this;
+    }
+
     public PageInfo<E> toPageInfo() {
         PageInfo<E> pageInfo = new PageInfo<E>(this);
         return pageInfo;
+    }
+
+    public PageSerializable<E> toPageSerializable() {
+        PageSerializable<E> serializable = new PageSerializable<E>(this);
+        return serializable;
     }
 
     public <E> Page<E> doSelectPage(ISelect select) {
@@ -312,11 +352,24 @@ public class Page<E> extends ArrayList<E> {
         return (PageInfo<E>) this.toPageInfo();
     }
 
+    public <E> PageSerializable<E> doSelectPageSerializable(ISelect select) {
+        select.doSelect();
+        return (PageSerializable<E>) this.toPageSerializable();
+    }
+
     public long doCount(ISelect select) {
         this.pageSizeZero = true;
         this.pageSize = 0;
         select.doSelect();
         return this.total;
+    }
+
+    public String getCountColumn() {
+        return countColumn;
+    }
+
+    public void setCountColumn(String countColumn) {
+        this.countColumn = countColumn;
     }
 
     @Override
@@ -331,6 +384,11 @@ public class Page<E> extends ArrayList<E> {
                 ", pages=" + pages +
                 ", reasonable=" + reasonable +
                 ", pageSizeZero=" + pageSizeZero +
-                '}';
+                '}' + super.toString();
+    }
+
+    @Override
+    public void close() {
+        PageHelper.clearPage();
     }
 }

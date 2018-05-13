@@ -22,34 +22,49 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper;
+package com.github.pagehelper.model;
 
-import org.apache.ibatis.session.RowBounds;
+import java.io.Serializable;
+import java.util.List;
 
-/**
- * @author liuzenghui
- */
-public class PageRowBounds extends RowBounds {
-    private Long total;
-    private Boolean count;
+public class CountryCode implements Serializable {
+    private static final long serialVersionUID = 6569081236403751407L;
 
-    public PageRowBounds(int offset, int limit) {
-        super(offset, limit);
+    private int    id;
+    private String countryname;
+    private Code   countrycode;
+
+    List<CountryCode> countries;
+
+    public int getId() {
+        return id;
     }
 
-    public Long getTotal() {
-        return total;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setTotal(Long total) {
-        this.total = total;
+    public String getCountryname() {
+        return countryname;
     }
 
-    public Boolean getCount() {
-        return count;
+    public void setCountryname(String countryname) {
+        this.countryname = countryname;
     }
 
-    public void setCount(Boolean count) {
-        this.count = count;
+    public Code getCountrycode() {
+        return countrycode;
+    }
+
+    public void setCountrycode(Code countrycode) {
+        this.countrycode = countrycode;
+    }
+
+    public List<CountryCode> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<CountryCode> countries) {
+        this.countries = countries;
     }
 }

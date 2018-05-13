@@ -1,6 +1,6 @@
-##HOW TO USE  
+## HOW TO USE  
 
-###1. Installation
+### 1. Installation
 
 To use PageHelper you just need to include the 
 [pagehelper-x.x.x.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 
@@ -15,9 +15,9 @@ If you are using Maven just add the following dependency to your pom.xml:
 </dependency>
 ```
 
-###2. Config PageHelper
+### 2. Config PageHelper
 
-####1. Using in mybatis-config.xml
+#### 1. Using in mybatis-config.xml
 ```xml
 <!-- 
     In the configuration file, 
@@ -35,7 +35,7 @@ If you are using Maven just add the following dependency to your pom.xml:
 	</plugin>
 </plugins>
 ```
-####2. Using in Spring application.xml    
+#### 2. Using in Spring application.xml    
 config `org.mybatis.spring.SqlSessionFactoryBean` as following:
 ```xml
 <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -54,7 +54,7 @@ config `org.mybatis.spring.SqlSessionFactoryBean` as following:
   </property>
 </bean>
 ```   
-####3. PageHelper Parameters  
+#### 3. PageHelper Parameters  
 PageHelper provides several optional parameters, 
 these parameters when used in accordance with the above two examples to configuration.
 
@@ -80,7 +80,7 @@ you need to manually specify for `sqlserver2012`, otherwise it will use the SqlS
 When this parameter is set to `true`, the` offset` parameter in `RowBounds` is used as` pageNum`.
 
 3. `rowBoundsWithCount`: Default value is `false`, When this parameter is set to `true`, 
-PageHelper will execute count query(`PageRowBounds` not affected by this parameter).
+PageHelper will execute count query.
 
 4. `pageSizeZero`: Default value is `false`, When this parameter is set to `true`, 
 if `pageSize=0` or `RowBounds.Limit = 0` will query all the results (the equivalent of a Paged query did not execute, 
@@ -108,34 +108,33 @@ it is possible to automatically recognize pagination of the corresponding dialec
 When you use a runtime dynamic data source or do not set the `helperDialect` property, PageHelper will automatically get the database type, then a database connection is automatically obtained,
 This property is used to set whether to close the connection, the default `true` close. When 'false' is set, It will not close the connection.
 
-####4. How to choose Configure these parameters
+#### 4. How to choose Configure these parameters
 
 Here are a few examples for some of the parameters may be used.
 
-#####Scene 1
+##### Scene 1
 
 If you are still in with a way to call a namespace like iBATIS, you might use `rowBoundsWithCount`.
 If you want to count when the paging query query, you need to set this parameter to `true`.
 
-In addition, another recommended way is to use the `PageRowBounds`, the use of this type as a paging parameter, the query will count the results into `PageRowBounds` in the `total` attribute.
-
-#####Scene 2
+**Note:** `PageRowBounds` also need `true`.
+##### Scene 2
 
 If you are still in with a way to call a namespace like iBATIS, If  you think `RowBounds` in the two parameters` offset, limit` not as good as `pageNum, pageSize` easy to understand.
 You can use the `offsetAsPageNum` parameter, when the parameter is set to `true`, `offset` as `pageNum`, `limit` and `pageSize` mean the same thing.
 
-#####Scene 3
+##### Scene 3
 
 If you feel you have to paginate a page somewhere and you still want to query all the results with control parameters.
 You can configure `pageSizeZero` to` true`,
 After configuration, when `pageSize = 0` or `RowBounds.limit = 0` will query all the results.
 
-#####Scene 4
+##### Scene 4
 
 If you want the user to enter the page number is not in the legal scope (the first page to the last page) to correctly respond to the correct results page,
 Then you can configure `reasonable` to` true`, and if `pageNum <= 0` will query the first page, the `pageNum> pages(total pages)` will query the last page.
 
-#####Scene 5
+##### Scene 5
 
 If you configure dynamic data sources in Spring and connect different types of databases, 
 you can configure `autoRuntimeDialect` to` true`, 
@@ -153,7 +152,7 @@ the database connection will only get once,
 so there is no need to worry about whether this connection will lead to a database error, 
 but also according to the characteristics of the data source to choose whether to close the connection.
 
-###3. How to use in your code
+### 3. How to use in your code
 
 Please note before reading [Important Notice](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
 
@@ -234,7 +233,7 @@ total = PageHelper.count(()->countryMapper.selectLike(country));
 
 Introduced The most common ways.
 
-####1). RowBounds and PageRowBounds
+#### 1). RowBounds and PageRowBounds
 
 ```java
 List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1, 10));
@@ -255,12 +254,12 @@ List<Country> selectAll(RowBounds rowBounds);
 **注意：** 由于默认情况下的 `RowBounds` 无法获取查询总数，分页插件提供了一个继承自 `RowBounds` 的 `PageRowBounds`，这个对象中增加了 `total` 属性，执行分页查询后，可以从该属性得到查询总数。
 
 
-####2). `PageHelper.startPage` 静态方法调用
+#### 2). `PageHelper.startPage` 静态方法调用
 除了 `PageHelper.startPage` 方法外，还提供了类似用法的 `PageHelper.offsetPage` 方法。
 
 在你需要进行分页的 MyBatis 查询方法前调用 `PageHelper.startPage` 静态方法即可，紧跟在这个方法后的第一个**MyBatis 查询方法**会被进行分页。  
 
-#####例一：  
+##### 例一：  
 
 ```java
 //获取第1页，10条内容，默认查询总数count
@@ -273,7 +272,7 @@ assertEquals(10, list.size());
 assertEquals(182, ((Page) list).getTotal());
 ```
 
-#####例二：
+##### 例二：
 ```java
 //request: url?pageNum=1&pageSize=10
 //支持 ServletRequest,Map,POJO 对象，需要配合 params 参数
@@ -294,7 +293,7 @@ assertEquals(1, list2.get(0).getId());
 assertEquals(182, list2.size());
 ```  
 
-#####例三，使用`PageInfo`的用法：  
+##### 例三，使用`PageInfo`的用法：  
 
 ```java
 //获取第1页，10条内容，默认查询总数count
@@ -317,7 +316,7 @@ assertEquals(false, page.isLastPage());
 assertEquals(false, page.isHasPreviousPage());
 assertEquals(true, page.isHasNextPage());
 ```
-####3). 使用参数方式
+#### 3). 使用参数方式
 想要使用参数方式，需要配置 `supportMethodsArguments` 参数为 `true`，同时要配置 `params` 参数。
 例如下面的配置：
 ```xml
@@ -348,17 +347,17 @@ List<Country> selectByPageNumSize(User user);
 注意：`pageNum` 和 `pageSize` 两个属性同时存在才会触发分页操作，在这个前提下，其他的分页参数才会生效。
 
 
-####3). `PageHelper` 安全调用
+#### 3). `PageHelper` 安全调用
 
-#####1. 使用 `RowBounds` 和 `PageRowBounds` 参数方式是极其安全的
+##### 1. 使用 `RowBounds` 和 `PageRowBounds` 参数方式是极其安全的
+ 
+##### 2. 使用参数方式是极其安全的
 
-#####2. 使用参数方式是极其安全的
-
-#####3. 使用 ISelect 接口调用是极其安全的
+##### 3. 使用 ISelect 接口调用是极其安全的
 
 ISelect 接口方式除了可以保证安全外，还特别实现了将查询转换为单纯的 count 查询方式，这个方法可以将任意的查询方法，变成一个 `select count(*)` 的查询方法。
 
-#####4. 什么时候会导致不安全的分页？
+##### 4. 什么时候会导致不安全的分页？
 
 `PageHelper` 方法使用了静态的 `ThreadLocal` 参数，分页参数和线程是绑定的。
 
@@ -407,7 +406,7 @@ if(param1 != null){
 ```
 这么写很不好看，而且没有必要。
 
-###4. MyBatis 和 Spring 集成示例
+### 4. MyBatis 和 Spring 集成示例
 
 如果和Spring集成不熟悉，可以参考下面两个
 
@@ -418,4 +417,4 @@ if(param1 != null){
 
 这两个集成框架集成了 PageHelper 和 [通用 Mapper](https://github.com/abel533/Mapper)。
 
-###5. Spring Boot 待定
+### 5. Spring Boot 待定

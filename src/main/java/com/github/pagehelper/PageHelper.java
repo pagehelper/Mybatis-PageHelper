@@ -28,6 +28,8 @@ import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.page.PageAutoDialect;
 import com.github.pagehelper.page.PageMethod;
 import com.github.pagehelper.page.PageParams;
+import com.github.pagehelper.util.MSUtils;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -49,10 +51,17 @@ public class PageHelper extends PageMethod implements Dialect {
 
     @Override
     public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
+        if(ms.getId().endsWith(MSUtils.COUNT)){
+            throw new RuntimeException("在系统中发现了多个分页插件，请检查系统配置!");
+        }
         Page page = pageParams.getPage(parameterObject, rowBounds);
         if (page == null) {
             return true;
         } else {
+            //设置默认的 count 列
+            if(StringUtil.isEmpty(page.getCountColumn())){
+                page.setCountColumn(pageParams.getCountColumn());
+            }
             autoDialect.initDelegateDialect(ms);
             return false;
         }
@@ -115,6 +124,7 @@ public class PageHelper extends PageMethod implements Dialect {
 
     @Override
     public void setProperties(Properties properties) {
+        setStaticProperties(properties);
         pageParams = new PageParams();
         autoDialect = new PageAutoDialect();
         pageParams.setProperties(properties);

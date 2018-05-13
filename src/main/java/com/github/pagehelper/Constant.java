@@ -24,32 +24,16 @@
 
 package com.github.pagehelper;
 
-import org.apache.ibatis.session.RowBounds;
-
 /**
- * @author liuzenghui
+ * @author liuzh
  */
-public class PageRowBounds extends RowBounds {
-    private Long total;
-    private Boolean count;
-
-    public PageRowBounds(int offset, int limit) {
-        super(offset, limit);
-    }
-
-    public Long getTotal() {
-        return total;
-    }
-
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
-    public Boolean getCount() {
-        return count;
-    }
-
-    public void setCount(Boolean count) {
-        this.count = count;
-    }
+public interface Constant {
+    //分页的id后缀
+    String SUFFIX_PAGE = "_PageHelper";
+    //count查询的id后缀
+    String SUFFIX_COUNT = SUFFIX_PAGE + "_Count";
+    //第一个分页参数
+    String PAGEPARAMETER_FIRST = "First" + SUFFIX_PAGE;
+    //第二个分页参数
+    String PAGEPARAMETER_SECOND = "Second" + SUFFIX_PAGE;
 }

@@ -26,6 +26,7 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.PageSerializable;
 import com.github.pagehelper.mapper.CountryMapper;
 import com.github.pagehelper.model.Country;
 import com.github.pagehelper.util.MybatisHelper;
@@ -49,6 +50,7 @@ public class PageInfoTest {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             List<Country> list = countryMapper.selectAll();
+            System.out.println(list);
             PageInfo<Country> page = new PageInfo<Country>(list);
             assertEquals(1, page.getPageNum());
             assertEquals(10, page.getPageSize());
@@ -62,6 +64,9 @@ public class PageInfoTest {
             assertEquals(false, page.isIsLastPage());
             assertEquals(false, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
+
+            PageSerializable<Country> serializable = PageSerializable.of(list);
+            assertEquals(183, serializable.getTotal());
 
 
             //获取第2页，10条内容，默认查询总数count

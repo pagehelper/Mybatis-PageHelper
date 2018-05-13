@@ -1,5 +1,114 @@
 ## 更新日志
 
+### 5.1.4 - 2018-04-22
+
+- 默认增加达梦数据库(dm)，可以自动根据 jdbcurl 使用Oracle方式进行分页。如果想换 SqlServer 可以参考 5.1.3 更新日志中的 `dialectAlias` 参数。
+
+### 5.1.3 - 2018-04-07
+
+- `Page` 的 `toString` 方法增加 `super.toString()`。最终输出形式如 `Page{属性}[集合]`。
+- 增加 `defaultCount` 参数，用于控制默认不带 count 查询的方法中，是否执行 count 查询，默认 true 会执行 count 查询，这是一个全局生效的参数，多数据源时也是统一的行为。
+- 增加 `dialectAlias` 参数，允许配置自定义实现的 别名，可以用于根据 JDBCURL 自动获取对应实现，允许通过此种方式覆盖已有的实现，配置示例如（多个时分号隔开）： 
+  ```xml
+  <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+  ```
+- 增加 `PageSerializable`，简化版的 `PageInfo` 类，不需要那么多信息时，推荐使用或者参考这个类实现。
+
+### 5.1.2 - 2017-09-18
+
+- 解决单独使用 `PageHelper.orderBy` 方法时的问题 #110;
+
+### 5.1.1 - 2017-08-30
+
+- 此次更新解决的问题只和 SqlServer 2005,2008 有关
+- 解决 `RegexWithNolockReplaceSql` 中正则 `w?` 错误的问题，应该是 `w+`。
+- 解决 `SqlServerDialect` 中没有初始化默认 `SimpleWithNolockReplaceSql` 的错误。
+- `SqlServerRowBoundsDialect` 增加对 `replaceSql` 参数的支持。
+
+### 5.1.0 - 2017-08-28
+
+- 增加 4.x 以前版本包含的排序功能，用法一致（PageHelper增加了几个排序相关的方法）。
+- 分页 SQL 转换为预编译 SQL。
+- 增加 `ReplaceSql` 接口用于处理 sqlServer 的 `with(nolock)` 问题，增加了针对性的 `replaceSql` 参数，可选值为 `simple` 和 `regex`，或者是实现了ReplaceSql接口的全限定类名。默认值为
+`simple`，仍然使用原来的方式处理，新的 `regex` 会将如 `table with(nolock)` 处理为 `table_PAGEWITHNOLOCK`。
+- `PageRowBounds` 增加 `count` 属性，可以控制是否进行 `count` 查询。
+
+### 5.1.0-beta2 - 2017-08-23
+
+- 增加 `ReplaceSql` 接口用于处理 sqlServer 的 `with(nolock)` 问题，增加了针对性的 `replaceSql` 参数，可选值为 `simple` 和 `regex`，或者是实现了ReplaceSql接口的全限定类名。默认值为
+`simple`，仍然使用原来的方式处理，新的 `regex` 会将如 `table with(nolock)` 处理为 `table_PAGEWITHNOLOCK`。
+
+### 5.1.0-beta - 2017-08-22
+
+- 增加 4.x 以前版本包含的排序功能，用法一致（PageHelper增加了几个排序相关的方法）。
+- 分页 SQL 转换为预编译 SQL。
+
+### 5.0.4 - 2017-08-01
+
+- 增加对 `Phoenix` 数据库的简单配置支持，配置 `helperDialect=phoenix` 即可，也可以自动识别 `Phoenix` 数据库的 jdbc url。
+- count 查询的缓存 `msCountMap` key 改为 `String` 类型，key 为 count 查询的 `MappedStatement` 的 id。
+- 增加 `countSuffix` count 查询后缀配置参数，该参数是针对 `PageInterceptor` 配置的，默认值为 `_COUNT`。
+- 增加手写 count 查询支持，详情看下面介绍。
+
+#### 增加手写 count 查询支持
+
+增加 `countSuffix` count 查询后缀配置参数，该参数是针对 `PageInterceptor` 配置的，默认值为 `_COUNT`。
+
+分页插件会优先通过当前查询的 msId + `countSuffix` 查找手写的分页查询。
+
+如果存在就使用手写的 count 查询，如果不存在，仍然使用之前的方式自动创建 count 查询。
+
+例如，如果存在下面两个查询：
+```xml
+<select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
+    select a.id,b.countryname,a.countrycode from country a
+    left join country b on a.id = b.id
+    order by a.id
+</select>
+<select id="selectLeftjoin_COUNT" resultType="Long">
+    select count(distinct a.id) from country a
+    left join country b on a.id = b.id
+</select>
+```
+上面的 `countSuffix` 使用的默认值 `_COUNT`，分页插件会自动获取到 `selectLeftjoin_COUNT` 查询，这个查询需要自己保证结果数正确。
+
+返回值的类型必须是`resultType="Long"`，入参使用的和 `selectLeftjoin` 查询相同的参数，所以在 SQL 中要按照 `selectLeftjoin` 的入参来使用。
+
+因为 `selectLeftjoin_COUNT` 方法是自动调用的，所以不需要在接口提供相应的方法，如果需要单独调用，也可以提供。
+
+上面方法执行输出的部分日志如下：
+```
+DEBUG [main] - ==>  Preparing: select count(distinct a.id) from country a left join country b on a.id = b.id 
+DEBUG [main] - ==> Parameters: 
+TRACE [main] - <==    Columns: C1
+TRACE [main] - <==        Row: 183
+DEBUG [main] - <==      Total: 1
+DEBUG [main] - Cache Hit Ratio [com.github.pagehelper.mapper.CountryMapper]: 0.0
+DEBUG [main] - ==>  Preparing: select a.id,b.countryname,a.countrycode from country a left join country b on a.id = b.id order by a.id LIMIT 10 
+DEBUG [main] - ==> Parameters: 
+TRACE [main] - <==    Columns: ID, COUNTRYNAME, COUNTRYCODE
+TRACE [main] - <==        Row: 1, Angola, AO
+TRACE [main] - <==        Row: 2, Afghanistan, AF
+TRACE [main] - <==        Row: 3, Albania, AL
+```
+
+### 5.0.3 -2017-06-20
+
+- 解决`supportMethodsArguments`参数不起作用的问题，由于之前默认为`false`，不起作用后效果为`true`，建议升级到最新版本。
+
+### 5.0.2 - 2017-05-30
+
+- `Page<E>` 继承 `Closeable` 接口，在 JDK7+中可以使用 `try()`方式调用，自动调用`PageHelper.clearPage();`[#58](https://github.com/pagehelper/Mybatis-PageHelper/issues/58)。
+- 解决：DB2分页时必须要指定子查询的别名,不然会发生异常 [#52](https://github.com/pagehelper/Mybatis-PageHelper/issues/52)
+- 解决：分页取数据时，如果数据一条都没有返回, pageInfo.isIsLastPage(); 返回false [#50](https://github.com/pagehelper/Mybatis-PageHelper/issues/50)
+
+### 5.0.1 - 2017-04-23
+
+- 增加新的参数 `countColumn` 用于配置自动 count 查询时的查询列，默认值`0`，也就是 `count(0)`
+- `Page` 对象也新增了 `countColumn` 参数，可以针对具体查询进行配置
+- 针对文档显示问题进行修改，by liumian* [PR #30](https://github.com/pagehelper/Mybatis-PageHelper/pull/30)
+- 解决 sqlserver2012 分页错误的问题 [42](https://github.com/pagehelper/Mybatis-PageHelper/issues/42)
+
 ### 5.0.0 - 2017-01-02
 
 - 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 处理分页逻辑
