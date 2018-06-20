@@ -38,10 +38,7 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 针对 PageHelper 的实现
@@ -216,5 +213,15 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
     @Override
     public void setProperties(Properties properties) {
 
+    }
+
+    protected void handleParameter(BoundSql boundSql, MappedStatement ms){
+        if (boundSql.getParameterMappings() != null) {
+            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>(boundSql.getParameterMappings());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
+            MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
+            metaObject.setValue("parameterMappings", newParameterMappings);
+        }
     }
 }

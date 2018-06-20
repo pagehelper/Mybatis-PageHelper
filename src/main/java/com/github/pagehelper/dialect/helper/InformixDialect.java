@@ -58,9 +58,7 @@ public class InformixDialect extends AbstractHelperDialect {
             if (page.getPageSize() > 0) {
                 newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
             }
-            if (boundSql != null && boundSql.getParameterMappings() != null) {
-                newParameterMappings.addAll(boundSql.getParameterMappings());
-            }
+            newParameterMappings.addAll(boundSql.getParameterMappings());
             MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
             metaObject.setValue("parameterMappings", newParameterMappings);
         }
