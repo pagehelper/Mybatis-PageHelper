@@ -151,7 +151,7 @@ public abstract class PageMethod {
     /**
      * 开始分页
      *
-     * @param offset 页码
+     * @param offset 起始位置，偏移位置
      * @param limit  每页显示数量
      */
     public static <E> Page<E> offsetPage(int offset, int limit) {
@@ -161,7 +161,7 @@ public abstract class PageMethod {
     /**
      * 开始分页
      *
-     * @param offset 页码
+     * @param offset 起始位置，偏移位置
      * @param limit  每页显示数量
      * @param count  是否进行count查询
      */
