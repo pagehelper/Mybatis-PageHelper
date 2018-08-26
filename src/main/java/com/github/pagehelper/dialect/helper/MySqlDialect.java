@@ -76,7 +76,6 @@ public class MySqlDialect extends AbstractHelperDialect {
         } else {
             sqlBuilder.append(" LIMIT ?, ? ");
         }
-        pageKey.update(page.getPageSize());
         return sqlBuilder.toString();
     }
 
