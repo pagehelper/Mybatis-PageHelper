@@ -12,6 +12,13 @@
 
 想要使用分页插件？请看[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)。
 
+## 新增 JavaDoc 文档
+
+文档地址：https://apidoc.gitee.com/free/Mybatis_PageHelper
+
+Method API: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
+
+
 ## 新书《MyBatis 从入门到精通》
 
 ![MyBatis 从入门到精通](https://github.com/mybatis-book/book/raw/master/book.png)
