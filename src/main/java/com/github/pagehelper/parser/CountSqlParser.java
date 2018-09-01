@@ -24,8 +24,8 @@
 
 package com.github.pagehelper.parser;
 
-import com.github.pagehelper.PageException;
 import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
@@ -33,7 +33,9 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * sql解析类，提供更智能的count查询sql
@@ -44,9 +46,13 @@ public class CountSqlParser {
     public static final String KEEP_ORDERBY = "/*keep orderby*/";
     private static final Alias TABLE_ALIAS;
 
+    private static final Set<String> SIMPLE_FUNCTION = new HashSet<String>();
+
     static {
         TABLE_ALIAS = new Alias("table_count");
         TABLE_ALIAS.setUseAs(false);
+
+        SIMPLE_FUNCTION.add("IFNULL");
     }
 
     /**
@@ -167,8 +173,12 @@ public class CountSqlParser {
             }
             //如果查询列中包含函数，也不可以，函数可能会聚合列
             if (item instanceof SelectExpressionItem) {
-                if (((SelectExpressionItem) item).getExpression() instanceof Function) {
-                    return false;
+                Expression expression = ((SelectExpressionItem) item).getExpression();
+                if (expression instanceof Function) {
+                    String name = ((Function) expression).getName();
+                    if (name != null && !SIMPLE_FUNCTION.contains(name.toUpperCase())) {
+                        return false;
+                    }
                 }
             }
         }
