@@ -24,7 +24,6 @@
 
 package com.github.pagehelper;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -135,11 +134,11 @@ public class PageInfo<T> extends PageSerializable<T> {
         }
     }
 
-    public static <T> PageInfo<T> of(List<T> list){
+    public static <T> PageInfo<T> of(List<T> list) {
         return new PageInfo<T>(list);
     }
 
-    public static <T> PageInfo<T> of(List<T> list, int navigatePages){
+    public static <T> PageInfo<T> of(List<T> list, int navigatePages) {
         return new PageInfo<T>(list, navigatePages);
     }
 
@@ -200,7 +199,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      */
     private void judgePageBoudary() {
         isFirstPage = pageNum == 1;
-        isLastPage = pageNum == pages || pages == 0;;
+        isLastPage = pageNum == pages || pages == 0;
         hasPreviousPage = pageNum > 1;
         hasNextPage = pageNum < pages;
     }
@@ -253,17 +252,6 @@ public class PageInfo<T> extends PageSerializable<T> {
         this.pages = pages;
     }
 
-    @Deprecated
-    // firstPage就是1, 此函数获取的是导航条上的第一页, 容易产生歧义
-    public int getFirstPage() {
-        return navigateFirstPage;
-    }
-
-    @Deprecated
-    public void setFirstPage(int firstPage) {
-        this.navigateFirstPage = firstPage;
-    }
-
     public int getPrePage() {
         return prePage;
     }
@@ -278,17 +266,6 @@ public class PageInfo<T> extends PageSerializable<T> {
 
     public void setNextPage(int nextPage) {
         this.nextPage = nextPage;
-    }
-
-    @Deprecated
-    // 请用getPages()来获取最后一页, 此函数获取的是导航条上的最后一页, 容易产生歧义.
-    public int getLastPage() {
-        return navigateLastPage;
-    }
-
-    @Deprecated
-    public void setLastPage(int lastPage) {
-        this.navigateLastPage = lastPage;
     }
 
     public boolean isIsFirstPage() {
