@@ -61,7 +61,7 @@ import java.util.Properties;
 public class PageInterceptor implements Interceptor {
     //缓存count查询的ms
     protected Cache<String, MappedStatement> msCountMap = null;
-    private Dialect dialect;
+    private volatile Dialect dialect;
     private String default_dialect_class = "com.github.pagehelper.PageHelper";
     private Field additionalParametersField;
     private String countSuffix = "_COUNT";
@@ -86,6 +86,16 @@ public class PageInterceptor implements Interceptor {
                 //6 个参数时
                 cacheKey = (CacheKey) args[4];
                 boundSql = (BoundSql) args[5];
+            }
+
+            // Spring bean 方式配置时，如果没有配置属性就不会执行下面的 setProperties 方法，就不会初始化
+            // 因此这里会出现 null 的情况 fixed #26
+            if(dialect == null){
+                synchronized (default_dialect_class){
+                    if(dialect == null){
+                        setProperties(new Properties());
+                    }
+                }
             }
             List resultList;
             //调用方法判断是否需要进行分页，如果不需要，直接返回结果
@@ -222,8 +232,6 @@ public class PageInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        //TODO Spring bean 方式配置时，如果没有配置属性就不会执行下面的 setProperties 方法，就不会初始化，因此考虑在这个方法中做一次判断和初始化
-        //TODO https://github.com/pagehelper/Mybatis-PageHelper/issues/26
         return Plugin.wrap(target, this);
     }
 
