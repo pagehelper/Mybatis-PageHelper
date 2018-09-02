@@ -1,5 +1,114 @@
 ## Changelog
 
+### 5.1.5 - 2018-09-02
+
+- Optimize the code and remove unnecessary checks(**by lenosp**)
+- Solve the small problem of pageKey multi-processing once #268
+- Added javadoc documentation on gitee(https://apidoc.gitee.com/free/Mybatis_PageHelper)
+- Solve the problem of default reflection without cache fixed #275
+- Optimizing mysql ifnull function causes paging performance problems (**by miaogr**)（This change was eventually changed to the following `aggregateFunctions`）
+- Jsqlparser has been upgraded to version 1.2, which is incompatible with 1.0 and has been resolved. fixed 273
+- Remove the g(s)etFirstPage and g(s)etLastPage methods that are ambiguous in PageInfo
+- Throws an exception that failed to parse when sorting fixed #257
+- Resolve the initialization problem when there is no properties property when configuring the spring use `<bean>`. fixed #26
+- Fix the problem that Oracle paging will leak data (**by muyun12**)
+- `aggregateFunctions`: The default is the aggregate function of all common databases,
+  allowing you to manually add aggregate functions ( affecting the number of rows ).
+  All functions that start with aggregate functions will be wrap as subquery.
+  Other functions and columns will be replaced with count(0).
+
+After adding the `aggregateFunctions` parameter, the biggest difference from the original is that if there is `select ifnull(XXX,YY) from table ...`, the original count query is
+ `select count(0) from (select ifnull(xxx,yy) from table ... ) temp_count` now distinguishes aggregate functions, if not aggregate functions, it will become
+ `select count(0) from table ...`.
+
+The aggregate function prefixes included by default are as follows:
+
+```java
+/**
+ * Aggregate functions, beginning with the following functions are considered aggregate functions
+ */
+private static final Set<String> AGGREGATE_FUNCTIONS = new HashSet<String>(Arrays.asList(
+        ("APPROX_COUNT_DISTINCT," +
+        "ARRAY_AGG," +
+        "AVG," +
+        "BIT_" +
+        //"BIT_AND," +
+        //"BIT_OR," +
+        //"BIT_XOR," +
+        "BOOL_," +
+        //"BOOL_AND," +
+        //"BOOL_OR," +
+        "CHECKSUM_AGG," +
+        "COLLECT," +
+        "CORR," +
+        //"CORR_," +
+        //"CORRELATION," +
+        "COUNT," +
+        //"COUNT_BIG," +
+        "COVAR," +
+        //"COVAR_POP," +
+        //"COVAR_SAMP," +
+        //"COVARIANCE," +
+        //"COVARIANCE_SAMP," +
+        "CUME_DIST," +
+        "DENSE_RANK," +
+        "EVERY," +
+        "FIRST," +
+        "GROUP," +
+        //"GROUP_CONCAT," +
+        //"GROUP_ID," +
+        //"GROUPING," +
+        //"GROUPING," +
+        //"GROUPING_ID," +
+        "JSON_," +
+        //"JSON_AGG," +
+        //"JSON_ARRAYAGG," +
+        //"JSON_OBJECT_AGG," +
+        //"JSON_OBJECTAGG," +
+        //"JSONB_AGG," +
+        //"JSONB_OBJECT_AGG," +
+        "LAST," +
+        "LISTAGG," +
+        "MAX," +
+        "MEDIAN," +
+        "MIN," +
+        "PERCENT_," +
+        //"PERCENT_RANK," +
+        //"PERCENTILE_CONT," +
+        //"PERCENTILE_DISC," +
+        "RANK," +
+        "REGR_," +
+        "SELECTIVITY," +
+        "STATS_," +
+        //"STATS_BINOMIAL_TEST," +
+        //"STATS_CROSSTAB," +
+        //"STATS_F_TEST," +
+        //"STATS_KS_TEST," +
+        //"STATS_MODE," +
+        //"STATS_MW_TEST," +
+        //"STATS_ONE_WAY_ANOVA," +
+        //"STATS_T_TEST_*," +
+        //"STATS_WSR_TEST," +
+        "STD," +
+        //"STDDEV," +
+        //"STDDEV_POP," +
+        //"STDDEV_SAMP," +
+        //"STDDEV_SAMP," +
+        //"STDEV," +
+        //"STDEVP," +
+        "STRING_AGG," +
+        "SUM," +
+        "SYS_OP_ZONE_ID," +
+        "SYS_XMLAGG," +
+        "VAR," +
+        //"VAR_POP," +
+        //"VAR_SAMP," +
+        //"VARIANCE," +
+        //"VARIANCE_SAMP," +
+        //"VARP," +
+        "XMLAGG").split(",")));
+```
+
 ### 5.1.4 - 2018-04-22
 
 - Add the DaMeng Database (dm) to page using Oracle. If you want to change SqlServer, you can refer to the `dialectAlias` parameter in the 5.1.3 update log.
