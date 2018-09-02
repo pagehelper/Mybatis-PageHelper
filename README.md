@@ -15,6 +15,12 @@ Some special cases please see the [**Important note**](https://github.com/pagehe
 Want to use PageHelper? 
 Please see [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md).
 
+## New JavaDoc
+
+https://apidoc.gitee.com/free/Mybatis_PageHelper
+
+Method API: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
+
 ## 新书《MyBatis 从入门到精通》
 
 ![MyBatis 从入门到精通](https://github.com/mybatis-book/book/raw/master/book.png)

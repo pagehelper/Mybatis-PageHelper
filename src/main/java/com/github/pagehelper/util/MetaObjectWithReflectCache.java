@@ -25,36 +25,27 @@
 package com.github.pagehelper.util;
 
 import com.github.pagehelper.PageException;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
-
-import java.lang.reflect.Method;
+import org.apache.ibatis.reflection.ReflectorFactory;
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.apache.ibatis.reflection.factory.ObjectFactory;
+import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 /**
+ * 反射带缓存，提高反射性能
+ *
  * @author liuzh
  */
-public class MetaObjectUtil {
-    public static Method method;
-
-    static {
-        try {
-            // 高版本中的 MetaObject.forObject 有 4 个参数，低版本是 1 个
-            // 下面这个 MetaObjectWithReflectCache 带反射的缓存信息
-            Class<?> metaClass = Class.forName("com.github.pagehelper.util.MetaObjectWithReflectCache");
-            method = metaClass.getDeclaredMethod("forObject", Object.class);
-        } catch (Throwable e1) {
-            try {
-                Class<?> metaClass = Class.forName("org.apache.ibatis.reflection.MetaObject");
-                method = metaClass.getDeclaredMethod("forObject", Object.class);
-            } catch (Exception e2) {
-                throw new PageException(e2);
-            }
-        }
-
-    }
+public class MetaObjectWithReflectCache {
+    public static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
+    public static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
+    public static final ReflectorFactory DEFAULT_REFLECTOR_FACTORY = new DefaultReflectorFactory();
 
     public static MetaObject forObject(Object object) {
         try {
-            return (MetaObject) method.invoke(null, object);
+            return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, DEFAULT_REFLECTOR_FACTORY);
         } catch (Exception e) {
             throw new PageException(e);
         }

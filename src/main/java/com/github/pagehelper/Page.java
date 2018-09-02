@@ -198,7 +198,9 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         }
         //分页合理化，针对不合理的页码自动处理
         if ((reasonable != null && reasonable) && pageNum > pages) {
-            pageNum = pages;
+            if(pages!=0){
+                pageNum = pages;
+            }
             calculateStartAndEndRow();
         }
     }

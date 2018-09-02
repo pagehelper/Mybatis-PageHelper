@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.parser;
 
+import com.github.pagehelper.PageException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
@@ -55,12 +56,12 @@ public class OrderByParser {
             List<OrderByElement> orderByElements = extraOrderBy(selectBody);
             String defaultOrderBy = PlainSelect.orderByToString(orderByElements);
             if (defaultOrderBy.indexOf('?') != -1) {
-                throw new RuntimeException("原SQL[" + sql + "]中的order by包含参数，因此不能使用OrderBy插件进行修改!");
+                throw new PageException("原SQL[" + sql + "]中的order by包含参数，因此不能使用OrderBy插件进行修改!");
             }
             //新的sql
             sql = select.toString();
         } catch (Throwable e) {
-            e.printStackTrace();
+            throw new PageException("处理排序失败: " + e, e);
         }
         return sql + " order by " + orderBy;
     }
