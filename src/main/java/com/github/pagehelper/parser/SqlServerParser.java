@@ -351,9 +351,11 @@ public class SqlServerParser {
     protected void processFromItem(FromItem fromItem, int level) {
         if (fromItem instanceof SubJoin) {
             SubJoin subJoin = (SubJoin) fromItem;
-            if (subJoin.getJoin() != null) {
-                if (subJoin.getJoin().getRightItem() != null) {
-                    processFromItem(subJoin.getJoin().getRightItem(), level + 1);
+            if (subJoin.getJoinList() != null && subJoin.getJoinList().size() > 0) {
+                for (Join join : subJoin.getJoinList()) {
+                    if (join.getRightItem() != null) {
+                        processFromItem(join.getRightItem(), level + 1);
+                    }
                 }
             }
             if (subJoin.getLeft() != null) {
