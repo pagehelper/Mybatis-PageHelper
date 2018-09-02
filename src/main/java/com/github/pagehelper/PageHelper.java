@@ -28,6 +28,7 @@ import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.page.PageAutoDialect;
 import com.github.pagehelper.page.PageMethod;
 import com.github.pagehelper.page.PageParams;
+import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.util.MSUtils;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
@@ -51,7 +52,7 @@ public class PageHelper extends PageMethod implements Dialect {
 
     @Override
     public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        if(ms.getId().endsWith(MSUtils.COUNT)){
+        if (ms.getId().endsWith(MSUtils.COUNT)) {
             throw new RuntimeException("在系统中发现了多个分页插件，请检查系统配置!");
         }
         Page page = pageParams.getPage(parameterObject, rowBounds);
@@ -59,7 +60,7 @@ public class PageHelper extends PageMethod implements Dialect {
             return true;
         } else {
             //设置默认的 count 列
-            if(StringUtil.isEmpty(page.getCountColumn())){
+            if (StringUtil.isEmpty(page.getCountColumn())) {
                 page.setCountColumn(pageParams.getCountColumn());
             }
             autoDialect.initDelegateDialect(ms);
@@ -105,7 +106,7 @@ public class PageHelper extends PageMethod implements Dialect {
     public Object afterPage(List pageList, Object parameterObject, RowBounds rowBounds) {
         //这个方法即使不分页也会被执行，所以要判断 null
         AbstractHelperDialect delegate = autoDialect.getDelegate();
-        if(delegate != null){
+        if (delegate != null) {
             return delegate.afterPage(pageList, parameterObject, rowBounds);
         }
         return pageList;
@@ -129,5 +130,7 @@ public class PageHelper extends PageMethod implements Dialect {
         autoDialect = new PageAutoDialect();
         pageParams.setProperties(properties);
         autoDialect.setProperties(properties);
+        //20180902新增 aggregateFunctions, 允许手动添加聚合函数（影响行数）
+        CountSqlParser.addAggregateFunctions(properties.getProperty("aggregateFunctions"));
     }
 }
