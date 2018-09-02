@@ -102,7 +102,7 @@ public class SqlServerParser {
         try {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (Throwable e) {
-            throw new PageException("不支持该SQL转换为分页查询!");
+            throw new PageException("不支持该SQL转换为分页查询!", e);
         }
         if (!(stmt instanceof Select)) {
             throw new PageException("分页语句必须是Select查询!");

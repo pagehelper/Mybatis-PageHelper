@@ -105,7 +105,7 @@ public abstract class PageObjectUtil {
             pageNum = Integer.parseInt(String.valueOf(_pageNum));
             pageSize = Integer.parseInt(String.valueOf(_pageSize));
         } catch (NumberFormatException e) {
-            throw new PageException("分页参数不是合法的数字类型!");
+            throw new PageException("分页参数不是合法的数字类型!", e);
         }
         Page page = new Page(pageNum, pageSize);
         //count查询
