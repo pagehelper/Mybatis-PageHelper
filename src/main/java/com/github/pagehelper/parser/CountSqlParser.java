@@ -45,8 +45,8 @@ public class CountSqlParser {
     private static final Alias TABLE_ALIAS;
 
     //<editor-fold desc="聚合函数">
-    private final Set<String> skipFunctions = new HashSet<String>();
-    private final Set<String> falseFunctions = new HashSet<String>();
+    private final Set<String> skipFunctions = Collections.synchronizedSet(new HashSet<String>());
+    private final Set<String> falseFunctions = Collections.synchronizedSet(new HashSet<String>());
 
     /**
      * 聚合函数，以下列函数开头的都认为是聚合函数
