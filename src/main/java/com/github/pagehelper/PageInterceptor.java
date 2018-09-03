@@ -26,7 +26,6 @@ package com.github.pagehelper;
 
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
-import com.github.pagehelper.executor.PagingExecutor;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -34,6 +33,7 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 
+import java.lang.reflect.Proxy;
 import java.util.Properties;
 
 /**
@@ -79,7 +79,10 @@ public class PageInterceptor implements Interceptor {
     public Object plugin(Object target) {
         if (target instanceof Executor) {
             checkDialectExists();
-            return new PagingExecutor((Executor) target, dialect, msCountMap, countSuffix);
+            return Proxy.newProxyInstance(
+                    target.getClass().getClassLoader(),
+                    new Class[]{Executor.class},
+                    new PagingInvocationHandler((Executor) target, dialect, msCountMap, countSuffix));
         }
         return target;
     }

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.executor;
+package com.github.pagehelper.util;
 
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageException;

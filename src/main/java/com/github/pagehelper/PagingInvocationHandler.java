@@ -22,10 +22,11 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.executor;
+package com.github.pagehelper;
 
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.cache.Cache;
+import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MSUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -34,26 +35,69 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author liuzenghui
+ * @author liuzh
  */
-public class PagingExecutor extends AbstractExecutor {
+public class PagingInvocationHandler implements InvocationHandler {
 
-    protected final Cache<String, MappedStatement> msCountMap;
     protected final Dialect dialect;
+    protected final Executor delegate;
     protected final String countSuffix;
+    protected final Cache<String, MappedStatement> msCountMap;
 
-    public PagingExecutor(Executor delegate, Dialect dialect, Cache<String, MappedStatement> msCountMap, String countSuffix) {
-        super(delegate);
+    public PagingInvocationHandler(Executor delegate, Dialect dialect, Cache<String, MappedStatement> msCountMap, String countSuffix) {
+        this.delegate = delegate;
         this.dialect = dialect;
         this.msCountMap = msCountMap;
         this.countSuffix = countSuffix;
     }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (method.getName().equals("query") && args.length == 4
+                && Executor.class.isAssignableFrom(method.getDeclaringClass())) {
+            return query((MappedStatement) args[0], args[1], (RowBounds) args[2], (ResultHandler) args[3]);
+        }
+        return method.invoke(delegate, args);
+    }
+
+
+    public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+        try {
+            BoundSql boundSql = ms.getBoundSql(parameter);
+
+            CacheKey cacheKey = delegate.createCacheKey(ms, parameter, rowBounds, boundSql);
+            List resultList;
+            //调用方法判断是否需要进行分页，如果不需要，直接返回结果
+            if (!dialect.skip(ms, parameter, rowBounds)) {
+                //判断是否需要进行 count 查询
+                if (dialect.beforeCount(ms, parameter, rowBounds)) {
+                    //查询总数
+                    Long count = count(ms, parameter, rowBounds, resultHandler, boundSql);
+                    //处理查询总数，返回 true 时继续分页查询，false 时直接返回
+                    if (!dialect.afterCount(count, parameter, rowBounds)) {
+                        //当查询总数为 0 时，直接返回空的结果
+                        return (List<E>) dialect.afterPage(new ArrayList(), parameter, rowBounds);
+                    }
+                }
+                resultList = pageQuery(ms, parameter, rowBounds, resultHandler, boundSql, cacheKey);
+            } else {
+                //rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
+                resultList = delegate.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
+            }
+            return (List<E>) dialect.afterPage(resultList, parameter, rowBounds);
+        } finally {
+            dialect.afterAll();
+        }
+    }
+
 
     private Long count(MappedStatement ms, Object parameter,
                        RowBounds rowBounds, ResultHandler resultHandler,
@@ -63,7 +107,7 @@ public class PagingExecutor extends AbstractExecutor {
         //先判断是否存在手写的 count 查询
         MappedStatement countMs = ExecutorUtil.getExistedMappedStatement(ms.getConfiguration(), countMsId);
         if (countMs != null) {
-            count = ExecutorUtil.executeManualCount(this, countMs, parameter, boundSql, resultHandler);
+            count = ExecutorUtil.executeManualCount(delegate, countMs, parameter, boundSql, resultHandler);
         } else {
             countMs = msCountMap.get(countMsId);
             //自动创建
@@ -72,7 +116,7 @@ public class PagingExecutor extends AbstractExecutor {
                 countMs = MSUtils.newCountMappedStatement(ms, countMsId);
                 msCountMap.put(countMsId, countMs);
             }
-            count = ExecutorUtil.executeAutoCount(dialect, this, countMs, parameter, boundSql, rowBounds, resultHandler);
+            count = ExecutorUtil.executeAutoCount(dialect, delegate, countMs, parameter, boundSql, rowBounds, resultHandler);
         }
         return count;
     }
@@ -97,40 +141,10 @@ public class PagingExecutor extends AbstractExecutor {
                 pageBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
             }
             //执行分页查询
-            return query(ms, parameter, RowBounds.DEFAULT, resultHandler, pageKey, pageBoundSql);
+            return delegate.query(ms, parameter, RowBounds.DEFAULT, resultHandler, pageKey, pageBoundSql);
         } else {
             //不执行分页的情况下，也不执行内存分页
-            return query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
-        }
-    }
-
-    @Override
-    public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
-        try {
-            BoundSql boundSql = ms.getBoundSql(parameter);
-
-            CacheKey cacheKey = createCacheKey(ms, parameter, rowBounds, boundSql);
-            List resultList;
-            //调用方法判断是否需要进行分页，如果不需要，直接返回结果
-            if (!dialect.skip(ms, parameter, rowBounds)) {
-                //判断是否需要进行 count 查询
-                if (dialect.beforeCount(ms, parameter, rowBounds)) {
-                    //查询总数
-                    Long count = count(ms, parameter, rowBounds, resultHandler, boundSql);
-                    //处理查询总数，返回 true 时继续分页查询，false 时直接返回
-                    if (!dialect.afterCount(count, parameter, rowBounds)) {
-                        //当查询总数为 0 时，直接返回空的结果
-                        return (List<E>) dialect.afterPage(new ArrayList(), parameter, rowBounds);
-                    }
-                }
-                resultList = pageQuery(ms, parameter, rowBounds, resultHandler, boundSql, cacheKey);
-            } else {
-                //rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
-                resultList = query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
-            }
-            return (List<E>) dialect.afterPage(resultList, parameter, rowBounds);
-        } finally {
-            dialect.afterAll();
+            return delegate.query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
         }
     }
 
