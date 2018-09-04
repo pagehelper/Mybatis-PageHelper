@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.page;
 
+import com.github.pagehelper.IPage;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageRowBounds;
@@ -74,7 +75,7 @@ public class PageParams {
                     PageRowBounds pageRowBounds = (PageRowBounds)rowBounds;
                     page.setCount(pageRowBounds.getCount() == null || pageRowBounds.getCount());
                 }
-            } else if(supportMethodsArguments){
+            } else if(parameterObject instanceof IPage || supportMethodsArguments){
                 try {
                     page = PageObjectUtil.getPageFromObject(parameterObject, false);
                 } catch (Exception e) {
