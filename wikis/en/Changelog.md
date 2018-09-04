@@ -1,5 +1,12 @@
 ## Changelog
 
+### 5.1.6 - 2018-09-05
+
+- Add the parameter useSqlserver2012, set to true, and use sqlserver2012(Dialect) as the default paging method for SQL Server databases, which is useful in dynamic data sources.
+- Add an IPage interface. Currently, there is only one parameter to support the MyBatis query method, and when the parameter implements the IPage interface, paging query will be automatically performed if paging parameters exist. Thanks to [moonfruit](https://github.com/moonfruit) Issue two years ago.
+- fixed # 276 to resolve hashset concurrency issue
+- Optimize code structure and streamline interceptor code
+
 ### 5.1.5 - 2018-09-02
 
 - Optimize the code and remove unnecessary checks(**by lenosp**)

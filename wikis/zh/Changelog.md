@@ -1,5 +1,12 @@
 ## 更新日志
 
+### 5.1.6 - 2018-09-05
+
+- 增加参数 useSqlserver2012，设置为 true 后，使用 sqlserver2012(Dialect) 作为 SqlServer 数据库的默认分页方式，这种情况在动态数据源时方便使用。默认使用的低版本(05,08)分页方式。
+- 增加 IPage 接口，目前支持 mybatis 查询方法只有一个参数，并且参数实现 IPage 接口时，如果存在分页参数，就会自动进行分页查询。感谢 [moonfruit](https://github.com/moonfruit) 两年前的 issue。
+- 解决 HashSet 并发问题 fixed #276
+- 优化代码结构，精简拦截器代码
+
 ### 5.1.5 - 2018-09-02
 
 - 优化代码，去掉没必要的校验(**by lenosp**)
