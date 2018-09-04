@@ -228,6 +228,12 @@ public class PageAutoDialect {
         if (StringUtil.isNotEmpty(closeConn)) {
             this.closeConn = Boolean.parseBoolean(closeConn);
         }
+        //使用 sqlserver2012 作为默认分页方式，这种情况在动态数据源时方便使用
+        String useSqlserver2012 = properties.getProperty("useSqlserver2012");
+        if (StringUtil.isNotEmpty(useSqlserver2012) && Boolean.parseBoolean(useSqlserver2012)) {
+            registerDialectAlias("sqlserver", SqlServer2012Dialect.class);
+            registerDialectAlias("sqlserver2008", SqlServerDialect.class);
+        }
         String dialectAlias = properties.getProperty("dialectAlias");
         if (StringUtil.isNotEmpty(dialectAlias)) {
             String[] alias = dialectAlias.split(";");
