@@ -1,5 +1,9 @@
 ## Changelog
 
+### 5.1.7 - 2018-10-11
+
+- Support Aliyun PPAS database. Automatic identification of edb. fixed #281
+
 ### 5.1.6 - 2018-09-05
 
 - Add the parameter useSqlserver2012, set to true, and use sqlserver2012(Dialect) as the default paging method for SQL Server databases, which is useful in dynamic data sources.

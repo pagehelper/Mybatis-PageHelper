@@ -28,7 +28,7 @@
 
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>5.1.6</version>
+    <version>5.1.7</version>
     <packaging>jar</packaging>
 
     <name>pagehelper 5</name>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.4.4</version>
+            <version>3.4.6</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
