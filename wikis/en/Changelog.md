@@ -1,5 +1,9 @@
 ## Changelog
 
+### 5.1.8 - 2018-11-11
+
+- Resolve the problem of `with(nolock)` in SQLServer ([#pr10](https://gitee.com/free/Mybatis_PageHelper/pulls/10)) by [lvshuyan](https://gitee.com/lvshuyan)
+
 ### 5.1.7 - 2018-10-11
 
 - Support Aliyun PPAS database. Automatic identification of edb. fixed #281

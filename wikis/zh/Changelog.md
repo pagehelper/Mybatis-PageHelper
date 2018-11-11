@@ -1,5 +1,9 @@
 ## 更新日志
 
+### 5.1.8 - 2018-11-11
+
+- 解决 sqlserver 中 with(nolock) 的问题([#pr10](https://gitee.com/free/Mybatis_PageHelper/pulls/10)) by [lvshuyan](https://gitee.com/lvshuyan)
+
 ### 5.1.7 - 2018-10-11
 
 - 增加对阿里云PPAS数据库的支持，自动识别edb，fixed #281
