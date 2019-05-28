@@ -181,4 +181,28 @@ public class SqlServerTest {
         String originalSql = "select distinct u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time from sys_user u left join sys_dept d on u.dept_id = d.dept_id left join sys_user_role ur on u.user_id = ur.user_id left join sys_role r on r.role_id = ur.role_id where u.del_flag = '0' and (r.role_id != 1 or r.role_id IS NULL) and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role ur on u.user_id = ur.user_id and ur.role_id = 1)";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
+
+    @Test
+    public void testSql386() throws JSQLParserException {
+        String originalSql = " select a.Guid,\n" +
+            "               ProManager,\n" +
+            "               WorkOrderType,\n" +
+            "               a.Name,\n" +
+            "               WorkNote,\n" +
+            "               b.Name                             TeamName,\n" +
+            "               ConstructionSite,\n" +
+            "               iif(a.MaterialGuid is null, 0, 1) as IsMaterial,\n" +
+            "               a.MaterialGuid,\n" +
+            "               c.Code                          as MaterialCode,\n" +
+            "               c.FullName                         MaterialName,\n" +
+            "               d.FullName                         MatStdSortName\n" +
+            "        from RMC_WorkOrder a\n" +
+            "                 left join dbo.SYS_OrgFrame b on a.TeamGuid = b.Code and b.ParentGuid is null\n" +
+            "                 left join dbo.BAS_Material c on a.MaterialGuid = c.Guid\n" +
+            "                 left join BAS_MatStdSort d on a.MatStdSortGuid = d.Guid\n" +
+            "        where a.ConfirmUser is null\n" +
+            "          and b.Guid = 1\n" +
+            "        order by a.ContractBillNO desc";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
 }
