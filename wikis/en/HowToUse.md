@@ -170,7 +170,7 @@ List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(0
 List<Country> list = countryMapper.selectIf(1, new RowBounds(0, 10));
 //or PageRowBounds
 PageRowBounds rowBounds = new PageRowBounds(0, 10);
-List<Country> list = countryMapper.selectIf(1, new RowBounds(0, 10));
+List<Country> list = countryMapper.selectIf(1, rowBounds);
 long total = rowBounds.getTotal();
 
 //2. use static method startPage
