@@ -92,7 +92,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         if (page.getPageSize() < 0) {
             return false;
         }
-        return count > 0;
+        return count > ((page.getPageNum() - 1) * page.getPageSize());
     }
 
     @Override
