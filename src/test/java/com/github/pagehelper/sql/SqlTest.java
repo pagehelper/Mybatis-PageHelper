@@ -130,4 +130,16 @@ public class SqlTest {
 
         System.out.println(sql);
     }
+
+    @Test
+    public void testSql375() throws JSQLParserException {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("SELECT IF(score >= 60, 'pass', 'failed') FROM tbl"));
+    }
+
+    @Test
+    public void testSql350() throws JSQLParserException {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("select a,b,c from tb_test having a not null"));
+    }
 }
