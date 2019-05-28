@@ -24,6 +24,8 @@
 
 package com.github.pagehelper.sql;
 
+import com.github.pagehelper.dialect.ReplaceSql;
+import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.parser.SqlServerParser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Ignore;
@@ -204,5 +206,18 @@ public class SqlServerTest {
             "          and b.Guid = 1\n" +
             "        order by a.ContractBillNO desc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
+
+    @Test
+    public void testSql345() throws JSQLParserException {
+        String originalSql = "Select CC.ClinicID, CC.CaseHistoryNum, CC.CaseHistoryID, CC.DoctorID, CC.ClientRegisterID\n" +
+            "From Client CC With(Nolock)\n" +
+            "Left Outer Join Register CR With(Nolock) On CC.ClientRegisterID = CR.ClientRegisterID\n" +
+            "Where CC.ClientID = 14374";
+      ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
+      String replace = replaceSql.replace(originalSql);
+      String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
+      String result = replaceSql.restore(pageSql);
+      System.out.println(result);
     }
 }
