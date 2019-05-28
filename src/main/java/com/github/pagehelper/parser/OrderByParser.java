@@ -28,6 +28,8 @@ import com.github.pagehelper.PageException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 
 import java.util.List;
 
@@ -38,6 +40,7 @@ import java.util.List;
  * @since 2015-06-27
  */
 public class OrderByParser {
+    private static final Log log = LogFactory.getLog(OrderByParser.class);
     /**
      * convert to order by sql
      *
@@ -61,7 +64,7 @@ public class OrderByParser {
             //新的sql
             sql = select.toString();
         } catch (Throwable e) {
-            throw new PageException("处理排序失败: " + e, e);
+            log.warn("处理排序失败: " + e + "，降级为直接拼接 order by 参数");
         }
         return sql + " order by " + orderBy;
     }
