@@ -109,7 +109,9 @@ public class PageInterceptor implements Interceptor {
             }
             return dialect.afterPage(resultList, parameter, rowBounds);
         } finally {
-            dialect.afterAll();
+            if(dialect != null){
+                dialect.afterAll();
+            }
         }
     }
 
