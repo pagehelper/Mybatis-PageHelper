@@ -175,4 +175,10 @@ public class SqlServerTest {
         String originalSql = "select t.*, 1 alias from country t order by t.countrycode";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
+
+    @Test
+    public void testSql377() throws JSQLParserException {
+        String originalSql = "select distinct u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time from sys_user u left join sys_dept d on u.dept_id = d.dept_id left join sys_user_role ur on u.user_id = ur.user_id left join sys_role r on r.role_id = ur.role_id where u.del_flag = '0' and (r.role_id != 1 or r.role_id IS NULL) and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role ur on u.user_id = ur.user_id and ur.role_id = 1)";
+        System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
 }
