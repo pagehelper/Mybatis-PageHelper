@@ -256,7 +256,7 @@ public class CountSqlParser {
      */
     public boolean isSimpleCount(PlainSelect select) {
         //包含group by的时候不可以
-        if (select.getGroupByColumnReferences() != null) {
+        if (select.getGroupBy() != null) {
             return false;
         }
         //包含distinct的时候不可以

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-/**
+package com.github.pagehelper.util;/**
  * @author liuzh
  */
 public class Ognl {

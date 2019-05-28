@@ -31,6 +31,7 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 
@@ -490,7 +491,7 @@ public class SqlServerParser {
 
             } else { // OrderByElement 不在查询列表中，需要自动生成一个查询列
                 if (expression instanceof Column) { // OrderByElement 为普通列
-                    String table = ((Column) expression).getTable().getName();
+                    Table table = ((Column) expression).getTable();
                     if (table == null) { // 表名为空
                         if (allColumns ||
                                 (allColumnsTables.size() == 1 && plainSelect.getJoins() == null) ||
@@ -501,7 +502,8 @@ public class SqlServerParser {
                         }
 
                     } else { //表名不为空
-                        if (allColumns || allColumnsTables.contains(table)) {
+                        String tableName = table.getName();
+                        if (allColumns || allColumnsTables.contains(tableName)) {
                             // 包含`*`查询列 或者 包含特定的`t.*`列
                             // 此时排序列其实已经包含在查询列表中了，只需去除排序列的表名引
                             ((Column) expression).setTable(null);

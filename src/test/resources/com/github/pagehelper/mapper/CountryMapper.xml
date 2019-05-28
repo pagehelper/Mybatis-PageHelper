@@ -103,7 +103,7 @@
 
     <select id="selectIf" resultType="com.github.pagehelper.model.Country">
         select * from country
-        <if test="@Ognl@isNotNull(id)">
+        <if test="@com.github.pagehelper.util.Ognl@isNotNull(id)">
             <!--<if test="id!=null">-->
             where id &gt; #{id}
         </if>
@@ -111,7 +111,7 @@
     </select>
     <select id="selectIf_TESTCOUNT" resultType="Long">
         select count(distinct id) from country
-        <if test="@Ognl@isNotNull(id)">
+        <if test="@com.github.pagehelper.util.Ognl@isNotNull(id)">
             <!--<if test="id!=null">-->
             where id &gt; #{id}
         </if>
