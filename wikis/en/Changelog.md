@@ -1,5 +1,17 @@
 ## Changelog
 
+### 5.1.9 - 2019-05-29
+
+- Upgrade jsqlparser to 2.0, upgrade mybatis to 3.5.1. resolve compatibility issues.
+- Improve paging logic judgment. fixed #389
+- Solve MetaObject version compatibility issues. fixed #349
+- Processing order by output warning log when parsing fails, not throwing exception
+- Solve three problems that may cause countColumn to fail fixed #325
+- Add a comma with less BIT_ fixed #341
+- Handling invalid links in documents isea533
+- Document sample error. fixed #366
+- fixed #373 NPE problem
+
 ### 5.1.8 - 2018-11-11
 
 - Resolve the problem of `with(nolock)` in SQLServer ([#pr10](https://gitee.com/free/Mybatis_PageHelper/pulls/10)) by [lvshuyan](https://gitee.com/lvshuyan)

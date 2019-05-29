@@ -1,5 +1,17 @@
 ## 更新日志
 
+### 5.1.9 - 2019-05-29
+
+- 升级 jsqlparser 为 2.0，升级 mybatis 为 3.5.1，解决兼容性问题。
+- 完善分页逻辑判断，fixed #389
+- 解决 MetaObject 版本兼容性问题 fixed #349
+- 处理 order by 解析失败时输出警告日志，不在抛出异常
+- 解决三处可能会导致countColumn失效的问题 fixed #325
+- 解决 BIT_ 少的逗号 fixed #341
+- 处理文档中的失效链接 isea533
+- 文档示例错误，fixed #366
+- fixed #373 NPE 问题
+
 ### 5.1.8 - 2018-11-11
 
 - 解决 sqlserver 中 with(nolock) 的问题([#pr10](https://gitee.com/free/Mybatis_PageHelper/pulls/10)) by [lvshuyan](https://gitee.com/lvshuyan)
