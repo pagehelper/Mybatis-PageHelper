@@ -55,7 +55,7 @@ public class CountSqlParser {
             ("APPROX_COUNT_DISTINCT," +
             "ARRAY_AGG," +
             "AVG," +
-            "BIT_" +
+            "BIT_," +
             //"BIT_AND," +
             //"BIT_OR," +
             //"BIT_XOR," +
