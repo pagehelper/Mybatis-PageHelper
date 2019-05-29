@@ -174,13 +174,13 @@ public class CountSqlParser {
         Statement stmt = null;
         //特殊sql不需要去掉order by时，使用注释前缀
         if(sql.indexOf(KEEP_ORDERBY) >= 0){
-            return getSimpleCountSql(sql);
+            return getSimpleCountSql(sql, name);
         }
         try {
             stmt = CCJSqlParserUtil.parse(sql);
         } catch (Throwable e) {
             //无法解析的用一般方法返回count语句
-            return getSimpleCountSql(sql);
+            return getSimpleCountSql(sql, name);
         }
         Select select = (Select) stmt;
         SelectBody selectBody = select.getSelectBody();
@@ -189,7 +189,7 @@ public class CountSqlParser {
             processSelectBody(selectBody);
         } catch (Exception e) {
             //当 sql 包含 group by 时，不去除 order by
-            return getSimpleCountSql(sql);
+            return getSimpleCountSql(sql, name);
         }
         //处理with-去order by
         processWithItemsList(select.getWithItemsList());
