@@ -1,5 +1,121 @@
 ## 更新日志
 
+### 5.1.10 - 2019-06-05
+
+在 *5.1.0 - 2017-08-28* 版本中，增加 `ReplaceSql` 接口用于处理 sqlServer 的 `with(nolock)` 问题，增加了针对性的 `replaceSql` 参数，
+可选值为 `simple` 和 `regex`，或者是实现了ReplaceSql接口的全限定类名。默认值为 `simple`，仍然使用原来的方式处理，
+新的 `regex` 会将如 `table with(nolock)` 处理为 `table_PAGEWITHNOLOCK`。
+
+本次更新仅仅是把默认值从 `simple` 改为了 `regex`，使用 `regex` 方式几乎能 100% 解决 sqlServer 的分页问题。
+
+下面是两个 issue 中的示例。
+
+#### 示例 SQL [#76](https://github.com/pagehelper/pagehelper-spring-boot/issues/76)
+
+原始 SQL：
+```sql
+SELECT *
+FROM
+forum_post_info a with(nolock)
+LEFT JOIN forum_carcase_tags as b with(nolock) on a.id = b.carcase_id where b.tag_id = 127
+```
+转换的 Count SQL：
+```sql
+SELECT COUNT(0)
+FROM forum_post_info a WITH (NOLOCK)
+	LEFT JOIN forum_carcase_tags b WITH (NOLOCK) ON a.id = b.carcase_id
+WHERE b.tag_id = 127
+```
+转换的分页 SQL：
+```sql
+SELECT TOP 10 *
+FROM (
+	SELECT ROW_NUMBER() OVER (ORDER BY RAND()) AS PAGE_ROW_NUMBER, *
+	FROM (
+		SELECT *
+		FROM forum_post_info a WITH (NOLOCK)
+			LEFT JOIN forum_carcase_tags b WITH (NOLOCK) ON a.id = b.carcase_id
+		WHERE b.tag_id = 127
+	) PAGE_TABLE_ALIAS
+) PAGE_TABLE_ALIAS
+WHERE PAGE_ROW_NUMBER > 1
+ORDER BY PAGE_ROW_NUMBER
+```
+
+#### 示例 SQL [#398](https://github.com/pagehelper/Mybatis-PageHelper/issues/398)
+
+原始 SQL：
+```sql
+Select AUS.ScheduleID, AUS.SystemID, AUS.ClinicID, AUS.DoctorID, AUS.ScheduleDate,
+	AUS.StartTime, AUS.EndTime, AUS.Status, AUS.BookBy, AUS.Note, AUS.Remark, AUS.SourceType, CM.CompanyName,
+	AU.UserName As DoctorName, AU.UserNumber As DoctorNumber, CC.CodeDesc As ClinicName, CD.Lat, CD.Lng,
+	CD.ContactTel, CD.Address, CR.ConsultationStatusID, CR.RegisterStatus,A1.CodeDesc as AreaLevel1, A2.CodeDesc as AreaLevel2
+	From ACM_User_Schedule AUS with(nolock)
+	Left Join Client_Register CR with(nolock) On AUS.BookBy=CR.ClientID And CR.SourceType='F' And AUS.ClientRegisterNum=CR.ClientRegisterNum
+	Inner Join ACM_User AU with(nolock) On AU.UserID = AUS.DoctorID
+	Inner Join Code_Clinic CC with(nolock) On AUS.ClinicID=CC.CodeID
+	Inner Join Clinic_Detail CD with(nolock) On CC.CodeID = CD.ClinicID
+	Inner Join Code_Area A1 with(nolock) On CD.AreaLevel1ID=A1.CodeID
+	Inner Join Code_Area A2 with(nolock) On CD.AreaLevel2ID=A2.CodeID
+	Inner Join Company_Master CM with(nolock) On CC.SystemID = CM.SystemID
+	Where BookBy=1
+```
+转换的 Count SQL：
+```sql
+SELECT COUNT(0)
+FROM ACM_User_Schedule AUS WITH (NOLOCK)
+	LEFT JOIN Client_Register CR WITH (NOLOCK)
+	ON AUS.BookBy = CR.ClientID
+		AND CR.SourceType = 'F'
+		AND AUS.ClientRegisterNum = CR.ClientRegisterNum
+	INNER JOIN ACM_User AU WITH (NOLOCK) ON AU.UserID = AUS.DoctorID
+	INNER JOIN Code_Clinic CC WITH (NOLOCK) ON AUS.ClinicID = CC.CodeID
+	INNER JOIN Clinic_Detail CD WITH (NOLOCK) ON CC.CodeID = CD.ClinicID
+	INNER JOIN Code_Area A1 WITH (NOLOCK) ON CD.AreaLevel1ID = A1.CodeID
+	INNER JOIN Code_Area A2 WITH (NOLOCK) ON CD.AreaLevel2ID = A2.CodeID
+	INNER JOIN Company_Master CM WITH (NOLOCK) ON CC.SystemID = CM.SystemID
+WHERE BookBy = 1
+```
+转换的分页 SQL：
+```sql
+SELECT TOP 10 ScheduleID, SystemID, ClinicID, DoctorID, ScheduleDate
+	, StartTime, EndTime, Status, BookBy, Note
+	, Remark, SourceType, CompanyName, DoctorName, DoctorNumber
+	, ClinicName, Lat, Lng, ContactTel, Address
+	, ConsultationStatusID, RegisterStatus, AreaLevel1, AreaLevel2
+FROM (
+	SELECT ROW_NUMBER() OVER (ORDER BY RAND()) AS PAGE_ROW_NUMBER, ScheduleID, SystemID, ClinicID, DoctorID
+		, ScheduleDate, StartTime, EndTime, Status, BookBy
+		, Note, Remark, SourceType, CompanyName, DoctorName
+		, DoctorNumber, ClinicName, Lat, Lng, ContactTel
+		, Address, ConsultationStatusID, RegisterStatus, AreaLevel1, AreaLevel2
+	FROM (
+		SELECT AUS.ScheduleID, AUS.SystemID, AUS.ClinicID, AUS.DoctorID, AUS.ScheduleDate
+			, AUS.StartTime, AUS.EndTime, AUS.Status, AUS.BookBy, AUS.Note
+			, AUS.Remark, AUS.SourceType, CM.CompanyName, AU.UserName AS DoctorName, AU.UserNumber AS DoctorNumber
+			, CC.CodeDesc AS ClinicName, CD.Lat, CD.Lng, CD.ContactTel, CD.Address
+			, CR.ConsultationStatusID, CR.RegisterStatus, A1.CodeDesc AS AreaLevel1, A2.CodeDesc AS AreaLevel2
+		FROM ACM_User_Schedule AUS WITH (NOLOCK)
+			LEFT JOIN Client_Register CR WITH (NOLOCK)
+			ON AUS.BookBy = CR.ClientID
+				AND CR.SourceType = 'F'
+				AND AUS.ClientRegisterNum = CR.ClientRegisterNum
+			INNER JOIN ACM_User AU WITH (NOLOCK) ON AU.UserID = AUS.DoctorID
+			INNER JOIN Code_Clinic CC WITH (NOLOCK) ON AUS.ClinicID = CC.CodeID
+			INNER JOIN Clinic_Detail CD WITH (NOLOCK) ON CC.CodeID = CD.ClinicID
+			INNER JOIN Code_Area A1 WITH (NOLOCK) ON CD.AreaLevel1ID = A1.CodeID
+			INNER JOIN Code_Area A2 WITH (NOLOCK) ON CD.AreaLevel2ID = A2.CodeID
+			INNER JOIN Company_Master CM WITH (NOLOCK) ON CC.SystemID = CM.SystemID
+		WHERE BookBy = 1
+	) PAGE_TABLE_ALIAS
+) PAGE_TABLE_ALIAS
+WHERE PAGE_ROW_NUMBER > 1
+ORDER BY PAGE_ROW_NUMBER
+```
+
+SQL 经过 https://tool.oschina.net/codeformat/sql 格式化。
+
+
 ### 5.1.9 - 2019-05-29
 
 - 升级 jsqlparser 为 2.0，升级 mybatis 为 3.5.1，解决兼容性问题。
