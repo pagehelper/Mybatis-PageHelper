@@ -92,66 +92,66 @@ public class SqlServerTest {
     @Test
     public void testSqlWith() throws JSQLParserException {
         String originalSql = "with cr as " +
-                " (select id " +
-                "    from country " +
-                "   where id > 100 " +
-                "     and id < 120) " +
-                "select id, countryname, countrycode " +
-                "  from country " +
-                " where id in (select * from cr) order by id";
+            " (select id " +
+            "    from country " +
+            "   where id > 100 " +
+            "     and id < 120) " +
+            "select id, countryname, countrycode " +
+            "  from country " +
+            " where id in (select * from cr) order by id";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlLeftJoin() throws JSQLParserException {
         String originalSql = "select * " +
-                "  from (select distinct A.USERID, " +
-                "                        A.USERCODE, " +
-                "                        A.USERNAME, " +
-                "                        A.USERPWD, " +
-                "                        A.CREATEDATE, " +
-                "                        A.UPDATEDATE, " +
-                "                        A.USERSTATE, " +
-                "                        A.MEMO, " +
-                "                        A.USERPHONE, " +
-                "                        A.USEREMAIL, " +
-                "                        A.IDCARD, " +
-                "                        D.DEPTNAME, " +
-                "                        D.DEPTID " +
-                "          from BASE_SYS_USER A " +
-                "          left JOIN BASE_SYS_ROLE_USER_REL B " +
-                "            ON A.USERID = B.USERID " +
-                "          left JOIN BASE_SYS_ROLE C " +
-                "            on C.ROLEID = B.ROLEID " +
-                "          left join BASE_SYS_DEPT_USER_REL REL " +
-                "            on REL.USERID = A.USERID " +
-                "          left join BASE_SYS_DEPT D " +
-                "            on D.DEPTID = REL.DEPTID " +
-                "         where 1 = 1 " +
-                "           and C.ROLEID = ? " +
-                "           and D.DEPTID = ? " +
-                "           and A.USERNAME LIKE '%heh%' " +
-                "           and A.USERSTATE = ? " +
-                "         ) A Order by A.createDate desc";
+            "  from (select distinct A.USERID, " +
+            "                        A.USERCODE, " +
+            "                        A.USERNAME, " +
+            "                        A.USERPWD, " +
+            "                        A.CREATEDATE, " +
+            "                        A.UPDATEDATE, " +
+            "                        A.USERSTATE, " +
+            "                        A.MEMO, " +
+            "                        A.USERPHONE, " +
+            "                        A.USEREMAIL, " +
+            "                        A.IDCARD, " +
+            "                        D.DEPTNAME, " +
+            "                        D.DEPTID " +
+            "          from BASE_SYS_USER A " +
+            "          left JOIN BASE_SYS_ROLE_USER_REL B " +
+            "            ON A.USERID = B.USERID " +
+            "          left JOIN BASE_SYS_ROLE C " +
+            "            on C.ROLEID = B.ROLEID " +
+            "          left join BASE_SYS_DEPT_USER_REL REL " +
+            "            on REL.USERID = A.USERID " +
+            "          left join BASE_SYS_DEPT D " +
+            "            on D.DEPTID = REL.DEPTID " +
+            "         where 1 = 1 " +
+            "           and C.ROLEID = ? " +
+            "           and D.DEPTID = ? " +
+            "           and A.USERNAME LIKE '%heh%' " +
+            "           and A.USERSTATE = ? " +
+            "         ) A Order by A.createDate desc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlUnion() throws JSQLParserException {
         String originalSql = "select countryname,countrycode code from country where id >170 " +
-                "union all " +
-                "select countryname,countrycode code from country where id < 10 order by code";
+            "union all " +
+            "select countryname,countrycode code from country where id < 10 order by code";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlUnion2() throws JSQLParserException {
         String originalSql = "select countryname,code from ( " +
-                "\tselect countryname,countrycode code from country where id >170 " +
-                "\tunion all " +
-                "\tselect countryname,countrycode code from country where id < 10 " +
-                ") as temp " +
-                "order by code";
+            "\tselect countryname,countrycode code from country where id >170 " +
+            "\tunion all " +
+            "\tselect countryname,countrycode code from country where id < 10 " +
+            ") as temp " +
+            "order by code";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
@@ -222,11 +222,11 @@ public class SqlServerTest {
             "From Client CC With(Nolock)\n" +
             "Left Outer Join Register CR With(Nolock) On CC.ClientRegisterID = CR.ClientRegisterID\n" +
             "Where CC.ClientID = 14374";
-      ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
-      String replace = replaceSql.replace(originalSql);
-      String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
-      String result = replaceSql.restore(pageSql);
-      System.out.println(result);
+        ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
+        String replace = replaceSql.replace(originalSql);
+        String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
+        String result = replaceSql.restore(pageSql);
+        System.out.println(result);
     }
 
     @Test
@@ -234,11 +234,11 @@ public class SqlServerTest {
         String originalSql = "Select * FROM table1 t1 with(nolock)\n" +
             "left join table2 t2 with(nolock) on t1.id=t2.id\n" +
             "left join table3 t3 with(nolock) on t1.id=t3.id";
-      ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
-      String replace = replaceSql.replace(originalSql);
-      String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
-      String result = replaceSql.restore(pageSql);
-      System.out.println(result);
+        ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
+        String replace = replaceSql.replace(originalSql);
+        String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
+        String result = replaceSql.restore(pageSql);
+        System.out.println(result);
     }
 
     @Test
@@ -247,9 +247,9 @@ public class SqlServerTest {
             "FROM\n" +
             "forum_post_info a with(nolock)\n" +
             "LEFT JOIN forum_carcase_tags as b with(nolock) on a.id = b.carcase_id where b.tag_id = 127";
-      ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
-      String replace = replaceSql.replace(originalSql);
-      String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
+        ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
+        String replace = replaceSql.replace(originalSql);
+        String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
 
 
         CountSqlParser countSqlParser = new CountSqlParser();
@@ -258,7 +258,37 @@ public class SqlServerTest {
         System.out.println(smartCountSql);
 
 
-      String result = replaceSql.restore(pageSql);
-      System.out.println(result);
+        String result = replaceSql.restore(pageSql);
+        System.out.println(result);
+    }
+
+    @Test
+    public void testSql398() throws JSQLParserException {
+        String originalSql = "Select AUS.ScheduleID, AUS.SystemID, AUS.ClinicID, AUS.DoctorID, AUS.ScheduleDate, \n" +
+            "\tAUS.StartTime, AUS.EndTime, AUS.Status, AUS.BookBy, AUS.Note, AUS.Remark, AUS.SourceType, CM.CompanyName,\n" +
+            "\tAU.UserName As DoctorName, AU.UserNumber As DoctorNumber, CC.CodeDesc As ClinicName, CD.Lat, CD.Lng,\n" +
+            "\tCD.ContactTel, CD.Address, CR.ConsultationStatusID, CR.RegisterStatus,A1.CodeDesc as AreaLevel1, A2.CodeDesc as AreaLevel2\n" +
+            "\tFrom ACM_User_Schedule AUS with(nolock)\n" +
+            "\tLeft Join Client_Register CR with(nolock) On AUS.BookBy=CR.ClientID And CR.SourceType='F' And AUS.ClientRegisterNum=CR.ClientRegisterNum \n" +
+            "\tInner Join ACM_User AU with(nolock) On AU.UserID = AUS.DoctorID \n" +
+            "\tInner Join Code_Clinic CC with(nolock) On AUS.ClinicID=CC.CodeID\n" +
+            "\tInner Join Clinic_Detail CD with(nolock) On CC.CodeID = CD.ClinicID\n" +
+            "\tInner Join Code_Area A1 with(nolock) On CD.AreaLevel1ID=A1.CodeID\n" +
+            "\tInner Join Code_Area A2 with(nolock) On CD.AreaLevel2ID=A2.CodeID\n" +
+            "\tInner Join Company_Master CM with(nolock) On CC.SystemID = CM.SystemID\n" +
+            "\tWhere BookBy=1";
+        ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
+        String replace = replaceSql.replace(originalSql);
+        String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
+
+
+        CountSqlParser countSqlParser = new CountSqlParser();
+        String smartCountSql = countSqlParser.getSmartCountSql(replace);
+        smartCountSql = replaceSql.restore(smartCountSql);
+        System.out.println(smartCountSql);
+
+
+        String result = replaceSql.restore(pageSql);
+        System.out.println(result);
     }
 }

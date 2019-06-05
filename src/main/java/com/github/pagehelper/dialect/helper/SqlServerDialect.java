@@ -116,10 +116,10 @@ public class SqlServerDialect extends AbstractHelperDialect {
     public void setProperties(Properties properties) {
         super.setProperties(properties);
         String replaceSql = properties.getProperty("replaceSql");
-        if(StringUtil.isEmpty(replaceSql) || "simple".equalsIgnoreCase(replaceSql)){
-            this.replaceSql = new SimpleWithNolockReplaceSql();
-        } else if("regex".equalsIgnoreCase(replaceSql)){
+        if(StringUtil.isEmpty(replaceSql) || "regex".equalsIgnoreCase(replaceSql)){
             this.replaceSql = new RegexWithNolockReplaceSql();
+        } else if("simple".equalsIgnoreCase(replaceSql)){
+            this.replaceSql = new SimpleWithNolockReplaceSql();
         } else {
             try {
                 this.replaceSql = (ReplaceSql) Class.forName(replaceSql).newInstance();
