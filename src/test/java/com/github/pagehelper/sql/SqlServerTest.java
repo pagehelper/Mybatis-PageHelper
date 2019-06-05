@@ -26,6 +26,7 @@ package com.github.pagehelper.sql;
 
 import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
+import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.SqlServerParser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Ignore;
@@ -236,6 +237,27 @@ public class SqlServerTest {
       ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
       String replace = replaceSql.replace(originalSql);
       String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
+      String result = replaceSql.restore(pageSql);
+      System.out.println(result);
+    }
+
+    @Test
+    public void testSql66() throws JSQLParserException {
+        String originalSql = "SELECT *\n" +
+            "FROM\n" +
+            "forum_post_info a with(nolock)\n" +
+            "LEFT JOIN forum_carcase_tags as b with(nolock) on a.id = b.carcase_id where b.tag_id = 127";
+      ReplaceSql replaceSql = new RegexWithNolockReplaceSql();
+      String replace = replaceSql.replace(originalSql);
+      String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
+
+
+        CountSqlParser countSqlParser = new CountSqlParser();
+        String smartCountSql = countSqlParser.getSmartCountSql(replace);
+        smartCountSql = replaceSql.restore(smartCountSql);
+        System.out.println(smartCountSql);
+
+
       String result = replaceSql.restore(pageSql);
       System.out.println(result);
     }
