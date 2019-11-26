@@ -6,19 +6,19 @@
 [中文版文档](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/README_zh.md)
 
 If you are using MyBatis, it is recommended to try this pagination plugin. 
-This must be the **Most Convenient** pagination plugin.
+This must be the **MOST CONVENIENT** pagination plugin.
 
-PageHelper support any complex single-table, multi-table queries.
-Some special cases please see the [**Important note**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md).
+PageHelper supports any complex single-table, multi-table queries.
+As to some special cases, please refer to the [**Important note**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md).
 
 Want to use PageHelper? 
-Please see [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md).
+Please check out [**How to use PageHelper**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md).
 
 ## New JavaDoc
 
 https://apidoc.gitee.com/free/Mybatis_PageHelper
 
-Method API: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
+APIs: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
 
 ## 新书《MyBatis 从入门到精通》
 
@@ -53,11 +53,11 @@ PageHelper supports the following databases:
 
 ## Installation
 
-To use PageHelper you just need to include the 
+To use PageHelper, you just need to include the 
 [pagehelper-x.x.x.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 
 and [jsqlparser-0.9.5.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/) file in the classpath.
 
-If you are using Maven just add the following dependency to your pom.xml:
+If you are using Maven, you could just add the following dependency to your `pom.xml`:
 
 ```xml  
 <dependency>
@@ -67,9 +67,9 @@ If you are using Maven just add the following dependency to your pom.xml:
 </dependency>
 ```  
 
-If you are using Spring Boot, You can refer to [pagehelper-spring-boot-starter](https://github.com/pagehelper/pagehelper-spring-boot)
+If you are using Spring Boot, You can refer to the [pagehelper-spring-boot-starter](https://github.com/pagehelper/pagehelper-spring-boot)
 
-[Read More...](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md)
+[More...](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md)
 
 ## Documentation  
 - [How to use the PageHelper](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md)
