@@ -1,5 +1,11 @@
 ## Changelog
 
+### 5.1.11 - 2019-11-26
+
+- Added support for Shentong database **wangss**
+- Add support for HerdDB - support HerdDB, mostly like MySQL - auto detect HerdDB **Enrico Olivelli**
+- fix some typos and grammar issues **LHearen**
+
 ### 5.1.10 - 2019-06-05
 
 In version *5.1.0 - 2017-08-28*. Added `ReplaceSql` interface for handling sqlServer with (nolock) problem,

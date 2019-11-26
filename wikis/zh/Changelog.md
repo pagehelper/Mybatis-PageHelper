@@ -1,5 +1,11 @@
 ## 更新日志
 
+### 5.1.11 - 2019-11-26
+
+- 增加神通数据库的支持 **wangss**
+- Add support for HerdDB - support HerdDB, mostly like MySQL - auto detect HerdDB **Enrico Olivelli**
+- fix some typos and grammar issues **LHearen**
+
 ### 5.1.10 - 2019-06-05
 
 在 *5.1.0 - 2017-08-28* 版本中，增加 `ReplaceSql` 接口用于处理 sqlServer 的 `with(nolock)` 问题，增加了针对性的 `replaceSql` 参数，
