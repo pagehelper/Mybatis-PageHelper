@@ -55,7 +55,9 @@ GitHub项目：https://github.com/mybatis-book/book
 由于分页插件 5.0 版本和 4.2.x 实现完全不同，所以 master 分支为 5.x 版本，4.2 作为一个分支存在，如果有针对 4.2 的 PR，请注意提交到分支版本。
 
 ## 集成
-使用 PageHelper 你只需要在 classpath 中包含 [pagehelper-x.x.x.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 和 [jsqlparser-0.9.5.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/0.9.5/)。
+使用 PageHelper 你只需要在 classpath 中包含 [pagehelper-x.y.z.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 和 [jsqlparser-x.y.z.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/)。
+
+>pagehelper 和 jsqlparser 对应关系参考 pom.xml 中的依赖版本。
 
 如果你使用 Maven，你只需要在 pom.xml 中添加下面的依赖：
 ```xml  
