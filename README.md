@@ -35,19 +35,25 @@ GitHub项目：https://github.com/mybatis-book/book
 
 PageHelper supports the following databases:
 
- 1. `Oracle`
- 2. `Mysql`
- 3. `MariaDB`
- 4. `SQLite`
- 5. `Hsqldb`
- 6. `PostgreSQL`
- 7. `DB2`
- 8. `SqlServer(2005,2008)`
- 9. `Informix`
- 10. `H2`
- 11. `SqlServer2012`
- 12. `Derby`
- 13. `Phoenix`
+1. `Oracle`
+2. `Mysql`
+3. `MariaDB`
+4. `SQLite`
+5. `Hsqldb`
+6. `PostgreSQL`
+7. `DB2`
+8. `SqlServer(2005,2008)`
+9. `Informix`
+10. `H2`
+11. `SqlServer2012`
+12. `Derby`
+13. `Phoenix`
+14. 达梦数据库(dm)
+15. 阿里云PPAS数据库
+16. 神通数据库
+17. HerdDB
+
+>The database list here is not updated in time, see details here [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58).
 
 ## Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 

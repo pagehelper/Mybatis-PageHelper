@@ -33,20 +33,26 @@ GitHub项目：https://github.com/mybatis-book/book
 
 该插件目前支持以下数据库的<b>物理分页</b>:
 
- 1. `Oracle`
- 2. `Mysql`
- 3. `MariaDB`
- 4. `SQLite`
- 5. `Hsqldb`
- 6. `PostgreSQL`
- 7. `DB2`
- 8. `SqlServer(2005,2008)`
- 9. `Informix`
- 10. `H2`
- 11. `SqlServer2012`
- 12. `Derby`
- 13. `Phoenix`
- 
+1. `Oracle`
+2. `Mysql`
+3. `MariaDB`
+4. `SQLite`
+5. `Hsqldb`
+6. `PostgreSQL`
+7. `DB2`
+8. `SqlServer(2005,2008)`
+9. `Informix`
+10. `H2`
+11. `SqlServer2012`
+12. `Derby`
+13. `Phoenix`
+14. 达梦数据库(dm)
+15. 阿里云PPAS数据库
+16. 神通数据库
+17. HerdDB
+
+>这里的数据库列表更新不及时，详情看这里: [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58)
+
 ## 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 [Executor 拦截器高级教程 - QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md)
 
