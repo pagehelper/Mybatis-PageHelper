@@ -101,13 +101,13 @@ GitHub项目：https://github.com/mybatis-book/book
 
 ## 作者信息
 
-网站：http://www.mybatis.tk
+网站：https://mybatis.io
 
 作者博客：http://blog.csdn.net/isea533
 
 作者邮箱： abel533@gmail.com  
 
-如需加群，请通过 http://mybatis.tk 首页按钮加群。
+如需加群，请通过 http://mybatis.io 首页按钮加群。
 
 本项目在 github 的项目地址：https://github.com/pagehelper/Mybatis-PageHelper
 

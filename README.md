@@ -99,7 +99,7 @@ If you are using Spring Boot, You can refer to the [pagehelper-spring-boot-start
 <img src="https://user-images.githubusercontent.com/1787798/69898077-4f4e3d00-138f-11ea-81f9-96fb7c49da89.png" height="200"/></a>
 
 ## Author Info
-Web: http://www.mybatis.tk
+Web: https://mybatis.io
 
 Blog: http://blog.csdn.net/isea533
 
