@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic.dynamic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class TestDynamicForeach {
     @Test
     public void testMapperWithStartPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             List<Long> idList = new ArrayList<Long>();
@@ -53,7 +53,7 @@ public class TestDynamicForeach {
             idList.add(2L);
             idList.add(3L);
             PageHelper.startPage(1, 2);
-            List<Country> list = countryMapper.selectByIdList(idList);
+            List<User> list = userMapper.selectByIdList(idList);
             assertEquals(1, list.get(0).getId());
             assertEquals(2, list.size());
             assertEquals(3, ((Page<?>) list).getTotal());
@@ -67,7 +67,7 @@ public class TestDynamicForeach {
     @Test
     public void testMapperWithStartPage2() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             List<Long> idList = new ArrayList<Long>();
@@ -75,7 +75,7 @@ public class TestDynamicForeach {
             idList.add(2L);
             idList.add(3L);
             PageHelper.startPage(1, 2);
-            List<Country> list = countryMapper.selectByIdList2(idList);
+            List<User> list = userMapper.selectByIdList2(idList);
             assertEquals(1, list.get(0).getId());
             assertEquals(2, list.size());
             assertEquals(3, ((Page<?>) list).getTotal());

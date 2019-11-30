@@ -26,7 +26,7 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -49,17 +49,17 @@ public class TestNamespaceMap {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("countryname", "c");
-            List<Country> list = sqlSession.selectList("selectLike", map);
-            assertEquals(30, list.get(0).getId());
+            map.put("name", "刘");
+            List<User> list = sqlSession.selectList("selectLike", map);
+            assertEquals(78, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(39, ((Page<?>) list).getTotal());
+            assertEquals(15, ((Page<?>) list).getTotal());
 
             PageHelper.startPage(1, 10);
-            map.put("countryname", "China");
-            map.put("countrycode", "CN");
+            map.put("name", "刘睿");
+            map.put("py", "LR");
             list = sqlSession.selectList("selectByMap", map);
-            assertEquals(35, list.get(0).getId());
+            assertEquals(78, list.get(0).getId());
             assertEquals(1, list.size());
             assertEquals(1, ((Page<?>) list).getTotal());
         } finally {

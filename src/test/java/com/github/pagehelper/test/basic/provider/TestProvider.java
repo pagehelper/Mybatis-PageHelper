@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic.provider;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -45,17 +45,17 @@ public class TestProvider {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("id", 100);
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectByProvider(map);
+            List<User> list = userMapper.selectByProvider(map);
             assertEquals(100, list.get(0).getId());
             assertEquals(1, list.size());
             assertEquals(1, ((Page<?>) list).getTotal());
 
-            map.put("countryname", "天朝");
+            map.put("name", "不存在");
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectByProvider(map);
+            list = userMapper.selectByProvider(map);
             assertEquals(0, list.size());
         } finally {
             sqlSession.close();
@@ -63,21 +63,21 @@ public class TestProvider {
     }
 
     @Test
-    public void testCountryProvider() {
+    public void testUserProvider() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        Country country = new Country();
-        country.setId(100);
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        User user = new User();
+        user.setId(100);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectByCountryProvider(country);
+            List<User> list = userMapper.selectByUserProvider(user);
             assertEquals(100, list.get(0).getId());
             assertEquals(1, list.size());
             assertEquals(1, ((Page<?>) list).getTotal());
 
-            country.setCountryname("天朝");
+            user.setName("不存在");
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectByCountryProvider(country);
+            list = userMapper.selectByUserProvider(user);
             assertEquals(0, list.size());
         } finally {
             sqlSession.close();
@@ -85,15 +85,15 @@ public class TestProvider {
     }
 
     @Test
-    public void testCountrySelect() {
+    public void testUserSelect() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        Country country = new Country();
-        country.setId(100);
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        User user = new User();
+        user.setId(100);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             PageHelper.startPage(1, 10);
-            List<Map<String, Object>> countryList = countryMapper.selectBySelect();
-            System.out.println(countryList.size());
+            List<Map<String, Object>> userList = userMapper.selectBySelect();
+            System.out.println(userList.size());
         } finally {
             sqlSession.close();
         }

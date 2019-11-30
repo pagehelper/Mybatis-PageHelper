@@ -315,14 +315,14 @@ private static final Set<String> AGGREGATE_FUNCTIONS = new HashSet<String>(Array
 
 例如，如果存在下面两个查询：
 ```xml
-<select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
-    select a.id,b.countryname,a.countrycode from country a
-    left join country b on a.id = b.id
+<select id="selectLeftjoin" resultType="com.github.pagehelper.model.User">
+    select a.id,b.name,a.py from user a
+    left join user b on a.id = b.id
     order by a.id
 </select>
 <select id="selectLeftjoin_COUNT" resultType="Long">
-    select count(distinct a.id) from country a
-    left join country b on a.id = b.id
+    select count(distinct a.id) from user a
+    left join user b on a.id = b.id
 </select>
 ```
 上面的 `countSuffix` 使用的默认值 `_COUNT`，分页插件会自动获取到 `selectLeftjoin_COUNT` 查询，这个查询需要自己保证结果数正确。
@@ -333,13 +333,13 @@ private static final Set<String> AGGREGATE_FUNCTIONS = new HashSet<String>(Array
 
 上面方法执行输出的部分日志如下：
 ```
-DEBUG [main] - ==>  Preparing: select count(distinct a.id) from country a left join country b on a.id = b.id 
+DEBUG [main] - ==>  Preparing: select count(distinct a.id) from user a left join user b on a.id = b.id
 DEBUG [main] - ==> Parameters: 
 TRACE [main] - <==    Columns: C1
 TRACE [main] - <==        Row: 183
 DEBUG [main] - <==      Total: 1
 DEBUG [main] - Cache Hit Ratio [com.github.pagehelper.mapper.CountryMapper]: 0.0
-DEBUG [main] - ==>  Preparing: select a.id,b.countryname,a.countrycode from country a left join country b on a.id = b.id order by a.id LIMIT 10 
+DEBUG [main] - ==>  Preparing: select a.id,b.name,a.py from user a left join user b on a.id = b.id order by a.id LIMIT 10
 DEBUG [main] - ==> Parameters: 
 TRACE [main] - <==    Columns: ID, COUNTRYNAME, COUNTRYCODE
 TRACE [main] - <==        Row: 1, Angola, AO
@@ -441,36 +441,36 @@ TRACE [main] - <==        Row: 3, Albania, AL
 
 ```java
 //jdk6,7用法，创建接口
-Page<Country> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(new ISelect() {
+Page<User> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(new ISelect() {
     @Override
     public void doSelect() {
-        countryMapper.selectGroupBy();
+        userMapper.selectGroupBy();
     }
 });
 //jdk8 lambda用法
-Page<Country> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(()-> countryMapper.selectGroupBy());
+Page<User> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(()-> userMapper.selectGroupBy());
 //为了说明可以链式使用，上面是单独setOrderBy("id desc")，也可以直接如下
-Page<Country> page = PageHelper.startPage(1, 10, "id desc").doSelectPage(()-> countryMapper.selectGroupBy());
+Page<User> page = PageHelper.startPage(1, 10, "id desc").doSelectPage(()-> userMapper.selectGroupBy());
 
 //也可以直接返回PageInfo，注意doSelectPageInfo方法和doSelectPage
 pageInfo = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPageInfo(new ISelect() {
     @Override
     public void doSelect() {
-        countryMapper.selectGroupBy();
+        userMapper.selectGroupBy();
     }
 });
 //对应的lambda用法
-pageInfo = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPageInfo(() -> countryMapper.selectGroupBy());
+pageInfo = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPageInfo(() -> userMapper.selectGroupBy());
 
 //count查询，返回一个查询语句的count数
 long total = PageHelper.count(new ISelect() {
     @Override
     public void doSelect() {
-        countryMapper.selectLike(country);
+        userMapper.selectLike(user);
     }
 });
 //lambda
-total = PageHelper.count(()->countryMapper.selectLike(country));
+total = PageHelper.count(()->userMapper.selectLike(user));
 ```
 
 ### 4.0.3 - 2015-11-09：
@@ -561,7 +561,7 @@ total = PageHelper.count(()->countryMapper.selectLike(country));
    现在可以直接使用`Parser`，使用方法如下：
 
    ```java
-   String originalSql = "Select * from country o where id > 10 order by id desc ";
+   String originalSql = "Select * from user o where id > 10 order by id desc ";
 
    Parser parser = AbstractParser.newParser("mysql");
    //获取count查询sql

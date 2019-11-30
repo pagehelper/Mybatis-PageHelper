@@ -27,8 +27,8 @@ package com.github.pagehelper.test.basic;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.PageSerializable;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -45,13 +45,13 @@ public class PageInfoTest {
     @Test
     public void testPageSize10() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectAll();
+            List<User> list = userMapper.selectAll();
             System.out.println(list);
-            PageInfo<Country> page = new PageInfo<Country>(list);
+            PageInfo<User> page = new PageInfo<User>(list);
             assertEquals(1, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(1, page.getStartRow());
@@ -63,14 +63,14 @@ public class PageInfoTest {
             assertEquals(false, page.isHasPreviousPage());
             assertEquals(true, page.isHasNextPage());
 
-            PageSerializable<Country> serializable = PageSerializable.of(list);
+            PageSerializable<User> serializable = PageSerializable.of(list);
             assertEquals(183, serializable.getTotal());
 
 
             //获取第2页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
             assertEquals(2, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(11, page.getStartRow());
@@ -85,8 +85,8 @@ public class PageInfoTest {
 
             //获取第19页，10条内容，默认查询总数count
             PageHelper.startPage(19, 10);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
             assertEquals(19, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(181, page.getStartRow());
@@ -110,12 +110,12 @@ public class PageInfoTest {
     @Test
     public void testPageSize50() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，50条内容，默认查询总数count
             PageHelper.startPage(1, 50);
-            List<Country> list = countryMapper.selectAll();
-            PageInfo<Country> page = new PageInfo<Country>(list);
+            List<User> list = userMapper.selectAll();
+            PageInfo<User> page = new PageInfo<User>(list);
             assertEquals(1, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(1, page.getStartRow());
@@ -130,8 +130,8 @@ public class PageInfoTest {
 
             //获取第2页，50条内容，默认查询总数count
             PageHelper.startPage(2, 50);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
             assertEquals(2, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(51, page.getStartRow());
@@ -145,8 +145,8 @@ public class PageInfoTest {
 
             //获取第3页，50条内容，默认查询总数count
             PageHelper.startPage(3, 50);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
             assertEquals(3, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(101, page.getStartRow());
@@ -161,8 +161,8 @@ public class PageInfoTest {
 
             //获取第4页，50条内容，默认查询总数count
             PageHelper.startPage(4, 50);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
             assertEquals(4, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(151, page.getStartRow());
@@ -186,12 +186,12 @@ public class PageInfoTest {
     @Test
     public void testNavigatePages() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectAll();
-            PageInfo<Country> page = new PageInfo<Country>(list, 20);
+            List<User> list = userMapper.selectAll();
+            PageInfo<User> page = new PageInfo<User>(list, 20);
             assertEquals(1, page.getPageNum());
             assertEquals(10, page.getPageSize());
             assertEquals(1, page.getStartRow());
@@ -205,8 +205,8 @@ public class PageInfoTest {
 
             //获取第2页，50条内容，默认查询总数count
             PageHelper.startPage(2, 50);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list, 2);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list, 2);
             assertEquals(2, page.getPageNum());
             assertEquals(50, page.getPageSize());
             assertEquals(51, page.getStartRow());

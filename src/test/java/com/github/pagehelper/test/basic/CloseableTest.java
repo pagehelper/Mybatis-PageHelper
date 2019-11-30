@@ -24,8 +24,8 @@
 
 package com.github.pagehelper.test.basic;
 
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
@@ -38,17 +38,17 @@ public class CloseableTest {
     @Test
     public void testCloseable() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         //下面注释代码只能在jdk7+中进行测试
 //        try(Page<Object> page = PageHelper.startPage(1, 10)) {
 //            int a = 10/0;
-//            countryMapper.selectAll();
+//            userMapper.selectAll();
 //            Assert.fail();
 //        } catch (Exception e){
 //            e.printStackTrace();
 //        }
-        List<Country> countries = countryMapper.selectAll();
-        Assert.assertEquals(183, countries.size());
+        List<User> user = userMapper.selectAll();
+        Assert.assertEquals(183, user.size());
         sqlSession.close();
     }
 }

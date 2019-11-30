@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -44,18 +44,18 @@ public class TestIntMax {
     @Test
     public void testCountCache() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, Integer.MAX_VALUE);
-            List<Country> list = countryMapper.selectIf(1);
+            List<User> list = userMapper.selectIf(1);
             assertEquals(2, list.get(0).getId());
             assertEquals(182, list.size());
             assertEquals(182, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, Integer.MAX_VALUE);
-            list = countryMapper.selectIf(null);
+            list = userMapper.selectIf(null);
             assertEquals(1, list.get(0).getId());
             assertEquals(183, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());

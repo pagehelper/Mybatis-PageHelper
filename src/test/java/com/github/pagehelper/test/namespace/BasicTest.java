@@ -25,7 +25,7 @@
 package com.github.pagehelper.test.namespace;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisRowBoundsHelper;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
@@ -45,15 +45,15 @@ public class BasicTest {
         SqlSession sqlSession = MybatisRowBoundsHelper.getSqlSession();
         try {
             Map<String, Object> map = new HashMap<String, Object>();
-            Country country = new Country();
-            country.setCountryname("China");
-            map.put("country", country);
+            User user = new User();
+            user.setName("刘睿");
+            map.put("user", user);
             //同时测试不可变Map
             map = Collections.unmodifiableMap(map);
-            List<Country> list = sqlSession.selectList("select1", map, new RowBounds(1, 10));
+            List<User> list = sqlSession.selectList("select1", map, new RowBounds(1, 10));
             assertEquals(1, list.size());
             //判断查询结果的位置是否正确
-            assertEquals(35, list.get(0).getId());
+            assertEquals(78, list.get(0).getId());
         } finally {
             sqlSession.close();
         }
@@ -64,25 +64,25 @@ public class BasicTest {
         SqlSession sqlSession = MybatisRowBoundsHelper.getSqlSession();
         try {
             Map<String, Object> map = new HashMap<String, Object>();
-            Country country = new Country();
-            map.put("country", country);
+            User user = new User();
+            map.put("user", user);
             //同时测试不可变Map
             map = Collections.unmodifiableMap(map);
-            List<Country> list = sqlSession.selectList("select1", map, new RowBounds(1, 10));
+            List<User> list = sqlSession.selectList("select1", map, new RowBounds(1, 10));
             assertEquals(10, list.size());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
 
             map = new HashMap<String, Object>();
-            country = new Country();
-            country.setCountryname("China");
-            map.put("country", country);
+            user = new User();
+            user.setName("刘睿");
+            map.put("user", user);
             //同时测试不可变Map
             map = Collections.unmodifiableMap(map);
             list = sqlSession.selectList("select1", map, new RowBounds(1, 10));
             assertEquals(1, list.size());
             //判断查询结果的位置是否正确
-            assertEquals(35, list.get(0).getId());
+            assertEquals(78, list.get(0).getId());
         } finally {
             sqlSession.close();
         }
@@ -93,14 +93,14 @@ public class BasicTest {
         SqlSession sqlSession = MybatisRowBoundsHelper.getSqlSession();
         try {
             Map<String, Object> map = new HashMap<String, Object>();
-            Country country = new Country();
-            country.setCountryname("China");
-            map.put("country", country);
+            User user = new User();
+            user.setName("刘睿");
+            map.put("user", user);
             PageHelper.startPage(1, 10);
-            List<Country> list = sqlSession.selectList("select1", map);
+            List<User> list = sqlSession.selectList("select1", map);
             assertEquals(1, list.size());
             //判断查询结果的位置是否正确
-            assertEquals(35, list.get(0).getId());
+            assertEquals(78, list.get(0).getId());
         } finally {
             sqlSession.close();
         }

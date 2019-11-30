@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic.count;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -45,25 +45,25 @@ public class TestSelectItems {
     @Test
     public void testSelectColumns() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectColumns();
+            List<User> list = userMapper.selectColumns();
             //1,'Angola','AO'
             assertEquals(1, list.get(0).getId());
-            assertEquals("Angola", list.get(0).getCountryname());
-            assertEquals("AO", list.get(0).getCountrycode());
+            assertEquals("毕淑儒", list.get(0).getName());
+            assertEquals("BSR", list.get(0).getPy());
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectColumns("id", "countryname");
+            list = userMapper.selectColumns("id", "name");
             //1,'Angola','AO'
             assertEquals(1, list.get(0).getId());
-            assertEquals("Angola", list.get(0).getCountryname());
-            assertNull(list.get(0).getCountrycode());
+            assertEquals("毕淑儒", list.get(0).getName());
+            assertNull(list.get(0).getPy());
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
@@ -77,11 +77,11 @@ public class TestSelectItems {
     @Test
     public void testSelectColumn2() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectMULId(1);
+            List<User> list = userMapper.selectMULId(1);
             //1,'Angola','AO'
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
@@ -89,7 +89,7 @@ public class TestSelectItems {
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectMULId(5);
+            list = userMapper.selectMULId(5);
             //1,'Angola','AO'
             assertEquals(5, list.get(0).getId());
             assertEquals(10, list.size());

@@ -24,8 +24,8 @@
 
 package com.github.pagehelper.rowbounds.test;
 
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.rowbounds.RowBoundsHelper;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
@@ -49,10 +49,10 @@ public class RowBoundsTest {
     @Test
     public void testMapperWithRowBounds() {
         SqlSession sqlSession = RowBoundsHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
-            List<Country> list = countryMapper.selectAll(new RowBounds(0, 10));
+            List<User> list = userMapper.selectAll(new RowBounds(0, 10));
             //新增PageInfo对象，对返回结果进行封装
             assertEquals(10, list.size());
             //判断查询结果的位置是否正确
@@ -61,7 +61,7 @@ public class RowBoundsTest {
 
 
             //获取第10页，10条内容，显式查询总数count
-            list = countryMapper.selectAll(new RowBounds(90, 10));
+            list = userMapper.selectAll(new RowBounds(90, 10));
             assertEquals(10, list.size());
             //判断查询结果的位置是否正确
             assertEquals(91, list.get(0).getId());
@@ -69,7 +69,7 @@ public class RowBoundsTest {
 
 
             //获取第3页，20条内容，默认查询总数count
-            list = countryMapper.selectAll(new RowBounds(100, 20));
+            list = userMapper.selectAll(new RowBounds(100, 20));
             assertEquals(20, list.size());
             //判断查询结果的位置是否正确
             assertEquals(101, list.get(0).getId());
@@ -91,7 +91,7 @@ public class RowBoundsTest {
         SqlSession sqlSession = RowBoundsHelper.getSqlSession();
         try {
             //获取从0开始，10条内容
-            List<Country> list = sqlSession.selectList("selectAll", null, new RowBounds(0, 10));
+            List<User> list = sqlSession.selectList("selectAll", null, new RowBounds(0, 10));
             assertEquals(10, list.size());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
@@ -122,7 +122,7 @@ public class RowBoundsTest {
         SqlSession sqlSession = RowBoundsHelper.getSqlSession();
         try {
             //获取从0开始，10条内容
-            List<Country> list = sqlSession.selectList("selectIf", null, new RowBounds(0, 10));
+            List<User> list = sqlSession.selectList("selectIf", null, new RowBounds(0, 10));
             assertEquals(10, list.size());
             //判断查询结果的位置是否正确
             assertEquals(1, list.get(0).getId());
@@ -147,15 +147,15 @@ public class RowBoundsTest {
     @Test
     public void testWithRowboundsAndCountTrue() {
         SqlSession sqlSession = RowBoundsHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //limit=0,这时候相当于用分页插件求count,但是前提必须是配置rounbounds方式求count，否则都是-1
             //这里由于没有配置，应该都是-1
-            List<Country> list = countryMapper.selectAll(new RowBounds(0, -1));
+            List<User> list = userMapper.selectAll(new RowBounds(0, -1));
             assertEquals(183, list.size());
 
             //pageSize<0的时候同上
-            list = countryMapper.selectAll(new RowBounds(0, -100));
+            list = userMapper.selectAll(new RowBounds(0, -100));
             assertEquals(183, list.size());
         } finally {
             sqlSession.close();

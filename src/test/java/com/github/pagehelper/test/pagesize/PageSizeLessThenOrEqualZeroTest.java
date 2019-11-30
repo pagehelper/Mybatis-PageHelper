@@ -26,8 +26,8 @@ package com.github.pagehelper.test.pagesize;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
@@ -45,19 +45,19 @@ public class PageSizeLessThenOrEqualZeroTest {
     @Test
     public void testWithStartPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //pageSize=0,这时候相当于用分页插件求count
             PageHelper.startPage(1, 0);
-            List<Country> list = countryMapper.selectAll();
-            PageInfo<Country> page = new PageInfo<Country>(list);
+            List<User> list = userMapper.selectAll();
+            PageInfo<User> page = new PageInfo<User>(list);
             assertEquals(183, list.size());
             assertEquals(183, page.getTotal());
 
             //limit<0的时候同上
             PageHelper.startPage(1, -100);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
             assertEquals(0, list.size());
             assertEquals(183, page.getTotal());
         } finally {
@@ -72,17 +72,17 @@ public class PageSizeLessThenOrEqualZeroTest {
     public void testWithRowbounds() {
         //注意这里是MybatisRowBoundsHelper，会求count
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //limit=0,这时候相当于用分页插件求count,但是前提必须是配置rounbounds方式求count，否则都是-1
-            List<Country> list = countryMapper.selectAll(new RowBounds(1, -1));
-            PageInfo<Country> page = new PageInfo<Country>(list);
+            List<User> list = userMapper.selectAll(new RowBounds(1, -1));
+            PageInfo<User> page = new PageInfo<User>(list);
             assertEquals(0, list.size());
             assertEquals(183, page.getTotal());
 
             //limit<0的时候同上
-            list = countryMapper.selectAll(new RowBounds(1, -100));
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll(new RowBounds(1, -100));
+            page = new PageInfo<User>(list);
             assertEquals(0, list.size());
             assertEquals(183, page.getTotal());
         } finally {

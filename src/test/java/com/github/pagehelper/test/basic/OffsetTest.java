@@ -27,8 +27,8 @@ package com.github.pagehelper.test.basic;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -41,16 +41,16 @@ public class OffsetTest {
     @Test
     public void testOffset() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             PageHelper.startPage(1, 6);
-            List<Country> list = countryMapper.selectAll();
+            List<User> list = userMapper.selectAll();
             assertEquals(6, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             PageHelper.offsetPage(6, 20);
-            list = countryMapper.selectAll();
-            PageInfo<Country> pageInfo = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            PageInfo<User> pageInfo = new PageInfo<User>(list);
             System.out.println(pageInfo.toString());
             assertEquals(2, ((Page<?>) list).getPageNum());
             assertEquals(20, list.size());
@@ -63,16 +63,16 @@ public class OffsetTest {
     @Test
     public void testPageNum() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             PageHelper.offsetPage(5, 5);
-            List<Country> list = countryMapper.selectAll();
+            List<User> list = userMapper.selectAll();
             assertEquals(2, ((Page<?>) list).getPageNum());
             assertEquals(5, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             PageHelper.offsetPage(15, 5);
-            list = countryMapper.selectAll();
+            list = userMapper.selectAll();
             assertEquals(4, ((Page<?>) list).getPageNum());
             assertEquals(5, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());

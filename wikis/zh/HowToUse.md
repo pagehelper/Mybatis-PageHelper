@@ -161,27 +161,27 @@
 
 ```java
 //第一种，RowBounds方式的调用
-List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(0, 10));
+List<User> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(0, 10));
 
 //第二种，Mapper接口方式的调用，推荐这种使用方式。
 PageHelper.startPage(1, 10);
-List<Country> list = countryMapper.selectIf(1);
+List<User> list = userMapper.selectIf(1);
 
 //第三种，Mapper接口方式的调用，推荐这种使用方式。
 PageHelper.offsetPage(1, 10);
-List<Country> list = countryMapper.selectIf(1);
+List<User> list = userMapper.selectIf(1);
 
 //第四种，参数方法调用
 //存在以下 Mapper 接口方法，你不需要在 xml 处理后两个参数
 public interface CountryMapper {
-    List<Country> selectByPageNumSize(
+    List<User> selectByPageNumSize(
             @Param("user") User user,
             @Param("pageNum") int pageNum, 
             @Param("pageSize") int pageSize);
 }
 //配置supportMethodsArguments=true
 //在代码中直接调用：
-List<Country> list = countryMapper.selectByPageNumSize(user, 1, 10);
+List<User> list = userMapper.selectByPageNumSize(user, 1, 10);
 
 //第五种，参数对象
 //如果 pageNum 和 pageSize 存在于 User 对象中，只要参数有值，也会被分页
@@ -194,41 +194,41 @@ public class User {
 }
 //存在以下 Mapper 接口方法，你不需要在 xml 处理后两个参数
 public interface CountryMapper {
-    List<Country> selectByPageNumSize(User user);
+    List<User> selectByPageNumSize(User user);
 }
 //当 user 中的 pageNum!= null && pageSize!= null 时，会自动分页
-List<Country> list = countryMapper.selectByPageNumSize(user);
+List<User> list = userMapper.selectByPageNumSize(user);
 
 //第六种，ISelect 接口方式
 //jdk6,7用法，创建接口
-Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(new ISelect() {
+Page<User> page = PageHelper.startPage(1, 10).doSelectPage(new ISelect() {
     @Override
     public void doSelect() {
-        countryMapper.selectGroupBy();
+        userMapper.selectGroupBy();
     }
 });
 //jdk8 lambda用法
-Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(()-> countryMapper.selectGroupBy());
+Page<User> page = PageHelper.startPage(1, 10).doSelectPage(()-> userMapper.selectGroupBy());
 
 //也可以直接返回PageInfo，注意doSelectPageInfo方法和doSelectPage
 pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(new ISelect() {
     @Override
     public void doSelect() {
-        countryMapper.selectGroupBy();
+        userMapper.selectGroupBy();
     }
 });
 //对应的lambda用法
-pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(() -> countryMapper.selectGroupBy());
+pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(() -> userMapper.selectGroupBy());
 
 //count查询，返回一个查询语句的count数
 long total = PageHelper.count(new ISelect() {
     @Override
     public void doSelect() {
-        countryMapper.selectLike(country);
+        userMapper.selectLike(user);
     }
 });
 //lambda
-total = PageHelper.count(()->countryMapper.selectLike(country));
+total = PageHelper.count(()->userMapper.selectLike(user));
 ```  
 
 下面对最常用的方式进行详细介绍
@@ -236,7 +236,7 @@ total = PageHelper.count(()->countryMapper.selectLike(country));
 #### 1). RowBounds方式的调用   
 
 ```java
-List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1, 10));
+List<User> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1, 10));
 ```  
 使用这种调用方式时，你可以使用RowBounds参数进行分页，这种方式侵入性最小，我们可以看到，通过RowBounds方式调用只是使用了这个参数，并没有增加其他任何内容。  
 
@@ -248,7 +248,7 @@ List<Country> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1
 
 ```java
 //这种情况下也会进行物理分页查询
-List<Country> selectAll(RowBounds rowBounds);  
+List<User> selectAll(RowBounds rowBounds);
 ```
 
 **注意：** 由于默认情况下的 `RowBounds` 无法获取查询总数，分页插件提供了一个继承自 `RowBounds` 的 `PageRowBounds`，这个对象中增加了 `total` 属性，执行分页查询后，可以从该属性得到查询总数。
@@ -265,7 +265,7 @@ List<Country> selectAll(RowBounds rowBounds);
 //获取第1页，10条内容，默认查询总数count
 PageHelper.startPage(1, 10);
 //紧跟着的第一个select方法会被分页
-List<Country> list = countryMapper.selectIf(1);
+List<User> list = userMapper.selectIf(1);
 assertEquals(2, list.get(0).getId());
 assertEquals(10, list.size());
 //分页时，实际返回的结果list类型是Page<E>，如果想取出分页信息，需要强制转换为Page<E>
@@ -278,10 +278,10 @@ assertEquals(182, ((Page) list).getTotal());
 //支持 ServletRequest,Map,POJO 对象，需要配合 params 参数
 PageHelper.startPage(request);
 //紧跟着的第一个select方法会被分页
-List<Country> list = countryMapper.selectIf(1);
+List<User> list = userMapper.selectIf(1);
 
 //后面的不会被分页，除非再次调用PageHelper.startPage
-List<Country> list2 = countryMapper.selectIf(null);
+List<User> list2 = userMapper.selectIf(null);
 //list1
 assertEquals(2, list.get(0).getId());
 assertEquals(10, list.size());
@@ -298,7 +298,7 @@ assertEquals(182, list2.size());
 ```java
 //获取第1页，10条内容，默认查询总数count
 PageHelper.startPage(1, 10);
-List<Country> list = countryMapper.selectAll();
+List<User> list = userMapper.selectAll();
 //用PageInfo对结果进行包装
 PageInfo page = new PageInfo(list);
 //测试PageInfo全部属性
@@ -331,7 +331,7 @@ assertEquals(true, page.isHasNextPage());
 ```
 在 MyBatis 方法中：
 ```java
-List<Country> selectByPageNumSize(
+List<User> selectByPageNumSize(
         @Param("user") User user,
         @Param("pageNumKey") int pageNum, 
         @Param("pageSizeKey") int pageSize);
@@ -340,7 +340,7 @@ List<Country> selectByPageNumSize(
 
 除了上面这种方式外，如果 User 对象中包含这两个参数值，也可以有下面的方法：
 ```java
-List<Country> selectByPageNumSize(User user);
+List<User> selectByPageNumSize(User user);
 ```
 当从 User 中同时发现了 `pageNumKey` 和 `pageSizeKey` 参数，这个方法就会被分页。
 
@@ -369,39 +369,39 @@ ISelect 接口方式除了可以保证安全外，还特别实现了将查询转
 但是如果你写出下面这样的代码，就是不安全的用法：
 ```java
 PageHelper.startPage(1, 10);
-List<Country> list;
+List<User> list;
 if(param1 != null){
-    list = countryMapper.selectIf(param1);
+    list = userMapper.selectIf(param1);
 } else {
-    list = new ArrayList<Country>();
+    list = new ArrayList<User>();
 }
 ```
 这种情况下由于 param1 存在 null 的情况，就会导致 PageHelper 生产了一个分页参数，但是没有被消费，这个参数就会一直保留在这个线程上。当这个线程再次被使用时，就可能导致不该分页的方法去消费这个分页参数，这就产生了莫名其妙的分页。
 
 上面这个代码，应该写成下面这个样子：
 ```java
-List<Country> list;
+List<User> list;
 if(param1 != null){
     PageHelper.startPage(1, 10);
-    list = countryMapper.selectIf(param1);
+    list = userMapper.selectIf(param1);
 } else {
-    list = new ArrayList<Country>();
+    list = new ArrayList<User>();
 }
 ```
 这种写法就能保证安全。
 
 如果你对此不放心，你可以手动清理 `ThreadLocal` 存储的分页参数，可以像下面这样使用：
 ```java
-List<Country> list;
+List<User> list;
 if(param1 != null){
     PageHelper.startPage(1, 10);
     try{
-        list = countryMapper.selectAll();
+        list = userMapper.selectAll();
     } finally {
         PageHelper.clearPage();
     }
 } else {
-    list = new ArrayList<Country>();
+    list = new ArrayList<User>();
 }
 ```
 这么写很不好看，而且没有必要。

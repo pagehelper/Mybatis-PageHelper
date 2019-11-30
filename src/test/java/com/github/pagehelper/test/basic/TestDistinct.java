@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -41,13 +41,13 @@ public class TestDistinct {
     @Test
     public void test() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectDistinct();
+            List<User> list = userMapper.selectDistinct();
             assertEquals(10, list.size());
-            assertEquals(24, ((Page<?>) list).getTotal());
+            assertEquals(58, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

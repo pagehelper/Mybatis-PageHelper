@@ -26,8 +26,8 @@ package com.github.pagehelper.test.reasonable;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisReasonableHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -43,13 +43,13 @@ public class PageTest {
     @Test
     public void testMapperWithStartPage() {
         SqlSession sqlSession = MybatisReasonableHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第20页，2条内容
             //分页插件会自动改为查询最后一页
             PageHelper.startPage(20, 50);
-            List<Country> list = countryMapper.selectAll();
-            PageInfo<Country> page = new PageInfo<Country>(list);
+            List<User> list = userMapper.selectAll();
+            PageInfo<User> page = new PageInfo<User>(list);
             assertEquals(33, list.size());
             assertEquals(151, page.getStartRow());
             assertEquals(4, page.getPageNum());
@@ -58,8 +58,8 @@ public class PageTest {
             //获取第-3页，2条内容
             //由于只有7天数据，分页插件会自动改为查询最后一页
             PageHelper.startPage(-3, 50);
-            list = countryMapper.selectAll();
-            page = new PageInfo<Country>(list);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
             assertEquals(50, list.size());
             assertEquals(1, page.getStartRow());
             assertEquals(1, page.getPageNum());

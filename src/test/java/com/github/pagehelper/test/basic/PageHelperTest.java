@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
@@ -43,7 +43,7 @@ public class PageHelperTest {
     public void shouldGetAllCountries() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         try {
-            List<Country> list = sqlSession.selectList("selectAll");
+            List<User> list = sqlSession.selectList("selectAll");
             assertEquals(183, list.size());
         } finally {
             sqlSession.close();
@@ -60,10 +60,10 @@ public class PageHelperTest {
     @Test
     public void testMapperWithRowBounds() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
-            List<Country> list = countryMapper.selectAll(new RowBounds(0, 10));
+            List<User> list = userMapper.selectAll(new RowBounds(0, 10));
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
@@ -72,7 +72,7 @@ public class PageHelperTest {
 
 
             //获取第2页，10条内容，显式查询总数count
-            list = countryMapper.selectAll(new RowBounds(10, 10));
+            list = userMapper.selectAll(new RowBounds(10, 10));
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
@@ -81,7 +81,7 @@ public class PageHelperTest {
 
 
             //获取第3页，20条内容，默认查询总数count
-            list = countryMapper.selectAll(new RowBounds(60, 20));
+            list = userMapper.selectAll(new RowBounds(60, 20));
             assertEquals(20, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
@@ -91,7 +91,7 @@ public class PageHelperTest {
 
             //同时使用startPage和RowBounds时，以startPage为准
             PageHelper.startPage(1, 20);
-            list = countryMapper.selectAll(new RowBounds(60, 20));
+            list = userMapper.selectAll(new RowBounds(60, 20));
             assertEquals(20, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确
@@ -116,7 +116,7 @@ public class PageHelperTest {
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = sqlSession.selectList("selectAll");
+            List<User> list = sqlSession.selectList("selectAll");
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
@@ -154,7 +154,7 @@ public class PageHelperTest {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         try {
             //获取从0开始，10条内容
-            List<Country> list = sqlSession.selectList("selectAll", null, new RowBounds(0, 10));
+            List<User> list = sqlSession.selectList("selectAll", null, new RowBounds(0, 10));
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
             //判断查询结果的位置是否正确

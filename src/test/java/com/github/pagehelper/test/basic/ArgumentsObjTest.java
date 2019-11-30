@@ -25,9 +25,9 @@
 package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
-import com.github.pagehelper.model.CountryQueryModel;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
+import com.github.pagehelper.model.UserQueryModel;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -44,25 +44,25 @@ public class ArgumentsObjTest {
     @Test
     public void testArgumentsObj() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
-            CountryQueryModel queryModel = new CountryQueryModel();
+            UserQueryModel queryModel = new UserQueryModel();
             queryModel.setPageNum(1);
             queryModel.setPageSize(10);
             queryModel.setOrderBy("id desc");
-            List<Country> list = countryMapper.selectByQueryModel(queryModel);
+            List<User> list = userMapper.selectByQueryModel(queryModel);
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             queryModel.setPageNum(2);
             queryModel.setOrderBy(null);
-            list = countryMapper.selectByQueryModel(queryModel);
+            list = userMapper.selectByQueryModel(queryModel);
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             queryModel.setPageNum(3);
             queryModel.setPageSize(20);
-            list = countryMapper.selectByQueryModel(queryModel);
+            list = userMapper.selectByQueryModel(queryModel);
             assertEquals(20, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
         } finally {

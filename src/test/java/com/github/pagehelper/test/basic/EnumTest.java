@@ -25,9 +25,9 @@
 package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
+import com.github.pagehelper.mapper.UserMapper;
 import com.github.pagehelper.model.Code;
-import com.github.pagehelper.model.CountryCode;
+import com.github.pagehelper.model.UserCode;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
@@ -40,10 +40,10 @@ public class EnumTest {
     @Test
     public void testCloseable() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         PageHelper.startPage(1, 2);
-        List<CountryCode> countryCodes = countryMapper.selectByCode(Code.AD);
-        Assert.assertEquals(1, countryCodes.size());
+        List<UserCode> userCodes = userMapper.selectByCode(Code.LR);
+        Assert.assertEquals(1, userCodes.size());
         sqlSession.close();
     }
 }

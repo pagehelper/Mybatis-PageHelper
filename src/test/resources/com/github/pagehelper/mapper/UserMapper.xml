@@ -27,82 +27,82 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.github.pagehelper.mapper.CountryMapper">
+<mapper namespace="com.github.pagehelper.mapper.UserMapper">
     <cache/>
-    <select id="selectAll" resultType="Country">
-        select * from country order by id
+    <select id="selectAll" resultType="User">
+        select * from user order by id
     </select>
     <select id="selectAll_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectGreterThanId" resultType="Country">
-        select * from country where id &gt;#{id} order by id
+    <select id="selectGreterThanId" resultType="User">
+        select * from user where id &gt;#{id} order by id
     </select>
     <select id="selectGreterThanId_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where id &gt;#{id}
+        select count(distinct id) from user where id &gt;#{id}
     </select>
 
-    <select id="selectGreterThanIdAndNotEquelContryname" resultType="Country">
-        select a.* from country a left join country b on a.id = b.id where a.id &gt;#{id} and b.countryname &lt;&gt;
-        #{countryname} order by a.id
+    <select id="selectGreterThanIdAndNotEquelName" resultType="User">
+        select a.* from user a left join user b on a.id = b.id where a.id &gt;#{id} and b.name &lt;&gt;
+        #{name} order by a.id
     </select>
-    <select id="selectGreterThanIdAndNotEquelContryname_TESTCOUNT" resultType="Long">
-        select count(distinct a.id) from country a left join country b on a.id = b.id where a.id &gt;#{id} and b.countryname &lt;&gt;
-        #{countryname}
+    <select id="selectGreterThanIdAndNotEquelName_TESTCOUNT" resultType="Long">
+        select count(distinct a.id) from user a left join user b on a.id = b.id where a.id &gt;#{id} and b.name &lt;&gt;
+        #{name}
     </select>
 
-    <select id="selectAllOrderby" resultType="com.github.pagehelper.model.Country">
-        select * from country order by countrycode desc
+    <select id="selectAllOrderby" resultType="com.github.pagehelper.model.User">
+        select * from user order by py desc
     </select>
     <select id="selectAllOrderby_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectAllOrderByParams" resultType="com.github.pagehelper.model.Country">
-        select * from country order by ${order1} desc,${order2} asc
+    <select id="selectAllOrderByParams" resultType="com.github.pagehelper.model.User">
+        select * from user order by ${order1} desc,${order2} asc
     </select>
     <select id="selectAllOrderByParams_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.Country">
+    <select id="selectAllOrderByMap" resultType="com.github.pagehelper.model.User">
         select * from ${tableName} where id &lt;&gt; #{order1} and id &lt;&gt; #{order2} order by id
     </select>
     <select id="selectAllOrderByMap_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where id &lt;&gt; #{order1} and id &lt;&gt; #{order2}
+        select count(distinct id) from user where id &lt;&gt; #{order1} and id &lt;&gt; #{order2}
     </select>
 
-    <select id="selectAllOrderByList" resultType="com.github.pagehelper.model.Country">
-        select * from country where id not in
+    <select id="selectAllOrderByList" resultType="com.github.pagehelper.model.User">
+        select * from user where id not in
         <foreach collection="list" item="par" separator="," open="(" close=")">
             #{par}
         </foreach>
         order by id
     </select>
     <select id="selectAllOrderByList_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where id not in
+        select count(distinct id) from user where id not in
         <foreach collection="list" item="par" separator="," open="(" close=")">
             #{par}
         </foreach>
     </select>
 
-    <select id="selectAllOrderByArray" resultType="com.github.pagehelper.model.Country">
-        select * from country where id not in
+    <select id="selectAllOrderByArray" resultType="com.github.pagehelper.model.User">
+        select * from user where id not in
         <foreach collection="array" item="par" separator="," open="(" close=")">
             #{par}
         </foreach>
         order by id
     </select>
     <select id="selectAllOrderByArray_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where id not in
+        select count(distinct id) from user where id not in
         <foreach collection="array" item="par" separator="," open="(" close=")">
             #{par}
         </foreach>
     </select>
 
-    <select id="selectIf" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectIf" resultType="com.github.pagehelper.model.User">
+        select * from user
         <if test="@com.github.pagehelper.util.Ognl@isNotNull(id)">
             <!--<if test="id!=null">-->
             where id &gt; #{id}
@@ -110,42 +110,42 @@
         order by id
     </select>
     <select id="selectIf_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
         <if test="@com.github.pagehelper.util.Ognl@isNotNull(id)">
             <!--<if test="id!=null">-->
             where id &gt; #{id}
         </if>
     </select>
 
-    <select id="selectIf3" parameterType="Country" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectIf3" parameterType="User" resultType="com.github.pagehelper.model.User">
+        select * from user
         <if test="id > 0">
             where id &gt; #{id}
         </if>
         order by id
     </select>
-    <select id="selectIf3_TESTCOUNT" parameterType="Country" resultType="Long">
-        select count(distinct id) from country
+    <select id="selectIf3_TESTCOUNT" parameterType="User" resultType="Long">
+        select count(distinct id) from user
         <if test="id > 0">
             where id &gt; #{id}
         </if>
     </select>
 
-    <select id="selectIf2" resultType="com.github.pagehelper.model.Country">
-        select * from country where id &gt; #{id1}
+    <select id="selectIf2" resultType="com.github.pagehelper.model.User">
+        select * from user where id &gt; #{id1}
         <if test="id2!=null">
             and id &gt; #{id2}
         </if>
     </select>
     <select id="selectIf2_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where id &gt; #{id1}
+        select count(distinct id) from user where id &gt; #{id1}
         <if test="id2!=null">
             and id &gt; #{id2}
         </if>
     </select>
 
-    <select id="selectIf2List" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectIf2List" resultType="com.github.pagehelper.model.User">
+        select * from user
         <where>
             <if test="id1!=null and id1.size>0">
                 id not in
@@ -163,7 +163,7 @@
         order by id
     </select>
     <select id="selectIf2List_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
         <where>
             <if test="id1!=null and id1.size>0">
                 id not in
@@ -180,8 +180,8 @@
         </where>
     </select>
 
-    <select id="selectIf2ListAndOrder" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectIf2ListAndOrder" resultType="com.github.pagehelper.model.User">
+        select * from user
         <where>
             <if test="id1!=null and id1.size>0">
                 id not in
@@ -204,7 +204,7 @@
         </if>
     </select>
     <select id="selectIf2ListAndOrder_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
         <where>
             <if test="id1!=null and id1.size>0">
                 id not in
@@ -221,8 +221,8 @@
         </where>
     </select>
 
-    <select id="selectChoose" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectChoose" resultType="com.github.pagehelper.model.User">
+        select * from user
         <where>
             <choose>
                 <when test="id1!=null">
@@ -236,7 +236,7 @@
         order by id
     </select>
     <select id="selectChoose_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
         <where>
             <choose>
                 <when test="id1!=null">
@@ -249,78 +249,78 @@
         </where>
     </select>
 
-    <select id="selectLike" resultType="com.github.pagehelper.model.Country">
-        select * from country where 1=1
-        <if test="countryname!=null and countryname!=''">
-            and lower(countryname) like '%${countryname}%'
+    <select id="selectLike" resultType="com.github.pagehelper.model.User">
+        select * from user where 1=1
+        <if test="name!=null and name!=''">
+            and lower(name) like '%${name}%'
         </if>
         order by id
     </select>
     <select id="selectLike_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where 1=1
-        <if test="countryname!=null and countryname!=''">
-            and lower(countryname) like '%${countryname}%'
+        select count(distinct id) from user where 1=1
+        <if test="name!=null and name!=''">
+            and lower(name) like '%${name}%'
         </if>
     </select>
 
-    <select id="selectByMap" resultType="com.github.pagehelper.model.Country">
-        select * from country where 1=1
-        <if test="countryname!=null and countryname !=''">
-            and countryname= #{countryname}
+    <select id="selectByMap" resultType="com.github.pagehelper.model.User">
+        select * from user where 1=1
+        <if test="name!=null and name !=''">
+            and name= #{name}
         </if>
-        <if test="countrycode!=null and countrycode !=''">
-            and countrycode= #{countrycode}
+        <if test="py!=null and py !=''">
+            and py= #{py}
         </if>
     </select>
     <select id="selectByMap_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where 1=1
-        <if test="countryname!=null and countryname !=''">
-            and countryname= #{countryname}
+        select count(distinct id) from user where 1=1
+        <if test="name!=null and name !=''">
+            and name= #{name}
         </if>
-        <if test="countrycode!=null and countrycode !=''">
-            and countrycode= #{countrycode}
+        <if test="py!=null and py !=''">
+            and py= #{py}
         </if>
     </select>
 
-    <select id="selectByOrder2" resultType="com.github.pagehelper.model.Country">
-        select * from country order by ${order}
+    <select id="selectByOrder2" resultType="com.github.pagehelper.model.User">
+        select * from user order by ${order}
     </select>
     <select id="selectByOrder2_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectUnion" resultType="com.github.pagehelper.model.Country">
-        select id,countryname,countrycode from country where id &gt;180
+    <select id="selectUnion" resultType="com.github.pagehelper.model.User">
+        select id,name,py from user where id &gt;180
         union
-        select id,countryname,countrycode from country where id &lt;=10 order by id
+        select id,name,py from user where id &lt;=10 order by id
     </select>
     <select id="selectUnion_TESTCOUNT" resultType="Long">
         select count(distinct id) from (
-        select id,countryname,countrycode from country where id &gt;180
+        select id,name,py from user where id &gt;180
         union
-        select id,countryname,countrycode from country where id &lt;=10) temp
+        select id,name,py from user where id &lt;=10) temp
     </select>
 
-    <select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
-        select a.id,b.countryname,a.countrycode from country a
-        left join country b on a.id = b.id
+    <select id="selectLeftjoin" resultType="com.github.pagehelper.model.User">
+        select a.id,b.name,a.py from user a
+        left join user b on a.id = b.id
         order by a.id
     </select>
     <select id="selectLeftjoin_TESTCOUNT" resultType="Long">
-        select count(distinct a.id) from country a
-        left join country b on a.id = b.id
+        select count(distinct a.id) from user a
+        left join user b on a.id = b.id
     </select>
 
-    <select id="selectWith" resultType="com.github.pagehelper.model.Country">
-        with rs as (select id from country where id>150) select * from country where id in (select * from rs) order by
+    <select id="selectWith" resultType="com.github.pagehelper.model.User">
+        with rs as (select id from user where id>150) select * from user where id in (select * from rs) order by
         id
     </select>
     <select id="selectWith_TESTCOUNT" resultType="Long">
-        with rs as (select id from country where id>150) select count(distinct id) from country where id in (select * from rs)
+        with rs as (select id from user where id>150) select count(distinct id) from user where id in (select * from rs)
     </select>
 
     <!--select column中包含参数时-->
-    <select id="selectColumns" resultType="com.github.pagehelper.model.Country">
+    <select id="selectColumns" resultType="com.github.pagehelper.model.User">
         select
         <if test="columns==null or columns.length == 0">
             *
@@ -330,34 +330,34 @@
                 ${column}
             </foreach>
         </if>
-        from country order by id
+        from user order by id
     </select>
     <!--select column中包含参数时-->
     <select id="selectColumns_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectMULId" resultType="com.github.pagehelper.model.Country">
-        select id * #{mul} as id,countryname,countrycode from country order by id
+    <select id="selectMULId" resultType="com.github.pagehelper.model.User">
+        select id * #{mul} as id,name,py from user order by id
     </select>
     <select id="selectMULId_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectGroupBy" resultType="com.github.pagehelper.model.Country">
-        /*keep orderby*/select countryname,countrycode,count(id) id from country
-        group by countryname,countrycode
-        order by countryname,countrycode
+    <select id="selectGroupBy" resultType="com.github.pagehelper.model.User">
+        /*keep orderby*/select name,py,count(id) id from user
+        group by name,py
+        order by name,py
     </select>
     <select id="selectGroupBy_TESTCOUNT" resultType="Long">
-        select count(distinct countryname) from (
-        select countryname,countrycode,count(id) id from country
-        group by countryname,countrycode
-        order by countryname,countrycode) as temp
+        select count(distinct name) from (
+        select name,py,count(id) id from user
+        group by name,py
+        order by name,py) as temp
     </select>
 
-    <select id="selectByWhereMap" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectByWhereMap" resultType="com.github.pagehelper.model.User">
+        select * from user
         <where>
             <foreach collection="map" item="val" index="key" separator="and">
                 ${key} = #{val}
@@ -366,7 +366,7 @@
         order by id
     </select>
     <select id="selectByWhereMap_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
         <where>
             <foreach collection="map" item="val" index="key" separator="and">
                 ${key} = #{val}
@@ -405,14 +405,14 @@
         </where>
     </sql>
 
-    <select id="selectByExample" resultType="com.github.pagehelper.model.Country"
-            parameterType="com.github.pagehelper.model.CountryExample">
+    <select id="selectByExample" resultType="com.github.pagehelper.model.User"
+            parameterType="com.github.pagehelper.model.UserExample">
         select
         <if test="distinct">
             distinct
         </if>
-        Id, countryname, countrycode
-        from country
+        Id, name, py
+        from user
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
         </if>
@@ -424,85 +424,85 @@
         </if>
     </select>
     <select id="selectByExample_TESTCOUNT" resultType="Long"
-            parameterType="com.github.pagehelper.model.CountryExample">
+            parameterType="com.github.pagehelper.model.UserExample">
         select
         count(
         <if test="distinct">
             distinct
         </if>
         Id)
-        from country
+        from user
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
         </if>
     </select>
 
-    <select id="selectDistinct" resultType="com.github.pagehelper.model.Country">
-        select distinct SUBSTR(countryname,1,1) countryname from country
+    <select id="selectDistinct" resultType="com.github.pagehelper.model.User">
+        select distinct SUBSTR(name,1,1) name from user
     </select>
     <select id="selectDistinct_TESTCOUNT" resultType="Long">
-        select count(distinct SUBSTR(countryname,1,1)) from country
+        select count(distinct SUBSTR(name,1,1)) from user
     </select>
 
-    <select id="selectExists" resultType="com.github.pagehelper.model.Country">
-        select * from country a where exists(select 1 from country b where a.id = b.id and b.id >100)
+    <select id="selectExists" resultType="com.github.pagehelper.model.User">
+        select * from user a where exists(select 1 from user b where a.id = b.id and b.id >100)
     </select>
     <select id="selectExists_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country a where exists(select 1 from country b where a.id = b.id and b.id >100)
+        select count(distinct id) from user a where exists(select 1 from user b where a.id = b.id and b.id >100)
     </select>
 
-    <select id="select1" resultType="com.github.pagehelper.model.Country">
-        select * from country a where 1=1
-        <if test="country!=null and country.countryname !=null and country.countryname!=null">
-            and countryname = #{country.countryname}
+    <select id="select1" resultType="com.github.pagehelper.model.User">
+        select * from user a where 1=1
+        <if test="user!=null and user.name !=null and user.name!=null">
+            and name = #{user.name}
         </if>
     </select>
     <select id="select1_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country a where 1=1
-        <if test="country!=null and country.countryname !=null and country.countryname!=null">
-            and countryname = #{country.countryname}
+        select count(distinct id) from user a where 1=1
+        <if test="user!=null and user.name !=null and user.name!=null">
+            and name = #{user.name}
         </if>
     </select>
 
-    <select id="selectByPageNumSize" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectByPageNumSize" resultType="com.github.pagehelper.model.User">
+        select * from user
     </select>
     <select id="selectByPageNumSize_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectByPageNumSizeOrderBy" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectByPageNumSizeOrderBy" resultType="com.github.pagehelper.model.User">
+        select * from user
     </select>
     <select id="selectByPageNumSizeOrderBy_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectByOrderBy" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectByOrderBy" resultType="com.github.pagehelper.model.User">
+        select * from user
     </select>
     <select id="selectByOrderBy_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectByQueryModel" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectByQueryModel" resultType="com.github.pagehelper.model.User">
+        select * from user
     </select>
     <select id="selectByQueryModel_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <select id="selectByIdList" resultType="com.github.pagehelper.model.Country">
-        select * from country
+    <select id="selectByIdList" resultType="com.github.pagehelper.model.User">
+        select * from user
         <if test="idList != null and idList.size()>0">
             where id in
             <foreach collection="idList" item="id" open="(" close=")" separator=",">
-              #{id}
+                #{id}
             </foreach>
         </if>
     </select>
     <select id="selectByIdList_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
         <if test="idList != null and idList.size()>0">
             where id in
             <foreach collection="idList" item="id" open="(" close=")" separator=",">
@@ -511,15 +511,15 @@
         </if>
     </select>
 
-    <select id="selectByIdList2" resultType="com.github.pagehelper.model.Country">
+    <select id="selectByIdList2" resultType="com.github.pagehelper.model.User">
         <foreach collection="idList" item="id" separator="union all">
-            select * from country where id = #{id}
+            select * from user where id = #{id}
         </foreach>
     </select>
     <select id="selectByIdList2_TESTCOUNT" resultType="Long">
         select count(distinct id) from(
         <foreach collection="idList" item="id" separator="union all">
-            select * from country where id = #{id}
+            select * from user where id = #{id}
         </foreach>
         ) temp
     </select>
@@ -527,28 +527,29 @@
     <select id="execute" resultType="map">
         ${sql}
     </select>
-    
-    <resultMap id="collectionMap" type="com.github.pagehelper.model.Country">
+
+    <resultMap id="collectionMap" type="com.github.pagehelper.model.User">
         <id column="id" property="id"/>
-        <collection property="countries" column="{id=id}" ofType="com.github.pagehelper.model.Country" select="selectGreterThanId"/>
+        <collection property="users" column="{id=id}" ofType="com.github.pagehelper.model.User"
+                    select="selectGreterThanId"/>
     </resultMap>
     
     <select id="selectCollectionMap" resultMap="collectionMap">
-        select * from country
+        select * from user
     </select>
     <select id="selectCollectionMap_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country
+        select count(distinct id) from user
     </select>
 
-    <resultMap id="codeMap" type="com.github.pagehelper.model.CountryCode">
+    <resultMap id="codeMap" type="com.github.pagehelper.model.UserCode">
         <id column="id" property="id"/>
-        <result column="countrycode" property="countrycode" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result column="py" property="py" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
     </resultMap>
 
     <select id="selectByCode" resultMap="codeMap">
-        select * from country where countrycode = #{code, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+        select * from user where py = #{code, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
     </select>
     <select id="selectByCode_TESTCOUNT" resultType="Long">
-        select count(distinct id) from country where countrycode = #{code, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+        select count(distinct id) from user where py = #{code, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
     </select>
 </mapper>

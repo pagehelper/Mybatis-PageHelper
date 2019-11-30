@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -44,23 +44,23 @@ public class TestLike {
     @Test
     public void testMapperWithStartPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            Country country = new Country();
-            country.setCountryname("c");
-            List<Country> list = countryMapper.selectLike(country);
-            assertEquals(30, list.get(0).getId());
+            User user = new User();
+            user.setName("刘");
+            List<User> list = userMapper.selectLike(user);
+            assertEquals(78, list.get(0).getId());
             assertEquals(10, list.size());
-            assertEquals(39, ((Page<?>) list).getTotal());
+            assertEquals(15, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
-            PageHelper.startPage(4, 10);
-            list = countryMapper.selectLike(country);
-            assertEquals(130, list.get(0).getId());
-            assertEquals(9, list.size());
-            assertEquals(39, ((Page<?>) list).getTotal());
+            PageHelper.startPage(2, 10);
+            list = userMapper.selectLike(user);
+            assertEquals(88, list.get(0).getId());
+            assertEquals(5, list.size());
+            assertEquals(15, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
@@ -72,16 +72,16 @@ public class TestLike {
     @Test
     public void testMapperWithStartPage_OrderBy() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.orderBy("id desc");
-            Country country = new Country();
-            country.setCountryname("c");
-            List<Country> list = countryMapper.selectLike(country);
-            assertEquals(174, list.get(0).getId());
-            assertEquals(39, list.size());
-            assertEquals(39, ((Page<?>) list).getTotal());
+            User user = new User();
+            user.setName("刘");
+            List<User> list = userMapper.selectLike(user);
+            assertEquals(92, list.get(0).getId());
+            assertEquals(15, list.size());
+            assertEquals(15, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }

@@ -24,47 +24,39 @@
 
 package com.github.pagehelper.model;
 
-import java.io.Serializable;
-import java.util.List;
+/**
+ * @author liuzh
+ * @since 2015-11-07 14:39
+ */
+public class UserQueryModel {
 
-public class CountryCode implements Serializable {
-    private static final long serialVersionUID = 6569081236403751407L;
+    private Integer pageNum;
 
-    private int    id;
-    private String countryname;
-    private Code   countrycode;
+    private Integer pageSize;
 
-    List<CountryCode> countries;
+    private String orderBy;
 
-    public int getId() {
-        return id;
+    public String getOrderBy() {
+        return orderBy;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
     }
 
-    public String getCountryname() {
-        return countryname;
+    public Integer getPageNum() {
+        return pageNum;
     }
 
-    public void setCountryname(String countryname) {
-        this.countryname = countryname;
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
     }
 
-    public Code getCountrycode() {
-        return countrycode;
+    public Integer getPageSize() {
+        return pageSize;
     }
 
-    public void setCountrycode(Code countrycode) {
-        this.countrycode = countrycode;
-    }
-
-    public List<CountryCode> getCountries() {
-        return countries;
-    }
-
-    public void setCountries(List<CountryCode> countries) {
-        this.countries = countries;
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }

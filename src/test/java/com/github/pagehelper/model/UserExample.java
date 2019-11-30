@@ -27,35 +27,15 @@ package com.github.pagehelper.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CountryExample {
+public class UserExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public CountryExample() {
+    public UserExample() {
         oredCriteria = new ArrayList<Criteria>();
-    }
-
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
-
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
-    public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
-    }
-
-    public boolean isDistinct() {
-        return distinct;
-    }
-
-    public List<Criteria> getOredCriteria() {
-        return oredCriteria;
     }
 
     public void or(Criteria criteria) {
@@ -93,18 +73,6 @@ public class CountryExample {
         protected GeneratedCriteria() {
             super();
             criteria = new ArrayList<Criterion>();
-        }
-
-        public boolean isValid() {
-            return criteria.size() > 0;
-        }
-
-        public List<Criterion> getAllCriteria() {
-            return criteria;
-        }
-
-        public List<Criterion> getCriteria() {
-            return criteria;
         }
 
         protected void addCriterion(String condition) {
@@ -188,144 +156,156 @@ public class CountryExample {
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameIsNull() {
-            addCriterion("countryname is null");
+        public Criteria andUsernameIsNull() {
+            addCriterion("name is null");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameIsNotNull() {
-            addCriterion("countryname is not null");
+        public Criteria andUsernameIsNotNull() {
+            addCriterion("name is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameEqualTo(String value) {
-            addCriterion("countryname =", value, "countryname");
+        public Criteria andUsernameEqualTo(String value) {
+            addCriterion("name =", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameNotEqualTo(String value) {
-            addCriterion("countryname <>", value, "countryname");
+        public Criteria andUsernameNotEqualTo(String value) {
+            addCriterion("name <>", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameGreaterThan(String value) {
-            addCriterion("countryname >", value, "countryname");
+        public Criteria andUsernameGreaterThan(String value) {
+            addCriterion("name >", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameGreaterThanOrEqualTo(String value) {
-            addCriterion("countryname >=", value, "countryname");
+        public Criteria andUsernameGreaterThanOrEqualTo(String value) {
+            addCriterion("name >=", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameLessThan(String value) {
-            addCriterion("countryname <", value, "countryname");
+        public Criteria andUsernameLessThan(String value) {
+            addCriterion("name <", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameLessThanOrEqualTo(String value) {
-            addCriterion("countryname <=", value, "countryname");
+        public Criteria andUsernameLessThanOrEqualTo(String value) {
+            addCriterion("name <=", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameLike(String value) {
-            addCriterion("countryname like", value, "countryname");
+        public Criteria andUsernameLike(String value) {
+            addCriterion("name like", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameNotLike(String value) {
-            addCriterion("countryname not like", value, "countryname");
+        public Criteria andUsernameNotLike(String value) {
+            addCriterion("name not like", value, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameIn(List<String> values) {
-            addCriterion("countryname in", values, "countryname");
+        public Criteria andUsernameIn(List<String> values) {
+            addCriterion("name in", values, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameNotIn(List<String> values) {
-            addCriterion("countryname not in", values, "countryname");
+        public Criteria andUsernameNotIn(List<String> values) {
+            addCriterion("name not in", values, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameBetween(String value1, String value2) {
-            addCriterion("countryname between", value1, value2, "countryname");
+        public Criteria andUsernameBetween(String value1, String value2) {
+            addCriterion("name between", value1, value2, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrynameNotBetween(String value1, String value2) {
-            addCriterion("countryname not between", value1, value2, "countryname");
+        public Criteria andUsernameNotBetween(String value1, String value2) {
+            addCriterion("name not between", value1, value2, "name");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeIsNull() {
-            addCriterion("countrycode is null");
+        public Criteria andUsercodeIsNull() {
+            addCriterion("py is null");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeIsNotNull() {
-            addCriterion("countrycode is not null");
+        public Criteria andUsercodeIsNotNull() {
+            addCriterion("py is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeEqualTo(String value) {
-            addCriterion("countrycode =", value, "countrycode");
+        public Criteria andUsercodeEqualTo(String value) {
+            addCriterion("py =", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeNotEqualTo(String value) {
-            addCriterion("countrycode <>", value, "countrycode");
+        public Criteria andUsercodeNotEqualTo(String value) {
+            addCriterion("py <>", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeGreaterThan(String value) {
-            addCriterion("countrycode >", value, "countrycode");
+        public Criteria andUsercodeGreaterThan(String value) {
+            addCriterion("py >", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeGreaterThanOrEqualTo(String value) {
-            addCriterion("countrycode >=", value, "countrycode");
+        public Criteria andUsercodeGreaterThanOrEqualTo(String value) {
+            addCriterion("py >=", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeLessThan(String value) {
-            addCriterion("countrycode <", value, "countrycode");
+        public Criteria andUsercodeLessThan(String value) {
+            addCriterion("py <", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeLessThanOrEqualTo(String value) {
-            addCriterion("countrycode <=", value, "countrycode");
+        public Criteria andUsercodeLessThanOrEqualTo(String value) {
+            addCriterion("py <=", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeLike(String value) {
-            addCriterion("countrycode like", value, "countrycode");
+        public Criteria andUsercodeLike(String value) {
+            addCriterion("py like", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeNotLike(String value) {
-            addCriterion("countrycode not like", value, "countrycode");
+        public Criteria andUsercodeNotLike(String value) {
+            addCriterion("py not like", value, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeIn(List<String> values) {
-            addCriterion("countrycode in", values, "countrycode");
+        public Criteria andUsercodeIn(List<String> values) {
+            addCriterion("py in", values, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeNotIn(List<String> values) {
-            addCriterion("countrycode not in", values, "countrycode");
+        public Criteria andUsercodeNotIn(List<String> values) {
+            addCriterion("py not in", values, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeBetween(String value1, String value2) {
-            addCriterion("countrycode between", value1, value2, "countrycode");
+        public Criteria andUsercodeBetween(String value1, String value2) {
+            addCriterion("py between", value1, value2, "py");
             return (Criteria) this;
         }
 
-        public Criteria andCountrycodeNotBetween(String value1, String value2) {
-            addCriterion("countrycode not between", value1, value2, "countrycode");
+        public Criteria andUsercodeNotBetween(String value1, String value2) {
+            addCriterion("py not between", value1, value2, "py");
             return (Criteria) this;
+        }
+
+        public List<Criterion> getAllCriteria() {
+            return criteria;
+        }
+
+        public List<Criterion> getCriteria() {
+            return criteria;
+        }
+
+        public boolean isValid() {
+            return criteria.size() > 0;
         }
     }
 
@@ -352,38 +332,6 @@ public class CountryExample {
         private boolean listValue;
 
         private String typeHandler;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
-        }
 
         protected Criterion(String condition) {
             super();
@@ -420,5 +368,57 @@ public class CountryExample {
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
         }
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+    }
+
+    public String getOrderByClause() {
+        return orderByClause;
+    }
+
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
+    }
+
+    public List<Criteria> getOredCriteria() {
+        return oredCriteria;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
     }
 }

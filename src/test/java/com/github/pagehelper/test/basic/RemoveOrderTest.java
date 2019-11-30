@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
@@ -43,11 +43,11 @@ public class RemoveOrderTest {
     @Test
     public void simpleOrderTest() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         //主要观看查询执行count查询的sql
         try {
             PageHelper.startPage(1, 50);
-            List<Country> list = countryMapper.selectAllOrderby();
+            List<User> list = userMapper.selectAllOrderby();
             //总数183
             Assert.assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
@@ -59,11 +59,11 @@ public class RemoveOrderTest {
     @Test
     public void paramsOrderTest() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         //主要观看查询执行count查询的sql
         try {
             PageHelper.startPage(1, 50);
-            List<Country> list = countryMapper.selectAllOrderByParams("countryname", "countrycode");
+            List<User> list = userMapper.selectAllOrderByParams("name", "py");
             //总数183
             Assert.assertEquals(183, ((Page<?>) list).getTotal());
         } finally {

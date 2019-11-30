@@ -309,14 +309,14 @@ If there is no custom query, the query is still automatically created using the 
 
 For example, if there are two queries:
 ```xml
-<select id="selectLeftjoin" resultType="com.github.pagehelper.model.Country">
-    select a.id,b.countryname,a.countrycode from country a
-    left join country b on a.id = b.id
+<select id="selectLeftjoin" resultType="com.github.pagehelper.model.User">
+    select a.id,b.name,a.py from user a
+    left join user b on a.id = b.id
     order by a.id
 </select>
 <select id="selectLeftjoin_COUNT" resultType="Long">
-    select count(distinct a.id) from country a
-    left join country b on a.id = b.id
+    select count(distinct a.id) from user a
+    left join user b on a.id = b.id
 </select>
 ```
 The above `countSuffix` uses the default value of` _COUNT`, and the paging plugin will automatically get the query to `selectLeftjoin_COUNT`. This query needs to ensure that the result is correct.
@@ -327,13 +327,13 @@ Because the `selectLeftjoin_COUNT` method is invoked automatically, there is no 
 
 The above method to perform the portion of the output log is as follows：
 ```
-DEBUG [main] - ==>  Preparing: select count(distinct a.id) from country a left join country b on a.id = b.id 
+DEBUG [main] - ==>  Preparing: select count(distinct a.id) from user a left join user b on a.id = b.id
 DEBUG [main] - ==> Parameters: 
 TRACE [main] - <==    Columns: C1
 TRACE [main] - <==        Row: 183
 DEBUG [main] - <==      Total: 1
 DEBUG [main] - Cache Hit Ratio [com.github.pagehelper.mapper.CountryMapper]: 0.0
-DEBUG [main] - ==>  Preparing: select a.id,b.countryname,a.countrycode from country a left join country b on a.id = b.id order by a.id LIMIT 10 
+DEBUG [main] - ==>  Preparing: select a.id,b.name,a.py from user a left join user b on a.id = b.id order by a.id LIMIT 10
 DEBUG [main] - ==> Parameters: 
 TRACE [main] - <==    Columns: ID, COUNTRYNAME, COUNTRYCODE
 TRACE [main] - <==        Row: 1, Angola, AO

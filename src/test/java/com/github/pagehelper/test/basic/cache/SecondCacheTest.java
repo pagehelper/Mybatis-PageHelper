@@ -25,8 +25,8 @@
 package com.github.pagehelper.test.basic.cache;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -40,27 +40,27 @@ public class SecondCacheTest {
     @Test
     public void test1() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectGreterThanId(10);
+            List<User> list = userMapper.selectGreterThanId(10);
             assertEquals(10, list.size());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectGreterThanId(10);
+            list = userMapper.selectGreterThanId(10);
             assertEquals(10, list.size());
         } finally {
             sqlSession.close();
         }
 
         sqlSession = MybatisHelper.getSqlSession();
-        countryMapper = sqlSession.getMapper(CountryMapper.class);
+        userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectGreterThanId(10);
+            List<User> list = userMapper.selectGreterThanId(10);
             assertEquals(10, list.size());
         } finally {
             sqlSession.close();
@@ -70,11 +70,11 @@ public class SecondCacheTest {
     @Test
     public void test2() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectGreterThanId(10);
+            List<User> list = userMapper.selectGreterThanId(10);
             assertEquals(10, list.size());
         } finally {
             sqlSession.close();
@@ -84,11 +84,11 @@ public class SecondCacheTest {
     @Test
     public void test3() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectGreterThanId(10);
+            List<User> list = userMapper.selectGreterThanId(10);
             assertEquals(10, list.size());
         } finally {
             sqlSession.close();

@@ -29,5 +29,5 @@ package com.github.pagehelper.model;
  * @since 2017/5/30.
  */
 public enum Code {
-    AO, AF, AL, DZ, AD, AI;
+    LR, LQQ
 }

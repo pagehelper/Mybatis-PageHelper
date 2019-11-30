@@ -24,7 +24,7 @@
 
 package com.github.pagehelper.mapper;
 
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class ProviderMethod {
     public String select(Map<String, Object> map) {
         Map<String, Object> param = (HashMap<String, Object>) map.get("param");
         StringBuilder sbSql = new StringBuilder();
-        sbSql.append("select * from country where 1=1 ");
+        sbSql.append("select * from user where 1=1 ");
         for (Map.Entry<String, Object> entry : param.entrySet()) {
             sbSql.append(" and " + entry.getKey() + "= #{param." + entry.getKey() + "} ");
         }
@@ -46,17 +46,17 @@ public class ProviderMethod {
         return sbSql.toString();
     }
 
-    public String selectCountry(Country country) {
+    public String selectUser(User user) {
         StringBuilder sbSql = new StringBuilder();
-        sbSql.append("select * from country where 1=1 ");
-        if (country.getId() > 0) {
+        sbSql.append("select * from user where 1=1 ");
+        if (user.getId() > 0) {
             sbSql.append(" and id = #{id} ");
         }
-        if (country.getCountrycode() != null) {
-            sbSql.append(" and countrycode = #{countrycode} ");
+        if (user.getPy() != null) {
+            sbSql.append(" and py = #{py} ");
         }
-        if (country.getCountryname() != null) {
-            sbSql.append(" and countryname = #{countryname} ");
+        if (user.getName() != null) {
+            sbSql.append(" and name = #{name} ");
         }
         sbSql.append("order by id");
         return sbSql.toString();

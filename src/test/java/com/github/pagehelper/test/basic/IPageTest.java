@@ -26,9 +26,9 @@ package com.github.pagehelper.test.basic;
 
 import com.github.pagehelper.IPage;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
-import com.github.pagehelper.model.CountryQueryModel;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
+import com.github.pagehelper.model.UserQueryModel;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -39,38 +39,38 @@ import static org.junit.Assert.assertEquals;
 
 public class IPageTest {
 
-    public static class CountryIPage extends CountryQueryModel implements IPage {
-
-    }
-
     @Test
     public void testIPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
-            CountryIPage queryModel = new CountryIPage();
+            UserIPage queryModel = new UserIPage();
             queryModel.setPageNum(1);
             queryModel.setPageSize(10);
             queryModel.setOrderBy("id desc");
-            List<Country> list = countryMapper.selectByQueryModel(queryModel);
+            List<User> list = userMapper.selectByQueryModel(queryModel);
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             queryModel.setPageNum(2);
             queryModel.setOrderBy(null);
-            list = countryMapper.selectByQueryModel(queryModel);
+            list = userMapper.selectByQueryModel(queryModel);
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             queryModel.setPageNum(null);
             queryModel.setPageSize(null);
             queryModel.setOrderBy("id asc");
-            list = countryMapper.selectByQueryModel(queryModel);
+            list = userMapper.selectByQueryModel(queryModel);
             assertEquals(1, list.get(0).getId());
             assertEquals(183, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
+    }
+
+    public static class UserIPage extends UserQueryModel implements IPage {
+
     }
 }

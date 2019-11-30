@@ -25,8 +25,8 @@
 package com.github.pagehelper.test.basic.cache;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -46,27 +46,27 @@ public class CacheTest {
     @Test
     public void testMapperWithStartPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectGreterThanId(10);
+            List<User> list = userMapper.selectGreterThanId(10);
             assertEquals(10, list.size());
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
-            list = countryMapper.selectGreterThanIdAndNotEquelContryname(10, "china");
+            list = userMapper.selectGreterThanIdAndNotEquelName(10, "刘睿");
             assertEquals(10, list.size());
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(3, 10);
-            list = countryMapper.selectGreterThanIdAndNotEquelContryname(10, "china");
+            list = userMapper.selectGreterThanIdAndNotEquelName(10, "刘睿");
             assertEquals(10, list.size());
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(4, 10);
-            list = countryMapper.selectGreterThanIdAndNotEquelContryname(10, "china");
+            list = userMapper.selectGreterThanIdAndNotEquelName(10, "刘睿");
             assertEquals(10, list.size());
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(5, 10);
-            list = countryMapper.selectGreterThanIdAndNotEquelContryname(10, "china");
+            list = userMapper.selectGreterThanIdAndNotEquelName(10, "刘睿");
             assertEquals(10, list.size());
         } finally {
             sqlSession.close();
@@ -109,14 +109,14 @@ public class CacheTest {
         public void run() {
             SqlSession sqlSession = MybatisHelper.getSqlSession();
             System.out.println(Thread.currentThread().getId() + "开始运行...");
-            CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectGreterThanIdAndNotEquelContryname(10, "china");
+            List<User> list = userMapper.selectGreterThanIdAndNotEquelName(10, "刘睿");
             assertEquals(10, list.size());
             //获取第2页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
-            list = countryMapper.selectGreterThanIdAndNotEquelContryname(10, "china");
+            list = userMapper.selectGreterThanIdAndNotEquelName(10, "刘睿");
             assertEquals(10, list.size());
             sqlSession.close();
         }

@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic.dynamic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -46,25 +46,25 @@ public class TestDynamicIfTwoList {
     @Test
     public void testMapperWithStartPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectIf2List(Arrays.asList(1, 2), Arrays.asList(3, 4));
+            List<User> list = userMapper.selectIf2List(Arrays.asList(1, 2), Arrays.asList(3, 4));
             assertEquals(5, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(179, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectIf2List(Arrays.asList(1, 2), null);
+            list = userMapper.selectIf2List(Arrays.asList(1, 2), null);
             assertEquals(3, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(181, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectIf2List(new ArrayList<Integer>(0), null);
+            list = userMapper.selectIf2List(new ArrayList<Integer>(0), null);
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());

@@ -47,45 +47,45 @@ public class SqlServerTest {
 
     @Test
     public void testSqlTest() throws JSQLParserException {
-        String originalSql = "Select * from country o where id > 10 order by id desc , countryname asc";
+        String originalSql = "Select * from user o where id > 10 order by id desc , name asc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlAlias() throws JSQLParserException {
-        String originalSql = "Select o.* from country o where id > 10 order by id desc , countryname asc";
+        String originalSql = "Select o.* from user o where id > 10 order by id desc , name asc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlOrderByAlias() throws JSQLParserException {
-        String originalSql = "select countrycode code from country order by code";
+        String originalSql = "select py code from user order by code";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlDistinct() throws JSQLParserException {
-        String originalSql = "select distinct countrycode,countryname from country order by countrycode";
+        String originalSql = "select distinct py,name from user order by py";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlTableAll() throws JSQLParserException {
-        String originalSql = "Select country.* from country where id > 10 order by id desc , countryname asc";
+        String originalSql = "Select user.* from user where id > 10 order by id desc , name asc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlAs() throws JSQLParserException {
         //TODO 使用AS的时候，不要带单引号
-        String originalSql = "Select id as id,countryname name,countrycode as code from country o where id > 10 order by id desc , countryname asc";
+        String originalSql = "Select id as id,name name,py as code from user o where id > 10 order by id desc , name asc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSelectParameter() throws JSQLParserException {
         //TODO 这种情况会增加?的个数，需要实际在Mybatis中测试
-        String originalSql = "Select id as id,? name,? from country o where id > 10 order by id desc , countryname asc";
+        String originalSql = "Select id as id,? name,? from user o where id > 10 order by id desc , name asc";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
@@ -93,11 +93,11 @@ public class SqlServerTest {
     public void testSqlWith() throws JSQLParserException {
         String originalSql = "with cr as " +
             " (select id " +
-            "    from country " +
+            "    from user " +
             "   where id > 100 " +
             "     and id < 120) " +
-            "select id, countryname, countrycode " +
-            "  from country " +
+            "select id, name, py " +
+            "  from user " +
             " where id in (select * from cr) order by id";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
@@ -138,18 +138,18 @@ public class SqlServerTest {
 
     @Test
     public void testSqlUnion() throws JSQLParserException {
-        String originalSql = "select countryname,countrycode code from country where id >170 " +
+        String originalSql = "select name,py code from user where id >170 " +
             "union all " +
-            "select countryname,countrycode code from country where id < 10 order by code";
+            "select name,py code from user where id < 10 order by code";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlUnion2() throws JSQLParserException {
-        String originalSql = "select countryname,code from ( " +
-            "\tselect countryname,countrycode code from country where id >170 " +
+        String originalSql = "select name,code from ( " +
+            "\tselect name,py code from user where id >170 " +
             "\tunion all " +
-            "\tselect countryname,countrycode code from country where id < 10 " +
+            "\tselect name,py code from user where id < 10 " +
             ") as temp " +
             "order by code";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
@@ -157,25 +157,25 @@ public class SqlServerTest {
 
     @Test
     public void testSqlOrderByFunctionAlias() throws JSQLParserException {
-        String originalSql = "select countrycode code, func() func_alias from country order by func()";
+        String originalSql = "select py code, func() func_alias from user order by func()";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlOrderByUnknown() throws JSQLParserException {
-        String originalSql = "select countryname from country order by countrycode";
+        String originalSql = "select name from user order by py";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlOrderByTable() throws JSQLParserException {
-        String originalSql = "select t.countrycode, t.countryname from country t order by t.countrycode";
+        String originalSql = "select t.py, t.name from user t order by t.py";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
     @Test
     public void testSqlStar() throws JSQLParserException {
-        String originalSql = "select t.*, 1 alias from country t order by t.countrycode";
+        String originalSql = "select t.*, 1 alias from user t order by t.py";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 

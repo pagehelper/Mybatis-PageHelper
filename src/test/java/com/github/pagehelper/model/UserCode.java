@@ -24,39 +24,47 @@
 
 package com.github.pagehelper.model;
 
-/**
- * @author liuzh
- * @since 2015-11-07 14:39
- */
-public class CountryQueryModel {
+import java.io.Serializable;
+import java.util.List;
 
-    private Integer pageNum;
+public class UserCode implements Serializable {
+    private static final long serialVersionUID = 6569081236403751407L;
 
-    private Integer pageSize;
+    private int id;
+    List<UserCode> users;
+    private String name;
+    private Code py;
 
-    private String orderBy;
-
-    public Integer getPageNum() {
-        return pageNum;
+    public int getId() {
+        return id;
     }
 
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public Integer getPageSize() {
-        return pageSize;
+    public String getName() {
+        return name;
     }
 
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
+    public UserCode setName(String name) {
+        this.name = name;
+        return this;
     }
 
-    public String getOrderBy() {
-        return orderBy;
+    public Code getPy() {
+        return py;
     }
 
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
+    public void setPy(Code py) {
+        this.py = py;
+    }
+
+    public List<UserCode> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserCode> users) {
+        this.users = users;
     }
 }

@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic.annotations;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -44,19 +44,19 @@ public class TestAnnotations {
     @Test
     public void testMapperWithStartPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectByOrder2("id");
+            List<User> list = userMapper.selectByOrder2("id");
             assertEquals(1, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectByOrder("countryname");
-            assertEquals(2, list.get(0).getId());
+            list = userMapper.selectByOrder("name");
+            assertEquals(18, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
@@ -70,18 +70,18 @@ public class TestAnnotations {
     @Test
     public void testMapperWithStartPage_OrderBy() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10, "id desc");
-            List<Country> list = countryMapper.selectByOrder2("id");
+            List<User> list = userMapper.selectByOrder2("id");
             assertEquals(183, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10, "id desc");
-            list = countryMapper.selectByOrder("countryname");
+            list = userMapper.selectByOrder("name");
             assertEquals(183, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());

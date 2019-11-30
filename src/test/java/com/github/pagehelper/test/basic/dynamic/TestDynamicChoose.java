@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic.dynamic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -44,18 +44,18 @@ public class TestDynamicChoose {
     @Test
     public void testMapperWithStartPage() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectChoose(1, 2);
+            List<User> list = userMapper.selectChoose(1, 2);
             assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(182, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            list = countryMapper.selectChoose(1, 2);
+            list = userMapper.selectChoose(1, 2);
             assertEquals(2, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(182, ((Page<?>) list).getTotal());
@@ -70,18 +70,18 @@ public class TestDynamicChoose {
     @Test
     public void testMapperWithStartPage_OrderBy() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10, "id desc");
-            List<Country> list = countryMapper.selectChoose(183, 2);
+            List<User> list = userMapper.selectChoose(183, 2);
             assertEquals(182, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(182, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10, "id desc");
-            list = countryMapper.selectChoose(183, 2);
+            list = userMapper.selectChoose(183, 2);
             assertEquals(182, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(182, ((Page<?>) list).getTotal());

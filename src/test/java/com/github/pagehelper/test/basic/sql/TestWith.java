@@ -26,8 +26,8 @@ package com.github.pagehelper.test.basic.sql;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import com.github.pagehelper.util.TestUtil;
 import org.apache.ibatis.session.SqlSession;
@@ -45,7 +45,7 @@ public class TestWith {
     @Test
     public void testUnion() throws Exception {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         //只测试oracle
         if (!TestUtil.getXmlPath().equalsIgnoreCase("oracle")) {
             return;
@@ -53,14 +53,14 @@ public class TestWith {
         try {
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(1, 10);
-            List<Country> list = countryMapper.selectWith();
+            List<User> list = userMapper.selectWith();
             assertEquals(151, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(33, ((Page<?>) list).getTotal());
 
             //获取第1页，10条内容，默认查询总数count
             PageHelper.startPage(2, 10);
-            list = countryMapper.selectWith();
+            list = userMapper.selectWith();
             assertEquals(161, list.get(0).getId());
             assertEquals(10, list.size());
             assertEquals(33, ((Page<?>) list).getTotal());

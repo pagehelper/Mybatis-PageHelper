@@ -66,6 +66,6 @@
     </databaseIdProvider>
 
     <mappers>
-        <mapper resource="com/github/pagehelper/mapper/CountryMapper.xml"/>
+        <mapper resource="com/github/pagehelper/mapper/UserMapper.xml"/>
     </mappers>
 </configuration>

@@ -28,18 +28,18 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Description: Country
+ * Description: User
  * Author: liuzh
  * Update: liuzh(2014-06-06 13:38)
  */
-public class Country implements Serializable {
+public class User
+    implements Serializable {
     private static final long serialVersionUID = 6569081236403751407L;
 
     private int id;
-    private String countryname;
-    private String countrycode;
-
-    List<Country> countries;
+    List<User> users;
+    private String name;
+    private String py;
 
     public int getId() {
         return id;
@@ -49,37 +49,37 @@ public class Country implements Serializable {
         this.id = id;
     }
 
-    public String getCountryname() {
-        return countryname;
-    }
-
-    public void setCountryname(String countryname) {
-        this.countryname = countryname;
-    }
-
-    public String getCountrycode() {
-        return countrycode;
-    }
-
-    public void setCountrycode(String countrycode) {
-        this.countrycode = countrycode;
-    }
-
-    public List<Country> getCountries() {
-        return countries;
-    }
-
-    public void setCountries(List<Country> countries) {
-        this.countries = countries;
-    }
-
     @Override
     public String toString() {
-        return "Country{" +
-                "id=" + id +
-                ", countryname='" + countryname + '\'' +
-                ", countrycode='" + countrycode + '\'' +
-                ", countries=" + countries +
-                '}';
+        return "User{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", py='" + py + '\'' +
+            ", user=" + users +
+            '}';
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPy() {
+        return py;
+    }
+
+    public void setPy(String py) {
+        this.py = py;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

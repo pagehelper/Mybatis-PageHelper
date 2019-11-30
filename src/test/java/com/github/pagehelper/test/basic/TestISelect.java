@@ -28,8 +28,8 @@ import com.github.pagehelper.ISelect;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.pagehelper.mapper.CountryMapper;
-import com.github.pagehelper.model.Country;
+import com.github.pagehelper.mapper.UserMapper;
+import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -44,47 +44,47 @@ public class TestISelect {
     @Test
     public void testGroupBy2() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
-        final CountryMapper countryMapper = sqlSession.getMapper(CountryMapper.class);
+        final UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
-            Page<Country> page = PageHelper.startPage(1, 10).doSelectPage(new ISelect() {
+            Page<User> page = PageHelper.startPage(1, 10).doSelectPage(new ISelect() {
                 @Override
                 public void doSelect() {
-                    countryMapper.selectGroupBy();
+                    userMapper.selectGroupBy();
                 }
             });
             //下面是该方法的lambda用法
-            //Page<Country> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(()-> countryMapper.selectGroupBy());
+            //Page<User> page = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPage(()-> userMapper.selectGroupBy());
             //1,'Angola','AO'
             assertEquals(1, page.get(0).getId());
             assertEquals(10, page.size());
             assertEquals(183, page.getTotal());
 
-            PageInfo<Country> pageInfo = page.toPageInfo();
+            PageInfo<User> pageInfo = page.toPageInfo();
             System.out.println(pageInfo);
 
 
             pageInfo = PageHelper.startPage(1, 10).doSelectPageInfo(new ISelect() {
                 @Override
                 public void doSelect() {
-                    countryMapper.selectGroupBy();
+                    userMapper.selectGroupBy();
                 }
             });
             //lambda
-            //pageInfo = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPageInfo(() -> countryMapper.selectGroupBy());
+            //pageInfo = PageHelper.startPage(1, 10).setOrderBy("id desc").doSelectPageInfo(() -> userMapper.selectGroupBy());
 
             System.out.println(pageInfo);
 
-            final Country country = new Country();
-            country.setCountryname("c");
+            final User user = new User();
+            user.setName("c");
 
             long total = PageHelper.count(new ISelect() {
                 @Override
                 public void doSelect() {
-                    countryMapper.selectLike(country);
+                    userMapper.selectLike(user);
                 }
             });
             //lambda
-            //long total = PageHelper.count(()->countryMapper.selectLike(country));
+            //long total = PageHelper.count(()->userMapper.selectLike(user));
 
             System.out.println(total);
         } finally {
