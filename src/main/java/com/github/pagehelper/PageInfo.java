@@ -24,8 +24,10 @@
 
 package com.github.pagehelper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * 对Page<E>结果进行包装
@@ -364,5 +366,43 @@ public class PageInfo<T> extends PageSerializable<T> {
         }
         sb.append('}');
         return sb.toString();
+    }
+
+    /**
+     * 类型转换（eg.PO->DTO）
+     * Java版本
+     * @since 1.8+
+     * 将PageInfo<S> source
+     * @param source
+     * 通过转换器（lambda表达式需要Java 1.8以上）
+     * @param converter
+     * 转换为PageInfo<T>
+     * @return PageInfo<T>
+     */
+    public static <S,T> PageInfo<T> convert(PageInfo<S> source, Function<S, T> converter){
+        PageInfo target = new PageInfo();
+        target.setPageNum(source.getPageNum());
+        target.setPageSize(source.getPageSize());
+        target.setSize(source.getSize());
+        target.setStartRow(source.getStartRow());
+        target.setEndRow(source.getEndRow());
+        target.setPages(source.getPages());
+        target.setPrePage(source.getPrePage());
+        target.setNextPage(source.getNextPage());
+        target.setIsFirstPage(source.isIsFirstPage());
+        target.setIsLastPage(source.isIsLastPage());
+        target.setHasPreviousPage(source.isHasPreviousPage());
+        target.setHasNextPage(source.isHasNextPage());
+        target.setNavigatePages(source.getNavigatePages());
+        target.setNavigatepageNums(source.getNavigatepageNums());
+        target.setNavigateFirstPage(source.getNavigateFirstPage());
+        target.setNavigateLastPage(source.getNavigateLastPage());
+        target.setTotal(source.getTotal());
+        List<T> tempList = new ArrayList<>();
+        if (source.getList() != null) {
+            source.getList().forEach(e -> tempList.add(converter.apply(e)));
+        }
+        target.setList(tempList);
+        return target;
     }
 }
