@@ -141,6 +141,72 @@ public class PageInfo<T> extends PageSerializable<T> {
     public static <T> PageInfo<T> of(List<T> list, int navigatePages) {
         return new PageInfo<T>(list, navigatePages);
     }
+    
+     /**
+     * 包装Page对象
+     * 用于数据库查询出来的对象和前端返回的对象列表不一致的情况
+     *
+     * @param originList 数据库查询出来的原始的数据列表
+     * @Param listVo 返回给前端的数据列表
+     */
+    public <O> PageInfo(List<O> originList, List<T> listVo) {
+        this(originList,listVo,8);
+    }
+
+
+    public <O> PageInfo(List<O> originList, List<T> listVo,  int navigatePages) {
+        this.list = listVo;
+        if(originList instanceof Page){
+            this.total = ((Page)originList).getTotal();
+        } else {
+            this.total = list.size();
+        }
+
+        if (originList instanceof Page) {
+            Page page = (Page) originList;
+            this.pageNum = page.getPageNum();
+            this.pageSize = page.getPageSize();
+
+            this.pages = page.getPages();
+            this.size = page.size();
+            //由于结果是>startRow的，所以实际的需要+1
+            if (this.size == 0) {
+                this.startRow = 0;
+                this.endRow = 0;
+            } else {
+                this.startRow = page.getStartRow() + 1;
+                //计算实际的endRow（最后一页的时候特殊）
+                this.endRow = this.startRow - 1 + this.size;
+            }
+        } else if (originList instanceof Collection) {
+            this.pageNum = 1;
+            this.pageSize = list.size();
+
+            this.pages = this.pageSize > 0 ? 1 : 0;
+            this.size = list.size();
+            this.startRow = 0;
+            this.endRow = list.size() > 0 ? list.size() - 1 : 0;
+        }
+
+        if (originList instanceof Collection) {
+            this.navigatePages = navigatePages;
+            //计算导航页
+            calcNavigatepageNums();
+            //计算前后页，第一页，最后一页
+            calcPage();
+            //判断页面边界
+            judgePageBoudary();
+        }
+    }
+
+    public static <O,T> PageInfo<T> of(List<O> originList, List<T> listVo) {
+        return new PageInfo<T>(originList,listVo);
+    }
+
+    public static <O,T> PageInfo<T> of(List<O> originList, List<T> listVo, int navigatePages) {
+        return new PageInfo<T>(originList,listVo, navigatePages);
+    }
+    
 
     /**
      * 计算导航页
