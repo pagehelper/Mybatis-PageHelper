@@ -121,8 +121,9 @@ public class PageAutoDialect {
     }
 
     private String fromJdbcUrl(String jdbcUrl) {
+        final String url = jdbcUrl.toLowerCase();
         for (String dialect : dialectAliasMap.keySet()) {
-            if (jdbcUrl.indexOf(":" + dialect + ":") != -1) {
+            if (url.contains(":" + dialect.toLowerCase() + ":")) {
                 return dialect;
             }
         }
