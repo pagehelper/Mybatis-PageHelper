@@ -55,8 +55,8 @@ public class OracleDialect extends AbstractHelperDialect {
         sqlBuilder.append("SELECT * FROM ( ");
         sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( ");
         sqlBuilder.append(sql);
-        sqlBuilder.append(" ) TMP_PAGE)");
-        sqlBuilder.append(" WHERE ROW_ID <= ? AND ROW_ID > ?");
+        sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ? ");
+        sqlBuilder.append(" ) WHERE ROW_ID > ? ");
         return sqlBuilder.toString();
     }
 
