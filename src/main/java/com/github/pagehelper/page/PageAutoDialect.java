@@ -67,6 +67,7 @@ public class PageAutoDialect {
         registerDialectAlias("herddb", HerdDBDialect.class);
 
         registerDialectAlias("oracle", OracleDialect.class);
+        registerDialectAlias("oracle9i", Oracle9iDialect.class);
         registerDialectAlias("db2", Db2Dialect.class);
         registerDialectAlias("informix", InformixDialect.class);
         //解决 informix-sqli #129，仍然保留上面的

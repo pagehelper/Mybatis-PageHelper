@@ -33,9 +33,14 @@ import org.apache.ibatis.mapping.MappedStatement;
 import java.util.Map;
 
 /**
+ * 参考
+ * <ul>
+ *     <li>https://github.com/pagehelper/Mybatis-PageHelper/pull/476</li>
+ *     <li>https://github.com/hibernate/hibernate-orm/search?utf8=%E2%9C%93&q=rownum&type=</li>
+ * </ul>
  * @author liuzh
  */
-public class OracleDialect extends AbstractHelperDialect {
+public class Oracle9iDialect extends AbstractHelperDialect {
 
     @Override
     public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
@@ -55,8 +60,8 @@ public class OracleDialect extends AbstractHelperDialect {
         sqlBuilder.append("SELECT * FROM ( ");
         sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( ");
         sqlBuilder.append(sql);
-        sqlBuilder.append(" ) TMP_PAGE)");
-        sqlBuilder.append(" WHERE ROW_ID <= ? AND ROW_ID > ?");
+        sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ? ");
+        sqlBuilder.append(" ) WHERE ROW_ID > ? ");
         return sqlBuilder.toString();
     }
 
