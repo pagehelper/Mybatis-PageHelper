@@ -83,6 +83,7 @@ public class PageAutoDialect {
         registerDialectAlias("edb", OracleDialect.class);
         //神通数据库
         registerDialectAlias("oscar", MySqlDialect.class);
+        registerDialectAlias("clickhouse", MySqlDialect.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
