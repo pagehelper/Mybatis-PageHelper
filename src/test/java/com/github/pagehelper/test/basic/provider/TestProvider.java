@@ -41,6 +41,21 @@ import static org.junit.Assert.assertEquals;
 public class TestProvider {
 
     @Test
+    public void testSelectSimple() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        try {
+            PageHelper.startPage(1, 10);
+            Page<User> list = userMapper.selectSimple("飞");
+            assertEquals(24, list.get(0).getId());
+            assertEquals(6, list.size());
+            assertEquals(6, list.getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Test
     public void testProvider() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         Map<String, Object> map = new HashMap<String, Object>();

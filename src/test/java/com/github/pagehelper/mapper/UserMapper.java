@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.mapper;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.model.*;
 import com.github.pagehelper.test.basic.dynamic.Where;
 import org.apache.ibatis.annotations.Param;
@@ -39,6 +40,10 @@ public interface UserMapper {
 
     @Select("select * from user order by ${order}")
     List<User> selectByOrder(@Param("order") String order);
+
+    //增加Provider测试
+    @SelectProvider(type = ProviderMethod.class, method = "selectSimple")
+    Page<User> selectSimple(String str);
 
     //增加Provider测试
     @SelectProvider(type = ProviderMethod.class, method = "select")

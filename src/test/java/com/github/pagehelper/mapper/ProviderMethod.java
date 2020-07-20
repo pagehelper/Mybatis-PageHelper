@@ -34,6 +34,10 @@ import java.util.Map;
  */
 public class ProviderMethod {
 
+    public String selectSimple(String str) {
+        return "select * from user where name like '%" + str + "'";
+    }
+
     @SuppressWarnings("unchecked")
     public String select(Map<String, Object> map) {
         Map<String, Object> param = (HashMap<String, Object>) map.get("param");
