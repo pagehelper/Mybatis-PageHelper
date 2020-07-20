@@ -215,11 +215,23 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
 
     }
 
-    protected void handleParameter(BoundSql boundSql, MappedStatement ms){
+    /**
+     * @param boundSql
+     * @param ms
+     * @deprecated use {@code handleParameter(BoundSql boundSql, MappedStatement ms, Class<?> firstClass, Class<?> secondClass)}
+     */
+    @Deprecated
+    protected void handleParameter(BoundSql boundSql, MappedStatement ms) {
+        if (boundSql.getParameterMappings() != null) {
+            handleParameter(boundSql, ms, long.class, long.class);
+        }
+    }
+
+    protected void handleParameter(BoundSql boundSql, MappedStatement ms, Class<?> firstClass, Class<?> secondClass) {
         if (boundSql.getParameterMappings() != null) {
             List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>(boundSql.getParameterMappings());
-            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
-            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, firstClass).build());
+            newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, secondClass).build());
             MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
             metaObject.setValue("parameterMappings", newParameterMappings);
         }

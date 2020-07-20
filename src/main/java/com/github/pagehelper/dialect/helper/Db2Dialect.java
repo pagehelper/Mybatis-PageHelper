@@ -45,7 +45,7 @@ public class Db2Dialect extends AbstractHelperDialect {
         pageKey.update(page.getStartRow() + 1);
         pageKey.update(page.getEndRow());
         //处理参数配置
-        handleParameter(boundSql, ms);
+        handleParameter(boundSql, ms, long.class, long.class);
         return paramMap;
     }
 

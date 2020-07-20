@@ -53,10 +53,10 @@ public class HsqldbDialect extends AbstractHelperDialect {
         if (boundSql.getParameterMappings() != null) {
             List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>(boundSql.getParameterMappings());
             if (page.getPageSize() > 0) {
-                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, Integer.class).build());
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, int.class).build());
             }
             if (page.getStartRow() > 0) {
-                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, Integer.class).build());
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, long.class).build());
             }
             MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
             metaObject.setValue("parameterMappings", newParameterMappings);

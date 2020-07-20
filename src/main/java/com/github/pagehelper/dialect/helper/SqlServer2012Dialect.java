@@ -44,7 +44,7 @@ public class SqlServer2012Dialect extends SqlServerDialect {
         pageKey.update(page.getStartRow());
         pageKey.update(page.getPageSize());
         //处理参数配置
-        handleParameter(boundSql, ms);
+        handleParameter(boundSql, ms, long.class, int.class);
         return paramMap;
     }
 

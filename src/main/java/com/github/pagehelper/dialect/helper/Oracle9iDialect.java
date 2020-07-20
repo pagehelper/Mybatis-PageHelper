@@ -50,7 +50,7 @@ public class Oracle9iDialect extends AbstractHelperDialect {
         pageKey.update(page.getEndRow());
         pageKey.update(page.getStartRow());
         //处理参数配置
-        handleParameter(boundSql, ms);
+        handleParameter(boundSql, ms, long.class, long.class);
         return paramMap;
     }
 

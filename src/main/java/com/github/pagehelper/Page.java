@@ -49,11 +49,11 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     /**
      * 起始行
      */
-    private int startRow;
+    private long startRow;
     /**
      * 末行
      */
-    private int endRow;
+    private long endRow;
     /**
      * 总数
      */
@@ -144,11 +144,11 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         return this;
     }
 
-    public int getEndRow() {
+    public long getEndRow() {
         return endRow;
     }
 
-    public Page<E> setEndRow(int endRow) {
+    public Page<E> setEndRow(long endRow) {
         this.endRow = endRow;
         return this;
     }
@@ -172,11 +172,11 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         return this;
     }
 
-    public int getStartRow() {
+    public long getStartRow() {
         return startRow;
     }
 
-    public Page<E> setStartRow(int startRow) {
+    public Page<E> setStartRow(long startRow) {
         this.startRow = startRow;
         return this;
     }
