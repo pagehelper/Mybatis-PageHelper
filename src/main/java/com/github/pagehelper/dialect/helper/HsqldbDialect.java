@@ -69,10 +69,10 @@ public class HsqldbDialect extends AbstractHelperDialect {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 20);
         sqlBuilder.append(sql);
         if (page.getPageSize() > 0) {
-            sqlBuilder.append(" LIMIT ? ");
+            sqlBuilder.append("\n LIMIT ? ");
         }
         if (page.getStartRow() > 0) {
-            sqlBuilder.append(" OFFSET ? ");
+            sqlBuilder.append("\n OFFSET ? ");
         }
         return sqlBuilder.toString();
     }

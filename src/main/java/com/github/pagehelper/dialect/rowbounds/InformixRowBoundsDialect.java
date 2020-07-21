@@ -49,9 +49,9 @@ public class InformixRowBoundsDialect extends AbstractRowBoundsDialect {
             sqlBuilder.append(rowBounds.getLimit());
             pageKey.update(rowBounds.getLimit());
         }
-        sqlBuilder.append(" * FROM ( ");
+        sqlBuilder.append(" * FROM ( \n");
         sqlBuilder.append(sql);
-        sqlBuilder.append(" ) TEMP_T");
+        sqlBuilder.append("\n ) TEMP_T");
         return sqlBuilder.toString();
     }
 

@@ -40,10 +40,10 @@ public class MySqlRowBoundsDialect extends AbstractRowBoundsDialect {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
         sqlBuilder.append(sql);
         if (rowBounds.getOffset() == 0) {
-            sqlBuilder.append(" LIMIT ");
+            sqlBuilder.append("\n LIMIT ");
             sqlBuilder.append(rowBounds.getLimit());
         } else {
-            sqlBuilder.append(" LIMIT ");
+            sqlBuilder.append("\n LIMIT ");
             sqlBuilder.append(rowBounds.getOffset());
             sqlBuilder.append(",");
             sqlBuilder.append(rowBounds.getLimit());

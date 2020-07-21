@@ -30,14 +30,14 @@
 <mapper namespace="com.github.pagehelper.mapper.UserMapper">
     <cache/>
     <select id="selectAll" resultType="User">
-        select * from user order by id
+        select * from user order by id -- comment
     </select>
     <select id="selectAll_TESTCOUNT" resultType="Long">
         select count(distinct id) from user
     </select>
 
     <select id="selectGreterThanId" resultType="User">
-        select * from user where id &gt;#{id} order by id
+        select * from user where id &gt;#{id} order by id -- comment
     </select>
     <select id="selectGreterThanId_TESTCOUNT" resultType="Long">
         select count(distinct id) from user where id &gt;#{id}

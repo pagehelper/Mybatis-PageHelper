@@ -40,12 +40,12 @@ public class HsqldbRowBoundsDialect extends AbstractRowBoundsDialect {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 20);
         sqlBuilder.append(sql);
         if (rowBounds.getLimit() > 0) {
-            sqlBuilder.append(" LIMIT ");
+            sqlBuilder.append("\n LIMIT ");
             sqlBuilder.append(rowBounds.getLimit());
             pageKey.update(rowBounds.getLimit());
         }
         if (rowBounds.getOffset() > 0) {
-            sqlBuilder.append(" OFFSET ");
+            sqlBuilder.append("\n OFFSET ");
             sqlBuilder.append(rowBounds.getOffset());
             pageKey.update(rowBounds.getOffset());
         }

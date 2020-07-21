@@ -38,7 +38,7 @@ public class SqlServer2012RowBoundsDialect extends SqlServerRowBoundsDialect {
     public String getPageSql(String sql, RowBounds rowBounds, CacheKey pageKey) {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
         sqlBuilder.append(sql);
-        sqlBuilder.append(" OFFSET ");
+        sqlBuilder.append("\n OFFSET ");
         sqlBuilder.append(rowBounds.getOffset());
         sqlBuilder.append(" ROWS ");
         pageKey.update(rowBounds.getOffset());

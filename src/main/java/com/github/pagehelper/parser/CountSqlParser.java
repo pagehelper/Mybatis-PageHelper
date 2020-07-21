@@ -219,9 +219,9 @@ public class CountSqlParser {
         StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
         stringBuilder.append("select count(");
         stringBuilder.append(name);
-        stringBuilder.append(") from (");
+        stringBuilder.append(") from ( \n");
         stringBuilder.append(sql);
-        stringBuilder.append(") tmp_count");
+        stringBuilder.append("\n ) tmp_count");
         return stringBuilder.toString();
     }
 

@@ -46,7 +46,9 @@ public class OracleRowBoundsDialect extends AbstractRowBoundsDialect {
         if (endRow > 0) {
             sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( ");
         }
+        sqlBuilder.append("\n");
         sqlBuilder.append(sql);
+        sqlBuilder.append("\n");
         if (endRow > 0) {
             sqlBuilder.append(" ) TMP_PAGE WHERE ROWNUM <= ");
             sqlBuilder.append(endRow);

@@ -75,9 +75,9 @@ public class InformixDialect extends AbstractHelperDialect {
         if (page.getPageSize() > 0) {
             sqlBuilder.append(" FIRST ? ");
         }
-        sqlBuilder.append(" * FROM ( ");
+        sqlBuilder.append(" * FROM ( \n");
         sqlBuilder.append(sql);
-        sqlBuilder.append(" ) TEMP_T ");
+        sqlBuilder.append("\n ) TEMP_T ");
         return sqlBuilder.toString();
     }
 

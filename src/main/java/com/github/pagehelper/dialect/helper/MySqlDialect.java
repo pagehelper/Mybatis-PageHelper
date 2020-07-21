@@ -69,9 +69,9 @@ public class MySqlDialect extends AbstractHelperDialect {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
         sqlBuilder.append(sql);
         if (page.getStartRow() == 0) {
-            sqlBuilder.append(" LIMIT ? ");
+            sqlBuilder.append("\n LIMIT ? ");
         } else {
-            sqlBuilder.append(" LIMIT ?, ? ");
+            sqlBuilder.append("\n LIMIT ?, ? ");
         }
         return sqlBuilder.toString();
     }
