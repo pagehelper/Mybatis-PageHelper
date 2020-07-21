@@ -58,10 +58,10 @@ public class Oracle9iDialect extends AbstractHelperDialect {
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 120);
         sqlBuilder.append("SELECT * FROM ( ");
-        sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( \n");
+        sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM PAGEHELPER_ROW_ID FROM ( \n");
         sqlBuilder.append(sql);
         sqlBuilder.append("\n ) TMP_PAGE WHERE ROWNUM <= ? ");
-        sqlBuilder.append(" ) WHERE ROW_ID > ? ");
+        sqlBuilder.append(" ) WHERE PAGEHELPER_ROW_ID > ? ");
         return sqlBuilder.toString();
     }
 

@@ -44,7 +44,7 @@ public class OracleRowBoundsDialect extends AbstractRowBoundsDialect {
             sqlBuilder.append("SELECT * FROM ( ");
         }
         if (endRow > 0) {
-            sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM ROW_ID FROM ( ");
+            sqlBuilder.append(" SELECT TMP_PAGE.*, ROWNUM PAGEHELPER_ROW_ID FROM ( ");
         }
         sqlBuilder.append("\n");
         sqlBuilder.append(sql);
@@ -55,7 +55,7 @@ public class OracleRowBoundsDialect extends AbstractRowBoundsDialect {
             pageKey.update(endRow);
         }
         if (startRow > 0) {
-            sqlBuilder.append(" ) WHERE ROW_ID > ");
+            sqlBuilder.append(" ) WHERE PAGEHELPER_ROW_ID > ");
             sqlBuilder.append(startRow);
             pageKey.update(startRow);
         }
