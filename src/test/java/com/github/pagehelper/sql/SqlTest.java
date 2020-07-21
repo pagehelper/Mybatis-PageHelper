@@ -69,6 +69,8 @@ public class SqlTest {
                 "select * from aa10 where aaa100 = 'AAC031')"));
 
         System.out.println(countSqlParser.getSmartCountSql("select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email,so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids,so.phone,so.remarks,so.type,so.zip_code from sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) where suo.user_id = ? group by so.id LIMIT ? "));
+
+        System.out.println(countSqlParser.getSmartCountSql("select xx,xx,xx from xx1 left join xx2 on xx1.id=xx2.user_id where 1=1 and xx1.`name` like \"%ll%\" and  xx1.status = 1 and (xx2.`type` = 1) order by xx1.number asc"));
     }
 
 
