@@ -99,7 +99,8 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
                 return false;
             }
         }
-        return page.getPageNum() > 0 && (count > ((page.getPageNum() - 1) * page.getPageSize()));
+        //页码>0 && 开始行数<总行数即可，不需要考虑 pageSize（上面的 if 已经处理不符合要求的值了）
+        return page.getPageNum() > 0 && count > page.getStartRow();
     }
 
     @Override
