@@ -39,7 +39,6 @@ public class SqlServerTest {
     public static final SqlServerParser sqlServer = new SqlServerParser();
 
     @Test
-    @Ignore("暂时不支持")
     public void testSqlTestWithlock() throws JSQLParserException {
         String originalSql = "select * from Agency with (NOLOCK) where status=0 order by CreateTime";
         System.out.println(sqlServer.convertToPageSql(originalSql, 1, 10));
