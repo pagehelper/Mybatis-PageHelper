@@ -89,8 +89,15 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         }
         //pageSize < 0 的时候，不执行分页查询
         //pageSize = 0 的时候，还需要执行后续查询，但是不会分页
-        if (page.getPageSize() < 0) {
-            return false;
+        if (page.getPageSizeZero() != null) {
+            //PageSizeZero=false&&pageSize<=0
+            if (!page.getPageSizeZero() && page.getPageSize() <= 0) {
+                return false;
+            }
+            //PageSizeZero=true&&pageSize<0 返回 false，只有>=0才需要执行后续的
+            else if (page.getPageSizeZero() && page.getPageSize() < 0) {
+                return false;
+            }
         }
         return page.getPageNum() > 0 && (count > ((page.getPageNum() - 1) * page.getPageSize()));
     }

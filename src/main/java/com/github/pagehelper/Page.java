@@ -227,7 +227,7 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     }
 
     public Page<E> setPageSizeZero(Boolean pageSizeZero) {
-        if (pageSizeZero != null) {
+        if (this.pageSizeZero == null && pageSizeZero != null) {
             this.pageSizeZero = pageSizeZero;
         }
         return this;

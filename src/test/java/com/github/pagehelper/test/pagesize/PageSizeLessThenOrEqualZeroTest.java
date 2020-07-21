@@ -51,7 +51,7 @@ public class PageSizeLessThenOrEqualZeroTest {
             PageHelper.startPage(1, 0);
             List<User> list = userMapper.selectAll();
             PageInfo<User> page = new PageInfo<User>(list);
-            assertEquals(183, list.size());
+            assertEquals(0, list.size());
             assertEquals(183, page.getTotal());
 
             //limit<0的时候同上
