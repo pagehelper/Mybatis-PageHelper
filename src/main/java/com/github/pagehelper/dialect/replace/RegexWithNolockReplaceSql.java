@@ -39,7 +39,7 @@ public class RegexWithNolockReplaceSql implements ReplaceSql {
 
     @Override
     public String replace(String sql) {
-        return sql.replaceAll("((?i)\\s*(\\w+)\\s*with\\s*\\(nolock\\))", " $2_PAGEWITHNOLOCK");
+        return sql.replaceAll("((?i)\\s*(\\w+)\\s*with\\s*\\(\\s*nolock\\s*\\))", " $2_PAGEWITHNOLOCK");
     }
 
     @Override
