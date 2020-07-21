@@ -138,7 +138,7 @@ public class PageInterceptor implements Interceptor {
         //先判断是否存在手写的 count 查询
         MappedStatement countMs = ExecutorUtil.getExistedMappedStatement(ms.getConfiguration(), countMsId);
         if (countMs != null) {
-            count = ExecutorUtil.executeManualCount(executor, countMs, parameter, boundSql, resultHandler);
+            count = ExecutorUtil.executeManualCount(executor, countMs, parameter, boundSql, null);
         } else {
             countMs = msCountMap.get(countMsId);
             //自动创建
