@@ -94,7 +94,7 @@ public class PageInterceptor implements Interceptor {
                 //判断是否需要进行 count 查询
                 if (dialect.beforeCount(ms, parameter, rowBounds)) {
                     //查询总数
-                    Long count = count(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+                    Long count = count(executor, ms, parameter, rowBounds, null, boundSql);
                     //处理查询总数，返回 true 时继续分页查询，false 时直接返回
                     if (!dialect.afterCount(count, parameter, rowBounds)) {
                         //当查询总数为 0 时，直接返回空的结果
@@ -138,7 +138,7 @@ public class PageInterceptor implements Interceptor {
         //先判断是否存在手写的 count 查询
         MappedStatement countMs = ExecutorUtil.getExistedMappedStatement(ms.getConfiguration(), countMsId);
         if (countMs != null) {
-            count = ExecutorUtil.executeManualCount(executor, countMs, parameter, boundSql, null);
+            count = ExecutorUtil.executeManualCount(executor, countMs, parameter, boundSql, resultHandler);
         } else {
             countMs = msCountMap.get(countMsId);
             //自动创建

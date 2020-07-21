@@ -68,4 +68,76 @@ public class PageTest {
             sqlSession.close();
         }
     }
+
+    @Test
+    public void testMapperWithStartPageAndReasonableFalse() {
+        SqlSession sqlSession = MybatisReasonableHelper.getSqlSession();
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        try {
+            //获取第20页，2条内容
+            //分页插件会自动改为查询最后一页
+            PageHelper.startPage(20, 50, true, false, false);
+            List<User> list = userMapper.selectAll();
+            PageInfo<User> page = new PageInfo<User>(list);
+            assertEquals(0, list.size());
+            assertEquals(0, page.getStartRow());
+            assertEquals(20, page.getPageNum());
+            assertEquals(183, page.getTotal());
+
+            PageHelper.startPage(4, 50, true, false, false);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
+            assertEquals(33, list.size());
+            assertEquals(151, page.getStartRow());
+            assertEquals(4, page.getPageNum());
+            assertEquals(183, page.getTotal());
+
+            PageHelper.startPage(-1, 50, true, false, false);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
+            assertEquals(0, list.size());
+            assertEquals(0, page.getStartRow());
+            assertEquals(-1, page.getPageNum());
+            assertEquals(183, page.getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testMapperWithStartPageAndReasonableTrue() {
+        SqlSession sqlSession = MybatisReasonableHelper.getSqlSession();
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        try {
+            //获取第20页，2条内容
+            //分页插件会自动改为查询最后一页
+            PageHelper.startPage(20, 50, true, true, false);
+            List<User> list = userMapper.selectAll();
+            PageInfo<User> page = new PageInfo<User>(list);
+            assertEquals(33, list.size());
+            assertEquals(151, page.getStartRow());
+            assertEquals(4, page.getPageNum());
+            assertEquals(183, page.getTotal());
+
+            PageHelper.startPage(4, 50, true, true, false);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
+            assertEquals(33, list.size());
+            assertEquals(151, page.getStartRow());
+            assertEquals(4, page.getPageNum());
+            assertEquals(183, page.getTotal());
+
+            PageHelper.startPage(-1, 50, true, true, false);
+            list = userMapper.selectAll();
+            page = new PageInfo<User>(list);
+            assertEquals(50, list.size());
+            assertEquals(1, page.getStartRow());
+            assertEquals(1, page.getPageNum());
+            assertEquals(183, page.getTotal());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+
 }
