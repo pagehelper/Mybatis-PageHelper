@@ -1,9 +1,6 @@
 ﻿CREATE DATABASE `pagehelper` DEFAULT CHARACTER SET utf8;
 
-CREATE USER pagehelper IDENTIFIED BY 'pagehelper';
-GRANT ALL PRIVILEGES ON `pagehelper`.* TO 'pagehelper'@'%' WITH GRANT OPTION;
-GRANT USAGE ON *.* TO 'pagehelper'@'%' IDENTIFIED BY 'pagehelper';
-
+USE `pagehelper`;
 DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
