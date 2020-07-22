@@ -29,8 +29,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageRowBounds;
 import com.github.pagehelper.parser.OrderByParser;
+import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MetaObjectUtil;
 import com.github.pagehelper.util.StringUtil;
+import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -39,6 +41,8 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.*;
+
+import static org.apache.ibatis.reflection.ParamNameResolver.GENERIC_NAME_PREFIX;
 
 /**
  * 针对 PageHelper 的实现
@@ -120,6 +124,14 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
             paramMap.putAll((Map) parameterObject);
         } else {
             paramMap = new HashMap<String, Object>();
+            // sqlSource为ProviderSqlSource时，处理只有1个参数的情况
+            if (ms.getSqlSource() instanceof ProviderSqlSource) {
+                String[] providerMethodArgumentNames = ExecutorUtil.getProviderMethodArgumentNames((ProviderSqlSource) ms.getSqlSource());
+                if (providerMethodArgumentNames.length == 1) {
+                    paramMap.put(providerMethodArgumentNames[0], parameterObject);
+                    paramMap.put(GENERIC_NAME_PREFIX + 1, parameterObject);
+                }
+            }
             //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
             //TypeHandlerRegistry可以直接处理的会作为一个直接使用的对象进行处理
             boolean hasTypeHandler = ms.getConfiguration().getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
@@ -207,7 +219,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
             page.setTotal(-1);
         } else if ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0) {
             page.setTotal(pageList.size());
-        } else if(page.isOrderByOnly()){
+        } else if (page.isOrderByOnly()) {
             page.setTotal(pageList.size());
         }
         return page;
