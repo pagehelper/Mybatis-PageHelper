@@ -39,6 +39,7 @@ import java.util.List;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PageInfo<T> extends PageSerializable<T> {
+    public static final int DEFAULT_NAVIGATE_PAGES = 8;
     //当前页
     private int pageNum;
     //每页的数量
@@ -87,7 +88,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      * @param list
      */
     public PageInfo(List<T> list) {
-        this(list, 8);
+        this(list, DEFAULT_NAVIGATE_PAGES);
     }
 
     /**
@@ -124,13 +125,7 @@ public class PageInfo<T> extends PageSerializable<T> {
             this.endRow = list.size() > 0 ? list.size() - 1 : 0;
         }
         if (list instanceof Collection) {
-            this.navigatePages = navigatePages;
-            //计算导航页
-            calcNavigatepageNums();
-            //计算前后页，第一页，最后一页
-            calcPage();
-            //判断页面边界
-            judgePageBoudary();
+            calcByNavigatePages(navigatePages);
         }
     }
 
@@ -140,6 +135,16 @@ public class PageInfo<T> extends PageSerializable<T> {
 
     public static <T> PageInfo<T> of(List<T> list, int navigatePages) {
         return new PageInfo<T>(list, navigatePages);
+    }
+
+    public void calcByNavigatePages(int navigatePages) {
+        setNavigatePages(navigatePages);
+        //计算导航页
+        calcNavigatepageNums();
+        //计算前后页，第一页，最后一页
+        calcPage();
+        //判断页面边界
+        judgePageBoudary();
     }
 
     /**

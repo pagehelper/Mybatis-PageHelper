@@ -352,13 +352,49 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     }
 
     public PageInfo<E> toPageInfo() {
-        PageInfo<E> pageInfo = new PageInfo<E>(this);
+        return new PageInfo<E>(this);
+    }
+
+    public <T> PageInfo<T> toPageInfo(Function<E, T> function) {
+        List<T> list = new ArrayList<T>(this.size());
+        for (E e : this) {
+            list.add(function.apply(e));
+        }
+        PageInfo<T> pageInfo = new PageInfo<T>(list);
+        pageInfo.setPageNum(this.getPageNum());
+        pageInfo.setPageSize(this.getPageSize());
+        pageInfo.setPages(this.getPages());
+        pageInfo.setStartRow(this.getStartRow());
+        pageInfo.setEndRow(this.getEndRow());
+        pageInfo.calcByNavigatePages(PageInfo.DEFAULT_NAVIGATE_PAGES);
         return pageInfo;
     }
 
     public PageSerializable<E> toPageSerializable() {
-        PageSerializable<E> serializable = new PageSerializable<E>(this);
-        return serializable;
+        return new PageSerializable<E>(this);
+    }
+
+    public <T> PageSerializable<T> toPageSerializable(Function<E, T> function) {
+        List<T> list = new ArrayList<T>(this.size());
+        for (E e : this) {
+            list.add(function.apply(e));
+        }
+        return new PageSerializable<T>(list);
+    }
+
+    /**
+     * 兼容低版本 Java 7-
+     */
+    public interface Function<E, T> {
+
+        /**
+         * Applies this function to the given argument.
+         *
+         * @param t the function argument
+         * @return the function result
+         */
+        T apply(E t);
+
     }
 
     public <E> Page<E> doSelectPage(ISelect select) {
