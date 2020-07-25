@@ -53,11 +53,14 @@ public abstract class ExecutorUtil {
         try {
             additionalParametersField = BoundSql.class.getDeclaredField("additionalParameters");
             additionalParametersField.setAccessible(true);
-
-            providerMethodArgumentNamesField = ProviderSqlSource.class.getDeclaredField("providerMethodArgumentNames");
-            providerMethodArgumentNamesField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             throw new PageException("获取 BoundSql 属性 additionalParameters 失败: " + e, e);
+        }
+        try {
+            //兼容低版本
+            providerMethodArgumentNamesField = ProviderSqlSource.class.getDeclaredField("providerMethodArgumentNames");
+            providerMethodArgumentNamesField.setAccessible(true);
+        } catch (NoSuchFieldException ignore) {
         }
     }
 
@@ -83,7 +86,7 @@ public abstract class ExecutorUtil {
      */
     public static String[] getProviderMethodArgumentNames(ProviderSqlSource providerSqlSource) {
         try {
-            return (String[]) providerMethodArgumentNamesField.get(providerSqlSource);
+            return providerMethodArgumentNamesField != null ? (String[]) providerMethodArgumentNamesField.get(providerSqlSource) : null;
         } catch (IllegalAccessException e) {
             throw new PageException("获取 ProviderSqlSource 属性值 providerMethodArgumentNames: " + e, e);
         }

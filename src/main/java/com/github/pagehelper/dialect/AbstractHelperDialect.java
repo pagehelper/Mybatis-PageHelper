@@ -42,8 +42,6 @@ import org.apache.ibatis.session.RowBounds;
 
 import java.util.*;
 
-import static org.apache.ibatis.reflection.ParamNameResolver.GENERIC_NAME_PREFIX;
-
 /**
  * 针对 PageHelper 的实现
  *
@@ -127,9 +125,9 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
             // sqlSource为ProviderSqlSource时，处理只有1个参数的情况
             if (ms.getSqlSource() instanceof ProviderSqlSource) {
                 String[] providerMethodArgumentNames = ExecutorUtil.getProviderMethodArgumentNames((ProviderSqlSource) ms.getSqlSource());
-                if (providerMethodArgumentNames.length == 1) {
+                if (providerMethodArgumentNames != null && providerMethodArgumentNames.length == 1) {
                     paramMap.put(providerMethodArgumentNames[0], parameterObject);
-                    paramMap.put(GENERIC_NAME_PREFIX + 1, parameterObject);
+                    paramMap.put("param1", parameterObject);
                 }
             }
             //动态sql时的判断条件不会出现在ParameterMapping中，但是必须有，所以这里需要收集所有的getter属性
