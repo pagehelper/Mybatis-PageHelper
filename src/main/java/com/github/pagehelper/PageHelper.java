@@ -26,6 +26,7 @@ package com.github.pagehelper;
 
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.page.PageAutoDialect;
+import com.github.pagehelper.page.PageBoundSqlInterceptors;
 import com.github.pagehelper.page.PageMethod;
 import com.github.pagehelper.page.PageParams;
 import com.github.pagehelper.parser.CountSqlParser;
@@ -36,6 +37,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.RowBounds;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -46,9 +48,10 @@ import java.util.Properties;
  * @author liuzh/abel533/isea533
  * @version 5.0.0
  */
-public class PageHelper extends PageMethod implements Dialect {
+public class PageHelper extends PageMethod implements Dialect, BoundSqlInterceptor.Chain {
     private PageParams pageParams;
     private PageAutoDialect autoDialect;
+    private PageBoundSqlInterceptors pageBoundSqlInterceptors;
 
     @Override
     public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
@@ -124,12 +127,38 @@ public class PageHelper extends PageMethod implements Dialect {
     }
 
     @Override
+    public BoundSql doBoundSql(BoundSqlInterceptor.Type type, BoundSql boundSql, CacheKey cacheKey) {
+        Page<Object> localPage = getLocalPage();
+        BoundSqlInterceptor.Chain chain = localPage != null ? localPage.getChain() : null;
+        if (chain == null) {
+            BoundSqlInterceptor boundSqlInterceptor = localPage != null ? localPage.getBoundSqlInterceptor() : null;
+            BoundSqlInterceptor.Chain defaultChain = pageBoundSqlInterceptors != null ? pageBoundSqlInterceptors.getChain() : null;
+            if (boundSqlInterceptor != null) {
+                chain = new BoundSqlInterceptorChain(defaultChain, Arrays.asList(boundSqlInterceptor));
+            } else if (defaultChain != null) {
+                chain = defaultChain;
+            }
+            if (chain == null) {
+                chain = DO_NOTHING;
+            }
+            if (localPage != null) {
+                localPage.setChain(chain);
+            }
+        } else if (chain instanceof BoundSqlInterceptorChain) {
+            ((BoundSqlInterceptorChain) chain).reset();
+        }
+        return chain.doBoundSql(type, boundSql, cacheKey);
+    }
+
+    @Override
     public void setProperties(Properties properties) {
         setStaticProperties(properties);
         pageParams = new PageParams();
         autoDialect = new PageAutoDialect();
+        pageBoundSqlInterceptors = new PageBoundSqlInterceptors();
         pageParams.setProperties(properties);
         autoDialect.setProperties(properties);
+        pageBoundSqlInterceptors.setProperties(properties);
         //20180902新增 aggregateFunctions, 允许手动添加聚合函数（影响行数）
         CountSqlParser.addAggregateFunctions(properties.getProperty("aggregateFunctions"));
     }

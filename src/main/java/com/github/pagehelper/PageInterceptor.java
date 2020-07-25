@@ -87,7 +87,10 @@ public class PageInterceptor implements Interceptor {
                 boundSql = (BoundSql) args[5];
             }
             checkDialectExists();
-
+            //对 boundSql 的拦截处理
+            if (dialect instanceof BoundSqlInterceptor.Chain) {
+                boundSql = ((BoundSqlInterceptor.Chain) dialect).doBoundSql(BoundSqlInterceptor.Type.ORIGINAL, boundSql, cacheKey);
+            }
             List resultList;
             //调用方法判断是否需要进行分页，如果不需要，直接返回结果
             if (!dialect.skip(ms, parameter, rowBounds)) {
@@ -140,14 +143,18 @@ public class PageInterceptor implements Interceptor {
         if (countMs != null) {
             count = ExecutorUtil.executeManualCount(executor, countMs, parameter, boundSql, resultHandler);
         } else {
-            countMs = msCountMap.get(countMsId);
+            if (msCountMap != null) {
+                countMs = msCountMap.get(countMsId);
+            }
             //自动创建
             if (countMs == null) {
                 //根据当前的 ms 创建一个返回值为 Long 类型的 ms
                 countMs = MSUtils.newCountMappedStatement(ms, countMsId);
-                msCountMap.put(countMsId, countMs);
+                if (msCountMap != null) {
+                    msCountMap.put(countMsId, countMs);
+                }
             }
-            count = ExecutorUtil.executeAutoCount(dialect, executor, countMs, parameter, boundSql, rowBounds, resultHandler);
+            count = ExecutorUtil.executeAutoCount(this.dialect, executor, countMs, parameter, boundSql, rowBounds, resultHandler);
         }
         return count;
     }

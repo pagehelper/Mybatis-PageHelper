@@ -86,6 +86,11 @@ public class Page<E> extends ArrayList<E> implements Closeable {
      * 只增加排序
      */
     private boolean orderByOnly;
+    /**
+     * sql拦截处理
+     */
+    private BoundSqlInterceptor boundSqlInterceptor;
+    private transient BoundSqlInterceptor.Chain chain;
 
     public Page() {
         super();
@@ -325,6 +330,17 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     }
 
     /**
+     * 设置 BoundSql 拦截器
+     *
+     * @param boundSqlInterceptor
+     * @return
+     */
+    public Page<E> boundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor) {
+        setBoundSqlInterceptor(boundSqlInterceptor);
+        return this;
+    }
+
+    /**
      * 指定 count 查询列
      *
      * @param columnName
@@ -373,6 +389,22 @@ public class Page<E> extends ArrayList<E> implements Closeable {
 
     public void setCountColumn(String countColumn) {
         this.countColumn = countColumn;
+    }
+
+    public BoundSqlInterceptor getBoundSqlInterceptor() {
+        return boundSqlInterceptor;
+    }
+
+    public void setBoundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor) {
+        this.boundSqlInterceptor = boundSqlInterceptor;
+    }
+
+    BoundSqlInterceptor.Chain getChain() {
+        return chain;
+    }
+
+    void setChain(BoundSqlInterceptor.Chain chain) {
+        this.chain = chain;
     }
 
     @Override

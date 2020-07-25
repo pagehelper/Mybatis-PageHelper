@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.util;
 
+import com.github.pagehelper.BoundSqlInterceptor;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageException;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
@@ -157,6 +158,10 @@ public abstract class ExecutorUtil {
         for (String key : additionalParameters.keySet()) {
             countBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
         }
+        //对 boundSql 的拦截处理
+        if (dialect instanceof BoundSqlInterceptor.Chain) {
+            countBoundSql = ((BoundSqlInterceptor.Chain) dialect).doBoundSql(BoundSqlInterceptor.Type.COUNT_SQL, countBoundSql, countKey);
+        }
         //执行 count 查询
         Object countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
         Long count = (Long) ((List) countResultList).get(0);
@@ -195,6 +200,10 @@ public abstract class ExecutorUtil {
             //设置动态参数
             for (String key : additionalParameters.keySet()) {
                 pageBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
+            }
+            //对 boundSql 的拦截处理
+            if (dialect instanceof BoundSqlInterceptor.Chain) {
+                pageBoundSql = ((BoundSqlInterceptor.Chain) dialect).doBoundSql(BoundSqlInterceptor.Type.PAGE_SQL, pageBoundSql, pageKey);
             }
             //执行分页查询
             return executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, pageKey, pageBoundSql);
