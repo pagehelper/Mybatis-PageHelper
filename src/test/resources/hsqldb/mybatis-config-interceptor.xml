@@ -47,6 +47,8 @@
             <property name="helperDialect" value="mysql"/>
             <property name="supportMethodsArguments" value="true"/>
             <property name="rowBoundsWithCount" value="true"/>
+            <property name="boundSqlInterceptors"
+                      value="com.github.pagehelper.test.basic.provider.TestBoundSqlInterceptor,com.github.pagehelper.test.basic.provider.TestBoundSqlInterceptor"/>
         </plugin>
     </plugins>
 

@@ -24,11 +24,15 @@
 
 package com.github.pagehelper.test.basic.provider;
 
+import com.github.pagehelper.BoundSqlInterceptor;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.mapper.ProviderMethod;
 import com.github.pagehelper.mapper.UserMapper;
 import com.github.pagehelper.util.MybatisInterceptorHelper;
+import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.session.SqlSession;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +44,18 @@ public class TestProviderInteceptor {
         SqlSession sqlSession = MybatisInterceptorHelper.getSqlSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
-            PageHelper.startPage(1, 10);
+            PageHelper.startPage(1, 10).boundSqlInterceptor(new BoundSqlInterceptor() {
+                @Override
+                public BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain) {
+                    System.out.println("before: " + boundSql.getSql());
+                    BoundSql doBoundSql = chain.doBoundSql(type, boundSql, cacheKey);
+                    System.out.println("after: " + doBoundSql.getSql());
+                    if (type == Type.ORIGINAL) {
+                        Assert.assertTrue(doBoundSql.getSql().contains(TestBoundSqlInterceptor.COMMENT));
+                    }
+                    return doBoundSql;
+                }
+            });
             String str = "飞";
             userMapper.selectSimple(str);
             assertEquals(new ProviderMethod().selectSimple(str), SqlCache.get());
