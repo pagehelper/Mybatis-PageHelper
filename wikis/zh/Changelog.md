@@ -1,5 +1,150 @@
 ## 更新日志
 
+### 5.2.0 - 2020-07-26
+
+- jsqlparser升级到3.2版本，sql解析更好，对sqlserver支持更好。
+- 修改 sqlserver 方式中的替换正则，现在允许 with( nolock ) 括号中存在空格。
+- 解决 reasonable 和 pageSizeZero,以及 offset 用法中的bug，现在的含义和结果更一致。
+- 分页 SQL 拼接过程中增加换行符，避免原始 SQL 中存在注释导致分页部分无效。
+- Oracle 和 Db2 中的行号 ROW_ID 别名改为 PAGEHELPER_ROW_ID，避免和常用名称冲突。
+- 解决单个参数ProviderSql使用其他拦截器时的特殊问题（支持 mybatis 3.4.0+）[by 罗震宇](https://github.com/luozhenyu)
+- 支持自动识别 clickhouse，使用 MySQL 方式进行分页。
+- 将 startRow, endRow 类型从 int 改为 long。
+- Page 增加 `public <T> PageInfo<T> toPageInfo(Function<E, T> function)` 方法，用于转换查询结果中的数据。
+- 参考 pr#476 提供 `·`Oracle9iDialect`，这也是曾经用过的一种分页方式，可以自己测试选择合适的分页方式。
+
+   目前提供的两种 Oracle 分页如下：
+   ```sql
+   -- OracleDialect 外层控制范围
+   WHERE ROW_ID <= ? AND ROW_ID > ?
+   -- Oracle9iDialect 内外分别控制范围
+   TMP_PAGE WHERE ROWNUM <= ? ) WHERE ROW_ID > ?
+   ```
+- 增加分页插件的 `BoundSqlInterceptor` 拦截器，可以在3个阶段对 SQL 进行处理或者简单读取，
+   增加参数 `boundSqlInterceptors`，可以配置多个实现 `BoundSqlInterceptor` 接口的实现类名，
+   使用英文逗号隔开。PageHelper调用时，也可以通过类似
+   `PageHelper.startPage(x,x).boundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor)`针对本次分页进行设置。
+
+
+本次更新最大的变化是增加了 `BoundSqlInterceptor`，通过该接口可以在运行时拦截分页处理的 SQL（BoundSQL对象）：
+```java
+/**
+ * BoundSql 处理器
+ */
+public interface BoundSqlInterceptor {
+    /**
+     * boundsql 处理
+     *
+     * @param type     类型
+     * @param boundSql 当前类型的 boundSql
+     * @param cacheKey 缓存 key
+     * @param chain    处理器链，通过 chain.doBoundSql 方法继续执行后续方法，也可以直接返回 boundSql 终止后续方法的执行
+     * @return 允许修改 boundSql 并返回修改后的
+     */
+    BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain);
+
+    enum Type {
+        /**
+         * 原始SQL，分页插件执行前，先执行这个类型
+         */
+        ORIGINAL,
+        /**
+         * count SQL，第二个执行这里
+         */
+        COUNT_SQL,
+        /**
+         * 分页 SQL，最后执行这里
+         */
+        PAGE_SQL
+    }
+
+    /**
+     * 处理器链，可以控制是否继续执行
+     */
+    interface Chain {
+        Chain DO_NOTHING = new Chain() {
+            @Override
+            public BoundSql doBoundSql(Type type, BoundSql boundSql, CacheKey cacheKey) {
+                return boundSql;
+            }
+        };
+
+        BoundSql doBoundSql(Type type, BoundSql boundSql, CacheKey cacheKey);
+    }
+}
+```
+
+接口中包含了 boundSql 接口方法，还有 Type 枚举，和 Chain 接口的定义，自己实现的时候不需要考虑 Chain。
+
+通过 `boundSqlInterceptors` 参数配置拦截器，执行时存在下面三种情况：
+
+1. 不管当前执行的 SQL 是否会分页，都会执行 `Type.ORIGINAL` 类型的拦截器方法，配置后一定会执行。
+
+2. 调用分页方法时，拦截器会继续执行 `Type.COUNT_SQL` 类型的拦截器方法，这个方法只有执行分页并且指定要进行 count 查询时才会执行。
+
+3. 调用分页方法时，如果 count > 0，就会执行 `Type.PAGE_SQL` 类型的拦截器方法，这个方法只有执行分页时才会执行。
+
+>通过 `PageHelper.startPage(1, Integer.MAX_VALUE, false).boundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor)` 
+>这种指定的参数时，也能起到不进行分页和count查询，但是可以执行 `Type.ORIGINAL` 类型的拦截器方法。
+
+当前拦截器在整个分页执行过程中，会执行3次，对应 Type 枚举的 3 个类型，执行顺序也一致。
+
+如果想获取分页 SQL 执行前的，只需要关注 Type.ORIGINAL，另外两种就是 count 执行前和分页执行前（count=0时分页方法不执行，这里也不会执行）。
+
+以测试代码为例：
+
+```java
+public class TestBoundSqlInterceptor implements BoundSqlInterceptor {
+    public static final String COMMENT = "\n /* TestBoundSqlInterceptor */\n";
+
+    @Override
+    public BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain) {
+        if (type == Type.ORIGINAL) {
+            String sql = boundSql.getSql();
+            MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
+            metaObject.setValue("sql", sql + COMMENT);
+        }
+        return chain.doBoundSql(type, boundSql, cacheKey);
+    }
+
+}
+```
+上面这段代码在 sql 执行前先修改原始 SQL，只是在最后增加了一段注释，不影响 SQL 执行，通过下面的方式配置：
+
+```xml
+<plugin interceptor="com.github.pagehelper.PageInterceptor">
+    <!-- 支持通过Mapper接口参数来传递分页参数 -->
+    <property name="helperDialect" value="mysql"/>
+    <property name="boundSqlInterceptors"
+              value="com.github.pagehelper.test.basic.provider.TestBoundSqlInterceptor,com.github.pagehelper.test.basic.provider.TestBoundSqlInterceptor"/>
+</plugin>
+```
+这里为了说明该参数值可以是多个，因此重复配置了一次，也就是上面的拦截器会执行两次。
+
+这样配置后，上面的 SQL 在分页执行的时候就会修改 SQL。
+
+除了这种配置方式外，还支持 PageHelper.startPage 时临时指定，这种方式会把拦截器放到链头先执行，因此可以控制后续的是否执行，也可以在后续所有执行外，做最后处理再返回。
+
+示例：
+
+```java
+PageHelper.startPage(1, 10).boundSqlInterceptor(new BoundSqlInterceptor() {
+    @Override
+    public BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain) {
+        System.out.println("before: " + boundSql.getSql());
+        BoundSql doBoundSql = chain.doBoundSql(type, boundSql, cacheKey);
+        System.out.println("after: " + doBoundSql.getSql());
+        if (type == Type.ORIGINAL) {
+            Assert.assertTrue(doBoundSql.getSql().contains(TestBoundSqlInterceptor.COMMENT));
+        }
+        return doBoundSql;
+    }
+});
+```
+
+
+
+
 ### 5.1.11 - 2019-11-26
 
 - 增加神通数据库的支持 **wangss**

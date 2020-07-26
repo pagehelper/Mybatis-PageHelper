@@ -1,5 +1,153 @@
 ## Changelog
 
+### 5.2.0 - 2020-07-26
+
+- Upgrading jsqlparser to version 3.2 makes sql parsing better and supports sqlserver better.
+
+- Modify the substitution regularity in sqlserver mode, and now allow spaces in `with( nolock)` brackets.
+
+- Solving the bugs in reasonable, pageSizeZero and offset usage, the meaning and result are more consistent now.
+
+- In the process of splicing paging SQL, a new line character is added to avoid invalid paging part caused by comments in the original SQL.
+
+- ROW_ID alias in Oracle and Db2 is changed to PAGEHELPER_ROW_ID to avoid conflict with common names.
+
+- Solve the special problem when using other interceptors with a single parameter ProviderSql (support mybatis 3.4.0+) [by Luo Zhenyu](https://github.com/luozhenyu)
+
+- Automatic identification of clickhouse is supported, and paging is performed by MySQL.
+
+- Change startRow, endRow type from int to long.
+
+- Page adds a `public <T> PageInfo<T> toPageInfo(Function<E, T> function)` method to convert the data in the query results.
+
+- Refer to `Oracle9iDialect` provided by pr#476, which is also a paging method used before. You can test and select the appropriate paging method by yourself.
+
+   At present, there are two kinds of Oracle pagination as follows:
+   ```sql
+   -- OracleDialect outer control range
+   WHERE ROW_ID <= ? AND ROW_ID > ?
+   -- Oracle9iDialect's internal and external control scope respectively
+   TMP_PAGE WHERE ROWNUM <= ? ) WHERE ROW_ID > ?
+  ```
+- Adding `BoundSqlInterceptor` of PageHelper plug-in can process or simply read SQL in three stages, adding `boundSqlInterceptors`, and configuring multiple implementation class names that implement `BoundSqlInterceptor` interface, separated by English commas. PageHelper can also be set for this paging through a `PageHelper.startPage(x,x).boundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor)`.
+
+The biggest change of this update is the addition of `BoundSqlInterceptor`, which can intercept the SQL(BoundSQL object) of paging processing at runtime:
+
+```java
+/**
+ * BoundSql 处理器
+ */
+public interface BoundSqlInterceptor {
+    /**
+     * boundsql 处理
+     *
+     * @param type     类型
+     * @param boundSql 当前类型的 boundSql
+     * @param cacheKey 缓存 key
+     * @param chain    处理器链，通过 chain.doBoundSql 方法继续执行后续方法，也可以直接返回 boundSql 终止后续方法的执行
+     * @return 允许修改 boundSql 并返回修改后的
+     */
+    BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain);
+
+    enum Type {
+        /**
+         * 原始SQL，分页插件执行前，先执行这个类型
+         */
+        ORIGINAL,
+        /**
+         * count SQL，第二个执行这里
+         */
+        COUNT_SQL,
+        /**
+         * 分页 SQL，最后执行这里
+         */
+        PAGE_SQL
+    }
+
+    /**
+     * 处理器链，可以控制是否继续执行
+     */
+    interface Chain {
+        Chain DO_NOTHING = new Chain() {
+            @Override
+            public BoundSql doBoundSql(Type type, BoundSql boundSql, CacheKey cacheKey) {
+                return boundSql;
+            }
+        };
+
+        BoundSql doBoundSql(Type type, BoundSql boundSql, CacheKey cacheKey);
+    }
+}
+```
+
+The interface includes boundSql interface method, Type enumeration, and the definition of Chain interface, and you don't need to consider Chain when you implement it yourself.
+
+The interceptor is configured by `boundSqlInterceptors` parameter, and there are three situations when executing:
+
+1. Regardless of whether the currently executed SQL will be paged or not, interceptor methods of `Type.ORIGINAL` will be executed.
+
+2. When the paging method is called, the interceptor will continue to execute the interceptor method of `Type.COUNT_SQL`, which will only be executed when paging is executed and count query is specified.
+
+3. When paging method is called, if count > 0, interceptor method of `Type.PAGE_SQL` will be executed, which will only be executed when paging is executed.
+
+>With the specified parameter `PageHelper.startPage(1, Integer.MAX_VALUE, false).boundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor)`, it can also play the role of not paging and count query, but can execute interceptor method of `Type.ORIGINAL`.
+
+If you want to get the page before SQL execution, you only need to pay attention to `Type.ORIGINAL`, and the other two are before count execution and before page execution (when count=0, the page method will not be executed and will not be executed here).
+
+Take the test code as an example:
+
+```java
+public class TestBoundSqlInterceptor implements BoundSqlInterceptor {
+    public static final String COMMENT = "\n /* TestBoundSqlInterceptor */\n";
+
+    @Override
+    public BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain) {
+        if (type == Type.ORIGINAL) {
+            String sql = boundSql.getSql();
+            MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
+            metaObject.setValue("sql", sql + COMMENT);
+        }
+        return chain.doBoundSql(type, boundSql, cacheKey);
+    }
+
+}
+```
+The above code modifies the original sql before SQL execution, but only adds a comment at the end, which does not affect SQL execution. It is configured in the following way:
+
+```xml
+<plugin interceptor="com.github.pagehelper.PageInterceptor">
+    <!-- 支持通过Mapper接口参数来传递分页参数 -->
+    <property name="helperDialect" value="mysql"/>
+    <property name="boundSqlInterceptors"
+              value="com.github.pagehelper.test.basic.provider.TestBoundSqlInterceptor,com.github.pagehelper.test.basic.provider.TestBoundSqlInterceptor"/>
+</plugin>
+```
+
+Here, in order to explain that the parameter value can be multiple, it is repeatedly configured once, that is, the above interceptor will execute it twice.
+
+With this configuration, the above SQL will modify the SQL when the page is executed.
+
+In addition to this configuration mode, temporary designation when PageHelper.startPage is also supported. This mode will put the interceptor at the chain head and execute it first, so you can control whether to execute it later or not, or you can do the final processing before returning after all subsequent executions.
+
+Example:
+
+```java
+PageHelper.startPage(1, 10).boundSqlInterceptor(new BoundSqlInterceptor() {
+    @Override
+    public BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain) {
+        System.out.println("before: " + boundSql.getSql());
+        BoundSql doBoundSql = chain.doBoundSql(type, boundSql, cacheKey);
+        System.out.println("after: " + doBoundSql.getSql());
+        if (type == Type.ORIGINAL) {
+            Assert.assertTrue(doBoundSql.getSql().contains(TestBoundSqlInterceptor.COMMENT));
+        }
+        return doBoundSql;
+    }
+});
+```
+
+
+
 ### 5.1.11 - 2019-11-26
 
 - Added support for Shentong database **wangss**
