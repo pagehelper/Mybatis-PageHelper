@@ -82,7 +82,7 @@ public class PageAutoDialect {
         //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281
         registerDialectAlias("edb", OracleDialect.class);
         //神通数据库
-        registerDialectAlias("oscar", MySqlDialect.class);
+        registerDialectAlias("oscar", OscarDialect.class);
         registerDialectAlias("clickhouse", MySqlDialect.class);
     }
 
