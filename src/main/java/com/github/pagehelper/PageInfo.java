@@ -24,6 +24,7 @@
 
 package com.github.pagehelper;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 
@@ -145,6 +146,70 @@ public class PageInfo<T> extends PageSerializable<T> {
         calcPage();
         //判断页面边界
         judgePageBoudary();
+    }
+
+    /**
+     * pageInfo泛型转换
+     *
+     * @param dtoClass                  DTO类的class对象
+     * @param <E>                       entity类
+     * @param <D>                       DTO类
+     * @return PageInfo<D>              返回转换后的PageInfo对象
+     */
+    public <E, D> PageInfo<D> convert(Class<D> dtoClass){
+        return convert(this,dtoClass);
+    }
+
+    /**
+     * pageInfo泛型转换
+     *
+     * @param pageInfoE                 pageInfo<E>类对象
+     * @param dtoClass                  DTO类的class对象
+     * @param <E>                       entity类
+     * @param <D>                       DTO类
+     * @return PageInfo<D>              返回转换后的PageInfo对象
+     */
+    public static <E, D> PageInfo<D> convert(PageInfo<E> pageInfoE, Class<D> dtoClass) {
+        //创建page对象，传入当前页，和每页数量进行初始化（page对象是ArrayList的子类，在ArrayList的基础上添加了分页的信息）
+        Page<D> page = new Page(pageInfoE.getPageNum(), pageInfoE.getPageSize());
+        //传入总记录数
+        page.setTotal(pageInfoE.getTotal());
+        //遍历原entity的列表
+        for (E e : pageInfoE.getList()) {
+            try {
+                //通过class对象生成DTO的对象
+                D d = dtoClass.getConstructor().newInstance();
+                //使用BeanUtils将entity中与dto相同的属性拷贝到dto中并放入page列表
+                copyProperties(e, d);
+                page.add(d);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        //通过page对象以及pageInfoE中的导航页码数创建要返回的pageInfo<D>对象
+        return new PageInfo<D>(page, pageInfoE.getNavigatePages());
+    }
+
+    /**
+     * 复制Bean对象属性<br>
+     *
+     * @param source 源Bean对象
+     * @param target 目标Bean对象
+     */
+    public static void copyProperties(Object source, Object target) {
+        try {
+            for (Field targetField : target.getClass().getDeclaredFields()) {
+                targetField.setAccessible(true);
+                for (Field sourceField : source.getClass().getDeclaredFields()) {
+                    sourceField.setAccessible(true);
+                    if (targetField.getName().equals(sourceField.getName())) {
+                        targetField.set(target, sourceField.get(source));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
