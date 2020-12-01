@@ -84,6 +84,8 @@ public class PageAutoDialect {
         //神通数据库
         registerDialectAlias("oscar", MySqlDialect.class);
         registerDialectAlias("clickhouse", MySqlDialect.class);
+        //瀚高数据库
+        registerDialectAlias("highgo",HsqldbDialect.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
