@@ -366,6 +366,7 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         pageInfo.setPages(this.getPages());
         pageInfo.setStartRow(this.getStartRow());
         pageInfo.setEndRow(this.getEndRow());
+        pageInfo.setTotal(this.getTotal());
         pageInfo.calcByNavigatePages(PageInfo.DEFAULT_NAVIGATE_PAGES);
         return pageInfo;
     }
