@@ -1,3 +1,4 @@
+![MyBatis Pagination - PageHelper](logo.png)
 # MyBatis 分页插件 - PageHelper
 
 [![Build Status](https://travis-ci.org/pagehelper/Mybatis-PageHelper.svg?branch=master)](https://travis-ci.org/pagehelper/Mybatis-PageHelper)
@@ -16,7 +17,6 @@
 文档地址：https://apidoc.gitee.com/free/Mybatis_PageHelper
 
 Method API: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
-
 
 ## 新书《MyBatis 从入门到精通》
 
@@ -51,7 +51,7 @@ GitHub项目：https://github.com/mybatis-book/book
 16. 神通数据库
 17. HerdDB
 
->这里的数据库列表更新不及时，详情看这里: [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58)
+> 这里的数据库列表更新不及时，详情看这里: [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58)
 
 ## 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 [Executor 拦截器高级教程 - QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md)
@@ -63,7 +63,7 @@ GitHub项目：https://github.com/mybatis-book/book
 ## 集成
 使用 PageHelper 你只需要在 classpath 中包含 [pagehelper-x.y.z.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/) 和 [jsqlparser-x.y.z.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/)。
 
->pagehelper 和 jsqlparser 对应关系参考 pom.xml 中的依赖版本。
+> pagehelper 和 jsqlparser 对应关系参考 pom.xml 中的依赖版本。
 
 如果你使用 Maven，你只需要在 pom.xml 中添加下面的依赖：
 ```xml  
@@ -105,7 +105,7 @@ GitHub项目：https://github.com/mybatis-book/book
 
 作者博客：http://blog.csdn.net/isea533
 
-作者邮箱： abel533@gmail.com  
+作者邮箱： abel533@gmail.com
 
 如需加群，请通过 http://mybatis.io 首页按钮加群。
 

@@ -1,3 +1,5 @@
+![MyBatis Pagination - PageHelper](logo.png)
+
 # MyBatis Pagination - PageHelper
 
 [![Build Status](https://travis-ci.org/pagehelper/Mybatis-PageHelper.svg?branch=master)](https://travis-ci.org/pagehelper/Mybatis-PageHelper)
@@ -5,8 +7,8 @@
 
 [中文版文档](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/README_zh.md)
 
-If you are using MyBatis, it is recommended to try this pagination plugin. 
-This must be the **MOST CONVENIENT** pagination plugin.
+If you are using MyBatis, it is recommended to try this pagination plugin. This must be the **MOST CONVENIENT**
+pagination plugin.
 
 PageHelper supports any complex single-table, multi-table queries.
 As to some special cases, please refer to the [**Important note**](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md).
@@ -53,7 +55,7 @@ PageHelper supports the following databases:
 16. 神通数据库
 17. HerdDB
 
->The database list here is not updated in time, see details here [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58).
+> The database list here is not updated in time, see details here [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58).
 
 ## Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 
@@ -63,7 +65,7 @@ To use PageHelper, you just need to include the
 [pagehelper-x.y.z.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/)
 and [jsqlparser-x.y.z.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/) file in the classpath.
 
->For version matching relation, please refer to the dependent version in pom.
+> For version matching relation, please refer to the dependent version in pom.
 
 If you are using Maven, you could just add the following dependency to your `pom.xml`:
 
@@ -103,7 +105,7 @@ Web: https://mybatis.io
 
 Blog: http://blog.csdn.net/isea533
 
-Email: abel533@gmail.com  
+Email: abel533@gmail.com
 
 PageHelper on github:https://github.com/pagehelper/Mybatis-PageHelper
 
