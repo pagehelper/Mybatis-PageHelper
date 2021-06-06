@@ -57,8 +57,9 @@ public class PageAutoDialect {
         //注册别名
         registerDialectAlias("hsqldb", HsqldbDialect.class);
         registerDialectAlias("h2", HsqldbDialect.class);
-        registerDialectAlias("postgresql", HsqldbDialect.class);
         registerDialectAlias("phoenix", HsqldbDialect.class);
+
+        registerDialectAlias("postgresql", PostgreSqlDialect.class);
 
         registerDialectAlias("mysql", MySqlDialect.class);
         registerDialectAlias("mariadb", MySqlDialect.class);
