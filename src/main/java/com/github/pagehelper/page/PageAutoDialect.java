@@ -49,7 +49,7 @@ public class PageAutoDialect {
 
     private static Map<String, Class<? extends Dialect>> dialectAliasMap = new HashMap<String, Class<? extends Dialect>>();
 
-    public static void registerDialectAlias(String alias, Class<? extends Dialect> dialectClass){
+    public static void registerDialectAlias(String alias, Class<? extends Dialect> dialectClass) {
         dialectAliasMap.put(alias, dialectClass);
     }
 
@@ -85,19 +85,21 @@ public class PageAutoDialect {
         registerDialectAlias("oscar", MySqlDialect.class);
         registerDialectAlias("clickhouse", MySqlDialect.class);
         //瀚高数据库
-        registerDialectAlias("highgo",HsqldbDialect.class);
+        registerDialectAlias("highgo", HsqldbDialect.class);
+        //虚谷数据库
+        registerDialectAlias("xugu", HsqldbDialect.class);
     }
 
     //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
-    private boolean autoDialect = true;
+    private boolean                            autoDialect        = true;
     //多数据源时，获取jdbcurl后是否关闭数据源
-    private boolean closeConn = true;
+    private boolean                            closeConn          = true;
     //属性配置
-    private Properties properties;
+    private Properties                         properties;
     //缓存
-    private Map<String, AbstractHelperDialect> urlDialectMap = new ConcurrentHashMap<String, AbstractHelperDialect>();
-    private ReentrantLock lock = new ReentrantLock();
-    private AbstractHelperDialect delegate;
+    private Map<String, AbstractHelperDialect> urlDialectMap      = new ConcurrentHashMap<String, AbstractHelperDialect>();
+    private ReentrantLock                      lock               = new ReentrantLock();
+    private AbstractHelperDialect              delegate;
     private ThreadLocal<AbstractHelperDialect> dialectThreadLocal = new ThreadLocal<AbstractHelperDialect>();
 
     //多数据动态获取时，每次需要初始化
@@ -250,9 +252,9 @@ public class PageAutoDialect {
             String[] alias = dialectAlias.split(";");
             for (int i = 0; i < alias.length; i++) {
                 String[] kv = alias[i].split("=");
-                if(kv.length != 2){
+                if (kv.length != 2) {
                     throw new IllegalArgumentException("dialectAlias 参数配置错误，" +
-                            "请按照 alias1=xx.dialectClass;alias2=dialectClass2 的形式进行配置!");
+                        "请按照 alias1=xx.dialectClass;alias2=dialectClass2 的形式进行配置!");
                 }
                 for (int j = 0; j < kv.length; j++) {
                     try {
