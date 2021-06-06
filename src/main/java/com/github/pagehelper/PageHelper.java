@@ -144,8 +144,6 @@ public class PageHelper extends PageMethod implements Dialect, BoundSqlIntercept
             if (localPage != null) {
                 localPage.setChain(chain);
             }
-        } else if (chain instanceof BoundSqlInterceptorChain) {
-            ((BoundSqlInterceptorChain) chain).reset();
         }
         return chain.doBoundSql(type, boundSql, cacheKey);
     }

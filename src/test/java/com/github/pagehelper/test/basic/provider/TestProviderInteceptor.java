@@ -35,6 +35,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 
 public class TestProviderInteceptor {
@@ -42,27 +44,49 @@ public class TestProviderInteceptor {
     @Test
     public void testInterceptor() {
         SqlSession sqlSession = MybatisInterceptorHelper.getSqlSession();
-        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        final UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
             PageHelper.startPage(1, 10).boundSqlInterceptor(new BoundSqlInterceptor() {
                 @Override
                 public BoundSql boundSql(Type type, BoundSql boundSql, CacheKey cacheKey, Chain chain) {
-                    System.out.println("before: " + boundSql.getSql());
+                    System.out.println("[" + Thread.currentThread().getName() + "] - before: " + boundSql.getSql());
                     BoundSql doBoundSql = chain.doBoundSql(type, boundSql, cacheKey);
-                    System.out.println("after: " + doBoundSql.getSql());
+                    System.out.println("[" + Thread.currentThread().getName() + "] - after: " + doBoundSql.getSql());
                     if (type == Type.ORIGINAL) {
                         Assert.assertTrue(doBoundSql.getSql().contains(TestBoundSqlInterceptor.COMMENT));
                     }
                     return doBoundSql;
                 }
             });
-            String str = "飞";
+            final String str = "飞";
+            userMapper.selectSimple(str);
+            assertEquals(new ProviderMethod().selectSimple(str), SqlCache.get());
+            userMapper.selectSimple(str);
+            assertEquals(new ProviderMethod().selectSimple(str), SqlCache.get());
             userMapper.selectSimple(str);
             assertEquals(new ProviderMethod().selectSimple(str), SqlCache.get());
         } finally {
             SqlCache.remove();
             sqlSession.close();
         }
+    }
+
+    @Test
+    public void testConcurrentExecution() throws InterruptedException {
+        for (int i = 0; i < 10; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(100 * new Random().nextInt(10));
+                        testInterceptor();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+        Thread.currentThread().join(1500);
     }
 
 }
