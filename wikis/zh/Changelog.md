@@ -1,5 +1,18 @@
 ## 更新日志
 
+### 5.2.1 - 2021-06-20
+
+- 升级依赖 jsqlparser 4.0, mybatis 3.5.7
+- 自动识别以下数据库：
+  - 虚谷数据库 xugu #599
+  - 神通数据库 oscar  by **ranqing**
+  - 瀚高数据库 highgo by **ashaiqing**
+- BoundSqlInterceptorChain拦截器index参数bug, fixed #587
+- fixed #558
+- 添加 PostgreSQL 方言 by **liym@home**
+- fixed #604, 解决total丢失的问题
+- 规范注释, fixed #547
+
 ### 5.2.0 - 2020-07-26
 
 - jsqlparser升级到3.2版本，sql解析更好，对sqlserver支持更好。

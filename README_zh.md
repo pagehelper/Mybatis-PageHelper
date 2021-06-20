@@ -18,11 +18,11 @@
 
 Method API: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
 
-## 新书《MyBatis 从入门到精通》
+## 《MyBatis 从入门到精通》
 
 ![MyBatis 从入门到精通](https://github.com/mybatis-book/book/raw/master/book.png)
 
-预售地址：[京东](https://item.jd.com/12103309.html)，[当当](http://product.dangdang.com/25098208.html)，[亚马逊](https://www.amazon.cn/MyBatis从入门到精通-刘增辉/dp/B072RC11DM/ref=sr_1_18?ie=UTF8&qid=1498007125&sr=8-18&keywords=mybatis)
+[京东](https://item.jd.com/12103309.html) ，[当当](http://product.dangdang.com/25098208.html) ，[亚马逊](https://www.amazon.cn/MyBatis从入门到精通-刘增辉/dp/B072RC11DM/ref=sr_1_18?ie=UTF8&qid=1498007125&sr=8-18&keywords=mybatis)
 
 CSDN博客：http://blog.csdn.net/isea533/article/details/73555400
 
@@ -33,25 +33,15 @@ GitHub项目：https://github.com/mybatis-book/book
 
 该插件目前支持以下数据库的<b>物理分页</b>:
 
-1. `Oracle`
-2. `Mysql`
-3. `MariaDB`
-4. `SQLite`
-5. `Hsqldb`
-6. `PostgreSQL`
-7. `DB2`
-8. `SqlServer(2005,2008)`
-9. `Informix`
-10. `H2`
-11. `SqlServer2012`
-12. `Derby`
-13. `Phoenix`
-14. 达梦数据库(dm)
-15. 阿里云PPAS数据库
-16. 神通数据库
-17. HerdDB
+https://github.com/pagehelper/Mybatis-PageHelper/blob/09348bddc3cef32548bc447b4816ce3a028dba8e/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L56-L92
 
-> 这里的数据库列表更新不及时，详情看这里: [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58)
+>如果你使用的数据库不在这个列表时，你可以配置 `dialectAlias` 参数。
+>
+>这个参数允许配置自定义实现的别名，可以用于根据 JDBCURL 自动获取对应实现，允许通过此种方式覆盖已有的实现，配置示例如（多个配置时使用分号隔开）：
+>
+>```xml
+><property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+>```
 
 ## 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 [Executor 拦截器高级教程 - QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md)

@@ -1,5 +1,18 @@
 ## Changelog
 
+### 5.2.1 - 2021-06-20
+
+- Upgrade dependency jsqlparser 4.0, mybatis 3.5.7
+- Automatically recognize the following databases：
+    - 虚谷数据库 xugu #599
+    - 神通数据库 oscar  by **ranqing**
+    - 瀚高数据库 highgo by **ashaiqing**
+- BoundSqlInterceptorChain interceptor index parameter bug, fixed #587
+- fixed #558
+- Add PostgreSQL dialect by **liym@home**
+- fixed #604, Solve the problem of total loss
+- Add code comments, fixed #547
+
 ### 5.2.0 - 2020-07-26
 
 - Upgrading jsqlparser to version 3.2 makes sql parsing better and supports sqlserver better.

@@ -22,40 +22,33 @@ https://apidoc.gitee.com/free/Mybatis_PageHelper
 
 APIs: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
 
-## 新书《MyBatis 从入门到精通》
+## 《MyBatis 从入门到精通》
 
 ![MyBatis 从入门到精通](https://github.com/mybatis-book/book/raw/master/book.png)
 
-预售地址：[京东](https://item.jd.com/12103309.html)，[当当](http://product.dangdang.com/25098208.html)，[亚马逊](https://www.amazon.cn/MyBatis从入门到精通-刘增辉/dp/B072RC11DM/ref=sr_1_18?ie=UTF8&qid=1498007125&sr=8-18&keywords=mybatis)
+[京东](https://item.jd.com/12103309.html) ，[当当](http://product.dangdang.com/25098208.html) ，[Amazon](https://www.amazon.cn/MyBatis从入门到精通-刘增辉/dp/B072RC11DM/ref=sr_1_18?ie=UTF8&qid=1498007125&sr=8-18&keywords=mybatis)
 
-CSDN博客：http://blog.csdn.net/isea533/article/details/73555400
+CSDN Blog：http://blog.csdn.net/isea533/article/details/73555400
 
-GitHub项目：https://github.com/mybatis-book/book
+GitHub：https://github.com/mybatis-book/book
 
 ## Support [MyBatis 3.1.0+](https://github.com/mybatis/mybatis-3)
 ## Physical Paging
 
 PageHelper supports the following databases:
 
-1. `Oracle`
-2. `Mysql`
-3. `MariaDB`
-4. `SQLite`
-5. `Hsqldb`
-6. `PostgreSQL`
-7. `DB2`
-8. `SqlServer(2005,2008)`
-9. `Informix`
-10. `H2`
-11. `SqlServer2012`
-12. `Derby`
-13. `Phoenix`
-14. 达梦数据库(dm)
-15. 阿里云PPAS数据库
-16. 神通数据库
-17. HerdDB
+https://github.com/pagehelper/Mybatis-PageHelper/blob/09348bddc3cef32548bc447b4816ce3a028dba8e/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L56-L92
 
-> The database list here is not updated in time, see details here [PageAutoDialect.java#L58](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L58).
+> If the database you are using is not in this list, you can configure the `dialectAlias` parameter.
+>
+> This parameter allows to configure the alias of a custom implementation, 
+> which can be used to automatically obtain the corresponding implementation according to the JDBCURL, 
+> and allows to overwrite the existing implementation in this way. 
+> The configuration example is as follows (use semicolons to separate multiple alias):
+>
+>```xml
+><property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+>```
 
 ## Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
 
