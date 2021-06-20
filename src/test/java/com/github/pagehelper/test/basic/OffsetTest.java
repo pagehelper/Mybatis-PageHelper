@@ -63,6 +63,14 @@ public class OffsetTest {
             assertEquals(2, ((Page<?>) list).getPageNum());
             assertEquals(180, list.size());
             assertEquals(183, ((Page<?>) list).getTotal());
+
+            PageHelper.offsetPage(0, Integer.MAX_VALUE);
+            list = userMapper.selectAll();
+            pageInfo = new PageInfo<User>(list);
+            System.out.println(pageInfo.toString());
+            assertEquals(1, ((Page<?>) list).getPageNum());
+            assertEquals(183, list.size());
+            assertEquals(183, ((Page<?>) list).getTotal());
         } finally {
             sqlSession.close();
         }
