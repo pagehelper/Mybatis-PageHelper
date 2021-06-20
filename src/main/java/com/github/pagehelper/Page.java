@@ -127,6 +127,7 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         if (rowBounds[0] == 0 && rowBounds[1] == Integer.MAX_VALUE) {
             pageSizeZero = true;
             this.pageSize = 0;
+            this.pageNum = 1;
         } else {
             this.pageSize = rowBounds[1];
             this.pageNum = rowBounds[1] != 0 ? (int) (Math.ceil(((double) rowBounds[0] + rowBounds[1]) / rowBounds[1])) : 0;
