@@ -35,9 +35,41 @@ GitHub：https://github.com/mybatis-book/book
 ## Support [MyBatis 3.1.0+](https://github.com/mybatis/mybatis-3)
 ## Physical Paging
 
-PageHelper supports the following databases:
+PageHelper supports the following databases [PageAutoDialect](src/main/java/com/github/pagehelper/page/PageAutoDialect.java):
 
-https://github.com/pagehelper/Mybatis-PageHelper/blob/09348bddc3cef32548bc447b4816ce3a028dba8e/src/main/java/com/github/pagehelper/page/PageAutoDialect.java#L56-L92
+```java
+static {
+    //register aliass
+    registerDialectAlias("hsqldb", HsqldbDialect.class);
+    registerDialectAlias("h2", HsqldbDialect.class);
+    registerDialectAlias("phoenix", HsqldbDialect.class);
+    registerDialectAlias("postgresql", PostgreSqlDialect.class);
+    registerDialectAlias("mysql", MySqlDialect.class); 
+    registerDialectAlias("mariadb", MySqlDialect.class); 
+    registerDialectAlias("sqlite", MySqlDialect.class);
+    registerDialectAlias("herddb", HerdDBDialect.class);
+    registerDialectAlias("oracle", OracleDialect.class); 
+    registerDialectAlias("oracle9i", Oracle9iDialect.class); 
+    registerDialectAlias("db2", Db2Dialect.class); 
+    registerDialectAlias("informix", InformixDialect.class); 
+    //解决 informix-sqli #129，仍然保留上面的 
+    registerDialectAlias("informix-sqli", InformixDialect.class);
+    registerDialectAlias("sqlserver", SqlServerDialect.class); 
+    registerDialectAlias("sqlserver2012", SqlServer2012Dialect.class);
+    registerDialectAlias("derby", SqlServer2012Dialect.class); 
+    //达梦数据库,https://github.com/mybatis-book/book/issues/43 
+    registerDialectAlias("dm", OracleDialect.class); 
+    //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281 
+    registerDialectAlias("edb", OracleDialect.class); 
+    //神通数据库 
+    registerDialectAlias("oscar", OscarDialect.class); 
+    registerDialectAlias("clickhouse", MySqlDialect.class); 
+    //瀚高数据库 
+    registerDialectAlias("highgo", HsqldbDialect.class); 
+    //虚谷数据库 
+    registerDialectAlias("xugu", HsqldbDialect.class); 
+}
+```
 
 > If the database you are using is not in this list, you can configure the `dialectAlias` parameter.
 >
