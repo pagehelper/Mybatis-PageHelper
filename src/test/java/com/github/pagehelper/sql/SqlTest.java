@@ -144,4 +144,10 @@ public class SqlTest {
         CountSqlParser countSqlParser = new CountSqlParser();
         System.out.println(countSqlParser.getSmartCountSql("select a,b,c from tb_test having a not null"));
     }
+
+    @Test
+    public void testSql555() throws JSQLParserException {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("SELECT (a.column1+a.column2) as popCount  FROM peaf_staff AS a ORDER BY FIELD(a.`store_id`, ?, ?), popCount DESC\n"));
+    }
 }
