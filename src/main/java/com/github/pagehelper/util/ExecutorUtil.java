@@ -127,8 +127,11 @@ public abstract class ExecutorUtil {
         CacheKey countKey = executor.createCacheKey(countMs, parameter, RowBounds.DEFAULT, boundSql);
         BoundSql countBoundSql = countMs.getBoundSql(parameter);
         Object countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
-        Long count = ((Number) ((List) countResultList).get(0)).longValue();
-        return count;
+        //某些数据（如 TDEngine）查询 count 无结果时返回 null
+        if (countResultList == null || ((List) countResultList).isEmpty()) {
+            return 0L;
+        }
+        return ((Number) ((List) countResultList).get(0)).longValue();
     }
 
     /**
@@ -164,8 +167,11 @@ public abstract class ExecutorUtil {
         }
         //执行 count 查询
         Object countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
-        Long count = (Long) ((List) countResultList).get(0);
-        return count;
+        //某些数据（如 TDEngine）查询 count 无结果时返回 null
+        if (countResultList == null || ((List) countResultList).isEmpty()) {
+            return 0L;
+        }
+        return ((Number) ((List) countResultList).get(0)).longValue();
     }
 
     /**
