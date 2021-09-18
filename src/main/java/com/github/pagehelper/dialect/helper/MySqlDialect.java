@@ -66,6 +66,10 @@ public class MySqlDialect extends AbstractHelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
+        // fix https://github.com/pagehelper/Mybatis-PageHelper/issues/620
+        if (sql.toLowerCase().contains("limit")){
+            return sql;
+        }
         StringBuilder sqlBuilder = new StringBuilder(sql.length() + 14);
         sqlBuilder.append(sql);
         if (page.getStartRow() == 0) {
