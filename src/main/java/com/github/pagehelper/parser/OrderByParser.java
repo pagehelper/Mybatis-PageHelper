@@ -75,20 +75,22 @@ public class OrderByParser {
      * @param selectBody
      */
     public static List<OrderByElement> extraOrderBy(SelectBody selectBody) {
-        if (selectBody instanceof PlainSelect) {
-            List<OrderByElement> orderByElements = ((PlainSelect) selectBody).getOrderByElements();
-            ((PlainSelect) selectBody).setOrderByElements(null);
-            return orderByElements;
-        } else if (selectBody instanceof WithItem) {
-            WithItem withItem = (WithItem) selectBody;
-            if (withItem.getSelectBody() != null) {
-                return extraOrderBy(withItem.getSelectBody());
-            }
-        } else {
-            SetOperationList operationList = (SetOperationList) selectBody;
-            if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
-                List<SelectBody> plainSelects = operationList.getSelects();
-                return extraOrderBy(plainSelects.get(plainSelects.size() - 1));
+        if (selectBody != null) {
+            if (selectBody instanceof PlainSelect) {
+                List<OrderByElement> orderByElements = ((PlainSelect) selectBody).getOrderByElements();
+                ((PlainSelect) selectBody).setOrderByElements(null);
+                return orderByElements;
+            } else if (selectBody instanceof WithItem) {
+                WithItem withItem = (WithItem) selectBody;
+                if (withItem.getSubSelect() != null) {
+                    return extraOrderBy(withItem.getSubSelect().getSelectBody());
+                }
+            } else {
+                SetOperationList operationList = (SetOperationList) selectBody;
+                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+                    List<SelectBody> plainSelects = operationList.getSelects();
+                    return extraOrderBy(plainSelects.get(plainSelects.size() - 1));
+                }
             }
         }
         return null;

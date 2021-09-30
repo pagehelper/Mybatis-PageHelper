@@ -300,19 +300,21 @@ public class SqlServerParser {
      * @param selectBody
      */
     protected void processSelectBody(SelectBody selectBody, int level) {
-        if (selectBody instanceof PlainSelect) {
-            processPlainSelect((PlainSelect) selectBody, level + 1);
-        } else if (selectBody instanceof WithItem) {
-            WithItem withItem = (WithItem) selectBody;
-            if (withItem.getSelectBody() != null) {
-                processSelectBody(withItem.getSelectBody(), level + 1);
-            }
-        } else {
-            SetOperationList operationList = (SetOperationList) selectBody;
-            if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
-                List<SelectBody> plainSelects = operationList.getSelects();
-                for (SelectBody plainSelect : plainSelects) {
-                    processSelectBody(plainSelect, level + 1);
+        if (selectBody != null) {
+            if (selectBody instanceof PlainSelect) {
+                processPlainSelect((PlainSelect) selectBody, level + 1);
+            } else if (selectBody instanceof WithItem) {
+                WithItem withItem = (WithItem) selectBody;
+                if (withItem.getSubSelect() != null) {
+                    processSelectBody(withItem.getSubSelect().getSelectBody(), level + 1);
+                }
+            } else {
+                SetOperationList operationList = (SetOperationList) selectBody;
+                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+                    List<SelectBody> plainSelects = operationList.getSelects();
+                    for (SelectBody plainSelect : plainSelects) {
+                        processSelectBody(plainSelect, level + 1);
+                    }
                 }
             }
         }

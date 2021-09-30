@@ -301,23 +301,25 @@ public class CountSqlParser {
      * @param selectBody
      */
     public void processSelectBody(SelectBody selectBody) {
-        if (selectBody instanceof PlainSelect) {
-            processPlainSelect((PlainSelect) selectBody);
-        } else if (selectBody instanceof WithItem) {
-            WithItem withItem = (WithItem) selectBody;
-            if (withItem.getSelectBody() != null) {
-                processSelectBody(withItem.getSelectBody());
-            }
-        } else {
-            SetOperationList operationList = (SetOperationList) selectBody;
-            if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
-                List<SelectBody> plainSelects = operationList.getSelects();
-                for (SelectBody plainSelect : plainSelects) {
-                    processSelectBody(plainSelect);
+        if (selectBody != null) {
+            if (selectBody instanceof PlainSelect) {
+                processPlainSelect((PlainSelect) selectBody);
+            } else if (selectBody instanceof WithItem) {
+                WithItem withItem = (WithItem) selectBody;
+                if (withItem.getSubSelect() != null) {
+                    processSelectBody(withItem.getSubSelect().getSelectBody());
                 }
-            }
-            if (!orderByHashParameters(operationList.getOrderByElements())) {
-                operationList.setOrderByElements(null);
+            } else {
+                SetOperationList operationList = (SetOperationList) selectBody;
+                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+                    List<SelectBody> plainSelects = operationList.getSelects();
+                    for (SelectBody plainSelect : plainSelects) {
+                        processSelectBody(plainSelect);
+                    }
+                }
+                if (!orderByHashParameters(operationList.getOrderByElements())) {
+                    operationList.setOrderByElements(null);
+                }
             }
         }
     }
@@ -352,7 +354,9 @@ public class CountSqlParser {
     public void processWithItemsList(List<WithItem> withItemsList) {
         if (withItemsList != null && withItemsList.size() > 0) {
             for (WithItem item : withItemsList) {
-                processSelectBody(item.getSelectBody());
+                if (item.getSubSelect() != null) {
+                    processSelectBody(item.getSubSelect().getSelectBody());
+                }
             }
         }
     }

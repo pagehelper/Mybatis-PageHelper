@@ -30,6 +30,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -40,69 +41,88 @@ public class SqlTest {
     @Test
     public void testSqlParser() throws JSQLParserException {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql("with " +
-            "cr as " +
-            "( " +
-            "    select UserRegionCode from person.UserRegion where Name like 'C%' order by name" +
-            ") " +
-            " " +
-            "select * from person.StateProvince where UserRegionCode in (select * from cr)"));
+        Assert.assertEquals("WITH cr AS (SELECT UserRegionCode FROM person.UserRegion WHERE Name LIKE 'C%') SELECT count(0) FROM person.StateProvince WHERE UserRegionCode IN (SELECT * FROM cr)",
+            countSqlParser.getSmartCountSql("with " +
+                "cr as " +
+                "( " +
+                "    select UserRegionCode from person.UserRegion where Name like 'C%' order by name" +
+                ") " +
+                " " +
+                "select * from person.StateProvince where UserRegionCode in (select * from cr)"));
 
-        System.out.println(countSqlParser.getSmartCountSql("with cr as " +
+        Assert.assertEquals("WITH cr AS (SELECT aaz093 FROM aa10 WHERE aaa100 LIKE 'AAB05%') SELECT count(0) FROM (SELECT count(1) FROM aa10 WHERE aaz093 IN (SELECT * FROM cr)) table_count",
+            countSqlParser.getSmartCountSql("with cr as " +
                 " (select aaz093 from aa10 where aaa100 like 'AAB05%' order by aaz093 desc) " +
                 "select count(1) from aa10 where aaz093 in (select * from cr)"));
 
 
-        System.out.println(countSqlParser.getSmartCountSql("select a.aac001,a.aac030,b.aaa103 " +
+        Assert.assertEquals("SELECT count(0) FROM ac02 a LEFT JOIN aa10 b ON b.aaa100 = 'AAC031' AND b.aaa102 = a.aac031",
+            countSqlParser.getSmartCountSql("select a.aac001,a.aac030,b.aaa103 " +
                 "  from ac02 a " +
                 "  left join aa10 b " +
                 "    on b.aaa100 = 'AAC031' " +
                 "   and b.aaa102 = a.aac031 " +
                 "   order by a.aac001"));
 
-        System.out.println(countSqlParser.getSmartCountSql("select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
+        Assert.assertEquals("SELECT count(0) FROM (SELECT * FROM aa10 WHERE aaa100 LIKE 'AAB05%' UNION SELECT * FROM aa10 WHERE aaa100 = 'AAC031') table_count",
+            countSqlParser.getSmartCountSql("select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
                 "union " +
                 "select * from aa10 where aaa100 = 'AAC031'"));
 
-        System.out.println(countSqlParser.getSmartCountSql("select * from (select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
+        Assert.assertEquals("SELECT count(0) FROM (SELECT * FROM aa10 WHERE aaa100 LIKE 'AAB05%' UNION SELECT * FROM aa10 WHERE aaa100 = 'AAC031')",
+            countSqlParser.getSmartCountSql("select * from (select * from aa10 WHERE aaa100 LIKE 'AAB05%' " +
                 "union " +
                 "select * from aa10 where aaa100 = 'AAC031')"));
 
-        System.out.println(countSqlParser.getSmartCountSql("select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email,so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids,so.phone,so.remarks,so.type,so.zip_code from sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) where suo.user_id = ? group by so.id LIMIT ? "));
+        Assert.assertEquals("SELECT count(0) FROM (SELECT so.id, so.address, so.area_code, so.area_id, so.del_flag, so.email, so.fax, so.grade, so.icon, so.master, so.name, so.parent_id, so.parent_ids, so.phone, so.remarks, so.type, so.zip_code FROM sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id OR FIND_IN_SET(suo.org_id, so.parent_ids)) WHERE suo.user_id = ? GROUP BY so.id LIMIT ?) table_count",
+            countSqlParser.getSmartCountSql("select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email,so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids,so.phone,so.remarks,so.type,so.zip_code from sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) where suo.user_id = ? group by so.id LIMIT ? "));
 
-        System.out.println(countSqlParser.getSmartCountSql("select xx,xx,xx from xx1 left join xx2 on xx1.id=xx2.user_id where 1=1 and xx1.`name` like \"%ll%\" and  xx1.status = 1 and (xx2.`type` = 1) order by xx1.number asc"));
+        Assert.assertEquals("SELECT count(0) FROM xx1 LEFT JOIN xx2 ON xx1.id = xx2.user_id WHERE 1 = 1 AND xx1.`name` LIKE \"%ll%\" AND xx1.status = 1 AND (xx2.`type` = 1)",
+            countSqlParser.getSmartCountSql("select xx,xx,xx from xx1 left join xx2 on xx1.id=xx2.user_id where 1=1 and xx1.`name` like \"%ll%\" and  xx1.status = 1 and (xx2.`type` = 1) order by xx1.number asc"));
     }
 
 
     @Test
     public void testSqlParser11() throws JSQLParserException {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql(
+        Assert.assertEquals("SELECT count(0) FROM (SELECT so.id, so.address, so.area_code, so.area_id, so.del_flag, so.email, so.fax, so.grade, so.icon, so.master, so.name, so.parent_id, so.parent_ids, so.phone, so.remarks, so.type, so.zip_code FROM sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id OR FIND_IN_SET(suo.org_id, so.parent_ids)) WHERE suo.user_id = ? GROUP BY so.id LIMIT ?) table_count",
+            countSqlParser.getSmartCountSql(
                 "select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email," +
-                        "so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids," +
-                        "so.phone,so.remarks,so.type,so.zip_code " +
-                        "from sys_organization so " +
-                        "LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) " +
-                        "where suo.user_id = ? group by so.id LIMIT ? "));
+                    "so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids," +
+                    "so.phone,so.remarks,so.type,so.zip_code " +
+                    "from sys_organization so " +
+                    "LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) " +
+                    "where suo.user_id = ? group by so.id LIMIT ? "));
 
-        System.out.println(countSqlParser.getSmartCountSql(
+        Assert.assertEquals("SELECT count(0) FROM sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id OR FIND_IN_SET(suo.org_id, so.parent_ids)) WHERE suo.user_id = ?",
+            countSqlParser.getSmartCountSql(
                 "select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email," +
-                        "so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids," +
-                        "so.phone,so.remarks,so.type,so.zip_code " +
-                        "from sys_organization so " +
-                        "LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) " +
-                        "where suo.user_id = ?"));
+                    "so.fax,so.grade,so.icon,so.master, so.name,so.parent_id,so.parent_ids," +
+                    "so.phone,so.remarks,so.type,so.zip_code " +
+                    "from sys_organization so " +
+                    "LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id or FIND_IN_SET(suo.org_id,so.parent_ids)) " +
+                    "where suo.user_id = ?"));
     }
 
     @Test
     public void testSqlParser2() throws JSQLParserException {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql("select name,count(id) from user group by name"));
+        Assert.assertEquals("SELECT count(0) FROM (SELECT name, count(id) FROM user GROUP BY name) table_count",
+            countSqlParser.getSmartCountSql("select name,count(id) from user group by name"));
     }
     @Test
     public void testSqlParser3() throws JSQLParserException {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql("SELECT *\n" +
+        Assert.assertEquals("select count(0) from ( \n" +
+                "SELECT *\n" +
+                "    FROM vwdatasearch\n" +
+                "    WHERE ComId = ?\n" +
+                "    AND (\n" +
+                "      Title1 %% ?\n" +
+                "    )\n" +
+                "\n" +
+                " ) tmp_count",
+            countSqlParser.getSmartCountSql("SELECT *\n" +
                 "    FROM vwdatasearch\n" +
                 "    WHERE ComId = ?\n" +
                 "    AND (\n" +
