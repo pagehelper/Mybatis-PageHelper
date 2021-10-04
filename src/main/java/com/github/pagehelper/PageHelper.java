@@ -66,7 +66,7 @@ public class PageHelper extends PageMethod implements Dialect, BoundSqlIntercept
             if (StringUtil.isEmpty(page.getCountColumn())) {
                 page.setCountColumn(pageParams.getCountColumn());
             }
-            autoDialect.initDelegateDialect(ms);
+            autoDialect.initDelegateDialect(ms, page.getDialectClass());
             return false;
         }
     }

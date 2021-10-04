@@ -73,24 +73,28 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     /**
      * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
      */
-    private Boolean pageSizeZero;
+    private           Boolean                   pageSizeZero;
     /**
      * 进行count查询的列名
      */
-    private String countColumn;
+    private           String                    countColumn;
     /**
      * 排序
      */
-    private String orderBy;
+    private           String                    orderBy;
     /**
      * 只增加排序
      */
-    private boolean orderByOnly;
+    private           boolean                   orderByOnly;
     /**
      * sql拦截处理
      */
-    private BoundSqlInterceptor boundSqlInterceptor;
+    private           BoundSqlInterceptor       boundSqlInterceptor;
     private transient BoundSqlInterceptor.Chain chain;
+    /**
+     * 分页实现类，可以使用 {@link com.github.pagehelper.page.PageAutoDialect} 类中注册的别名，例如 "mysql", "oracle"
+     */
+    private           String                    dialectClass;
 
     public Page() {
         super();
@@ -254,6 +258,25 @@ public class Page<E> extends ArrayList<E> implements Closeable {
 
     public void setOrderByOnly(boolean orderByOnly) {
         this.orderByOnly = orderByOnly;
+    }
+
+    public String getDialectClass() {
+        return dialectClass;
+    }
+
+    public void setDialectClass(String dialectClass) {
+        this.dialectClass = dialectClass;
+    }
+
+    /**
+     * 指定使用的分页实现，如果自己使用的很频繁，建议自己增加一层封装再使用
+     *
+     * @param dialect 分页实现类，可以使用 {@link com.github.pagehelper.page.PageAutoDialect} 类中注册的别名，例如 "mysql", "oracle"
+     * @return
+     */
+    public Page<E> using(String dialect) {
+        this.dialectClass = dialect;
+        return this;
     }
 
     /**

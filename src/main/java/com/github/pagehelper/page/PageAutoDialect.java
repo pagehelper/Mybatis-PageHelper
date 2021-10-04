@@ -91,24 +91,52 @@ public class PageAutoDialect {
         registerDialectAlias("xugu", HsqldbDialect.class);
     }
 
-    //自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
+    /**
+     * 自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
+     */
     private boolean                            autoDialect        = true;
-    //多数据源时，获取jdbcurl后是否关闭数据源
+    /**
+     * 多数据源时，获取jdbcurl后是否关闭数据源
+     */
     private boolean                            closeConn          = true;
-    //属性配置
+    /**
+     * 属性配置
+     */
     private Properties                         properties;
-    //缓存
+    /**
+     * 缓存 dialect 实现，key 有两种，分别为 jdbcurl 和 dialectClassName
+     */
     private Map<String, AbstractHelperDialect> urlDialectMap      = new ConcurrentHashMap<String, AbstractHelperDialect>();
     private ReentrantLock                      lock               = new ReentrantLock();
     private AbstractHelperDialect              delegate;
     private ThreadLocal<AbstractHelperDialect> dialectThreadLocal = new ThreadLocal<AbstractHelperDialect>();
 
-    //多数据动态获取时，每次需要初始化
-    public void initDelegateDialect(MappedStatement ms) {
-        if (delegate == null) {
+    /**
+     * 多数据动态获取时，每次需要初始化，还可以运行时指定具体的实现
+     *
+     * @param ms
+     * @param dialectClass 分页实现，必须是 {@link AbstractHelperDialect} 实现类，可以使用当前类中注册的别名，例如 "mysql", "oracle"
+     */
+    public void initDelegateDialect(MappedStatement ms, String dialectClass) {
+        if (StringUtil.isNotEmpty(dialectClass)) {
+            AbstractHelperDialect dialect = urlDialectMap.get(dialectClass);
+            if (dialect == null) {
+                lock.lock();
+                try {
+                    if ((dialect = urlDialectMap.get(dialectClass)) == null) {
+                        dialect = initDialect(dialectClass, properties);
+                        urlDialectMap.put(dialectClass, dialect);
+                    }
+                } finally {
+                    lock.unlock();
+                }
+            }
+            dialectThreadLocal.set(dialect);
+        } else if (delegate == null) {
             if (autoDialect) {
                 this.delegate = getDialect(ms);
             } else {
+                //TODO 将下面动态识别改为接口，允许自己调整，返回值为 cacheKey, dialect
                 dialectThreadLocal.set(getDialect(ms));
             }
         }
@@ -216,8 +244,8 @@ public class PageAutoDialect {
         if (urlDialectMap.containsKey(url)) {
             return urlDialectMap.get(url);
         }
+        lock.lock();
         try {
-            lock.lock();
             if (urlDialectMap.containsKey(url)) {
                 return urlDialectMap.get(url);
             }
