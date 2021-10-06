@@ -39,7 +39,7 @@ import org.junit.Test;
 public class SqlTest {
 
     @Test
-    public void testSqlParser() throws JSQLParserException {
+    public void testSqlParser() {
         CountSqlParser countSqlParser = new CountSqlParser();
         Assert.assertEquals("WITH cr AS (SELECT UserRegionCode FROM person.UserRegion WHERE Name LIKE 'C%') SELECT count(0) FROM person.StateProvince WHERE UserRegionCode IN (SELECT * FROM cr)",
             countSqlParser.getSmartCountSql("with " +
@@ -83,7 +83,7 @@ public class SqlTest {
 
 
     @Test
-    public void testSqlParser11() throws JSQLParserException {
+    public void testSqlParser11() {
         CountSqlParser countSqlParser = new CountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM (SELECT so.id, so.address, so.area_code, so.area_id, so.del_flag, so.email, so.fax, so.grade, so.icon, so.master, so.name, so.parent_id, so.parent_ids, so.phone, so.remarks, so.type, so.zip_code FROM sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id OR FIND_IN_SET(suo.org_id, so.parent_ids)) WHERE suo.user_id = ? GROUP BY so.id LIMIT ?) table_count",
             countSqlParser.getSmartCountSql(
@@ -105,13 +105,14 @@ public class SqlTest {
     }
 
     @Test
-    public void testSqlParser2() throws JSQLParserException {
+    public void testSqlParser2() {
         CountSqlParser countSqlParser = new CountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM (SELECT name, count(id) FROM user GROUP BY name) table_count",
             countSqlParser.getSmartCountSql("select name,count(id) from user group by name"));
     }
+
     @Test
-    public void testSqlParser3() throws JSQLParserException {
+    public void testSqlParser3() {
         CountSqlParser countSqlParser = new CountSqlParser();
         Assert.assertEquals("select count(0) from ( \n" +
                 "SELECT *\n" +
@@ -133,9 +134,7 @@ public class SqlTest {
     @Test
     public void testWithNolock(){
         String sql = "SELECT * FROM A WITH(NOLOCK) INNER JOIN B WITH(NOLOCK) ON A.TypeId = B.Id";
-        System.out.println(sql);
         sql = sql.replaceAll("((?i)\\s*(\\w?)\\s*with\\s*\\(nolock\\))", " $2_PAGEWITHNOLOCK");
-        System.out.println(sql);
         //解析SQL
         Statement stmt = null;
         try {
@@ -149,35 +148,48 @@ public class SqlTest {
         sql = selectBody.toString();
 
         sql = sql.replaceAll("\\s*(\\w*?)_PAGEWITHNOLOCK", " $1 WITH(NOLOCK)");
-
-        System.out.println(sql);
+        Assert.assertEquals("SELECT * FROM A WITH(NOLOCK) INNER JOIN B WITH(NOLOCK) ON A.TypeId = B.Id", sql);
     }
 
     @Test
-    public void testSql375() throws JSQLParserException {
+    public void testSql375() {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql("SELECT IF(score >= 60, 'pass', 'failed') FROM tbl"));
+        Assert.assertEquals("SELECT count(0) FROM tbl", countSqlParser.getSmartCountSql("SELECT IF(score >= 60, 'pass', 'failed') FROM tbl"));
     }
 
     @Test
-    public void testSql350() throws JSQLParserException {
+    public void testSql350() {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql("select a,b,c from tb_test having a not null"));
+        Assert.assertEquals("select count(0) from ( \n" +
+            "select a,b,c from tb_test having a not null\n" +
+            " ) tmp_count", countSqlParser.getSmartCountSql("select a,b,c from tb_test having a not null"));
     }
 
     @Test
-    public void testSql555() throws JSQLParserException {
+    public void testSql555() {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql("SELECT (a.column1+a.column2) as popCount  FROM peaf_staff AS a ORDER BY FIELD(a.`store_id`, ?, ?), popCount DESC\n"));
+        Assert.assertEquals("SELECT count(0) FROM (SELECT (a.column1 + a.column2) AS popCount FROM peaf_staff AS a ORDER BY FIELD(a.`store_id`, ?, ?), popCount DESC) table_count",
+            countSqlParser.getSmartCountSql("SELECT (a.column1+a.column2) as popCount  FROM peaf_staff AS a ORDER BY FIELD(a.`store_id`, ?, ?), popCount DESC\n"));
     }
 
     @Test
-    public void testSql606() throws JSQLParserException {
+    public void testSql606() {
         CountSqlParser countSqlParser = new CountSqlParser();
-        System.out.println(countSqlParser.getSmartCountSql("select\n" +
-            "(SELECT COUNT(1) FROM test1 WHERE test1.id = test.test1_id )as successCount ,\n" +
-            "(SELECT COUNT(1) FROM test1 ) as Total\n" +
-            "from test\n" +
-            "Having successCount = Total"));
+        Assert.assertEquals("SELECT count(0) FROM (SELECT (SELECT COUNT(1) FROM test1 WHERE test1.id = test.test1_id) AS successCount, (SELECT COUNT(1) FROM test1) AS Total FROM test HAVING successCount = Total) table_count",
+            countSqlParser.getSmartCountSql("select\n" +
+                "(SELECT COUNT(1) FROM test1 WHERE test1.id = test.test1_id )as successCount ,\n" +
+                "(SELECT COUNT(1) FROM test1 ) as Total\n" +
+                "from test\n" +
+                "Having successCount = Total"));
+    }
+
+    @Test
+    public void testSql201() {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        Assert.assertEquals("SELECT count(0) FROM BASE_PARENT bp LEFT JOIN (BASE_STUDENT bs, BASE_PARENT_STUDENT bst) ON (bp.ID = bst.PARENT_ID AND bs.ID = bst.STUDENT_ID) WHERE 1 = 1",
+            countSqlParser.getSmartCountSql("SELECT bp.ID, bp.NAME, bp.PHONE, bp.IDCODE, bp.CREDENTIALS_PIC, bp.ROLE, bs.ID child_id, bs.NAME child_name " +
+                "FROM BASE_PARENT bp " +
+                "LEFT JOIN (BASE_STUDENT bs ,BASE_PARENT_STUDENT bst) ON (bp.ID = bst.PARENT_ID AND bs.ID = bst.STUDENT_ID) " +
+                "WHERE 1 = 1"));
     }
 }
