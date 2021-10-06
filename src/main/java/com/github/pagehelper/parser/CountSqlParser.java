@@ -28,6 +28,7 @@ import com.github.pagehelper.util.StringUtil;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -263,6 +264,10 @@ public class CountSqlParser {
         if (select.getDistinct() != null) {
             return false;
         }
+        //#606,包含having时不可以
+        if (select.getHaving() != null) {
+            return false;
+        }
         for (SelectItem item : select.getSelectItems()) {
             //select列中包含参数的时候不可以，否则会引起参数个数错误
             if (item.toString().contains("?")) {
@@ -281,7 +286,7 @@ public class CountSqlParser {
                             return false;
                         } else {
                             for (String aggregateFunction : AGGREGATE_FUNCTIONS) {
-                                if(NAME.startsWith(aggregateFunction)){
+                                if (NAME.startsWith(aggregateFunction)) {
                                     falseFunctions.add(NAME);
                                     return false;
                                 }
@@ -289,6 +294,10 @@ public class CountSqlParser {
                             skipFunctions.add(NAME);
                         }
                     }
+                } else if (expression instanceof Parenthesis && ((SelectExpressionItem) item).getAlias() != null) {
+                    //#555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
+                    // 这里想要更智能，需要在整个SQL中查找别名出现的位置，暂时不考虑，直接排除
+                    return false;
                 }
             }
         }

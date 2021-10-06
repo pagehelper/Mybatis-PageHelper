@@ -170,4 +170,14 @@ public class SqlTest {
         CountSqlParser countSqlParser = new CountSqlParser();
         System.out.println(countSqlParser.getSmartCountSql("SELECT (a.column1+a.column2) as popCount  FROM peaf_staff AS a ORDER BY FIELD(a.`store_id`, ?, ?), popCount DESC\n"));
     }
+
+    @Test
+    public void testSql606() throws JSQLParserException {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("select\n" +
+            "(SELECT COUNT(1) FROM test1 WHERE test1.id = test.test1_id )as successCount ,\n" +
+            "(SELECT COUNT(1) FROM test1 ) as Total\n" +
+            "from test\n" +
+            "Having successCount = Total"));
+    }
 }
