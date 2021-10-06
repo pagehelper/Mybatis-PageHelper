@@ -31,6 +31,8 @@ import com.github.pagehelper.util.MSUtils;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
@@ -54,16 +56,35 @@ import java.util.Properties;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Intercepts(
-        {
-                @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
-                @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
-        }
+    {
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
+    }
 )
 public class PageInterceptor implements Interceptor {
-    private volatile Dialect dialect;
-    private String countSuffix = "_COUNT";
-    protected Cache<String, MappedStatement> msCountMap = null;
-    private String default_dialect_class = "com.github.pagehelper.PageHelper";
+    private static final Log log = LogFactory.getLog(PageInterceptor.class);
+
+    private volatile Dialect                        dialect;
+    private          String                         countSuffix           = "_COUNT";
+    protected        Cache<String, MappedStatement> msCountMap            = null;
+    private          String                         default_dialect_class = "com.github.pagehelper.PageHelper";
+
+    public PageInterceptor() {
+        String bannerEnabled = System.getProperty("pagehelper.banner");
+        if (StringUtil.isEmpty(bannerEnabled)) {
+            bannerEnabled = System.getenv("PAGEHELPER_BANNER");
+        }
+        //默认 TRUE
+        if (StringUtil.isEmpty(bannerEnabled) || Boolean.parseBoolean(bannerEnabled)) {
+            log.debug("\n\n" +
+                ",------.                           ,--.  ,--.         ,--.                         \n" +
+                "|  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--. \n" +
+                "|  '--' | ' ,-.  | | .-. | | .-. : |  .--.  | | .-. : |  | | .-. | | .-. : |  .--' \n" +
+                "|  | --'  \\ '-'  | ' '-' ' \\   --. |  |  |  | \\   --. |  | | '-' ' \\   --. |  |    \n" +
+                "`--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'    \n" +
+                "                   `---'                                   `--'                        is intercepting.\n");
+        }
+    }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
