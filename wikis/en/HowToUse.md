@@ -2,11 +2,12 @@
 
 ### 1. Installation
 
-To use PageHelper you just need to include the 
-[pagehelper-x.y.z.jar](http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/)
-and [jsqlparser-x.y.z.jar](http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/) file in the classpath.
+To use PageHelper you just need to include the
+[pagehelper-x.y.z.jar](https://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/)
+and [jsqlparser-x.y.z.jar](https://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/) file in the classpath.
 
-If you are using Maven just add the following dependency to your pom.xml: 
+If you are using Maven just add the following dependency to your pom.xml:
+
 ```xml  
 <dependency>
     <groupId>com.github.pagehelper</groupId>

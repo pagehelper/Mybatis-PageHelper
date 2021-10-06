@@ -8,13 +8,13 @@
 
 你可以从下面的地址中下载最新版本的 jar 包 
 
- - https://oss.sonatype.org/content/repositories/releases/com/github/pagehelper/pagehelper/
- 
- - http://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
+- https://oss.sonatype.org/content/repositories/releases/com/github/pagehelper/pagehelper/
+
+- https://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
 
 由于使用了sql 解析工具，你还需要下载 jsqlparser.jar(需要和PageHelper 依赖的版本一致) ：
 
- - http://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/
+- https://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/
 
 #### 2). 使用 Maven  
   
