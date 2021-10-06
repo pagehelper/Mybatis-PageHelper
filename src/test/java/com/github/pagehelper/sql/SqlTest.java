@@ -192,4 +192,13 @@ public class SqlTest {
                 "LEFT JOIN (BASE_STUDENT bs ,BASE_PARENT_STUDENT bst) ON (bp.ID = bst.PARENT_ID AND bs.ID = bst.STUDENT_ID) " +
                 "WHERE 1 = 1"));
     }
+
+    @Test
+    public void testSql545() {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        Assert.assertEquals("select count(0) from ( \n" +
+                " select * from user_info order by [ ]\n" +
+                " ) tmp_count",
+            countSqlParser.getSmartCountSql(" select * from user_info order by [ ]"));
+    }
 }
