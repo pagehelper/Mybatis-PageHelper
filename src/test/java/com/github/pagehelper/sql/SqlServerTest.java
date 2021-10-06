@@ -235,6 +235,13 @@ public class SqlServerTest {
     }
 
     @Test
+    public void testSql374() {
+        String originalSql = "select * from table_a order by id";
+        Assert.assertEquals("SELECT TOP 10 * FROM (SELECT ROW_NUMBER() OVER (ORDER BY id) PAGE_ROW_NUMBER, * FROM (SELECT * FROM table_a) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
+            sqlServer.convertToPageSql(originalSql, 1, 10));
+    }
+
+    @Test
     public void testSql345() {
         String originalSql = "Select CC.ClinicID, CC.CaseHistoryNum, CC.CaseHistoryID, CC.DoctorID, CC.ClientRegisterID\n" +
             "From Client CC With(Nolock)\n" +
