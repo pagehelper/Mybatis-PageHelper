@@ -90,6 +90,7 @@ public class PageAutoDialect {
         //虚谷数据库
         registerDialectAlias("xugu", HsqldbDialect.class);
         registerDialectAlias("impala", HsqldbDialect.class);
+        registerDialectAlias("firebirdsql", FirebirdDialect.class);
     }
 
     /**
