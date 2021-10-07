@@ -28,6 +28,7 @@ import com.github.pagehelper.AutoDialect;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageException;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
+import com.github.pagehelper.dialect.auto.*;
 import com.github.pagehelper.dialect.helper.*;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -46,9 +47,10 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author liuzh
  */
-public class PageAutoDialect implements AutoDialect<String> {
+public class PageAutoDialect {
 
     private static Map<String, Class<? extends Dialect>> dialectAliasMap = new HashMap<String, Class<? extends Dialect>>();
+    private static Map<String, Class<? extends AutoDialect>> autoDialectMap = new HashMap<String, Class<? extends AutoDialect>>();
 
     public static void registerDialectAlias(String alias, Class<? extends Dialect> dialectClass) {
         dialectAliasMap.put(alias, dialectClass);
@@ -92,16 +94,27 @@ public class PageAutoDialect implements AutoDialect<String> {
         registerDialectAlias("xugu", HsqldbDialect.class);
         registerDialectAlias("impala", HsqldbDialect.class);
         registerDialectAlias("firebirdsql", FirebirdDialect.class);
+
+        //注册 AutoDialect
+        //想要实现和以前版本相同的效果时，可以配置 autoDialectClass=old
+        registerAutoDialectAlias("old", DefaultAutoDialect.class);
+        registerAutoDialectAlias("hikari", HikariAutoDialect.class);
+        registerAutoDialectAlias("druid", DruidAutoDialect.class);
+        registerAutoDialectAlias("tomcat-jdbc", TomcatAutoDialect.class);
+        registerAutoDialectAlias("dbcp", DbcpAutoDialect.class);
+        registerAutoDialectAlias("c3p0", C3P0AutoDialect.class);
+        //不配置时，默认使用 DataSourceNegotiationAutoDialect
+        registerAutoDialectAlias("default", DataSourceNegotiationAutoDialect.class);
+    }
+
+    public static void registerAutoDialectAlias(String alias, Class<? extends AutoDialect> autoDialectClass) {
+        autoDialectMap.put(alias, autoDialectClass);
     }
 
     /**
      * 自动获取dialect,如果没有setProperties或setSqlUtilConfig，也可以正常进行
      */
-    private boolean                            autoDialect        = true;
-    /**
-     * 多数据源时，获取jdbcurl后是否关闭数据源
-     */
-    private boolean                            closeConn          = true;
+    private boolean autoDialect = true;
     /**
      * 属性配置
      */
@@ -232,42 +245,21 @@ public class PageAutoDialect implements AutoDialect<String> {
         return urlDialectMap.get(dialectKey);
     }
 
-    @Override
-    public String extractDialectKey(MappedStatement ms, DataSource dataSource, Properties properties) {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            return conn.getMetaData().getURL();
-        } catch (SQLException e) {
-            throw new PageException(e);
-        } finally {
-            if (conn != null) {
-                try {
-                    if (closeConn) {
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    //ignore
-                }
-            }
-        }
-    }
-
-    @Override
-    public AbstractHelperDialect extractDialect(String dialectKey, MappedStatement ms, DataSource dataSource, Properties properties) {
-        String dialectStr = fromJdbcUrl(dialectKey);
-        if (dialectStr == null) {
-            throw new PageException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
-        }
-        return instanceDialect(dialectStr, properties);
-    }
-
-    public void setProperties(Properties properties) {
-        //初始化自定义AutoDialect
+    /**
+     * 初始化自定义 AutoDialect
+     *
+     * @param properties
+     */
+    private void initAutoDialectClass(Properties properties) {
         String autoDialectClassStr = properties.getProperty("autoDialectClass");
         if (StringUtil.isNotEmpty(autoDialectClassStr)) {
             try {
-                Class<AutoDialect> autoDialectClass = (Class<AutoDialect>) Class.forName(autoDialectClassStr);
+                Class<? extends AutoDialect> autoDialectClass;
+                if (autoDialectMap.containsKey(autoDialectClassStr)) {
+                    autoDialectClass = autoDialectMap.get(autoDialectClassStr);
+                } else {
+                    autoDialectClass = (Class<AutoDialect>) Class.forName(autoDialectClassStr);
+                }
                 this.autoDialectDelegate = autoDialectClass.getConstructor().newInstance();
             } catch (ClassNotFoundException e) {
                 throw new IllegalArgumentException("请确保 autoDialectClass 配置的 AutoDialect 实现类(" + autoDialectClassStr + ")存在!", e);
@@ -275,19 +267,16 @@ public class PageAutoDialect implements AutoDialect<String> {
                 throw new RuntimeException(autoDialectClassStr + " 类必须提供无参的构造方法", e);
             }
         } else {
-            this.autoDialectDelegate = this;
+            this.autoDialectDelegate = new DataSourceNegotiationAutoDialect();
         }
-        //多数据源时，获取 jdbcurl 后是否关闭数据源
-        String closeConn = properties.getProperty("closeConn");
-        if (StringUtil.isNotEmpty(closeConn)) {
-            this.closeConn = Boolean.parseBoolean(closeConn);
-        }
-        //使用 sqlserver2012 作为默认分页方式，这种情况在动态数据源时方便使用
-        String useSqlserver2012 = properties.getProperty("useSqlserver2012");
-        if (StringUtil.isNotEmpty(useSqlserver2012) && Boolean.parseBoolean(useSqlserver2012)) {
-            registerDialectAlias("sqlserver", SqlServer2012Dialect.class);
-            registerDialectAlias("sqlserver2008", SqlServerDialect.class);
-        }
+    }
+
+    /**
+     * 初始化方言别名
+     *
+     * @param properties
+     */
+    private void initDialectAlias(Properties properties) {
         String dialectAlias = properties.getProperty("dialectAlias");
         if (StringUtil.isNotEmpty(dialectAlias)) {
             String[] alias = dialectAlias.split(";");
@@ -295,7 +284,7 @@ public class PageAutoDialect implements AutoDialect<String> {
                 String[] kv = alias[i].split("=");
                 if (kv.length != 2) {
                     throw new IllegalArgumentException("dialectAlias 参数配置错误，" +
-                        "请按照 alias1=xx.dialectClass;alias2=dialectClass2 的形式进行配置!");
+                            "请按照 alias1=xx.dialectClass;alias2=dialectClass2 的形式进行配置!");
                 }
                 for (int j = 0; j < kv.length; j++) {
                     try {
@@ -308,6 +297,18 @@ public class PageAutoDialect implements AutoDialect<String> {
                 }
             }
         }
+    }
+
+    public void setProperties(Properties properties) {
+        //初始化自定义AutoDialect
+        initAutoDialectClass(properties);
+        //使用 sqlserver2012 作为默认分页方式，这种情况在动态数据源时方便使用
+        String useSqlserver2012 = properties.getProperty("useSqlserver2012");
+        if (StringUtil.isNotEmpty(useSqlserver2012) && Boolean.parseBoolean(useSqlserver2012)) {
+            registerDialectAlias("sqlserver", SqlServer2012Dialect.class);
+            registerDialectAlias("sqlserver2008", SqlServerDialect.class);
+        }
+        initDialectAlias(properties);
         //指定的 Helper 数据库方言，和  不同
         String dialect = properties.getProperty("helperDialect");
         //运行时获取数据源

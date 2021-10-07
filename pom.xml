@@ -83,7 +83,43 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-
+        <!-- 针对多数据源连接池的内部支持 -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <!-- 这里为了能在 java6 编译选择的低版本，不影响自己选择高版本 -->
+            <artifactId>HikariCP-java6</artifactId>
+            <version>2.3.13</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.2.8</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>9.0.53</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.5</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.9.0</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>

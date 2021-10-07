@@ -24,15 +24,22 @@
 
 package com.github.pagehelper.util;
 
+import com.github.pagehelper.dialect.AbstractHelperDialect;
+import com.github.pagehelper.dialect.auto.DataSourceAutoDialect;
+import com.github.pagehelper.dialect.auto.DataSourceNegotiationAutoDialect;
+import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
+import java.util.Properties;
 
 /**
  * Description: MybatisHelper
@@ -71,6 +78,13 @@ public class MybatisHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //添加一个针对 unpool 的 AutoDialect
+        DataSourceNegotiationAutoDialect.registerAutoDialect(new DataSourceAutoDialect<UnpooledDataSource>() {
+            @Override
+            public String getJdbcUrl(UnpooledDataSource unpooledDataSource) {
+                return unpooledDataSource.getUrl();
+            }
+        });
     }
 
     /**
