@@ -1,12 +1,41 @@
 ## 更新日志
 
+### 5.3.0 - 2021-10-07
+
+- 增加 `AutoDialect` 接口用于自动获取数据库类型，可以通过 `autoDialectClass` 配置为自己的实现类，默认使用 `DataSourceNegotiationAutoDialect`，优先根据连接池获取。
+  默认实现中，增加针对 `hikari,druid,tomcat-jdbc,c3p0,dbcp` 类型数据库连接池的特殊处理，直接从配置获取jdbcUrl，当使用其他类型数据源时，仍然使用旧的方式获取连接在读取jdbcUrl。
+  想要使用和旧版本完全相同方式时，可以配置 `autoDialectClass=old`。当数据库连接池类型非常明确时，建议配置为具体值，例如使用 hikari 时，配置 `autoDialectClass=hikari`
+  ，使用其他连接池时，配置为自己的实现类。
+- 支持运行时动态指定使用的 dialect 实现，例如 `PageHelper.startPage(1, 10).using("oracle");`
+  或者 `PageHelper.startPage(2, 10).using("org.exmaple.CustomDialect");`
+- `PageInfo` 增加空实例常量属性 `PageInfo.EMPTY` 以及内容判断 `boolean hasContent()`。
+- 启动中增加 banner, 需要日志级别 debug，可以通过 `-Dpagehelper.banner=false` 或者环境变量 `PAGEHELPER_BANNER=false` 关闭
+  ```
+   DEBUG [main] -
+   
+   ,------.                           ,--.  ,--.         ,--.                         
+   |  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--.
+   |  '--' | ' ,-.  | | .-. | | .-. : |  .--.  | | .-. : |  | | .-. | | .-. : |  .--'
+   |  | --'  \ '-'  | ' '-' ' \   --. |  |  |  | \   --. |  | | '-' ' \   --. |  |    
+   `--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'    
+   `---'                                   `--'                        is intercepting.
+   ```
+  增加 banner 的目的在于，如果你配置了多次分页插件，你会看到 banner 输出多次，你可以在 `PageInterceptor` 构造方法断点看看那些地方进行了实例化。
+- 完善 Count 查询，当存在 having 时，不在优化查询列。查询列存在有别名的函数或者运算时也不优化查询列，避免 order by 或 having 中使用的别名不存在。
+- 增加判断处理某些数据（如 TDEngine）查询 count 无结果时返回 null
+- 添加 Firebird 数据库支持和 SqlServer2012 分页语法相同。
+- 添加 impala 数据库自动识别。
+- JSqlParser 升级为 4.2 版本。
+
+> 距离上次更新3个月左右，这次更新直接让假期少了3天 :running: ，关了 GitHub 和 Gitee 上的 200 多个issue，不一定所有问题都得到了处理，如果你还有疑问，可以继续提 issue，下个大版本会考虑直接 6.0，计划全部升级到 java 8，功能保持不变。
+
 ### 5.2.1 - 2021-06-20
 
 - 升级依赖 jsqlparser 4.0, mybatis 3.5.7
 - 自动识别以下数据库：
-  - 虚谷数据库 xugu #599
-  - 神通数据库 oscar  by **ranqing**
-  - 瀚高数据库 highgo by **ashaiqing**
+    - 虚谷数据库 xugu #599
+    - 神通数据库 oscar by **ranqing**
+    - 瀚高数据库 highgo by **ashaiqing**
 - BoundSqlInterceptorChain拦截器index参数bug, fixed #587
 - fixed #558
 - 添加 PostgreSQL 方言 by **liym@home**

@@ -1,12 +1,49 @@
 ## Changelog
 
+### 5.3.0 - 2021-10-07
+
+- Add `AutoDialect` interface to automatically obtain the database type, which can be configured as its own
+  implementation class through `autoDialectClass`. By default, `DataSourceNegotiationAutoDialect` is used, which is
+  obtained according to the connection pool first. In the default implementation, special processing is added
+  for `hikari,druid,tomcat-jdbc,c3p0,dbcp` type database connection pools, and jdbcUrl are obtained directly from the
+  configuration. When other types of data sources are used, the connection is still obtained in the old way. You can
+  configure `autoDialectClass=old` when you want to use exactly the same way as the old version. When the database
+  connection pool type is very clear, it is recommended to configure it as a specific value. For example, when using
+  hikari, configure `autoDialectClass=hikari`, and when using other connection pools, configure it as its own
+  implementation class.
+- Enable dynamic designation of dialect implementation at runtime, such
+  as `PageHelper.startPage(1, 10).using("oracle");` Or `PageHelper.startPage(2, 10).using("org.exmaple.CustomDialect");`
+- `PageInfo` adds the empty instance constant attribute `PageInfo.EMPTY` and the content judgment `boolean hasContent()`
+  .
+- Adding banner to startup requires log level debug, which can be closed by `-Dpagehelper.banner=false` or environment
+  variable `PAGEHELPER_BANNER=false`.
+  ```
+   DEBUG [main] -
+   
+   ,------.                           ,--.  ,--.         ,--.                         
+   |  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--.
+   |  '--' | ' ,-.  | | .-. | | .-. : |  .--.  | | .-. : |  | | .-. | | .-. : |  .--'
+   |  | --'  \ '-'  | ' '-' ' \   --. |  |  |  | \   --. |  | | '-' ' \   --. |  |    
+   `--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'    
+   `---'                                   `--'                        is intercepting.
+   ```
+  The purpose of adding banner is that if you configure paging plug-ins multiple times, you will see banner output
+  multiple times, and you can see where it has been instantiated at the breakpoint of the `PageInterceptor` constructor.
+- Improve the Count query. When having exists, the query column is not optimized. The query column is not optimized when
+  there are functions or operations with aliases in the column, so as to avoid that aliases used in order by or having
+  do not exist.
+- It is judged that processing some data (such as TDEngine) returns null when there is no result in querying count.
+- Adding Firebird database support is the same as SqlServer2012 paging syntax.
+- Add impala database automatic recognition.
+- Upgrade JSqlParser to version 4.2.
+
 ### 5.2.1 - 2021-06-20
 
 - Upgrade dependency jsqlparser 4.0, mybatis 3.5.7
 - Automatically recognize the following databases：
-    - 虚谷数据库 xugu #599
-    - 神通数据库 oscar  by **ranqing**
-    - 瀚高数据库 highgo by **ashaiqing**
+  - 虚谷数据库 xugu #599
+  - 神通数据库 oscar by **ranqing**
+  - 瀚高数据库 highgo by **ashaiqing**
 - BoundSqlInterceptorChain interceptor index parameter bug, fixed #587
 - fixed #558
 - Add PostgreSQL dialect by **liym@home**
