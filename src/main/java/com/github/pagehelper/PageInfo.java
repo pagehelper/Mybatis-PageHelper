@@ -40,12 +40,12 @@ import java.util.List;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PageInfo<T> extends PageSerializable<T> {
-    public static final  int      DEFAULT_NAVIGATE_PAGES = 8;
-    private static final PageInfo EMPTY_PAGE_INFO        = new PageInfo(Collections.emptyList(), 0);
+    public static final int DEFAULT_NAVIGATE_PAGES = 8;
+    public static final PageInfo EMPTY = new PageInfo(Collections.emptyList(), 0);
     /**
      * 当前页
      */
-    private              int      pageNum;
+    private int pageNum;
     /**
      * 每页的数量
      */
@@ -176,7 +176,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      * @return
      */
     public static <T> PageInfo<T> emptyPageInfo() {
-        return EMPTY_PAGE_INFO;
+        return EMPTY;
     }
 
     public void calcByNavigatePages(int navigatePages) {
