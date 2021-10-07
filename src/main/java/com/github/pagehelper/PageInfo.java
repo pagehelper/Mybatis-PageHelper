@@ -25,6 +25,7 @@
 package com.github.pagehelper;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,19 +40,20 @@ import java.util.List;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PageInfo<T> extends PageSerializable<T> {
-    public static final int DEFAULT_NAVIGATE_PAGES = 8;
+    public static final  int      DEFAULT_NAVIGATE_PAGES = 8;
+    private static final PageInfo EMPTY_PAGE_INFO        = new PageInfo(Collections.emptyList(), 0);
     /**
      * 当前页
      */
-    private int pageNum;
+    private              int      pageNum;
     /**
      * 每页的数量
      */
-    private int pageSize;
+    private              int      pageSize;
     /**
      * 当前页的数量
      */
-    private int size;
+    private              int      size;
 
     /**
      * 由于startRow和endRow不常用，这里说个具体的用法
@@ -168,6 +170,15 @@ public class PageInfo<T> extends PageSerializable<T> {
         return new PageInfo<T>(list, navigatePages);
     }
 
+    /**
+     * 返回一个空的 Pageinfo 对象
+     *
+     * @return
+     */
+    public static <T> PageInfo<T> emptyPageInfo() {
+        return EMPTY_PAGE_INFO;
+    }
+
     public void calcByNavigatePages(int navigatePages) {
         setNavigatePages(navigatePages);
         //计算导航页
@@ -238,6 +249,13 @@ public class PageInfo<T> extends PageSerializable<T> {
         isLastPage = pageNum == pages || pages == 0;
         hasPreviousPage = pageNum > 1;
         hasNextPage = pageNum < pages;
+    }
+
+    /**
+     * 是否包含内容
+     */
+    public boolean hasContent() {
+        return this.size > 0;
     }
 
     public int getPageNum() {
