@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.page;
 
+import com.github.pagehelper.AutoDialect;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageException;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
@@ -45,7 +46,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author liuzh
  */
-public class PageAutoDialect {
+public class PageAutoDialect implements AutoDialect<String> {
 
     private static Map<String, Class<? extends Dialect>> dialectAliasMap = new HashMap<String, Class<? extends Dialect>>();
 
@@ -104,44 +105,24 @@ public class PageAutoDialect {
     /**
      * 属性配置
      */
-    private Properties                         properties;
+    private Properties properties;
     /**
      * 缓存 dialect 实现，key 有两种，分别为 jdbcurl 和 dialectClassName
      */
-    private Map<String, AbstractHelperDialect> urlDialectMap      = new ConcurrentHashMap<String, AbstractHelperDialect>();
-    private ReentrantLock                      lock               = new ReentrantLock();
-    private AbstractHelperDialect              delegate;
+    private Map<Object, AbstractHelperDialect> urlDialectMap = new ConcurrentHashMap<Object, AbstractHelperDialect>();
+    private ReentrantLock lock = new ReentrantLock();
+    private AbstractHelperDialect delegate;
     private ThreadLocal<AbstractHelperDialect> dialectThreadLocal = new ThreadLocal<AbstractHelperDialect>();
+    private AutoDialect autoDialectDelegate;
 
-    /**
-     * 多数据动态获取时，每次需要初始化，还可以运行时指定具体的实现
-     *
-     * @param ms
-     * @param dialectClass 分页实现，必须是 {@link AbstractHelperDialect} 实现类，可以使用当前类中注册的别名，例如 "mysql", "oracle"
-     */
-    public void initDelegateDialect(MappedStatement ms, String dialectClass) {
-        if (StringUtil.isNotEmpty(dialectClass)) {
-            AbstractHelperDialect dialect = urlDialectMap.get(dialectClass);
-            if (dialect == null) {
-                lock.lock();
-                try {
-                    if ((dialect = urlDialectMap.get(dialectClass)) == null) {
-                        dialect = initDialect(dialectClass, properties);
-                        urlDialectMap.put(dialectClass, dialect);
-                    }
-                } finally {
-                    lock.unlock();
-                }
-            }
-            dialectThreadLocal.set(dialect);
-        } else if (delegate == null) {
-            if (autoDialect) {
-                this.delegate = getDialect(ms);
-            } else {
-                //TODO 将下面动态识别改为接口，允许自己调整，返回值为 cacheKey, dialect
-                dialectThreadLocal.set(getDialect(ms));
+    public static String fromJdbcUrl(String jdbcUrl) {
+        final String url = jdbcUrl.toLowerCase();
+        for (String dialect : dialectAliasMap.keySet()) {
+            if (url.contains(":" + dialect.toLowerCase() + ":")) {
+                return dialect;
             }
         }
+        return null;
     }
 
     //获取当前的代理对象
@@ -157,16 +138,6 @@ public class PageAutoDialect {
         dialectThreadLocal.remove();
     }
 
-    private String fromJdbcUrl(String jdbcUrl) {
-        final String url = jdbcUrl.toLowerCase();
-        for (String dialect : dialectAliasMap.keySet()) {
-            if (url.contains(":" + dialect.toLowerCase() + ":")) {
-                return dialect;
-            }
-        }
-        return null;
-    }
-
     /**
      * 反射类
      *
@@ -174,7 +145,7 @@ public class PageAutoDialect {
      * @return
      * @throws Exception
      */
-    private Class resloveDialectClass(String className) throws Exception {
+    public static Class resloveDialectClass(String className) throws Exception {
         if (dialectAliasMap.containsKey(className.toLowerCase())) {
             return dialectAliasMap.get(className.toLowerCase());
         } else {
@@ -188,7 +159,7 @@ public class PageAutoDialect {
      * @param dialectClass
      * @param properties
      */
-    private AbstractHelperDialect initDialect(String dialectClass, Properties properties) {
+    public static AbstractHelperDialect instanceDialect(String dialectClass, Properties properties) {
         AbstractHelperDialect dialect;
         if (StringUtil.isEmpty(dialectClass)) {
             throw new PageException("使用 PageHelper 分页插件时，必须设置 helper 属性");
@@ -208,12 +179,61 @@ public class PageAutoDialect {
     }
 
     /**
-     * 获取url
+     * 多数据动态获取时，每次需要初始化，还可以运行时指定具体的实现
      *
-     * @param dataSource
+     * @param ms
+     * @param dialectClass 分页实现，必须是 {@link AbstractHelperDialect} 实现类，可以使用当前类中注册的别名，例如 "mysql", "oracle"
+     */
+    public void initDelegateDialect(MappedStatement ms, String dialectClass) {
+        if (StringUtil.isNotEmpty(dialectClass)) {
+            AbstractHelperDialect dialect = urlDialectMap.get(dialectClass);
+            if (dialect == null) {
+                lock.lock();
+                try {
+                    if ((dialect = urlDialectMap.get(dialectClass)) == null) {
+                        dialect = instanceDialect(dialectClass, properties);
+                        urlDialectMap.put(dialectClass, dialect);
+                    }
+                } finally {
+                    lock.unlock();
+                }
+            }
+            dialectThreadLocal.set(dialect);
+        } else if (delegate == null) {
+            if (autoDialect) {
+                this.delegate = autoGetDialect(ms);
+            } else {
+                dialectThreadLocal.set(autoGetDialect(ms));
+            }
+        }
+    }
+
+    /**
+     * 自动获取分页方言实现
+     *
+     * @param ms
      * @return
      */
-    private String getUrl(DataSource dataSource) {
+    public AbstractHelperDialect autoGetDialect(MappedStatement ms) {
+        DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
+        Object dialectKey = autoDialectDelegate.extractDialectKey(ms, dataSource, properties);
+        if (dialectKey == null) {
+            return autoDialectDelegate.extractDialect(dialectKey, ms, dataSource, properties);
+        } else if (!urlDialectMap.containsKey(dialectKey)) {
+            lock.lock();
+            try {
+                if (!urlDialectMap.containsKey(dialectKey)) {
+                    urlDialectMap.put(dialectKey, autoDialectDelegate.extractDialect(dialectKey, ms, dataSource, properties));
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+        return urlDialectMap.get(dialectKey);
+    }
+
+    @Override
+    public String extractDialectKey(MappedStatement ms, DataSource dataSource, Properties properties) {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -233,40 +253,30 @@ public class PageAutoDialect {
         }
     }
 
-    /**
-     * 根据 jdbcUrl 获取数据库方言
-     *
-     * @param ms
-     * @return
-     */
-    private AbstractHelperDialect getDialect(MappedStatement ms) {
-        //改为对dataSource做缓存
-        DataSource dataSource = ms.getConfiguration().getEnvironment().getDataSource();
-        String url = getUrl(dataSource);
-        if (urlDialectMap.containsKey(url)) {
-            return urlDialectMap.get(url);
+    @Override
+    public AbstractHelperDialect extractDialect(String dialectKey, MappedStatement ms, DataSource dataSource, Properties properties) {
+        String dialectStr = fromJdbcUrl(dialectKey);
+        if (dialectStr == null) {
+            throw new PageException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
         }
-        lock.lock();
-        try {
-            if (urlDialectMap.containsKey(url)) {
-                return urlDialectMap.get(url);
-            }
-            if (StringUtil.isEmpty(url)) {
-                throw new PageException("无法自动获取jdbcUrl，请在分页插件中配置dialect参数!");
-            }
-            String dialectStr = fromJdbcUrl(url);
-            if (dialectStr == null) {
-                throw new PageException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
-            }
-            AbstractHelperDialect dialect = initDialect(dialectStr, properties);
-            urlDialectMap.put(url, dialect);
-            return dialect;
-        } finally {
-            lock.unlock();
-        }
+        return instanceDialect(dialectStr, properties);
     }
 
     public void setProperties(Properties properties) {
+        //初始化自定义AutoDialect
+        String autoDialectClassStr = properties.getProperty("autoDialectClass");
+        if (StringUtil.isNotEmpty(autoDialectClassStr)) {
+            try {
+                Class<AutoDialect> autoDialectClass = (Class<AutoDialect>) Class.forName(autoDialectClassStr);
+                this.autoDialectDelegate = autoDialectClass.getConstructor().newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new IllegalArgumentException("请确保 autoDialectClass 配置的 AutoDialect 实现类(" + autoDialectClassStr + ")存在!", e);
+            } catch (Exception e) {
+                throw new RuntimeException(autoDialectClassStr + " 类必须提供无参的构造方法", e);
+            }
+        } else {
+            this.autoDialectDelegate = this;
+        }
         //多数据源时，获取 jdbcurl 后是否关闭数据源
         String closeConn = properties.getProperty("closeConn");
         if (StringUtil.isNotEmpty(closeConn)) {
@@ -315,7 +325,7 @@ public class PageAutoDialect {
         //3.指定方言
         else {
             autoDialect = false;
-            this.delegate = initDialect(dialect, properties);
+            this.delegate = instanceDialect(dialect, properties);
         }
     }
 }

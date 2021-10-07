@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ The MIT License (MIT)
+  ~
+  ~ Copyright (c) 2014-2017 abel533@gmail.com
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="lazyLoadingEnabled" value="false"/>
+        <setting name="aggressiveLazyLoading" value="true"/>
+        <!--<setting name="logImpl" value="LOG4J"/>-->
+    </settings>
+
+    <typeAliases>
+        <package name="com.github.pagehelper.model"/>
+    </typeAliases>
+
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- dialect参数可以忽略不写 -->
+            <!-- 如果需要用自己的实现方法，可以将value写成类的全限定名称 -->
+            <!-- 如下所示，该类必须继承Parser接口 -->
+            <!--<property name="dialect" value="hsqldb"/>-->
+            <!-- 支持通过Mapper接口参数来传递分页参数 -->
+            <property name="supportMethodsArguments" value="true"/>
+            <!-- 运行时自动判断数据库类型，支持多数据源DataSource分页 -->
+            <property name="autoRuntimeDialect" value="true"/>
+            <property name="autoDialectClass"
+                      value="com.github.pagehelper.test.features.autodialect.SimpleAutoDialect"/>
+            <property name="closeConn" value="true"/>
+            <property name="rowBoundsWithCount" value="true"/>
+            <!-- 该参数可选，可以设置sql缓存实现类，默认为SimpleCache，当项目包含guava时，使用GuavaCache，
+                 也可以通过参数 sqlCacheClass 指定自己的实现类 -->
+            <property name="sqlCacheClass" value="com.github.pagehelper.cache.SimpleCache"/>
+            <property name="countColumn" value="1"/>
+            <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+        </plugin>
+    </plugins>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC">
+                <property name="" value=""/>
+            </transactionManager>
+            <dataSource type="UNPOOLED">
+                <property name="driver" value="org.hsqldb.jdbcDriver"/>
+                <property name="url" value="jdbc:hsqldb:mem:basetest"/>
+                <property name="username" value="sa"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource="com/github/pagehelper/mapper/UserMapper.xml"/>
+    </mappers>
+
+</configuration>
