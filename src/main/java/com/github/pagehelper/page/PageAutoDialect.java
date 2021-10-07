@@ -89,6 +89,7 @@ public class PageAutoDialect {
         registerDialectAlias("highgo", HsqldbDialect.class);
         //虚谷数据库
         registerDialectAlias("xugu", HsqldbDialect.class);
+        registerDialectAlias("impala", HsqldbDialect.class);
     }
 
     /**
