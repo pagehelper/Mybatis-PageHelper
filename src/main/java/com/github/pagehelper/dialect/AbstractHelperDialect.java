@@ -28,6 +28,7 @@ import com.github.pagehelper.Constant;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageRowBounds;
+import com.github.pagehelper.page.PageParamMap;
 import com.github.pagehelper.parser.OrderByParser;
 import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MetaObjectUtil;
@@ -113,15 +114,15 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         if (page.isOrderByOnly()) {
             return parameterObject;
         }
-        Map<String, Object> paramMap = null;
+        PageParamMap<String, Object> paramMap = null;
         if (parameterObject == null) {
-            paramMap = new HashMap<String, Object>();
+            paramMap = new PageParamMap<String, Object>();
         } else if (parameterObject instanceof Map) {
             //解决不可变Map的情况
-            paramMap = new HashMap<String, Object>();
+            paramMap = new PageParamMap<String, Object>();
             paramMap.putAll((Map) parameterObject);
         } else {
-            paramMap = new HashMap<String, Object>();
+            paramMap = new PageParamMap<String, Object>();
             // sqlSource为ProviderSqlSource时，处理只有1个参数的情况
             if (ms.getSqlSource() instanceof ProviderSqlSource) {
                 String[] providerMethodArgumentNames = ExecutorUtil.getProviderMethodArgumentNames((ProviderSqlSource) ms.getSqlSource());
