@@ -24,6 +24,8 @@
 
 package com.github.pagehelper;
 
+import net.sf.cglib.beans.BeanCopier;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -162,6 +164,50 @@ public class PageInfo<T> extends PageSerializable<T> {
         }
     }
 
+
+    /**
+     * pageInfo泛型转换
+     *
+     * @param dtoClass DTO类的class对象
+     * @param <E>      entity类
+     * @return PageInfo<D>              返回转换后的PageInfo对象
+     */
+    public <E> PageInfo<E> convert(Class<E> dtoClass) {
+        return convert(this, dtoClass);
+    }
+
+    /**
+     * pageInfo泛型转换
+     *
+     * @param source pageInfo<D>类对象
+     * @param target DTO类的class对象
+     * @param <D>    entity类
+     * @param <E>    DTO类
+     * @return PageInfo<D>              返回转换后的PageInfo对象
+     */
+    public static <D, E> PageInfo<E> convert(PageInfo<D> source, Class<E> target) {
+        //创建page对象，传入当前页，和每页数量进行初始化（page对象是ArrayList的子类，在ArrayList的基础上添加了分页的信息）
+        Page<E> page = new Page(source.getPageNum(), source.getPageSize());
+        //传入总记录数
+        page.setTotal(source.getTotal());
+        //遍历原entity的列表
+        for (D d : source.getList()) {
+            try {
+                page.add(convert(d, target));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        //通过page对象以及pageInfoE中的导航页码数创建要返回的pageInfo<D>对象
+        return new PageInfo<E>(page, source.getNavigatePages());
+    }
+
+    public static <E> E convert(Object source, Class<E> target) throws Exception {
+        BeanCopier beanCopier = BeanCopier.create(source.getClass(), target, false);
+        E result = target.getConstructor().newInstance();
+        beanCopier.copy(source, target, null);
+        return result;
+    }
     public static <T> PageInfo<T> of(List<T> list) {
         return new PageInfo<T>(list);
     }

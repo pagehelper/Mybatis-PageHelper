@@ -141,6 +141,13 @@
             <version>2.2.9</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>3.3.0</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
         <!--
         <dependency>
             <groupId>mysql</groupId>
