@@ -1,0 +1,16 @@
+name: Maven verify
+on:
+  pull_request:
+    types: [ opened, reopened, edited ]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+      - name: Run the Maven verify phase
+        run: mvn --batch-mode --update-snapshots -P dev verify
