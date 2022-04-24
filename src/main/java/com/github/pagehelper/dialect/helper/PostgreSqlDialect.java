@@ -24,9 +24,19 @@
 
 package com.github.pagehelper.dialect.helper;
 
+import com.github.pagehelper.dialect.AbstractHelperDialect;
+import com.github.pagehelper.util.MetaObjectUtil;
 import org.apache.ibatis.cache.CacheKey;
 
 import com.github.pagehelper.Page;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.reflection.MetaObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * PostgreSQL 方言.
@@ -34,7 +44,29 @@ import com.github.pagehelper.Page;
  * @author liym
  * @since 2021-02-06 19:27 新建
  */
-public class PostgreSqlDialect extends MySqlDialect {
+public class PostgreSqlDialect extends AbstractHelperDialect {
+
+    @Override
+    public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
+        paramMap.put(PAGEPARAMETER_SECOND, page.getPageSize());
+        paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow());
+        //处理pageKey
+        pageKey.update(page.getPageSize());
+        pageKey.update(page.getStartRow());
+        //处理参数配置
+        if (boundSql.getParameterMappings() != null) {
+            List<ParameterMapping> newParameterMappings = new ArrayList<ParameterMapping>(boundSql.getParameterMappings());
+            if (page.getStartRow() == 0) {
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, int.class).build());
+            } else {
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_SECOND, int.class).build());
+                newParameterMappings.add(new ParameterMapping.Builder(ms.getConfiguration(), PAGEPARAMETER_FIRST, long.class).build());
+            }
+            MetaObject metaObject = MetaObjectUtil.forObject(boundSql);
+            metaObject.setValue("parameterMappings", newParameterMappings);
+        }
+        return paramMap;
+    }
 
     /**
      * 构建 <a href="https://www.postgresql.org/docs/current/queries-limit.html">PostgreSQL</a>分页查询语句
@@ -46,7 +78,7 @@ public class PostgreSqlDialect extends MySqlDialect {
         if (page.getStartRow() == 0) {
             sqlStr.append(" LIMIT ?");
         } else {
-            sqlStr.append(" OFFSET ? LIMIT ?");
+            sqlStr.append(" LIMIT ? OFFSET ?");
         }
         return sqlStr.toString();
     }
