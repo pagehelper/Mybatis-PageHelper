@@ -48,10 +48,10 @@ public class PostgreSqlRowBoundsDialect extends AbstractRowBoundsDialect {
             sqlStr.append(" LIMIT ");
             sqlStr.append(rowBounds.getLimit());
         } else {
-            sqlStr.append(" OFFSET ");
-            sqlStr.append(rowBounds.getOffset());
             sqlStr.append(" LIMIT ");
             sqlStr.append(rowBounds.getLimit());
+            sqlStr.append(" OFFSET ");
+            sqlStr.append(rowBounds.getOffset());
             pageKey.update(rowBounds.getOffset());
         }
         pageKey.update(rowBounds.getLimit());
