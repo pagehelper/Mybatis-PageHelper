@@ -120,7 +120,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      *
      * @param list
      */
-    public PageInfo(List<T> list) {
+    public PageInfo(List<? extends T> list) {
         this(list, DEFAULT_NAVIGATE_PAGES);
     }
 
@@ -130,7 +130,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      * @param list          page结果
      * @param navigatePages 页码数量
      */
-    public PageInfo(List<T> list, int navigatePages) {
+    public PageInfo(List<? extends T> list, int navigatePages) {
         super(list);
         if (list instanceof Page) {
             Page page = (Page) list;
@@ -162,11 +162,11 @@ public class PageInfo<T> extends PageSerializable<T> {
         }
     }
 
-    public static <T> PageInfo<T> of(List<T> list) {
+    public static <T> PageInfo<T> of(List<? extends T> list) {
         return new PageInfo<T>(list);
     }
 
-    public static <T> PageInfo<T> of(List<T> list, int navigatePages) {
+    public static <T> PageInfo<T> of(List<? extends T> list, int navigatePages) {
         return new PageInfo<T>(list, navigatePages);
     }
 

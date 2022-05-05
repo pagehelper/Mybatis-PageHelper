@@ -40,16 +40,17 @@ public class PageSerializable<T> implements Serializable {
     public PageSerializable() {
     }
 
-    public PageSerializable(List<T> list) {
-        this.list = list;
+    @SuppressWarnings("unchecked")
+    public PageSerializable(List<? extends T> list) {
+        this.list = (List<T>) list;
         if(list instanceof Page){
-            this.total = ((Page)list).getTotal();
+            this.total = ((Page<?>)list).getTotal();
         } else {
             this.total = list.size();
         }
     }
 
-    public static <T> PageSerializable<T> of(List<T> list){
+    public static <T> PageSerializable<T> of(List<? extends T> list){
         return new PageSerializable<T>(list);
     }
 
