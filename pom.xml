@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.7</version>
+            <version>3.5.9</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>31.1-jre</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -97,14 +97,14 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.2.8</version>
+            <version>1.2.9</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jdbc</artifactId>
-            <version>9.0.53</version>
+            <version>10.0.20</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

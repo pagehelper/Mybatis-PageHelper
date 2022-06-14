@@ -24,6 +24,8 @@
 
 package com.github.pagehelper;
 
+import com.github.pagehelper.util.SqlSafeUtil;
+
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,28 +75,28 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     /**
      * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
      */
-    private           Boolean                   pageSizeZero;
+    private Boolean pageSizeZero;
     /**
      * 进行count查询的列名
      */
-    private           String                    countColumn;
+    private String countColumn;
     /**
      * 排序
      */
-    private           String                    orderBy;
+    private String orderBy;
     /**
      * 只增加排序
      */
-    private           boolean                   orderByOnly;
+    private boolean orderByOnly;
     /**
      * sql拦截处理
      */
-    private           BoundSqlInterceptor       boundSqlInterceptor;
+    private BoundSqlInterceptor boundSqlInterceptor;
     private transient BoundSqlInterceptor.Chain chain;
     /**
      * 分页实现类，可以使用 {@link com.github.pagehelper.page.PageAutoDialect} 类中注册的别名，例如 "mysql", "oracle"
      */
-    private           String                    dialectClass;
+    private String dialectClass;
 
     public Page() {
         super();
@@ -247,7 +249,27 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         return orderBy;
     }
 
+    /**
+     * 设置排序字段，增加 SQL 注入校验，如果需要在 order by 使用函数，可以使用 {@link #setUnsafeOrderBy(String)} 方法
+     *
+     * @param orderBy 排序字段
+     */
     public <E> Page<E> setOrderBy(String orderBy) {
+        if (SqlSafeUtil.check(orderBy)) {
+            throw new PageException("order by [" + orderBy + "] 存在 SQL 注入风险, 如想避免 SQL 注入校验，可以调用 Page.setUnsafeOrderBy");
+        }
+        this.orderBy = orderBy;
+        return (Page<E>) this;
+    }
+
+    /**
+     * 不安全的设置排序方法，如果从前端接收参数，请自行做好注入校验。
+     * <p>
+     * 请不要故意使用该方法注入然后提交漏洞!!!
+     *
+     * @param orderBy 排序字段
+     */
+    public <E> Page<E> setUnsafeOrderBy(String orderBy) {
         this.orderBy = orderBy;
         return (Page<E>) this;
     }
