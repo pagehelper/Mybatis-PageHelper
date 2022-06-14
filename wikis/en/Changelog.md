@@ -1,5 +1,12 @@
 ## Changelog
 
+### 5.3.1
+
+- Resolve CVE-2022-28111 vulnerability, limit the order by parameter, avoid SQL injection
+- Add support for as400. **by bluezealot**
+- Optimize generic parameters of `Page` class **by Zhang Fulai * *
+- Standardize the order of PostgreSQL paging parameters **by outian**
+
 ### 5.3.0 - 2021-10-07
 
 - Add `AutoDialect` interface to automatically obtain the database type, which can be configured as its own

@@ -1,5 +1,12 @@
 ## 更新日志
 
+### 5.3.1 - 2022-06-14
+
+- 处理 CVE-2022-28111 漏洞，限制 order by 参数，避免 SQL 注入
+- Add support for as400. **by bluezealot**
+- 优化分页结果包装类的泛型参数 **by 章福来**
+- 规范PostgreSQL分页参数的顺序 **by outian**
+
 ### 5.3.0 - 2021-10-07
 
 - 增加 `AutoDialect` 接口用于自动获取数据库类型，可以通过 `autoDialectClass` 配置为自己的实现类，默认使用 `DataSourceNegotiationAutoDialect`，优先根据连接池获取。
