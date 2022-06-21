@@ -95,6 +95,8 @@ public class PageAutoDialect {
         registerDialectAlias("xugu", HsqldbDialect.class);
         registerDialectAlias("impala", HsqldbDialect.class);
         registerDialectAlias("firebirdsql", FirebirdDialect.class);
+        //人大金仓数据库
+        registerDialectAlias("kingbase", PostgreSqlDialect.class);
 
         //注册 AutoDialect
         //想要实现和以前版本相同的效果时，可以配置 autoDialectClass=old
