@@ -64,6 +64,8 @@ static {
     registerDialectAlias("highgo", HsqldbDialect.class); 
     //虚谷数据库 
     registerDialectAlias("xugu", HsqldbDialect.class); 
+    //人大金仓数据库
+    registerDialectAlias("kingbase", PostgreSqlDialect.class);
 }
 ```
 
