@@ -28,9 +28,7 @@ import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.SqlServerParser;
-import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -319,5 +317,14 @@ public class SqlServerTest {
         String result = replaceSql.restore(pageSql);
         Assert.assertEquals("SELECT TOP 10 ScheduleID, SystemID, ClinicID, DoctorID, ScheduleDate, StartTime, EndTime, Status, BookBy, Note, Remark, SourceType, CompanyName, DoctorName, DoctorNumber, ClinicName, Lat, Lng, ContactTel, Address, ConsultationStatusID, RegisterStatus, AreaLevel1, AreaLevel2 FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, ScheduleID, SystemID, ClinicID, DoctorID, ScheduleDate, StartTime, EndTime, Status, BookBy, Note, Remark, SourceType, CompanyName, DoctorName, DoctorNumber, ClinicName, Lat, Lng, ContactTel, Address, ConsultationStatusID, RegisterStatus, AreaLevel1, AreaLevel2 FROM (SELECT AUS.ScheduleID, AUS.SystemID, AUS.ClinicID, AUS.DoctorID, AUS.ScheduleDate, AUS.StartTime, AUS.EndTime, AUS.Status, AUS.BookBy, AUS.Note, AUS.Remark, AUS.SourceType, CM.CompanyName, AU.UserName AS DoctorName, AU.UserNumber AS DoctorNumber, CC.CodeDesc AS ClinicName, CD.Lat, CD.Lng, CD.ContactTel, CD.Address, CR.ConsultationStatusID, CR.RegisterStatus, A1.CodeDesc AS AreaLevel1, A2.CodeDesc AS AreaLevel2 FROM ACM_User_Schedule AUS WITH(NOLOCK) LEFT JOIN Client_Register CR WITH(NOLOCK) ON AUS.BookBy = CR.ClientID AND CR.SourceType = 'F' AND AUS.ClientRegisterNum = CR.ClientRegisterNum INNER JOIN ACM_User AU WITH(NOLOCK) ON AU.UserID = AUS.DoctorID INNER JOIN Code_Clinic CC WITH(NOLOCK) ON AUS.ClinicID = CC.CodeID INNER JOIN Clinic_Detail CD WITH(NOLOCK) ON CC.CodeID = CD.ClinicID INNER JOIN Code_Area A1 WITH(NOLOCK) ON CD.AreaLevel1ID = A1.CodeID INNER JOIN Code_Area A2 WITH(NOLOCK) ON CD.AreaLevel2ID = A2.CodeID INNER JOIN Company_Master CM WITH(NOLOCK) ON CC.SystemID = CM.SystemID WHERE BookBy = 1) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
             result);
+    }
+
+    @Test
+    public void testSqlServerSquareBrackets() {
+        String originalSql = "SELECT [ID] AS [ComsnCountID] FROM B_ComsnCount;";
+        String pageSql = sqlServer.convertToPageSql(originalSql, 1, 20);
+
+        Assert.assertEquals("SELECT TOP 20 [ComsnCountID] FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, [ComsnCountID] FROM (SELECT [ID] AS [ComsnCountID] FROM B_ComsnCount) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
+                pageSql);
     }
 }
