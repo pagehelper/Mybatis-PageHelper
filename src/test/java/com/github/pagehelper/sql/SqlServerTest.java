@@ -192,10 +192,16 @@ public class SqlServerTest {
             sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
+    /**
+     * JSqlParser的4.4版本对于 UR RS RR CS 作为别名解析错误
+     * 故将UR更改为SUR
+     *
+     * 详见：https://github.com/JSQLParser/JSqlParser/issues/1520
+     */
     @Test
     public void testSql377() {
-        String originalSql = "select distinct u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time from sys_user u left join sys_dept d on u.dept_id = d.dept_id left join sys_user_role ur on u.user_id = ur.user_id left join sys_role r on r.role_id = ur.role_id where u.del_flag = '0' and (r.role_id != 1 or r.role_id IS NULL) and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role ur on u.user_id = ur.user_id and ur.role_id = 1)";
-        Assert.assertEquals("SELECT TOP 10 user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT DISTINCT u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time FROM sys_user u LEFT JOIN sys_dept d ON u.dept_id = d.dept_id LEFT JOIN sys_user_role ur ON u.user_id = ur.user_id LEFT JOIN sys_role r ON r.role_id = ur.role_id WHERE u.del_flag = '0' AND (r.role_id != 1 OR r.role_id IS NULL) AND u.user_id NOT IN (SELECT u.user_id FROM sys_user u INNER JOIN sys_user_role ur ON u.user_id = ur.user_id AND ur.role_id = 1)) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
+        String originalSql = "select distinct u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time from sys_user u left join sys_dept d on u.dept_id = d.dept_id left join sys_user_role sur on u.user_id = sur.user_id left join sys_role r on r.role_id = sur.role_id where u.del_flag = '0' and (r.role_id != 1 or r.role_id IS NULL) and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role sur on u.user_id = sur.user_id and sur.role_id = 1)";
+        Assert.assertEquals("SELECT TOP 10 user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT DISTINCT u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time FROM sys_user u LEFT JOIN sys_dept d ON u.dept_id = d.dept_id LEFT JOIN sys_user_role sur ON u.user_id = sur.user_id LEFT JOIN sys_role r ON r.role_id = sur.role_id WHERE u.del_flag = '0' AND (r.role_id != 1 OR r.role_id IS NULL) AND u.user_id NOT IN (SELECT u.user_id FROM sys_user u INNER JOIN sys_user_role sur ON u.user_id = sur.user_id AND sur.role_id = 1)) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
             sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
