@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.9</version>
+            <version>3.5.10</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
