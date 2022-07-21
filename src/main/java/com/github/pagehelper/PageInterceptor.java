@@ -157,7 +157,14 @@ public class PageInterceptor implements Interceptor {
     private Long count(Executor executor, MappedStatement ms, Object parameter,
                        RowBounds rowBounds, ResultHandler resultHandler,
                        BoundSql boundSql) throws SQLException {
-        String countMsId = ms.getId() + countSuffix;
+        String countMsId = ms.getId();
+        // fix:  手写sql对应_COUNT 保持不变
+        // fix:  selectByExamle对应selectCountByExample
+        if (countMsId.endsWith("selectByExample")){
+            countMsId = ms.getId().replaceAll("selectByExample$", "selectCountByExample");
+        }else{
+            countMsId = ms.getId() + countSuffix;
+        }
         Long count;
         //先判断是否存在手写的 count 查询
         MappedStatement countMs = ExecutorUtil.getExistedMappedStatement(ms.getConfiguration(), countMsId);
