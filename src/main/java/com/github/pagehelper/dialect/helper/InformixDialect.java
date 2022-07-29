@@ -67,18 +67,25 @@ public class InformixDialect extends AbstractHelperDialect {
 
     @Override
     public String getPageSql(String sql, Page page, CacheKey pageKey) {
-        StringBuilder sqlBuilder = new StringBuilder(sql.length() + 40);
-        sqlBuilder.append("SELECT ");
-        if (page.getStartRow() > 0) {
+        tring result = null;
+        String lowerCaseSql = sql.toLowerCase();
+        int selectIndex = lowerCaseSql.indexOf("select");
+        if (selectIndex > -1) {
+          StringBuilder sqlBuilder = new StringBuilder(sql.length() + 40);
+          if (page.getStartRow() > 0) {
             sqlBuilder.append(" SKIP ? ");
-        }
-        if (page.getPageSize() > 0) {
+          }
+          if (page.getPageSize() > 0) {
             sqlBuilder.append(" FIRST ? ");
+          }
+          result =
+              sql.substring(0, selectIndex + 6)
+                  + sqlBuilder.toString()
+                  + " "
+                  + sql.substring(selectIndex + 6);
         }
-        sqlBuilder.append(" * FROM ( \n");
-        sqlBuilder.append(sql);
-        sqlBuilder.append("\n ) TEMP_T ");
-        return sqlBuilder.toString();
+
+        return result;
     }
 
 }
