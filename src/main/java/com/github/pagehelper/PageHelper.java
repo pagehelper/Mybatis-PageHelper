@@ -24,6 +24,7 @@
 
 package com.github.pagehelper;
 
+import com.github.pagehelper.config.PageHelperConfig;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.page.PageAutoDialect;
 import com.github.pagehelper.page.PageBoundSqlInterceptors;
@@ -150,6 +151,9 @@ public class PageHelper extends PageMethod implements Dialect, BoundSqlIntercept
 
     @Override
     public void setProperties(Properties properties) {
+        // 从命令行参数、jvm参数、环境变量、配置文件
+        PageHelperConfig.fillPropertiesByConfig(properties);
+
         setStaticProperties(properties);
         pageParams = new PageParams();
         autoDialect = new PageAutoDialect();
