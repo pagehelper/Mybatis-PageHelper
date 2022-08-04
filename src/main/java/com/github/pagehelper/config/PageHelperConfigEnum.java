@@ -84,5 +84,9 @@ public enum PageHelperConfigEnum {
      * 默认实现中，增加针对 `hikari,druid,tomcat-jdbc,c3p0,dbcp` 类型数据库连接池的特殊处理，直接从配置获取jdbcUrl，当使用其他类型数据源时，仍然使用旧的方式获取连接在读取jdbcUrl。
      * 想要使用和旧版本完全相同方式时，可以配置 `autoDialectClass=old`。当数据库连接池类型非常明确时，建议配置为具体值，例如使用 hikari 时，配置 `autoDialectClass=hikari`，使用其他连接池时，配置为自己的实现类。
      */
-    autoDialectClass
+    autoDialectClass,
+    /**
+     * 是否展示启动banner
+     */
+    banner
 }
