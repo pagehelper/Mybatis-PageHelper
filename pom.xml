@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.9</version>
+            <version>3.5.10</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -145,6 +145,11 @@
             <artifactId>hsqldb</artifactId>
             <version>2.2.9</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.mybatis</groupId>
+            <artifactId>mybatis-config</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <!--
         <dependency>
