@@ -29,6 +29,7 @@ import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MSUtils;
 import com.github.pagehelper.util.StringUtil;
+import io.mybatis.config.ConfigHelper;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.logging.Log;
@@ -70,10 +71,7 @@ public class PageInterceptor implements Interceptor {
     private          String                         default_dialect_class = "com.github.pagehelper.PageHelper";
 
     public PageInterceptor() {
-        String bannerEnabled = System.getProperty("pagehelper.banner");
-        if (StringUtil.isEmpty(bannerEnabled)) {
-            bannerEnabled = System.getenv("PAGEHELPER_BANNER");
-        }
+        String bannerEnabled = ConfigHelper.getStr("pagehelper.banner");
         //默认 TRUE
         if (StringUtil.isEmpty(bannerEnabled) || Boolean.parseBoolean(bannerEnabled)) {
             log.debug("\n\n" +
