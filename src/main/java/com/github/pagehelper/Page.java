@@ -25,9 +25,12 @@
 package com.github.pagehelper;
 
 import com.github.pagehelper.util.SqlSafeUtil;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,6 +42,8 @@ import java.util.List;
  */
 public class Page<E> extends ArrayList<E> implements Closeable {
     private static final long serialVersionUID = 1L;
+
+    private static final Log log = LogFactory.getLog(Page.class);
 
     /**
      * 页码，从1开始
@@ -97,6 +102,23 @@ public class Page<E> extends ArrayList<E> implements Closeable {
      * 分页实现类，可以使用 {@link com.github.pagehelper.page.PageAutoDialect} 类中注册的别名，例如 "mysql", "oracle"
      */
     private String dialectClass;
+
+    /**
+     * 记录当前堆栈,可查找到page在何处创建
+     * 需开启pagehelper.debug
+     */
+    private final StackTraceElement[] stackTraceElements = PageInterceptor.isDebug() ? Thread.currentThread().getStackTrace() : null;
+
+    /**
+     * 输出创建时堆栈
+     */
+    public void printStackTrace() {
+        log.debug(Arrays.toString(getStackTraceElements()));
+    }
+
+    public StackTraceElement[] getStackTraceElements() {
+        return stackTraceElements;
+    }
 
     public Page() {
         super();
