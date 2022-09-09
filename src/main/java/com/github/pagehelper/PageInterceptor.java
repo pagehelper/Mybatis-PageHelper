@@ -26,6 +26,7 @@ package com.github.pagehelper;
 
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
+import com.github.pagehelper.page.PageMethod;
 import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MSUtils;
 import com.github.pagehelper.util.StringUtil;
@@ -74,8 +75,7 @@ public class PageInterceptor implements Interceptor {
         if (StringUtil.isEmpty(bannerEnabled)) {
             bannerEnabled = System.getenv("PAGEHELPER_BANNER");
         }
-        //默认 TRUE
-        if (StringUtil.isEmpty(bannerEnabled) || Boolean.parseBoolean(bannerEnabled)) {
+        if (Boolean.parseBoolean(bannerEnabled) || isDebug()) {
             log.debug("\n\n" +
                 ",------.                           ,--.  ,--.         ,--.                         \n" +
                 "|  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--. \n" +
@@ -86,9 +86,23 @@ public class PageInterceptor implements Interceptor {
         }
     }
 
+    /**
+     * 是否开启debug
+     * @return
+     */
+    public static boolean isDebug() {
+        String debugEnabled = System.getProperty("pagehelper.debug");
+        if (StringUtil.isEmpty(debugEnabled)) {
+            debugEnabled = System.getenv("PAGEHELPER.DEBUG");
+        }
+        //默认 false
+        return Boolean.parseBoolean(debugEnabled);
+    }
+
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         try {
+            debugStackTraceLog();
             Object[] args = invocation.getArgs();
             MappedStatement ms = (MappedStatement) args[0];
             Object parameter = args[1];
@@ -136,6 +150,13 @@ public class PageInterceptor implements Interceptor {
             if(dialect != null){
                 dialect.afterAll();
             }
+        }
+    }
+
+    private static void debugStackTraceLog() {
+        if (isDebug()) {
+            Page<Object> page = PageMethod.getLocalPage();
+            page.printStackTrace();
         }
     }
 
