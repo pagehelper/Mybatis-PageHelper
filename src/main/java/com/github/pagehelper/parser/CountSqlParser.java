@@ -30,6 +30,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.parser.Token;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
@@ -197,6 +198,16 @@ public class CountSqlParser {
         //处理为count查询
         sqlToCount(select, countColumn);
         String result = select.toString();
+        if (selectBody instanceof PlainSelect) {
+            Token token = ((PlainSelect) selectBody).getASTNode().jjtGetFirstToken().specialToken;
+            if (token != null) {
+                String hints = token.toString().trim();
+                // 这里判断是否存在hint, 且result是不包含hint的
+                if (hints.startsWith("/*") && hints.endsWith("*/") && !result.startsWith("/*")) {
+                    result = hints + result;
+                }
+            }
+        }
         return result;
     }
 
