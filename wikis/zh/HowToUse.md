@@ -1,46 +1,65 @@
-## 使用方法  
+## 使用方法
 
-### 1. 引入分页插件  
+### 1. 引入分页插件 <a href="https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper"><img src="https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper/badge.svg"/></a>
 
-引入分页插件有下面2种方式，推荐使用 Maven 方式。  
+#### 1). 使用 Maven
 
-#### 1). 引入 Jar 包  
+在 pom.xml 中添加如下依赖：
 
-你可以从下面的地址中下载最新版本的 jar 包 
+```xml
 
-- https://oss.sonatype.org/content/repositories/releases/com/github/pagehelper/pagehelper/
-
-- https://repo1.maven.org/maven2/com/github/pagehelper/pagehelper/
-
-由于使用了sql 解析工具，你还需要下载 jsqlparser.jar(需要和PageHelper 依赖的版本一致) ：
-
-- https://repo1.maven.org/maven2/com/github/jsqlparser/jsqlparser/
-
-#### 2). 使用 Maven  
-  
-在 pom.xml 中添加如下依赖：  
-
-```xml  
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
     <version>最新版本</version>
 </dependency>
-```  
-最新版本号可以从首页查看。
+```
+
+#### 2). 使用 Gradle
+
+在 `build.gradle` 中添加：
+
+```groovy
+dependencies {
+    compile("com.github.pagehelper:pagehelper:最新版本")
+}
+```
+
+#### 3). 使用 Spring Boot 时 <a href="https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper-spring-boot-starter"><img src="https://maven-badges.herokuapp.com/maven-central/com.github.pagehelper/pagehelper-spring-boot-starter/badge.svg"/></a>
+
+Maven：
+
+```xml
+
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper-spring-boot-starter</artifactId>
+    <version>最新版本</version>
+</dependency>
+```
+
+Gradle:
+
+```groovy
+dependencies {
+    compile("com.github.pagehelper:pagehelper-spring-boot-starter:最新版本")
+}
+```
 
 ### 2. 配置拦截器插件
+
 特别注意，新版拦截器是 `com.github.pagehelper.PageInterceptor`。
 `com.github.pagehelper.PageHelper` 现在是一个特殊的 `dialect` 实现类，是分页插件的默认实现类，提供了和以前相同的用法。
 
 #### 1. 在 MyBatis 配置 xml 中配置拦截器插件
+
 ```xml
-<!-- 
+<!--
     plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下:
-    properties?, settings?, 
-    typeAliases?, typeHandlers?, 
-    objectFactory?,objectWrapperFactory?, 
-    plugins?, 
+    properties?, settings?,
+    typeAliases?, typeHandlers?,
+    objectFactory?,objectWrapperFactory?,
+    plugins?,
     environments?, databaseIdProvider?, mappers?
 -->
 <plugins>
@@ -48,44 +67,129 @@
     <plugin interceptor="com.github.pagehelper.PageInterceptor">
         <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
         <property name="param1" value="value1"/>
-	</plugin>
+    </plugin>
 </plugins>
 ```
-#### 2. 在 Spring 配置文件中配置拦截器插件
-使用 spring 的属性配置方式，可以使用 `plugins` 属性像下面这样配置：    
 
+#### 2. 在 Spring 配置文件中配置拦截器插件
+
+使用 spring 的 XML 配置方式，可以使用 `plugins` 属性像下面这样配置：
 ```xml
 <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
   <!-- 注意其他配置 -->
   <property name="plugins">
     <array>
       <bean class="com.github.pagehelper.PageInterceptor">
-        <property name="properties">
-          <!--使用下面的方式配置参数，一行配置一个 -->
-          <value>
-            params=value1
-          </value>
-        </property>
+          <property name="properties">
+              <!--使用下面的方式配置参数，一行配置一个 -->
+              <value>
+                  params=value1
+              </value>
+          </property>
       </bean>
     </array>
   </property>
 </bean>
-```   
-#### 3. 分页插件参数介绍    
-分页插件提供了多个可选参数，这些参数使用时，按照上面两种配置方式中的示例配置即可。
+```
 
-分页插件可选参数如下：
+#### 3. 在 Spring Boot 中配置
 
-- `dialect`：默认情况下会使用 PageHelper 方式进行分页，如果想要实现自己的分页逻辑，可以实现 `Dialect`(`com.github.pagehelper.Dialect`) 
-接口，然后配置该属性为实现类的全限定名称。
+Spring Boot 引入 starter 后自动生效，对分页插件进行配置时，在 Spring Boot 对应的配置文件 `application.[properties|yaml]` 中配置：
+
+properties:
+
+```properties
+pagehelper.propertyName=propertyValue
+pagehelper.reasonable=false
+pagehelper.defaultCount=true
+```
+
+yaml:
+
+```yaml
+pagehelper:
+  propertyName: propertyValue
+  reasonable: false
+  defaultCount: true # 分页插件默认参数支持 default-count 形式，自定义扩展的参数，必须大小写一致
+```
+
+> 分页插件默认参数支持 default-count 形式，自定义扩展的参数，必须大小写一致。
+>
+>
+支持的默认参数参考: [PageHelperStandardProperties.java](https://github.com/pagehelper/pagehelper-spring-boot/blob/master/pagehelper-spring-boot-autoconfigure/src/main/java/com/github/pagehelper/autoconfigure/PageHelperStandardProperties.java)
+
+#### 4. 分页插件横幅banner设置
+
+为了避免多次配置分页插件导致的错误，配置分页插件后，启动时会输出 banner。
+
+```
+DEBUG [main] -
+
+,------.                           ,--.  ,--.         ,--.
+|  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--.
+|  '--' | ' ,-.  | | .-. | | .-. : |  .--.  | | .-. : |  | | .-. | | .-. : |  .--'
+|  | --'  \ '-'  | ' '-' ' \   --. |  |  |  | \   --. |  | | '-' ' \   --. |  |
+`--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'
+`---'                                   `--'                        is intercepting.
+```
+
+如果在项目启动时输出了多次 banner，就是配置了多次分页插件，根据日志输出的位置排查系统通过哪些方式配置了分页插件。
+
+如果不想在启动时输出 banner，可以通过系统变量或环境变量关闭。
+
+- 系统变量：`-Dpagehelper.banner=false`
+- 环境变量：`PAGEHELPER_BANNER=false`
+
+#### 5. 分页插件参数介绍
+
+分页插件提供了多个可选参数，这些参数使用时，按照上面配置方式中的示例配置即可。
+
+**分页插件可选参数如下：**
+
+1. `debug`: 调试参数，默认 `false` 关闭，设置为 `true` 启用后，可以排查系统中存在的**不安全调用**，[#查看如何安全调用](#3-pagehelper-安全调用)。
+   通过 `PageHelper.startPage` 等静态方法调用设置分页参数时，会记录当前执行的方法堆栈信息，当执行 MyBatis 的查询方法时，会使用设置好的分页参数，
+   此时会输出设置时的方法堆栈，通过查看堆栈，如果和当前执行的方法不一致，那么堆栈中对应的调用就是**不安全调用**，需要根据 [#安全调用](#3-pagehelper-安全调用) 中的方式调整。输出的堆栈示例如下：
+   ```
+   00:19:08.915 [main] DEBUG c.github.pagehelper.PageInterceptor - java.lang.Exception: 设置分页参数时的堆栈信息
+       at com.github.pagehelper.util.StackTraceUtil.current(StackTraceUtil.java:12)
+       at com.github.pagehelper.Page.<init>(Page.java:111)
+       at com.github.pagehelper.Page.<init>(Page.java:126)
+       at com.github.pagehelper.page.PageMethod.startPage(PageMethod.java:139)
+       at com.github.pagehelper.page.PageMethod.startPage(PageMethod.java:113)
+       at com.github.pagehelper.page.PageMethod.startPage(PageMethod.java:102)
+       at com.github.pagehelper.test.basic.PageHelperTest.testNamespaceWithStartPage(PageHelperTest.java:118)
+       ...省略
+
+   00:19:09.069 [main] DEBUG c.g.pagehelper.mapper.UserMapper - Cache Hit Ratio [com.github.pagehelper.mapper.UserMapper]: 0.0
+   00:19:09.077 [main] DEBUG o.a.i.t.jdbc.JdbcTransaction - Opening JDBC Connection
+   00:19:09.078 [main] DEBUG o.a.i.t.jdbc.JdbcTransaction - Setting autocommit to false on JDBC Connection [org.hsqldb.jdbc.JDBCConnection@6da21078]
+   00:19:09.087 [main] DEBUG c.g.p.m.UserMapper.selectAll_COUNT - ==>  Preparing: SELECT count(1) FROM user
+   00:19:09.121 [main] DEBUG c.g.p.m.UserMapper.selectAll_COUNT - ==> Parameters:
+   00:19:09.131 [main] TRACE c.g.p.m.UserMapper.selectAll_COUNT - <==    Columns: C1
+   00:19:09.131 [main] TRACE c.g.p.m.UserMapper.selectAll_COUNT - <==        Row: 183
+   00:19:09.147 [main] DEBUG c.g.p.m.UserMapper.selectAll_COUNT - <==      Total: 1
+   ```
+
+2. `dialect`：默认情况下会使用 PageHelper 方式进行分页，如果想要实现自己的分页逻辑，可以实现 `Dialect`(`com.github.pagehelper.Dialect`)
+   接口，然后配置该属性为实现类的全限定名称。
+
+3. `countSuffix`：根据查询创建或者查找对应的 count 查询时，追加的 msId 后缀，默认 `_COUNT`。
+
+4. `countMsIdGen`（5.3.2+）：count 方法的 msId 生成方式，默认是 查询的 msId +
+   countSuffix，想要自己定义时，可以实现 `com.github.pagehelper.CountMsIdGen` 接口，将该参数配置为实现的全限定类名即可。
+   **一个常见的用途：** 在有Example查询的情况，`selectByExample` 可以使用对应的 `selectCountByExample` 方法进行 count 查询。
+
+5. `msCountCache`：自动创建查询的 count 查询方法时，创建的 count `MappedStatement` 会进行缓存，默认会优先查找 `com.google.common.cache.Cache`
+   的实现，如果项目没有 guava 依赖就会使用 mybatis 内置的 `CacheBuilder` 创建。想要对缓存进行细粒度的配置请参考源码: `com.github.pagehelper.cache.CacheFactory`
+   ，两种默认方案提供了多个属性进行配置，也可以按照这里要求自己扩展实现。
 
 **下面几个参数都是针对默认 dialect 情况下的参数。使用自定义 dialect 实现时，下面的参数没有任何作用。**
 
 1. `helperDialect`：分页插件会自动检测当前的数据库链接，自动选择合适的分页方式。
-你可以配置`helperDialect`属性来指定分页插件使用哪种方言。配置时，可以使用下面的缩写值：  
-`oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`,`derby`  
-<b>特别注意：</b>使用 SqlServer2012 数据库时，需要手动指定为 `sqlserver2012`，否则会使用 SqlServer2005 的方式进行分页。  
-你也可以实现 `AbstractHelperDialect`，然后配置该属性为实现类的全限定名称即可使用自定义的实现方法。
+   你可以配置`helperDialect`属性来指定分页插件使用哪种方言。配置时，可以使用下面的缩写值：
+   `oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`,`derby`
+   <b>特别注意：</b>使用 SqlServer2012 数据库时，需要手动指定为 `sqlserver2012`，否则会使用 SqlServer2005 的方式进行分页。
+   你也可以实现 `AbstractHelperDialect`，然后配置该属性为实现类的全限定名称即可使用自定义的实现方法。
 
 2. `offsetAsPageNum`：默认值为 `false`，该参数对使用 `RowBounds` 作为分页参数时有效。
 当该参数设置为 `true` 时，会将 `RowBounds` 中的 `offset` 参数当成 `pageNum` 使用，可以用页码和页面大小两个参数进行分页。
@@ -103,21 +207,35 @@
 默认值为`pageNum=pageNum;pageSize=pageSize;count=countSql;reasonable=reasonable;pageSizeZero=pageSizeZero`。
 
 7. `supportMethodsArguments`：支持通过 Mapper 接口参数来传递分页参数，默认值`false`，分页插件会从查询方法的参数值中，自动根据上面 `params` 配置的字段中取值，查找到合适的值时就会自动分页。
-使用方法可以参考测试代码中的 `com.github.pagehelper.test.basic` 包下的 `ArgumentsMapTest` 和 `ArgumentsObjTest`。
+   使用方法可以参考测试代码中的 `com.github.pagehelper.test.basic` 包下的 `ArgumentsMapTest` 和 `ArgumentsObjTest`。
 
 8. `autoRuntimeDialect`：默认值为 `false`。设置为 `true` 时，允许在运行时根据多数据源自动识别对应方言的分页
-（不支持自动选择`sqlserver2012`，只能使用`sqlserver`），用法和注意事项参考下面的**场景五**。
+   （不支持自动选择`sqlserver2012`，只能使用`sqlserver`），用法和注意事项参考下面的**场景五**。
 
 9. `closeConn`：默认值为 `true`。当使用运行时动态数据源或没有设置 `helperDialect` 属性自动获取数据库类型时，会自动获取一个数据库连接，
-通过该属性来设置是否关闭获取的这个连接，默认`true`关闭，设置为 `false` 后，不会关闭获取的连接，这个参数的设置要根据自己选择的数据源来决定。
+   通过该属性来设置是否关闭获取的这个连接，默认`true`关闭，设置为 `false` 后，不会关闭获取的连接，这个参数的设置要根据自己选择的数据源来决定。
 
-10. `aggregateFunctions`(5.1.5+)：默认为所有常见数据库的聚合函数，允许手动添加聚合函数（影响行数），所有以聚合函数开头的函数，在进行 count 转换时，会套一层。其他函数和列会被替换为 count(0)，其中count列可以自己配置。
+10. `aggregateFunctions`(5.1.5+)：默认为所有常见数据库的聚合函数，允许手动添加聚合函数（影响行数），所有以聚合函数开头的函数，在进行 count 转换时，会套一层。其他函数和列会被替换为 count(0)
+    ，其中count列可以自己配置。
+
+11. `replaceSql`(sqlserver): 可选值为 `regex` 和 `simple`，默认值空时采用 `regex`
+    方式，也可以自己实现 `com.github.pagehelper.dialect.ReplaceSql` 接口。
+
+12. `sqlCacheClass`(sqlserver): 针对 sqlserver 生成的 count 和 page sql 进行缓存，缓存使用的 `com.github.pagehelper.cache.CacheFactory`
+    ，可选的参数和前面的 `msCountCache` 一样。
+
+13. `autoDialectClass`
+14. `dialectAlias`
+15. `useSqlserver2012`(sqlserver)
+16. `boundSqlInterceptors`
+17. `defaultCount`
+18. `countColumn`
 
 **重要提示：**
 
 当 `offsetAsPageNum=false` 的时候，由于 `PageNum` 问题，`RowBounds`查询的时候 `reasonable` 会强制为 `false`。使用 `PageHelper.startPage` 方法不受影响。
 
-#### 4. 如何选择配置这些参数
+#### 6. 如何选择配置这些参数
 
 单独看每个参数的说明可能是一件让人不爽的事情，这里列举一些可能会用到某些参数的情况。
 
@@ -135,7 +253,7 @@
 你可以使用 `offsetAsPageNum` 参数，将该参数设置为 `true` 后，`offset`会当成 `pageNum` 使用，`limit` 和 `pageSize` 含义相同。
 
 ##### 场景三
- 
+
 如果觉得某个地方使用分页后，你仍然想通过控制参数查询全部的结果，你可以配置 `pageSizeZero` 为 `true`，
 配置后，当 `pageSize=0` 或者 `RowBounds.limit = 0` 就会查询出全部的结果。
 
@@ -153,11 +271,11 @@
 
 当不使用动态数据源而只是自动获取 `helperDialect` 时，数据库连接只会获取一次，所以不需要担心占用的这一个连接是否会导致数据库出错，但是最好也根据数据源的特性选择是否关闭连接。
 
-### 3. 如何在代码中使用  
+### 3. 如何在代码中使用
 
 阅读前请注意看[重要提示](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
 
-分页插件支持以下几种调用方式：  
+分页插件支持以下几种调用方式：
 
 ```java
 //第一种，RowBounds方式的调用
@@ -176,7 +294,7 @@ List<User> list = userMapper.selectIf(1);
 public interface CountryMapper {
     List<User> selectByPageNumSize(
             @Param("user") User user,
-            @Param("pageNum") int pageNum, 
+            @Param("pageNum") int pageNum,
             @Param("pageSize") int pageSize);
 }
 //配置supportMethodsArguments=true
@@ -228,23 +346,24 @@ long total = PageHelper.count(new ISelect() {
     }
 });
 //lambda
-total = PageHelper.count(()->userMapper.selectLike(user));
-```  
+        total=PageHelper.count(()->userMapper.selectLike(user));
+```
 
 下面对最常用的方式进行详细介绍
 
-#### 1). RowBounds方式的调用   
+#### 1). RowBounds方式的调用
 
 ```java
-List<User> list = sqlSession.selectList("x.y.selectIf", null, new RowBounds(1, 10));
-```  
-使用这种调用方式时，你可以使用RowBounds参数进行分页，这种方式侵入性最小，我们可以看到，通过RowBounds方式调用只是使用了这个参数，并没有增加其他任何内容。  
+List<User> list=sqlSession.selectList("x.y.selectIf",null,new RowBounds(1,10));
+```
+
+使用这种调用方式时，你可以使用RowBounds参数进行分页，这种方式侵入性最小，我们可以看到，通过RowBounds方式调用只是使用了这个参数，并没有增加其他任何内容。
 
 分页插件检测到使用了RowBounds参数时，就会对该查询进行<b>物理分页</b>。
 
 关于这种方式的调用，有两个特殊的参数是针对 `RowBounds` 的，你可以参看上面的 **场景一** 和 **场景二**
 
-<b>注：</b>不只有命名空间方式可以用RowBounds，使用接口的时候也可以增加RowBounds参数，例如：  
+<b>注：</b>不只有命名空间方式可以用RowBounds，使用接口的时候也可以增加RowBounds参数，例如：
 
 ```java
 //这种情况下也会进行物理分页查询
@@ -255,11 +374,12 @@ List<User> selectAll(RowBounds rowBounds);
 
 
 #### 2). `PageHelper.startPage` 静态方法调用
+
 除了 `PageHelper.startPage` 方法外，还提供了类似用法的 `PageHelper.offsetPage` 方法。
 
-在你需要进行分页的 MyBatis 查询方法前调用 `PageHelper.startPage` 静态方法即可，紧跟在这个方法后的第一个**MyBatis 查询方法**会被进行分页。  
+在你需要进行分页的 MyBatis 查询方法前调用 `PageHelper.startPage` 静态方法即可，紧跟在这个方法后的第一个**MyBatis 查询方法**会被进行分页。
 
-##### 例一：  
+##### 例一：
 
 ```java
 //获取第1页，10条内容，默认查询总数count
@@ -291,9 +411,9 @@ assertEquals(182, ((Page) list).getTotal());
 //list2
 assertEquals(1, list2.get(0).getId());
 assertEquals(182, list2.size());
-```  
+```
 
-##### 例三，使用`PageInfo`的用法：  
+##### 例三，使用`PageInfo`的用法：
 
 ```java
 //获取第1页，10条内容，默认查询总数count
@@ -332,9 +452,9 @@ assertEquals(true, page.isHasNextPage());
 在 MyBatis 方法中：
 ```java
 List<User> selectByPageNumSize(
-        @Param("user") User user,
-        @Param("pageNumKey") int pageNum, 
-        @Param("pageSizeKey") int pageSize);
+@Param("user") User user,
+@Param("pageNumKey") int pageNum,
+@Param("pageSizeKey") int pageSize);
 ```
 当调用这个方法时，由于同时发现了 `pageNumKey` 和 `pageSizeKey` 参数，这个方法就会被分页。params 提供的几个参数都可以这样使用。
 
@@ -419,4 +539,5 @@ if(param1 != null){
 
 ### 5. Spring Boot 集成示例
 
+- [pagehelper-spring-boot-samples](https://github.com/pagehelper/pagehelper-spring-boot/tree/master/pagehelper-spring-boot-samples)
 - https://github.com/abel533/MyBatis-Spring-Boot
