@@ -111,6 +111,7 @@ public class SqlTest {
             countSqlParser.getSmartCountSql("select name,count(id) from user group by name"));
     }
 
+
     @Test
     public void testSqlParser3() {
         CountSqlParser countSqlParser = new CountSqlParser();
@@ -129,6 +130,14 @@ public class SqlTest {
                 "    AND (\n" +
                 "      Title1 %% ?\n" +
                 "    )\n"));
+    }
+
+    @Test
+    public void testSqlParser4() {
+        CountSqlParser countSqlParser = new CountSqlParser();
+        String sql = countSqlParser.getSmartCountSql("/* test */select name,count(id) from user group by name");
+        Assert.assertEquals("/* test */SELECT count(0) FROM (SELECT name, count(id) FROM user GROUP BY name) table_count",
+                sql );
     }
 
     @Test
