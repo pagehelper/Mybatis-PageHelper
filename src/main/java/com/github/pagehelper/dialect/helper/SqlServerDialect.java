@@ -25,6 +25,7 @@
 package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
@@ -123,6 +124,9 @@ public class SqlServerDialect extends AbstractHelperDialect {
         } else {
             try {
                 this.replaceSql = (ReplaceSql) Class.forName(replaceSql).newInstance();
+                if (this.replaceSql instanceof PageProperties) {
+                    ((PageProperties) this.replaceSql).setProperties(properties);
+                }
             } catch (Exception e) {
                 throw new RuntimeException("replaceSql 参数配置的值不符合要求，可选值为 simple 和 regex，或者是实现了 "
                         + ReplaceSql.class.getCanonicalName() + " 接口的全限定类名", e);

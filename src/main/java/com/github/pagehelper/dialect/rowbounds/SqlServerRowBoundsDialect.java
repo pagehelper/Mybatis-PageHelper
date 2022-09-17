@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.dialect.rowbounds;
 
+import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.dialect.AbstractRowBoundsDialect;
 import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
@@ -79,6 +80,9 @@ public class SqlServerRowBoundsDialect extends AbstractRowBoundsDialect {
         } else {
             try {
                 this.replaceSql = (ReplaceSql) Class.forName(replaceSql).newInstance();
+                if (this.replaceSql instanceof PageProperties) {
+                    ((PageProperties) this.replaceSql).setProperties(properties);
+                }
             } catch (Exception e) {
                 throw new RuntimeException("replaceSql 参数配置的值不符合要求，可选值为 simple 和 regex，或者是实现了 "
                         + ReplaceSql.class.getCanonicalName() + " 接口的全限定类名", e);

@@ -25,6 +25,7 @@
 package com.github.pagehelper.cache;
 
 import com.github.pagehelper.PageException;
+import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.util.StringUtil;
 
 import java.lang.reflect.Constructor;
@@ -58,7 +59,11 @@ public abstract class CacheFactory {
                     Constructor<? extends Cache> constructor = clazz.getConstructor(Properties.class, String.class);
                     return constructor.newInstance(properties, prefix);
                 } catch (Exception e) {
-                    return clazz.newInstance();
+                    Cache cache = clazz.newInstance();
+                    if (cache instanceof PageProperties) {
+                        ((PageProperties) cache).setProperties(properties);
+                    }
+                    return cache;
                 }
             } catch (Throwable t) {
                 throw new PageException("Created Sql Cache [" + sqlCacheClass + "] Error", t);

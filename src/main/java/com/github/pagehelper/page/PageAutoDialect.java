@@ -27,6 +27,7 @@ package com.github.pagehelper.page;
 import com.github.pagehelper.AutoDialect;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageException;
+import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.dialect.auto.*;
 import com.github.pagehelper.dialect.helper.*;
@@ -264,6 +265,9 @@ public class PageAutoDialect {
                     autoDialectClass = (Class<AutoDialect>) Class.forName(autoDialectClassStr);
                 }
                 this.autoDialectDelegate = autoDialectClass.getConstructor().newInstance();
+                if (this.autoDialectDelegate instanceof PageProperties) {
+                    ((PageProperties) this.autoDialectDelegate).setProperties(properties);
+                }
             } catch (ClassNotFoundException e) {
                 throw new IllegalArgumentException("请确保 autoDialectClass 配置的 AutoDialect 实现类(" + autoDialectClassStr + ")存在!", e);
             } catch (Exception e) {

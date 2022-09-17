@@ -2,6 +2,7 @@ package com.github.pagehelper.page;
 
 import com.github.pagehelper.BoundSqlInterceptor;
 import com.github.pagehelper.BoundSqlInterceptorChain;
+import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.util.StringUtil;
 
 import java.util.ArrayList;
@@ -20,7 +21,11 @@ public class PageBoundSqlInterceptors {
             List<BoundSqlInterceptor> list = new ArrayList<BoundSqlInterceptor>();
             for (int i = 0; i < boundSqlInterceptors.length; i++) {
                 try {
-                    list.add((BoundSqlInterceptor) Class.forName(boundSqlInterceptors[i]).newInstance());
+                    BoundSqlInterceptor boundSqlInterceptor = (BoundSqlInterceptor) Class.forName(boundSqlInterceptors[i]).newInstance();
+                    if (boundSqlInterceptor instanceof PageProperties) {
+                        ((PageProperties) boundSqlInterceptor).setProperties(properties);
+                    }
+                    list.add(boundSqlInterceptor);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
