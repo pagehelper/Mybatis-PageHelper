@@ -41,6 +41,7 @@
 
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="debug" value="true"/>
             <!-- dialect参数可以忽略不写 -->
             <!-- 如果需要用自己的实现方法，可以将value写成类的全限定名称 -->
             <!-- 如下所示，该类必须继承Parser接口 -->

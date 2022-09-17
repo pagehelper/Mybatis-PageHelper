@@ -64,6 +64,7 @@ import java.util.Properties;
 )
 public class PageInterceptor implements Interceptor {
     private static final Log                            log                   = LogFactory.getLog(PageInterceptor.class);
+    private static       boolean                        debug                 = false;
     protected            Cache<String, MappedStatement> msCountMap            = null;
     protected            CountMsIdGen                   countMsIdGen          = CountMsIdGen.DEFAULT;
     private volatile     Dialect                        dialect;
@@ -75,7 +76,8 @@ public class PageInterceptor implements Interceptor {
         if (StringUtil.isEmpty(bannerEnabled)) {
             bannerEnabled = System.getenv("PAGEHELPER_BANNER");
         }
-        if (Boolean.parseBoolean(bannerEnabled) || isDebug()) {
+        //默认 TRUE
+        if (StringUtil.isEmpty(bannerEnabled) || Boolean.parseBoolean(bannerEnabled)) {
             log.debug("\n\n" +
                     ",------.                           ,--.  ,--.         ,--.                         \n" +
                     "|  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--. \n" +
@@ -86,23 +88,23 @@ public class PageInterceptor implements Interceptor {
         }
     }
 
-    /**
-     * 是否开启debug
-     * @return
-     */
     public static boolean isDebug() {
-        String debugEnabled = System.getProperty("pagehelper.debug");
-        if (StringUtil.isEmpty(debugEnabled)) {
-            debugEnabled = System.getenv("PAGEHELPER.DEBUG");
+        return debug;
+    }
+
+    /**
+     * 输出启用分页方法时的调用堆栈信息
+     */
+    protected void debugStackTraceLog() {
+        if (isDebug()) {
+            Page<Object> page = PageMethod.getLocalPage();
+            log.debug(page.getStackTrace());
         }
-        //默认 false
-        return Boolean.parseBoolean(debugEnabled);
     }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         try {
-            debugStackTraceLog();
             Object[] args = invocation.getArgs();
             MappedStatement ms = (MappedStatement) args[0];
             Object parameter = args[1];
@@ -129,6 +131,9 @@ public class PageInterceptor implements Interceptor {
             List resultList;
             //调用方法判断是否需要进行分页，如果不需要，直接返回结果
             if (!dialect.skip(ms, parameter, rowBounds)) {
+                //开启debug时，输出触发当前分页执行时的PageHelper调用堆栈
+                // 如果和当前调用堆栈不一致，说明在启用分页后没有消费，当前线程再次执行时消费，调用堆栈显示的方法使用不安全
+                debugStackTraceLog();
                 //判断是否需要进行 count 查询
                 if (dialect.beforeCount(ms, parameter, rowBounds)) {
                     //查询总数
@@ -150,13 +155,6 @@ public class PageInterceptor implements Interceptor {
             if (dialect != null) {
                 dialect.afterAll();
             }
-        }
-    }
-
-    private static void debugStackTraceLog() {
-        if (isDebug()) {
-            Page<Object> page = PageMethod.getLocalPage();
-            page.printStackTrace();
         }
     }
 
@@ -226,6 +224,9 @@ public class PageInterceptor implements Interceptor {
         if (StringUtil.isNotEmpty(countSuffix)) {
             this.countSuffix = countSuffix;
         }
+
+        // debug模式，用于排查不安全分页调用
+        debug = Boolean.parseBoolean(properties.getProperty("debug"));
 
         // 通过 countMsId 配置自定义类
         String countMsIdGenClass = properties.getProperty("countMsIdGen");

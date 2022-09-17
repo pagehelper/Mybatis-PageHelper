@@ -25,6 +25,7 @@
 package com.github.pagehelper;
 
 import com.github.pagehelper.util.SqlSafeUtil;
+import com.github.pagehelper.util.StackTraceUtil;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
@@ -107,17 +108,10 @@ public class Page<E> extends ArrayList<E> implements Closeable {
      * 记录当前堆栈,可查找到page在何处创建
      * 需开启pagehelper.debug
      */
-    private final StackTraceElement[] stackTraceElements = PageInterceptor.isDebug() ? Thread.currentThread().getStackTrace() : null;
+    private final String stackTrace = PageInterceptor.isDebug() ? StackTraceUtil.current() : null;
 
-    /**
-     * 输出创建时堆栈
-     */
-    public void printStackTrace() {
-        log.debug(Arrays.toString(getStackTraceElements()));
-    }
-
-    public StackTraceElement[] getStackTraceElements() {
-        return stackTraceElements;
+    public String getStackTrace() {
+        return stackTrace;
     }
 
     public Page() {
