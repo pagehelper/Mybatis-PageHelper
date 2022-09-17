@@ -56,18 +56,18 @@ import java.util.Properties;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Intercepts(
-    {
-        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
-        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
-    }
+        {
+                @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+                @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
+        }
 )
 public class PageInterceptor implements Interceptor {
-    private static final Log log = LogFactory.getLog(PageInterceptor.class);
-
-    private volatile Dialect                        dialect;
-    private          String                         countSuffix           = "_COUNT";
-    protected        Cache<String, MappedStatement> msCountMap            = null;
-    private          String                         default_dialect_class = "com.github.pagehelper.PageHelper";
+    private static final Log                            log                   = LogFactory.getLog(PageInterceptor.class);
+    protected            Cache<String, MappedStatement> msCountMap            = null;
+    protected            CountMsIdGen                   countMsIdGen          = CountMsIdGen.DEFAULT;
+    private volatile     Dialect                        dialect;
+    private              String                         countSuffix           = "_COUNT";
+    private              String                         default_dialect_class = "com.github.pagehelper.PageHelper";
 
     public PageInterceptor() {
         String bannerEnabled = System.getProperty("pagehelper.banner");
@@ -77,12 +77,12 @@ public class PageInterceptor implements Interceptor {
         //默认 TRUE
         if (StringUtil.isEmpty(bannerEnabled) || Boolean.parseBoolean(bannerEnabled)) {
             log.debug("\n\n" +
-                ",------.                           ,--.  ,--.         ,--.                         \n" +
-                "|  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--. \n" +
-                "|  '--' | ' ,-.  | | .-. | | .-. : |  .--.  | | .-. : |  | | .-. | | .-. : |  .--' \n" +
-                "|  | --'  \\ '-'  | ' '-' ' \\   --. |  |  |  | \\   --. |  | | '-' ' \\   --. |  |    \n" +
-                "`--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'    \n" +
-                "                   `---'                                   `--'                        is intercepting.\n");
+                    ",------.                           ,--.  ,--.         ,--.                         \n" +
+                    "|  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--. \n" +
+                    "|  '--' | ' ,-.  | | .-. | | .-. : |  .--.  | | .-. : |  | | .-. | | .-. : |  .--' \n" +
+                    "|  | --'  \\ '-'  | ' '-' ' \\   --. |  |  |  | \\   --. |  | | '-' ' \\   --. |  |    \n" +
+                    "`--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'    \n" +
+                    "                   `---'                                   `--'                        is intercepting.\n");
         }
     }
 
@@ -133,7 +133,7 @@ public class PageInterceptor implements Interceptor {
             }
             return dialect.afterPage(resultList, parameter, rowBounds);
         } finally {
-            if(dialect != null){
+            if (dialect != null) {
                 dialect.afterAll();
             }
         }
@@ -157,7 +157,7 @@ public class PageInterceptor implements Interceptor {
     private Long count(Executor executor, MappedStatement ms, Object parameter,
                        RowBounds rowBounds, ResultHandler resultHandler,
                        BoundSql boundSql) throws SQLException {
-        String countMsId = ms.getId() + countSuffix;
+        String countMsId = countMsIdGen.genCountMsId(ms, parameter, boundSql, countSuffix);
         Long count;
         //先判断是否存在手写的 count 查询
         MappedStatement countMs = ExecutorUtil.getExistedMappedStatement(ms.getConfiguration(), countMsId);
@@ -204,6 +204,20 @@ public class PageInterceptor implements Interceptor {
         String countSuffix = properties.getProperty("countSuffix");
         if (StringUtil.isNotEmpty(countSuffix)) {
             this.countSuffix = countSuffix;
+        }
+
+        // 通过 countMsId 配置自定义类
+        String countMsIdGenClass = properties.getProperty("countMsIdGen");
+        if (StringUtil.isNotEmpty(countMsIdGenClass)) {
+            try {
+                Class<?> aClass = Class.forName(countMsIdGenClass);
+                countMsIdGen = (CountMsIdGen) aClass.newInstance();
+                if (countMsIdGen instanceof PageProperties) {
+                    ((PageProperties) countMsIdGen).setProperties(properties);
+                }
+            } catch (Exception e) {
+                throw new PageException(e);
+            }
         }
     }
 
