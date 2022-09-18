@@ -35,38 +35,38 @@ GitHub项目：https://github.com/mybatis-book/book
 
 ```java
 static {
-    //注册别名
-    registerDialectAlias("hsqldb", HsqldbDialect.class);
-    registerDialectAlias("h2", HsqldbDialect.class);
-    registerDialectAlias("phoenix", HsqldbDialect.class);
-    registerDialectAlias("postgresql", PostgreSqlDialect.class);
-    registerDialectAlias("mysql", MySqlDialect.class); 
-    registerDialectAlias("mariadb", MySqlDialect.class); 
-    registerDialectAlias("sqlite", MySqlDialect.class);
-    registerDialectAlias("herddb", HerdDBDialect.class);
-    registerDialectAlias("oracle", OracleDialect.class); 
-    registerDialectAlias("oracle9i", Oracle9iDialect.class); 
-    registerDialectAlias("db2", Db2Dialect.class); 
-    registerDialectAlias("informix", InformixDialect.class); 
-    //解决 informix-sqli #129，仍然保留上面的 
-    registerDialectAlias("informix-sqli", InformixDialect.class);
-    registerDialectAlias("sqlserver", SqlServerDialect.class); 
-    registerDialectAlias("sqlserver2012", SqlServer2012Dialect.class);
-    registerDialectAlias("derby", SqlServer2012Dialect.class); 
-    //达梦数据库,https://github.com/mybatis-book/book/issues/43 
-    registerDialectAlias("dm", OracleDialect.class); 
-    //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281 
-    registerDialectAlias("edb", OracleDialect.class); 
-    //神通数据库 
-    registerDialectAlias("oscar", OscarDialect.class); 
-    registerDialectAlias("clickhouse", MySqlDialect.class); 
-    //瀚高数据库 
-    registerDialectAlias("highgo", HsqldbDialect.class); 
-    //虚谷数据库 
-    registerDialectAlias("xugu", HsqldbDialect.class); 
-    //人大金仓数据库
-    registerDialectAlias("kingbase", PostgreSqlDialect.class);
-}
+        //注册别名
+        registerDialectAlias("hsqldb",HsqldbDialect.class);
+        registerDialectAlias("h2",HsqldbDialect.class);
+        registerDialectAlias("phoenix",HsqldbDialect.class);
+        registerDialectAlias("postgresql",PostgreSqlDialect.class);
+        registerDialectAlias("mysql",MySqlDialect.class);
+        registerDialectAlias("mariadb",MySqlDialect.class);
+        registerDialectAlias("sqlite",MySqlDialect.class);
+        registerDialectAlias("herddb",HerdDBDialect.class);
+        registerDialectAlias("oracle",OracleDialect.class);
+        registerDialectAlias("oracle9i",Oracle9iDialect.class);
+        registerDialectAlias("db2",Db2Dialect.class);
+        registerDialectAlias("informix",InformixDialect.class);
+        //解决 informix-sqli #129，仍然保留上面的
+        registerDialectAlias("informix-sqli",InformixDialect.class);
+        registerDialectAlias("sqlserver",SqlServerDialect.class);
+        registerDialectAlias("sqlserver2012",SqlServer2012Dialect.class);
+        registerDialectAlias("derby",SqlServer2012Dialect.class);
+        //达梦数据库,https://github.com/mybatis-book/book/issues/43
+        registerDialectAlias("dm",OracleDialect.class);
+        //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281
+        registerDialectAlias("edb",OracleDialect.class);
+        //神通数据库
+        registerDialectAlias("oscar",OscarDialect.class);
+        registerDialectAlias("clickhouse",MySqlDialect.class);
+        //瀚高数据库
+        registerDialectAlias("highgo",HsqldbDialect.class);
+        //虚谷数据库
+        registerDialectAlias("xugu",HsqldbDialect.class);
+        //人大金仓数据库
+        registerDialectAlias("kingbase",PostgreSqlDialect.class);
+        }
 ```
 
 >如果你使用的数据库不在这个列表时，你可以配置 `dialectAlias` 参数。
@@ -77,7 +77,7 @@ static {
 ><property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
 >```
 
-## 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java) 
+## 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java)
 [Executor 拦截器高级教程 - QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md)
 
 ## 分页插件 5.0
@@ -90,19 +90,21 @@ static {
 > pagehelper 和 jsqlparser 对应关系参考 pom.xml 中的依赖版本。
 
 如果你使用 Maven，你只需要在 pom.xml 中添加下面的依赖：
-```xml  
+
+```xml
+
 <dependency>
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
     <version>最新版本</version>
 </dependency>
-```  
+```
 
 如果你使用 Spring Boot 可以参考： [pagehelper-spring-boot-starter](https://github.com/pagehelper/pagehelper-spring-boot)
 
 [继续查看配置和用法](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)
 
-## 文档：  
+## 文档：
 
 - [如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)
 - [更新日志](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Changelog.md)
@@ -115,6 +117,7 @@ static {
 - [集成 Spring Boot](https://github.com/abel533/MyBatis-Spring-Boot)
 
 ## 提交 BUG
+
 - [提交到 github](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
 - [提交到 gitosc](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
@@ -122,6 +125,14 @@ static {
 
 <a href="https://www.jetbrains.com/?from=Mybatis-PageHelper" target="_blank">
 <img src="https://user-images.githubusercontent.com/1787798/69898077-4f4e3d00-138f-11ea-81f9-96fb7c49da89.png" height="200"/></a>
+
+## 项目的发展离不开你的支持
+
+### 请作者喝杯咖啡吧！
+
+<img src="ali_pay.png" height="300"/>
+
+<img src="wx_pay.png" height="300"/>
 
 ## 作者信息
 
@@ -138,9 +149,11 @@ static {
 本项目在 gitosc 的项目地址：http://git.oschina.net/free/Mybatis_PageHelper
 
 ## MyBatis-3
-- 项目：https://github.com/mybatis/mybatis-3
-- 文档：http://mybatis.github.io/mybatis-3/zh/index.html  
 
-MyBatis 专栏： 
+- 项目：https://github.com/mybatis/mybatis-3
+- 文档：http://mybatis.github.io/mybatis-3/zh/index.html
+
+MyBatis 专栏：
+
 - [MyBatis示例](http://blog.csdn.net/column/details/mybatis-sample.html)
-- [MyBatis问题集](http://blog.csdn.net/column/details/mybatisqa.html)  
+- [MyBatis问题集](http://blog.csdn.net/column/details/mybatisqa.html)

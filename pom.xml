@@ -65,12 +65,12 @@
         <dependency>
             <groupId>com.github.jsqlparser</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>4.2</version>
+            <version>4.5</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.9</version>
+            <version>3.5.10</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.2.9</version>
+            <version>1.2.12</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -138,7 +138,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
+            <version>1.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
