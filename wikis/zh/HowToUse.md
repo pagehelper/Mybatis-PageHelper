@@ -193,7 +193,7 @@ DEBUG [main] -
    将2012改为sqlserver的默认方式。
    你也可以实现 `AbstractHelperDialect`，然后配置该属性为实现类的全限定名称即可使用自定义的实现方法。
 
-2. `dialectAlias`：，允许配置自定义实现的 别名，可以用于根据 JDBCURL 自动获取对应实现，允许通过此种方式覆盖已有的实现，配置示例如（多个时分号隔开）：
+2. `dialectAlias`：允许配置自定义实现的 别名，可以用于根据 JDBCURL 自动获取对应实现，允许通过此种方式覆盖已有的实现，配置示例如（多个时分号隔开）：
    ```xml
    <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
    ```

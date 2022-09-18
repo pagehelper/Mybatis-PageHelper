@@ -1,6 +1,26 @@
 ## Changelog
 
-### 5.3.1
+### 5.3.2 - 2022-09-18
+
+- Use document update, all parameters are included, the default home page document changed to Chinese.
+- Add support for kingbase. by **HanHuimin001**
+- Add 'debug' parameter, default 'false', turn on 'debug' mode when 'true', call stack will be recorded after 'debug'
+  mode starts. by **huyingqian**
+- add supports for count sql hint syntax. by **zhanliquan**
+- Add a `PageProperties` interface, which can be used by the instantiated extension class inside the framework to obtain
+  the paging plug-in configuration.
+- To add the `CountMsIdGen` interface, you can configure a custom implementation class by `CountMsIdGen`, which is used
+  to generate the msId for the query corresponding to the COUNT query. The default implementation is still `countSuffix`
+  , with extensions like 'selectByExample' mapped to the corresponding 'selectCountByExample' method.
+- Added `keepOrderBy` and `keepSubSelectOrderBy` configurations.
+- Add the `sqlParser` configuration and add the `JSqlParser` interface to solve the problem that JSqlParser and JDK
+  compatibility cause no additional configuration.
+- The test uses the Logback logging framework and removes log4j.
+- Resolve that 'dialectKey' is empty resulting in NPE，fixed #656
+
+For a detailed description of the above parameters, see [**How to use PageHelper**](HowToUse.md).
+
+### 5.3.1 - 2022-06-14
 
 - Resolve CVE-2022-28111 vulnerability, limit the order by parameter, avoid SQL injection
 - Add support for as400. **by bluezealot**
@@ -26,12 +46,12 @@
   variable `PAGEHELPER_BANNER=false`.
   ```
    DEBUG [main] -
-   
-   ,------.                           ,--.  ,--.         ,--.                         
+
+   ,------.                           ,--.  ,--.         ,--.
    |  .--. '  ,--,--.  ,---.   ,---.  |  '--'  |  ,---.  |  |  ,---.   ,---.  ,--.--.
    |  '--' | ' ,-.  | | .-. | | .-. : |  .--.  | | .-. : |  | | .-. | | .-. : |  .--'
-   |  | --'  \ '-'  | ' '-' ' \   --. |  |  |  | \   --. |  | | '-' ' \   --. |  |    
-   `--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'    
+   |  | --'  \ '-'  | ' '-' ' \   --. |  |  |  | \   --. |  | | '-' ' \   --. |  |
+   `--'       `--`--' .`-  /   `----' `--'  `--'  `----' `--' |  |-'   `----' `--'
    `---'                                   `--'                        is intercepting.
    ```
   The purpose of adding banner is that if you configure paging plug-ins multiple times, you will see banner output
@@ -533,13 +553,13 @@ Because the `selectLeftjoin_COUNT` method is invoked automatically, there is no 
 The above method to perform the portion of the output log is as follows：
 ```
 DEBUG [main] - ==>  Preparing: select count(distinct a.id) from user a left join user b on a.id = b.id
-DEBUG [main] - ==> Parameters: 
+DEBUG [main] - ==> Parameters:
 TRACE [main] - <==    Columns: C1
 TRACE [main] - <==        Row: 183
 DEBUG [main] - <==      Total: 1
 DEBUG [main] - Cache Hit Ratio [com.github.pagehelper.mapper.CountryMapper]: 0.0
 DEBUG [main] - ==>  Preparing: select a.id,b.name,a.py from user a left join user b on a.id = b.id order by a.id LIMIT 10
-DEBUG [main] - ==> Parameters: 
+DEBUG [main] - ==> Parameters:
 TRACE [main] - <==    Columns: ID, COUNTRYNAME, COUNTRYCODE
 TRACE [main] - <==        Row: 1, Angola, AO
 TRACE [main] - <==        Row: 2, Afghanistan, AF
@@ -571,9 +591,11 @@ TRACE [main] - <==        Row: 3, Albania, AL
 - New pagination plugin only a `dialect` parameter, the default `dialect` is `PageHelper`
 - `PageHelper` continue to support previously provided parameters, Among the latest to use the document has been fully updated
 - `PageHelper` has a `helperDialect` parameter which is the same functional as the previous `dialect`
-- Added paging implementation based on pure `RowBounds` and `PageRowBounds`, 
-in `com.github. pagehelper. dialect. rowbounds` package, it is used as `dialect` Parameter sample implementation, more detailed documentation will be added later
-- Removed inappropriate orderby functions that appear in pagination plugin. It will provide a separate sort plug-ins in the future
+- Added paging implementation based on pure `RowBounds` and `PageRowBounds`,
+  in `com.github. pagehelper. dialect. rowbounds` package, it is used as `dialect` Parameter sample implementation, more
+  detailed documentation will be added later
+- Removed inappropriate orderby functions that appear in pagination plugin. It will provide a separate sort plug-ins in
+  the future
 - Remove `PageHelper` are less commonly used methods
 - A new document, an important part of the update has been mentioned in the changelog, provides the English version of this document
 - fix bug [#149](http://git.oschina.net/free/Mybatis_PageHelper/issues/149)
