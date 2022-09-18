@@ -94,7 +94,7 @@ public class DataSourceNegotiationAutoDialect implements AutoDialect<String> {
 
     @Override
     public AbstractHelperDialect extractDialect(String dialectKey, MappedStatement ms, DataSource dataSource, Properties properties) {
-        if (urlMap.containsKey(dialectKey)) {
+        if (dialectKey != null && urlMap.containsKey(dialectKey)) {
             return urlMap.get(dialectKey).extractDialect(dialectKey, ms, dataSource, properties);
         }
         //都不匹配的时候使用默认方式
