@@ -55,9 +55,6 @@ public class PageHelper extends PageMethod implements Dialect, BoundSqlIntercept
 
     @Override
     public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
-        if (ms.getId().endsWith(MSUtils.COUNT)) {
-            throw new RuntimeException("在系统中发现了多个分页插件，请检查系统配置!");
-        }
         Page page = pageParams.getPage(parameterObject, rowBounds);
         if (page == null) {
             return true;

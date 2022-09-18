@@ -37,7 +37,6 @@ import java.util.List;
  * @author liuzh
  */
 public class MSUtils {
-    public static final String COUNT = "_COUNT";
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
 
     /**
@@ -76,13 +75,4 @@ public class MSUtils {
         return builder.build();
     }
 
-    /**
-     * 新建count查询的MappedStatement
-     *
-     * @param ms
-     * @return
-     */
-    public static MappedStatement newCountMappedStatement(MappedStatement ms) {
-        return newCountMappedStatement(ms, ms.getId() + COUNT);
-    }
 }
