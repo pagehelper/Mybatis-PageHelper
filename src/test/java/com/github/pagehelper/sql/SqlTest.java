@@ -41,6 +41,10 @@ public class SqlTest {
     @Test
     public void testSqlParser() {
         CountSqlParser countSqlParser = new CountSqlParser();
+
+        Assert.assertEquals("WITH AA AS (SELECT 1 FROM A1), BB AS (SELECT 1 FROM B2), AB AS (SELECT * FROM AA UNION ALL SELECT * FROM BB) SELECT count(0) FROM AB",
+                countSqlParser.getSmartCountSql("WITH AA AS (SELECT 1 FROM A1), BB AS (SELECT 1 FROM B2), AB AS (SELECT * FROM AA UNION ALL SELECT * FROM BB) SELECT * FROM AB"));
+
         Assert.assertEquals("WITH cr AS (SELECT UserRegionCode FROM person.UserRegion WHERE Name LIKE 'C%') SELECT count(0) FROM person.StateProvince WHERE UserRegionCode IN (SELECT * FROM cr)",
                 countSqlParser.getSmartCountSql("with " +
                         "cr as " +
