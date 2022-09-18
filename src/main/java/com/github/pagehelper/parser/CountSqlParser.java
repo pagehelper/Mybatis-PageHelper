@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.parser;
 
+import com.github.pagehelper.page.PageMethod;
 import com.github.pagehelper.util.StringUtil;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
@@ -175,7 +176,7 @@ public class CountSqlParser {
         //解析SQL
         Statement stmt = null;
         //特殊sql不需要去掉order by时，使用注释前缀
-        if(sql.indexOf(KEEP_ORDERBY) >= 0){
+        if (sql.indexOf(KEEP_ORDERBY) >= 0 || keepOrderBy()) {
             return getSimpleCountSql(sql, countColumn);
         }
         try {
@@ -326,7 +327,7 @@ public class CountSqlParser {
                 processPlainSelect((PlainSelect) selectBody);
             } else if (selectBody instanceof WithItem) {
                 WithItem withItem = (WithItem) selectBody;
-                if (withItem.getSubSelect() != null) {
+                if (withItem.getSubSelect() != null && !keepSubSelectOrderBy()) {
                     processSelectBody(withItem.getSubSelect().getSelectBody());
                 }
             } else {
@@ -374,7 +375,7 @@ public class CountSqlParser {
     public void processWithItemsList(List<WithItem> withItemsList) {
         if (withItemsList != null && withItemsList.size() > 0) {
             for (WithItem item : withItemsList) {
-                if (item.getSubSelect() != null) {
+                if (item.getSubSelect() != null && !keepSubSelectOrderBy()) {
                     processSelectBody(item.getSubSelect().getSelectBody());
                 }
             }
@@ -401,7 +402,7 @@ public class CountSqlParser {
             }
         } else if (fromItem instanceof SubSelect) {
             SubSelect subSelect = (SubSelect) fromItem;
-            if (subSelect.getSelectBody() != null) {
+            if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
                 processSelectBody(subSelect.getSelectBody());
             }
         } else if (fromItem instanceof ValuesList) {
@@ -410,12 +411,26 @@ public class CountSqlParser {
             LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
             if (lateralSubSelect.getSubSelect() != null) {
                 SubSelect subSelect = lateralSubSelect.getSubSelect();
-                if (subSelect.getSelectBody() != null) {
+                if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
                     processSelectBody(subSelect.getSelectBody());
                 }
             }
         }
         //Table时不用处理
+    }
+
+    /**
+     * 保留 order by
+     */
+    protected boolean keepOrderBy() {
+        return PageMethod.getLocalPage() != null && PageMethod.getLocalPage().keepOrderBy();
+    }
+
+    /**
+     * 保留子查询 order by
+     */
+    protected boolean keepSubSelectOrderBy() {
+        return PageMethod.getLocalPage() != null && PageMethod.getLocalPage().keepSubSelectOrderBy();
     }
 
     /**

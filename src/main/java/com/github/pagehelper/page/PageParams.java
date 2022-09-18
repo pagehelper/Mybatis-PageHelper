@@ -41,17 +41,21 @@ import java.util.Properties;
  */
 public class PageParams {
     //RowBounds参数offset作为PageNum使用 - 默认不使用
-    protected boolean offsetAsPageNum = false;
+    protected boolean offsetAsPageNum         = false;
     //RowBounds是否进行count查询 - 默认不查询
-    protected boolean rowBoundsWithCount = false;
+    protected boolean rowBoundsWithCount      = false;
     //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
-    protected boolean pageSizeZero = false;
+    protected boolean pageSizeZero            = false;
     //分页合理化
-    protected boolean reasonable = false;
+    protected boolean reasonable              = false;
     //是否支持接口参数来传递分页参数，默认false
     protected boolean supportMethodsArguments = false;
     //默认count(0)
-    protected String countColumn = "0";
+    protected String  countColumn             = "0";
+    //转换count查询时保留 order by 排序
+    private   boolean keepOrderBy             = false;
+    //转换count查询时保留子查询的 order by 排序
+    private   boolean keepSubSelectOrderBy    = false;
 
     /**
      * 获取分页参数
@@ -71,18 +75,18 @@ public class PageParams {
                     //offsetAsPageNum=false的时候，由于PageNum问题，不能使用reasonable，这里会强制为false
                     page.setReasonable(false);
                 }
-                if(rowBounds instanceof PageRowBounds){
-                    PageRowBounds pageRowBounds = (PageRowBounds)rowBounds;
+                if (rowBounds instanceof PageRowBounds) {
+                    PageRowBounds pageRowBounds = (PageRowBounds) rowBounds;
                     page.setCount(pageRowBounds.getCount() == null || pageRowBounds.getCount());
                 }
-            } else if(parameterObject instanceof IPage || supportMethodsArguments){
+            } else if (parameterObject instanceof IPage || supportMethodsArguments) {
                 try {
                     page = PageObjectUtil.getPageFromObject(parameterObject, false);
                 } catch (Exception e) {
                     return null;
                 }
             }
-            if(page == null){
+            if (page == null) {
                 return null;
             }
             PageHelper.setLocalPage(page);
@@ -94,6 +98,12 @@ public class PageParams {
         //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
         if (page.getPageSizeZero() == null) {
             page.setPageSizeZero(pageSizeZero);
+        }
+        if (page.getKeepOrderBy() == null) {
+            page.setKeepOrderBy(keepOrderBy);
+        }
+        if (page.getKeepSubSelectOrderBy() == null) {
+            page.setKeepSubSelectOrderBy(keepSubSelectOrderBy);
         }
         return page;
     }
@@ -116,12 +126,16 @@ public class PageParams {
         this.supportMethodsArguments = Boolean.parseBoolean(supportMethodsArguments);
         //默认count列
         String countColumn = properties.getProperty("countColumn");
-        if(StringUtil.isNotEmpty(countColumn)){
+        if (StringUtil.isNotEmpty(countColumn)) {
             this.countColumn = countColumn;
         }
         //当offsetAsPageNum=false的时候，不能
         //参数映射
         PageObjectUtil.setParams(properties.getProperty("params"));
+        // count查询时，是否保留查询中的 order by
+        keepOrderBy = Boolean.parseBoolean(properties.getProperty("keepOrderBy"));
+        // count查询时，是否保留子查询中的 order by
+        keepSubSelectOrderBy = Boolean.parseBoolean(properties.getProperty("keepSubSelectOrderBy"));
     }
 
     public boolean isOffsetAsPageNum() {

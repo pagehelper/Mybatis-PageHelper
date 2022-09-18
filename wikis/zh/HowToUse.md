@@ -247,14 +247,20 @@ DEBUG [main] -
     默认实现中，增加针对 `hikari,druid,tomcat-jdbc,c3p0,dbcp` 类型数据库连接池的特殊处理，直接从配置获取jdbcUrl，当使用其他类型数据源时，仍然使用旧的方式获取连接在读取jdbcUrl。
     想要使用和旧版本完全相同方式时，可以配置 `autoDialectClass=old`。当数据库连接池类型非常明确时，建议配置为具体值，例如使用 hikari 时，配置 `autoDialectClass=hikari`
     ，使用其他连接池时，配置为自己的实现类。
+
 18. `boundSqlInterceptors`：增加分页插件的 `BoundSqlInterceptor` 拦截器，可以在3个阶段对 SQL 进行处理或者简单读取，
     增加参数 `boundSqlInterceptors`，可以配置多个实现 `BoundSqlInterceptor` 接口的实现类名，
     使用英文逗号隔开。PageHelper调用时，也可以通过类似
     `PageHelper.startPage(x,x).boundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor)`针对本次分页进行设置。
 
+19. `keepOrderBy`：转换count查询时保留查询的 order by 排序。除全局配置外，可以针对单次操作进行设置。
+
+20. `keepSubSelectOrderBy`：转换count查询时保留子查询的 order by 排序。可以避免给所有子查询添加 `/*keep orderby*/`，除全局配置外，可以针对单次操作进行设置。
+
 **重要提示：**
 
-当 `offsetAsPageNum=false` 的时候，由于 `PageNum` 问题，`RowBounds`查询的时候 `reasonable` 会强制为 `false`。使用 `PageHelper.startPage` 方法不受影响。
+当 `offsetAsPageNum=false` 的时候，由于 `PageNum` 问题，`RowBounds`查询的时候 `reasonable` 会强制为 `false`。使用 `PageHelper.startPage`
+方法不受影响。
 
 #### 6. 如何选择配置这些参数
 

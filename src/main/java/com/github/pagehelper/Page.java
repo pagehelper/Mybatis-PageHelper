@@ -31,7 +31,6 @@ import org.apache.ibatis.logging.LogFactory;
 
 import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,75 +43,77 @@ import java.util.List;
 public class Page<E> extends ArrayList<E> implements Closeable {
     private static final long serialVersionUID = 1L;
 
-    private static final Log log = LogFactory.getLog(Page.class);
-
-    /**
-     * 页码，从1开始
-     */
-    private int pageNum;
-    /**
-     * 页面大小
-     */
-    private int pageSize;
-    /**
-     * 起始行
-     */
-    private long startRow;
-    /**
-     * 末行
-     */
-    private long endRow;
-    /**
-     * 总数
-     */
-    private long total;
-    /**
-     * 总页数
-     */
-    private int pages;
-    /**
-     * 包含count查询
-     */
-    private boolean count = true;
-    /**
-     * 分页合理化
-     */
-    private Boolean reasonable;
-    /**
-     * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
-     */
-    private Boolean pageSizeZero;
-    /**
-     * 进行count查询的列名
-     */
-    private String countColumn;
-    /**
-     * 排序
-     */
-    private String orderBy;
-    /**
-     * 只增加排序
-     */
-    private boolean orderByOnly;
-    /**
-     * sql拦截处理
-     */
-    private BoundSqlInterceptor boundSqlInterceptor;
-    private transient BoundSqlInterceptor.Chain chain;
-    /**
-     * 分页实现类，可以使用 {@link com.github.pagehelper.page.PageAutoDialect} 类中注册的别名，例如 "mysql", "oracle"
-     */
-    private String dialectClass;
-
+    private static final Log                       log        = LogFactory.getLog(Page.class);
     /**
      * 记录当前堆栈,可查找到page在何处创建
      * 需开启pagehelper.debug
      */
-    private final String stackTrace = PageInterceptor.isDebug() ? StackTraceUtil.current() : null;
-
-    public String getStackTrace() {
-        return stackTrace;
-    }
+    private final        String                    stackTrace = PageInterceptor.isDebug() ? StackTraceUtil.current() : null;
+    /**
+     * 页码，从1开始
+     */
+    private              int                       pageNum;
+    /**
+     * 页面大小
+     */
+    private              int                       pageSize;
+    /**
+     * 起始行
+     */
+    private              long                      startRow;
+    /**
+     * 末行
+     */
+    private              long                      endRow;
+    /**
+     * 总数
+     */
+    private              long                      total;
+    /**
+     * 总页数
+     */
+    private              int                       pages;
+    /**
+     * 包含count查询
+     */
+    private              boolean                   count      = true;
+    /**
+     * 分页合理化
+     */
+    private              Boolean                   reasonable;
+    /**
+     * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+     */
+    private              Boolean                   pageSizeZero;
+    /**
+     * 进行count查询的列名
+     */
+    private              String                    countColumn;
+    /**
+     * 排序
+     */
+    private              String                    orderBy;
+    /**
+     * 只增加排序
+     */
+    private              boolean                   orderByOnly;
+    /**
+     * sql拦截处理
+     */
+    private              BoundSqlInterceptor       boundSqlInterceptor;
+    private transient    BoundSqlInterceptor.Chain chain;
+    /**
+     * 分页实现类，可以使用 {@link com.github.pagehelper.page.PageAutoDialect} 类中注册的别名，例如 "mysql", "oracle"
+     */
+    private              String                    dialectClass;
+    /**
+     * 转换count查询时保留查询的 order by 排序
+     */
+    private              Boolean                   keepOrderBy;
+    /**
+     * 转换count查询时保留子查询的 order by 排序
+     */
+    private              Boolean                   keepSubSelectOrderBy;
 
     public Page() {
         super();
@@ -157,6 +158,10 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         this.startRow = rowBounds[0];
         this.count = count;
         this.endRow = this.startRow + rowBounds[1];
+    }
+
+    public String getStackTrace() {
+        return stackTrace;
     }
 
     public List<E> getResult() {
@@ -306,6 +311,23 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         this.dialectClass = dialectClass;
     }
 
+    public Boolean getKeepOrderBy() {
+        return keepOrderBy;
+    }
+
+    public Page<E> setKeepOrderBy(Boolean keepOrderBy) {
+        this.keepOrderBy = keepOrderBy;
+        return this;
+    }
+
+    public Boolean getKeepSubSelectOrderBy() {
+        return keepSubSelectOrderBy;
+    }
+
+    public void setKeepSubSelectOrderBy(Boolean keepSubSelectOrderBy) {
+        this.keepSubSelectOrderBy = keepSubSelectOrderBy;
+    }
+
     /**
      * 指定使用的分页实现，如果自己使用的很频繁，建议自己增加一层封装再使用
      *
@@ -413,6 +435,36 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         return this;
     }
 
+    /**
+     * 转换count查询时保留查询的 order by 排序
+     *
+     * @param keepOrderBy
+     * @return
+     */
+    public Page<E> keepOrderBy(boolean keepOrderBy) {
+        this.keepOrderBy = keepOrderBy;
+        return this;
+    }
+
+    public boolean keepOrderBy() {
+        return this.keepOrderBy != null && this.keepOrderBy;
+    }
+
+    /**
+     * 转换count查询时保留子查询的 order by 排序
+     *
+     * @param keepSubSelectOrderBy
+     * @return
+     */
+    public Page<E> keepSubSelectOrderBy(boolean keepSubSelectOrderBy) {
+        this.keepSubSelectOrderBy = keepSubSelectOrderBy;
+        return this;
+    }
+
+    public boolean keepSubSelectOrderBy() {
+        return this.keepSubSelectOrderBy != null && this.keepSubSelectOrderBy;
+    }
+
     public PageInfo<E> toPageInfo() {
         return new PageInfo<E>(this);
     }
@@ -459,21 +511,6 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         PageSerializable<T> pageSerializable = new PageSerializable<T>(list);
         pageSerializable.setTotal(this.getTotal());
         return pageSerializable;
-    }
-
-    /**
-     * 兼容低版本 Java 7-
-     */
-    public interface Function<E, T> {
-
-        /**
-         * Applies this function to the given argument.
-         *
-         * @param t the function argument
-         * @return the function result
-         */
-        T apply(E t);
-
     }
 
     public <E> Page<E> doSelectPage(ISelect select) {
@@ -540,5 +577,20 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     @Override
     public void close() {
         PageHelper.clearPage();
+    }
+
+    /**
+     * 兼容低版本 Java 7-
+     */
+    public interface Function<E, T> {
+
+        /**
+         * Applies this function to the given argument.
+         *
+         * @param t the function argument
+         * @return the function result
+         */
+        T apply(E t);
+
     }
 }
