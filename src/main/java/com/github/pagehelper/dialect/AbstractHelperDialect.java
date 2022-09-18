@@ -188,7 +188,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         String orderBy = page.getOrderBy();
         if (StringUtil.isNotEmpty(orderBy)) {
             pageKey.update(orderBy);
-            sql = OrderByParser.converToOrderBySql(sql, orderBy);
+            sql = OrderByParser.converToOrderBySql(sql, orderBy, jSqlParser);
         }
         if (page.isOrderByOnly()) {
             return sql;
@@ -230,7 +230,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
 
     @Override
     public void setProperties(Properties properties) {
-
+        super.setProperties(properties);
     }
 
     /**

@@ -111,7 +111,7 @@ public class DataSourceNegotiationAutoDialectTest {
         DruidAutoDialect druidAutoDialect = new DruidAutoDialect();
         String jdbcUrl = druidAutoDialect.getJdbcUrl(getDriud());
         Assert.assertEquals(DRUID, jdbcUrl);
-        AbstractHelperDialect dialect = druidAutoDialect.extractDialect(jdbcUrl, null, null, null);
+        AbstractHelperDialect dialect = druidAutoDialect.extractDialect(jdbcUrl, null, null, new Properties());
         Assert.assertTrue(dialect instanceof HerdDBDialect);
     }
 

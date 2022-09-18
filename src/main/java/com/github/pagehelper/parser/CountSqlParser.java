@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.parser;
 
+import com.github.pagehelper.JSqlParser;
 import com.github.pagehelper.page.PageMethod;
 import com.github.pagehelper.util.StringUtil;
 import net.sf.jsqlparser.expression.Alias;
@@ -48,8 +49,9 @@ public class CountSqlParser {
     private static final Alias TABLE_ALIAS;
 
     //<editor-fold desc="聚合函数">
-    private final Set<String> skipFunctions = Collections.synchronizedSet(new HashSet<String>());
+    private final Set<String> skipFunctions  = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> falseFunctions = Collections.synchronizedSet(new HashSet<String>());
+    private final JSqlParser  jSqlParser;
 
     /**
      * 聚合函数，以下列函数开头的都认为是聚合函数
@@ -146,13 +148,21 @@ public class CountSqlParser {
      *
      * @param functions
      */
-    public static void addAggregateFunctions(String functions){
-        if(StringUtil.isNotEmpty(functions)){
+    public static void addAggregateFunctions(String functions) {
+        if (StringUtil.isNotEmpty(functions)) {
             String[] funs = functions.split(",");
             for (int i = 0; i < funs.length; i++) {
                 AGGREGATE_FUNCTIONS.add(funs[i].toUpperCase());
             }
         }
+    }
+
+    public CountSqlParser() {
+        this.jSqlParser = JSqlParser.DEFAULT;
+    }
+
+    public CountSqlParser(JSqlParser jSqlParser) {
+        this.jSqlParser = jSqlParser;
     }
 
     /**
@@ -180,7 +190,7 @@ public class CountSqlParser {
             return getSimpleCountSql(sql, countColumn);
         }
         try {
-            stmt = CCJSqlParserUtil.parse(sql);
+            stmt = jSqlParser.parse(sql);
         } catch (Throwable e) {
             //无法解析的用一般方法返回count语句
             return getSimpleCountSql(sql, countColumn);

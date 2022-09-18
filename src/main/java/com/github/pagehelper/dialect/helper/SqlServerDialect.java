@@ -47,7 +47,7 @@ import java.util.Properties;
  * @author liuzh
  */
 public class SqlServerDialect extends AbstractHelperDialect {
-    protected SqlServerParser pageSql = new SqlServerParser();
+    protected SqlServerParser       pageSql;
     protected Cache<String, String> CACHE_COUNTSQL;
     protected Cache<String, String> CACHE_PAGESQL;
     protected ReplaceSql            replaceSql;
@@ -106,7 +106,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
         if (StringUtil.isNotEmpty(orderBy)) {
             pageKey.update(orderBy);
             sql = this.replaceSql.replace(sql);
-            sql = OrderByParser.converToOrderBySql(sql, orderBy);
+            sql = OrderByParser.converToOrderBySql(sql, orderBy, jSqlParser);
             sql = this.replaceSql.restore(sql);
         }
 
@@ -116,10 +116,11 @@ public class SqlServerDialect extends AbstractHelperDialect {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
+        this.pageSql = new SqlServerParser(jSqlParser);
         String replaceSql = properties.getProperty("replaceSql");
-        if(StringUtil.isEmpty(replaceSql) || "regex".equalsIgnoreCase(replaceSql)){
+        if (StringUtil.isEmpty(replaceSql) || "regex".equalsIgnoreCase(replaceSql)) {
             this.replaceSql = new RegexWithNolockReplaceSql();
-        } else if("simple".equalsIgnoreCase(replaceSql)){
+        } else if ("simple".equalsIgnoreCase(replaceSql)) {
             this.replaceSql = new SimpleWithNolockReplaceSql();
         } else {
             try {

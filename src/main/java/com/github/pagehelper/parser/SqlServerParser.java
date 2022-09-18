@@ -24,6 +24,7 @@
 
 package com.github.pagehelper.parser;
 
+import com.github.pagehelper.JSqlParser;
 import com.github.pagehelper.PageException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
@@ -54,29 +55,38 @@ import java.util.*;
  */
 public class SqlServerParser {
     //开始行号
-    public static final String START_ROW = String.valueOf(Long.MIN_VALUE);
+    public static final    String     START_ROW                = String.valueOf(Long.MIN_VALUE);
     //结束行号
-    public static final String PAGE_SIZE = String.valueOf(Long.MAX_VALUE);
+    public static final    String     PAGE_SIZE                = String.valueOf(Long.MAX_VALUE);
     //外层包装表
-    protected static final String WRAP_TABLE = "WRAP_OUTER_TABLE";
+    protected static final String     WRAP_TABLE               = "WRAP_OUTER_TABLE";
     //表别名名字
-    protected static final String PAGE_TABLE_NAME = "PAGE_TABLE_ALIAS";
+    protected static final String     PAGE_TABLE_NAME          = "PAGE_TABLE_ALIAS";
     //protected
-    public static final Alias PAGE_TABLE_ALIAS = new Alias(PAGE_TABLE_NAME);
+    public static final    Alias      PAGE_TABLE_ALIAS         = new Alias(PAGE_TABLE_NAME);
     //行号
-    protected static final String PAGE_ROW_NUMBER = "PAGE_ROW_NUMBER";
+    protected static final String     PAGE_ROW_NUMBER          = "PAGE_ROW_NUMBER";
     //行号列
-    protected static final Column PAGE_ROW_NUMBER_COLUMN = new Column(PAGE_ROW_NUMBER);
+    protected static final Column     PAGE_ROW_NUMBER_COLUMN   = new Column(PAGE_ROW_NUMBER);
     //TOP 100 PERCENT
-    protected static final Top TOP100_PERCENT;
+    protected static final Top        TOP100_PERCENT;
     //别名前缀
-    protected static final String PAGE_COLUMN_ALIAS_PREFIX = "ROW_ALIAS_";
+    protected static final String     PAGE_COLUMN_ALIAS_PREFIX = "ROW_ALIAS_";
+    private final          JSqlParser jSqlParser;
 
     //静态方法处理
     static {
         TOP100_PERCENT = new Top();
         TOP100_PERCENT.setExpression(new LongValue(100));
         TOP100_PERCENT.setPercentage(true);
+    }
+
+    public SqlServerParser() {
+        this.jSqlParser = JSqlParser.DEFAULT;
+    }
+
+    public SqlServerParser(JSqlParser jSqlParser) {
+        this.jSqlParser = jSqlParser;
     }
 
     /**
@@ -101,7 +111,7 @@ public class SqlServerParser {
         //解析SQL
         Statement stmt;
         try {
-            stmt = CCJSqlParserUtil.parse(sql);
+            stmt = jSqlParser.parse(sql);
         } catch (Throwable e) {
             throw new PageException("不支持该SQL转换为分页查询!", e);
         }

@@ -91,6 +91,6 @@ public abstract class AbstractRowBoundsDialect extends AbstractDialect {
 
     @Override
     public void setProperties(Properties properties) {
-
+        super.setProperties(properties);
     }
 }
