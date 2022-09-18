@@ -51,7 +51,7 @@ dependencies {
 特别注意，新版拦截器是 `com.github.pagehelper.PageInterceptor`。
 `com.github.pagehelper.PageHelper` 现在是一个特殊的 `dialect` 实现类，是分页插件的默认实现类，提供了和以前相同的用法。
 
-#### 1. 在 MyBatis 配置 xml 中配置拦截器插件
+#### 1). 在 MyBatis 配置 xml 中配置拦截器插件
 
 ```xml
 <!--
@@ -71,7 +71,7 @@ dependencies {
 </plugins>
 ```
 
-#### 2. 在 Spring 配置文件中配置拦截器插件
+#### 2). 在 Spring 配置文件中配置拦截器插件
 
 使用 spring 的 XML 配置方式，可以使用 `plugins` 属性像下面这样配置：
 ```xml
@@ -92,7 +92,7 @@ dependencies {
 </bean>
 ```
 
-#### 3. 在 Spring Boot 中配置
+#### 3). 在 Spring Boot 中配置
 
 Spring Boot 引入 starter 后自动生效，对分页插件进行配置时，在 Spring Boot 对应的配置文件 `application.[properties|yaml]` 中配置：
 
@@ -118,7 +118,7 @@ pagehelper:
 >
 支持的默认参数参考: [PageHelperStandardProperties.java](https://github.com/pagehelper/pagehelper-spring-boot/blob/master/pagehelper-spring-boot-autoconfigure/src/main/java/com/github/pagehelper/autoconfigure/PageHelperStandardProperties.java)
 
-#### 4. 分页插件横幅banner设置
+#### 4). 分页插件横幅banner设置
 
 为了避免多次配置分页插件导致的错误，配置分页插件后，启动时会输出 banner。
 
@@ -140,7 +140,7 @@ DEBUG [main] -
 - 系统变量：`-Dpagehelper.banner=false`
 - 环境变量：`PAGEHELPER_BANNER=false`
 
-#### 5. 分页插件参数介绍
+#### 5). 分页插件参数介绍
 
 分页插件提供了多个可选参数，这些参数使用时，按照上面配置方式中的示例配置即可。
 
@@ -188,48 +188,69 @@ DEBUG [main] -
 1. `helperDialect`：分页插件会自动检测当前的数据库链接，自动选择合适的分页方式。
    你可以配置`helperDialect`属性来指定分页插件使用哪种方言。配置时，可以使用下面的缩写值：
    `oracle`,`mysql`,`mariadb`,`sqlite`,`hsqldb`,`postgresql`,`db2`,`sqlserver`,`informix`,`h2`,`sqlserver2012`,`derby`
-   <b>特别注意：</b>使用 SqlServer2012 数据库时，需要手动指定为 `sqlserver2012`，否则会使用 SqlServer2005 的方式进行分页。
+   （完整内容看 [PageAutoDialect](src/main/java/com/github/pagehelper/page/PageAutoDialect.java)）
+   <b>特别注意：</b>使用 SqlServer2012 数据库时，需要手动指定为 `sqlserver2012`，否则会使用 SqlServer2005 的方式进行分页，还可以设置 `useSqlserver2012=true`
+   将2012改为sqlserver的默认方式。
    你也可以实现 `AbstractHelperDialect`，然后配置该属性为实现类的全限定名称即可使用自定义的实现方法。
 
-2. `offsetAsPageNum`：默认值为 `false`，该参数对使用 `RowBounds` 作为分页参数时有效。
-当该参数设置为 `true` 时，会将 `RowBounds` 中的 `offset` 参数当成 `pageNum` 使用，可以用页码和页面大小两个参数进行分页。
+2. `dialectAlias`：，允许配置自定义实现的 别名，可以用于根据 JDBCURL 自动获取对应实现，允许通过此种方式覆盖已有的实现，配置示例如（多个时分号隔开）：
+   ```xml
+   <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+   ```
+   当你使用的 jdbcurl 不在 [PageAutoDialect](src/main/java/com/github/pagehelper/page/PageAutoDialect.java)
+   默认提供范围时，可以通过改参数实现自动识别。
 
-3. `rowBoundsWithCount`：默认值为`false`，该参数对使用 `RowBounds` 作为分页参数时有效。
-当该参数设置为`true`时，使用 `RowBounds` 分页会进行 count 查询。
+3. `useSqlserver2012`(sqlserver)：使用 SqlServer2012 数据库时，需要手动指定为 `sqlserver2012`，否则会使用 SqlServer2005
+   的方式进行分页，还可以设置 `useSqlserver2012=true`将2012改为sqlserver的默认方式。
 
-4. `pageSizeZero`：默认值为 `false`，当该参数设置为 `true` 时，如果 `pageSize=0` 或者 `RowBounds.limit = 0` 就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是 `Page` 类型）。
+4. `defaultCount`：用于控制默认不带 count 查询的方法中，是否执行 count 查询，默认 `true` 会执行 count 查询，这是一个全局生效的参数，多数据源时也是统一的行为。
 
-5. `reasonable`：分页合理化参数，默认值为`false`。当该参数设置为 `true` 时，`pageNum<=0` 时会查询第一页，
-`pageNum>pages`（超过总数时），会查询最后一页。默认`false` 时，直接根据参数进行查询。
+5. `countColumn`：用于配置自动 count 查询时的查询列，默认值`0`，也就是 `count(0)`，`Page` 对象也新增了 `countColumn` 参数，可以针对具体查询进行配置。
 
-6. `params`：为了支持`startPage(Object params)`方法，增加了该参数来配置参数映射，用于从对象中根据属性名取值，
-可以配置 `pageNum,pageSize,count,pageSizeZero,reasonable`，不配置映射的用默认值，
-默认值为`pageNum=pageNum;pageSize=pageSize;count=countSql;reasonable=reasonable;pageSizeZero=pageSizeZero`。
+6. `offsetAsPageNum`：默认值为 `false`，该参数对使用 `RowBounds` 作为分页参数时有效。
+   当该参数设置为 `true` 时，会将 `RowBounds` 中的 `offset` 参数当成 `pageNum` 使用，可以用页码和页面大小两个参数进行分页。
 
-7. `supportMethodsArguments`：支持通过 Mapper 接口参数来传递分页参数，默认值`false`，分页插件会从查询方法的参数值中，自动根据上面 `params` 配置的字段中取值，查找到合适的值时就会自动分页。
-   使用方法可以参考测试代码中的 `com.github.pagehelper.test.basic` 包下的 `ArgumentsMapTest` 和 `ArgumentsObjTest`。
+7. `rowBoundsWithCount`：默认值为`false`，该参数对使用 `RowBounds` 作为分页参数时有效。
+   当该参数设置为`true`时，使用 `RowBounds` 分页会进行 count 查询。
 
-8. `autoRuntimeDialect`：默认值为 `false`。设置为 `true` 时，允许在运行时根据多数据源自动识别对应方言的分页
-   （不支持自动选择`sqlserver2012`，只能使用`sqlserver`），用法和注意事项参考下面的**场景五**。
+8. `pageSizeZero`：默认值为 `false`，当该参数设置为 `true` 时，如果 `pageSize=0` 或者 `RowBounds.limit = 0`
+   就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是 `Page` 类型）。
 
-9. `closeConn`：默认值为 `true`。当使用运行时动态数据源或没有设置 `helperDialect` 属性自动获取数据库类型时，会自动获取一个数据库连接，
-   通过该属性来设置是否关闭获取的这个连接，默认`true`关闭，设置为 `false` 后，不会关闭获取的连接，这个参数的设置要根据自己选择的数据源来决定。
+9. `reasonable`：分页合理化参数，默认值为`false`。当该参数设置为 `true` 时，`pageNum<=0` 时会查询第一页，
+   `pageNum>pages`（超过总数时），会查询最后一页。默认`false` 时，直接根据参数进行查询。
 
-10. `aggregateFunctions`(5.1.5+)：默认为所有常见数据库的聚合函数，允许手动添加聚合函数（影响行数），所有以聚合函数开头的函数，在进行 count 转换时，会套一层。其他函数和列会被替换为 count(0)
+10. `params`：为了支持`startPage(Object params)`方法，增加了该参数来配置参数映射，用于从对象中根据属性名取值，
+    可以配置 `pageNum,pageSize,count,pageSizeZero,reasonable`，不配置映射的用默认值，
+    默认值为`pageNum=pageNum;pageSize=pageSize;count=countSql;reasonable=reasonable;pageSizeZero=pageSizeZero`。
+
+11. `supportMethodsArguments`：支持通过 Mapper 接口参数来传递分页参数，默认值`false`，分页插件会从查询方法的参数值中，自动根据上面 `params`
+    配置的字段中取值，查找到合适的值时就会自动分页。
+    使用方法可以参考测试代码中的 `com.github.pagehelper.test.basic` 包下的 `ArgumentsMapTest` 和 `ArgumentsObjTest`。
+
+12. `autoRuntimeDialect`：默认值为 `false`。设置为 `true` 时，允许在运行时根据多数据源自动识别对应方言的分页
+    （不支持自动选择`sqlserver2012`，只能使用`sqlserver`），用法和注意事项参考下面的**场景五**。
+
+13. `closeConn`：默认值为 `true`。当使用运行时动态数据源或没有设置 `helperDialect` 属性自动获取数据库类型时，会自动获取一个数据库连接，
+    通过该属性来设置是否关闭获取的这个连接，默认`true`关闭，设置为 `false` 后，不会关闭获取的连接，这个参数的设置要根据自己选择的数据源来决定。
+
+14. `aggregateFunctions`(5.1.5+)：默认为所有常见数据库的聚合函数，允许手动添加聚合函数（影响行数），所有以聚合函数开头的函数，在进行 count 转换时，会套一层。其他函数和列会被替换为 count(0)
     ，其中count列可以自己配置。
 
-11. `replaceSql`(sqlserver): 可选值为 `regex` 和 `simple`，默认值空时采用 `regex`
+15. `replaceSql`(sqlserver): 可选值为 `regex` 和 `simple`，默认值空时采用 `regex`
     方式，也可以自己实现 `com.github.pagehelper.dialect.ReplaceSql` 接口。
 
-12. `sqlCacheClass`(sqlserver): 针对 sqlserver 生成的 count 和 page sql 进行缓存，缓存使用的 `com.github.pagehelper.cache.CacheFactory`
+16. `sqlCacheClass`(sqlserver): 针对 sqlserver 生成的 count 和 page sql 进行缓存，缓存使用的 `com.github.pagehelper.cache.CacheFactory`
     ，可选的参数和前面的 `msCountCache` 一样。
 
-13. `autoDialectClass`
-14. `dialectAlias`
-15. `useSqlserver2012`(sqlserver)
-16. `boundSqlInterceptors`
-17. `defaultCount`
-18. `countColumn`
+17. `autoDialectClass`：增加 `AutoDialect` 接口用于自动获取数据库类型，可以通过 `autoDialectClass`
+    配置为自己的实现类，默认使用 `DataSourceNegotiationAutoDialect`，优先根据连接池获取。
+    默认实现中，增加针对 `hikari,druid,tomcat-jdbc,c3p0,dbcp` 类型数据库连接池的特殊处理，直接从配置获取jdbcUrl，当使用其他类型数据源时，仍然使用旧的方式获取连接在读取jdbcUrl。
+    想要使用和旧版本完全相同方式时，可以配置 `autoDialectClass=old`。当数据库连接池类型非常明确时，建议配置为具体值，例如使用 hikari 时，配置 `autoDialectClass=hikari`
+    ，使用其他连接池时，配置为自己的实现类。
+18. `boundSqlInterceptors`：增加分页插件的 `BoundSqlInterceptor` 拦截器，可以在3个阶段对 SQL 进行处理或者简单读取，
+    增加参数 `boundSqlInterceptors`，可以配置多个实现 `BoundSqlInterceptor` 接口的实现类名，
+    使用英文逗号隔开。PageHelper调用时，也可以通过类似
+    `PageHelper.startPage(x,x).boundSqlInterceptor(BoundSqlInterceptor boundSqlInterceptor)`针对本次分页进行设置。
 
 **重要提示：**
 
