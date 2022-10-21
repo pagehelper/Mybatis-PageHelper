@@ -98,6 +98,8 @@ public class PageAutoDialect {
         registerDialectAlias("firebirdsql", FirebirdDialect.class);
         //人大金仓数据库
         registerDialectAlias("kingbase", PostgreSqlDialect.class);
+        // 人大金仓新版本kingbase8
+        registerDialectAlias("kingbase8", PostgreSqlDialect.class);
         //行云数据库
         registerDialectAlias("xcloud", CirroDataDialect.class);
 
