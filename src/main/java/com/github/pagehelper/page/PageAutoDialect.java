@@ -143,6 +143,9 @@ public class PageAutoDialect {
                 return dialect;
             }
         }
+        if (url.contains("oceanbase")){
+            return "mysql";
+        }
         return null;
     }
 
