@@ -66,6 +66,8 @@ static {
         registerDialectAlias("xugu",HsqldbDialect.class);
         //人大金仓数据库
         registerDialectAlias("kingbase",PostgreSqlDialect.class);
+        //华为openGauss数据库
+        registerDialectAlias("opengauss",PostgreSqlDialect.class);
         }
 ```
 
