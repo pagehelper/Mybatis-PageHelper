@@ -103,6 +103,9 @@ public class PageAutoDialect {
         //行云数据库
         registerDialectAlias("xcloud", CirroDataDialect.class);
 
+        //openGauss数据库
+        registerDialectAlias("opengauss",PostgreSqlDialect.class);
+
         //注册 AutoDialect
         //想要实现和以前版本相同的效果时，可以配置 autoDialectClass=old
         registerAutoDialectAlias("old", DefaultAutoDialect.class);
