@@ -13,4 +13,4 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
       - name: Run the Maven verify phase
-        run: mvn --batch-mode --update-snapshots -P dev verify
+        run: mvn --batch-mode --update-snapshots -P dev verify -Dsurefire.useFile=false -DdisableXmlReport=true
