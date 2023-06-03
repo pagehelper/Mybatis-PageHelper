@@ -1,5 +1,13 @@
 ## 更新日志
 
+### 5.3.3 - 2023-06-03
+
+- Ignoring unnecessarily generated surefire-report **by java-codehunger**
+- 支持从URL中解析openGauss 数据库 对应的方言 **by saxisuer**
+- 修复sql注入检验不正确问题 #716 **by uyong**
+- 支持从url中解析人大金仓kingbase8对应的方言 **by univ**
+- 添加支持cirrodata的分页 #705 **by sxh0570**
+
 ### 5.3.2 - 2022-09-18
 
 - 使用文档更新，所有参数都包含在内，首页默认文档改为中文。
@@ -7,7 +15,8 @@
 - 增加 `debug` 参数，默认 `false`，为`true`时开启`debug`模式，开始 `debug` 模式后将记录调用堆栈 by **huyingqian**
 - Add 支持count的sql支持hint语法 by **zhanliquan**
 - 增加 `PageProperties` 接口，框架内部实例化的扩展类如果实现了这个接口，可以通过这个接口的方法获取分页插件配置。
-- 增加 `CountMsIdGen` 接口，可以通过 `countMsIdGen` 配置自定义实现类，该类用于生成查询对应COUNT查询的msId。默认实现还是使用`countSuffix`
+- 增加 `CountMsIdGen` 接口，可以通过 `countMsIdGen`
+  配置自定义实现类，该类用于生成查询对应COUNT查询的msId。默认实现还是使用`countSuffix`
   ，通过扩展可以实现如 `selectByExample` 映射到对应的 `selectCountByExample` 方法。
 - 增加 `keepOrderBy` 和 `keepSubSelectOrderBy` 配置。
 - 增加 `sqlParser` 配置，增加 `JSqlParser` 接口，解决 jsqlparser 和 jdk 兼容性导致无法额外配置的问题。

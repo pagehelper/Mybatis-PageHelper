@@ -1,5 +1,13 @@
 ## Changelog
 
+### 5.3.3 - 2023-06-03
+
+- Ignoring unnecessarily generated surefire-report **by java-codehunger**
+- Supports parsing of the dialect corresponding to the openGauss database from the URL **by saxisuer**
+- Fixed the issue that SQL injection verification was incorrect #716 **by uyong**
+- Support parsing of the dialect corresponding to Kingbase 8 from the URL **by univ**
+- Add support for cirrodata #705 **by sxh0570**
+
 ### 5.3.2 - 2022-09-18
 
 - Use document update, all parameters are included, the default home page document changed to Chinese.
