@@ -28,9 +28,7 @@ import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.SqlServerParser;
-import net.sf.jsqlparser.JSQLParserException;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -194,10 +192,16 @@ public class SqlServerTest {
             sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
+    /**
+     * JSqlParser的4.4版本对于 UR RS RR CS 作为别名解析错误
+     * 故将UR更改为SUR
+     *
+     * 详见：https://github.com/JSQLParser/JSqlParser/issues/1520
+     */
     @Test
     public void testSql377() {
-        String originalSql = "select distinct u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time from sys_user u left join sys_dept d on u.dept_id = d.dept_id left join sys_user_role ur on u.user_id = ur.user_id left join sys_role r on r.role_id = ur.role_id where u.del_flag = '0' and (r.role_id != 1 or r.role_id IS NULL) and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role ur on u.user_id = ur.user_id and ur.role_id = 1)";
-        Assert.assertEquals("SELECT TOP 10 user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT DISTINCT u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time FROM sys_user u LEFT JOIN sys_dept d ON u.dept_id = d.dept_id LEFT JOIN sys_user_role ur ON u.user_id = ur.user_id LEFT JOIN sys_role r ON r.role_id = ur.role_id WHERE u.del_flag = '0' AND (r.role_id != 1 OR r.role_id IS NULL) AND u.user_id NOT IN (SELECT u.user_id FROM sys_user u INNER JOIN sys_user_role ur ON u.user_id = ur.user_id AND ur.role_id = 1)) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
+        String originalSql = "select distinct u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time from sys_user u left join sys_dept d on u.dept_id = d.dept_id left join sys_user_role sur on u.user_id = sur.user_id left join sys_role r on r.role_id = sur.role_id where u.del_flag = '0' and (r.role_id != 1 or r.role_id IS NULL) and u.user_id not in (select u.user_id from sys_user u inner join sys_user_role sur on u.user_id = sur.user_id and sur.role_id = 1)";
+        Assert.assertEquals("SELECT TOP 10 user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, user_id, dept_id, login_name, user_name, email, phonenumber, status, create_time FROM (SELECT DISTINCT u.user_id, u.dept_id, u.login_name, u.user_name, u.email, u.phonenumber, u.status, u.create_time FROM sys_user u LEFT JOIN sys_dept d ON u.dept_id = d.dept_id LEFT JOIN sys_user_role sur ON u.user_id = sur.user_id LEFT JOIN sys_role r ON r.role_id = sur.role_id WHERE u.del_flag = '0' AND (r.role_id != 1 OR r.role_id IS NULL) AND u.user_id NOT IN (SELECT u.user_id FROM sys_user u INNER JOIN sys_user_role sur ON u.user_id = sur.user_id AND sur.role_id = 1)) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
             sqlServer.convertToPageSql(originalSql, 1, 10));
     }
 
@@ -319,5 +323,14 @@ public class SqlServerTest {
         String result = replaceSql.restore(pageSql);
         Assert.assertEquals("SELECT TOP 10 ScheduleID, SystemID, ClinicID, DoctorID, ScheduleDate, StartTime, EndTime, Status, BookBy, Note, Remark, SourceType, CompanyName, DoctorName, DoctorNumber, ClinicName, Lat, Lng, ContactTel, Address, ConsultationStatusID, RegisterStatus, AreaLevel1, AreaLevel2 FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, ScheduleID, SystemID, ClinicID, DoctorID, ScheduleDate, StartTime, EndTime, Status, BookBy, Note, Remark, SourceType, CompanyName, DoctorName, DoctorNumber, ClinicName, Lat, Lng, ContactTel, Address, ConsultationStatusID, RegisterStatus, AreaLevel1, AreaLevel2 FROM (SELECT AUS.ScheduleID, AUS.SystemID, AUS.ClinicID, AUS.DoctorID, AUS.ScheduleDate, AUS.StartTime, AUS.EndTime, AUS.Status, AUS.BookBy, AUS.Note, AUS.Remark, AUS.SourceType, CM.CompanyName, AU.UserName AS DoctorName, AU.UserNumber AS DoctorNumber, CC.CodeDesc AS ClinicName, CD.Lat, CD.Lng, CD.ContactTel, CD.Address, CR.ConsultationStatusID, CR.RegisterStatus, A1.CodeDesc AS AreaLevel1, A2.CodeDesc AS AreaLevel2 FROM ACM_User_Schedule AUS WITH(NOLOCK) LEFT JOIN Client_Register CR WITH(NOLOCK) ON AUS.BookBy = CR.ClientID AND CR.SourceType = 'F' AND AUS.ClientRegisterNum = CR.ClientRegisterNum INNER JOIN ACM_User AU WITH(NOLOCK) ON AU.UserID = AUS.DoctorID INNER JOIN Code_Clinic CC WITH(NOLOCK) ON AUS.ClinicID = CC.CodeID INNER JOIN Clinic_Detail CD WITH(NOLOCK) ON CC.CodeID = CD.ClinicID INNER JOIN Code_Area A1 WITH(NOLOCK) ON CD.AreaLevel1ID = A1.CodeID INNER JOIN Code_Area A2 WITH(NOLOCK) ON CD.AreaLevel2ID = A2.CodeID INNER JOIN Company_Master CM WITH(NOLOCK) ON CC.SystemID = CM.SystemID WHERE BookBy = 1) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
             result);
+    }
+
+    @Test
+    public void testSqlServerSquareBrackets() {
+        String originalSql = "SELECT [ID] AS [ComsnCountID] FROM B_ComsnCount;";
+        String pageSql = sqlServer.convertToPageSql(originalSql, 1, 20);
+
+        Assert.assertEquals("SELECT TOP 20 [ComsnCountID] FROM (SELECT ROW_NUMBER() OVER (ORDER BY RAND()) PAGE_ROW_NUMBER, [ComsnCountID] FROM (SELECT [ID] AS [ComsnCountID] FROM B_ComsnCount) AS PAGE_TABLE_ALIAS) AS PAGE_TABLE_ALIAS WHERE PAGE_ROW_NUMBER > 1 ORDER BY PAGE_ROW_NUMBER",
+                pageSql);
     }
 }

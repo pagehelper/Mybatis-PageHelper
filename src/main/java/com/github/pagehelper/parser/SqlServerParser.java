@@ -111,7 +111,7 @@ public class SqlServerParser {
         //解析SQL
         Statement stmt;
         try {
-            stmt = jSqlParser.parse(sql);
+            stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
         } catch (Throwable e) {
             throw new PageException("不支持该SQL转换为分页查询!", e);
         }
