@@ -30,7 +30,6 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
@@ -72,7 +71,6 @@ public class SqlServerParser {
     protected static final Top        TOP100_PERCENT;
     //别名前缀
     protected static final String     PAGE_COLUMN_ALIAS_PREFIX = "ROW_ALIAS_";
-    private final          JSqlParser jSqlParser;
 
     //静态方法处理
     static {
@@ -80,6 +78,8 @@ public class SqlServerParser {
         TOP100_PERCENT.setExpression(new LongValue(100));
         TOP100_PERCENT.setPercentage(true);
     }
+
+    private final JSqlParser jSqlParser;
 
     public SqlServerParser() {
         this.jSqlParser = JSqlParser.DEFAULT;
@@ -111,7 +111,7 @@ public class SqlServerParser {
         //解析SQL
         Statement stmt;
         try {
-            stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
+            stmt = jSqlParser.parse(sql);
         } catch (Throwable e) {
             throw new PageException("不支持该SQL转换为分页查询!", e);
         }

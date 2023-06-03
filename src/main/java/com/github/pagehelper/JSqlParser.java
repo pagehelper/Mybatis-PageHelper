@@ -51,7 +51,7 @@ public interface JSqlParser {
     JSqlParser DEFAULT = new JSqlParser() {
         @Override
         public Statement parse(String statementReader) throws JSQLParserException {
-            return CCJSqlParserUtil.parse(statementReader);
+            return CCJSqlParserUtil.parse(statementReader, parser -> parser.withSquareBracketQuotation(true));
         }
     };
 
