@@ -24,6 +24,7 @@
 
 package com.github.pagehelper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -249,6 +250,39 @@ public class PageInfo<T> extends PageSerializable<T> {
         isLastPage = pageNum == pages || pages == 0;
         hasPreviousPage = pageNum > 1;
         hasNextPage = pageNum < pages;
+    }
+
+    /**
+     * 数据对象转换
+     *
+     * @param function 用以转换数据对象的函数
+     * @param <E>      目标类型
+     * @return 转换了对象类型的包装结果
+     */
+    private <E> PageInfo<E> convert(Page.Function<T, E> function) {
+        List<E> list = new ArrayList<E>(this.list.size());
+        for (T t : this.list) {
+            list.add(function.apply(t));
+        }
+        PageInfo<E> newPageInfo = new PageInfo<>(list);
+        newPageInfo.setPageNum(this.pageNum);
+        newPageInfo.setPageSize(this.pageSize);
+        newPageInfo.setSize(this.size);
+        newPageInfo.setStartRow(this.startRow);
+        newPageInfo.setEndRow(this.endRow);
+        newPageInfo.setTotal(this.total);
+        newPageInfo.setPages(this.pages);
+        newPageInfo.setPrePage(this.prePage);
+        newPageInfo.setNextPage(this.nextPage);
+        newPageInfo.setIsFirstPage(this.isFirstPage);
+        newPageInfo.setIsLastPage(this.isLastPage);
+        newPageInfo.setHasPreviousPage(this.hasPreviousPage);
+        newPageInfo.setHasNextPage(this.hasNextPage);
+        newPageInfo.setNavigatePages(this.navigatePages);
+        newPageInfo.setNavigateFirstPage(this.navigateFirstPage);
+        newPageInfo.setNavigateLastPage(this.navigateLastPage);
+        newPageInfo.setNavigatepageNums(this.navigatepageNums);
+        return newPageInfo;
     }
 
     /**
