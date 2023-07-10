@@ -209,9 +209,7 @@ public class SqlTest {
     @Test
     public void testSql545() {
         CountSqlParser countSqlParser = new CountSqlParser();
-        Assert.assertEquals("select count(0) from ( \n" +
-                        " select * from user_info order by [ ]\n" +
-                        " ) tmp_count",
+        Assert.assertEquals("SELECT count(0) FROM user_info",
                 countSqlParser.getSmartCountSql(" select * from user_info order by [ ]"));
     }
 
