@@ -14,11 +14,11 @@ import java.util.Map;
 public class CirroDataDialect extends AbstractHelperDialect {
     @Override
     public Object processPageParameter(MappedStatement ms, Map<String, Object> paramMap, Page page, BoundSql boundSql, CacheKey pageKey) {
-        paramMap.put(PAGEPARAMETER_FIRST, page.getEndRow());
-        paramMap.put(PAGEPARAMETER_SECOND, page.getStartRow());
+        paramMap.put(PAGEPARAMETER_FIRST, page.getStartRow() + 1);
+        paramMap.put(PAGEPARAMETER_SECOND, page.getEndRow());
         //处理pageKey
+        pageKey.update(page.getStartRow() + 1);
         pageKey.update(page.getEndRow());
-        pageKey.update(page.getStartRow());
         //处理参数配置
         handleParameter(boundSql, ms, long.class, long.class);
         return paramMap;
