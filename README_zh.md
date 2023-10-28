@@ -123,11 +123,6 @@ static {
 - [提交到 github](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
 - [提交到 gitosc](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
-## 感谢 JetBrains 免费的开源授权
-
-<a href="https://www.jetbrains.com/?from=Mybatis-PageHelper" target="_blank">
-<img src="https://user-images.githubusercontent.com/1787798/69898077-4f4e3d00-138f-11ea-81f9-96fb7c49da89.png" height="200"/></a>
-
 ## 项目的发展离不开你的支持
 
 ### 请作者喝杯咖啡吧！

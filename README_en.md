@@ -134,11 +134,6 @@ the [pagehelper-spring-boot-starter](https://github.com/pagehelper/pagehelper-sp
 - [Submit to github](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
 - [Submit to gitosc](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
 
-## Thanks for free JetBrains Open Source license
-
-<a href="https://www.jetbrains.com/?from=Mybatis-PageHelper" target="_blank">
-<img src="https://user-images.githubusercontent.com/1787798/69898077-4f4e3d00-138f-11ea-81f9-96fb7c49da89.png" height="200"/></a>
-
 ## Thank you for your support
 
 ### Buy the author a cup of coffee!
