@@ -223,9 +223,9 @@ public class SqlServerParser {
         fromItem.setAlias(new Alias(WRAP_TABLE));
         selectBody.setFromItem(fromItem);
         //order by
-        if (isNotEmptyList(plainSelect.getOrderByElements())) {
-            selectBody.setOrderByElements(plainSelect.getOrderByElements());
-            plainSelect.setOrderByElements(null);
+        if (isNotEmptyList(setOperationList.getOrderByElements())) {
+            selectBody.setOrderByElements(setOperationList.getOrderByElements());
+            setOperationList.setOrderByElements(null);
         }
         return selectBody;
     }
