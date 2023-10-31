@@ -29,12 +29,14 @@ import com.github.pagehelper.JSqlParser;
 import com.github.pagehelper.PageException;
 import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.parser.CountSqlParser;
+import com.github.pagehelper.parser.DefaultCountSqlParser;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.RowBounds;
 
+import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 /**
@@ -69,6 +71,26 @@ public abstract class AbstractDialect implements Dialect {
         } else {
             jSqlParser = JSqlParser.DEFAULT;
         }
-        this.countSqlParser = new CountSqlParser(jSqlParser);
+        // 自定义 countSqlParser 的 sql 解析器
+        String countSqlParserStr = properties.getProperty("countSqlParser");
+        if (StringUtil.isNotEmpty(countSqlParserStr)) {
+            try {
+                Class<?> aClass = Class.forName(countSqlParserStr);
+                Constructor<?> constructor = null;
+                try {
+                    constructor = aClass.getConstructor(JSqlParser.class);
+                    countSqlParser = (CountSqlParser) constructor.newInstance(jSqlParser);
+                } catch (NoSuchMethodException e) {
+                    countSqlParser = (CountSqlParser) aClass.newInstance();
+                }
+                if (countSqlParser instanceof PageProperties) {
+                    ((PageProperties) countSqlParser).setProperties(properties);
+                }
+            } catch (Exception e) {
+                throw new PageException(e);
+            }
+        } else {
+            this.countSqlParser = new DefaultCountSqlParser(jSqlParser);
+        }
     }
 }
