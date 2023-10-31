@@ -44,7 +44,7 @@ public abstract class PageMethod {
      *
      * @param page
      */
-    protected static void setLocalPage(Page page) {
+    public static void setLocalPage(Page page) {
         LOCAL_PAGE.set(page);
     }
 
