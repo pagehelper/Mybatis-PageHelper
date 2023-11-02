@@ -35,9 +35,7 @@ import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.mapping.MappedStatement;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,8 +48,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PageAutoDialect {
 
-    private static Map<String, Class<? extends Dialect>> dialectAliasMap = new HashMap<String, Class<? extends Dialect>>();
-    private static Map<String, Class<? extends AutoDialect>> autoDialectMap = new HashMap<String, Class<? extends AutoDialect>>();
+    private static Map<String, Class<? extends Dialect>>     dialectAliasMap = new LinkedHashMap<>();
+    private static Map<String, Class<? extends AutoDialect>> autoDialectMap  = new LinkedHashMap<>();
 
     public static void registerDialectAlias(String alias, Class<? extends Dialect> dialectClass) {
         dialectAliasMap.put(alias, dialectClass);
