@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2022 abel533@gmail.com
+ * Copyright (c) 2014-2023 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,9 @@
 
 package com.github.pagehelper.dialect.rowbounds;
 
+import com.github.pagehelper.dialect.AbstractRowBoundsDialect;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.session.RowBounds;
-
-import com.github.pagehelper.dialect.AbstractRowBoundsDialect;
 
 /**
  * PostgreSQL 基于 RowBounds 的分页.

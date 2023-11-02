@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2022 abel533@gmail.com
+ * Copyright (c) 2014-2023 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 
 package com.github.pagehelper.test.basic;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.mapper.UserMapper;
 import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
@@ -40,13 +42,14 @@ public class CloseableTest {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         //下面注释代码只能在jdk7+中进行测试
-//        try(Page<Object> page = PageHelper.startPage(1, 10)) {
-//            int a = 10/0;
-//            userMapper.selectAll();
-//            Assert.fail();
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
+        try (Page<Object> ignored = PageHelper.startPage(1, 10)) {
+            int a = 10 / 0;
+            userMapper.selectAll();
+            Assert.fail();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //上面分页会被清理，这里不会被分页
         List<User> user = userMapper.selectAll();
         Assert.assertEquals(183, user.size());
         sqlSession.close();

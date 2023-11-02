@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2022 abel533@gmail.com
+ * Copyright (c) 2014-2023 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,10 @@ import com.github.pagehelper.AutoDialect;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.page.PageAutoDialect;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.type.TypeException;
-import org.apache.ibatis.type.TypeReference;
 
 import javax.sql.DataSource;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Properties;
 
 /**
