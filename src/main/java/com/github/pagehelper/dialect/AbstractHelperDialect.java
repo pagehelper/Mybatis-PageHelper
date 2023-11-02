@@ -213,12 +213,13 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
             return pageList;
         }
         page.addAll(pageList);
-        if (!page.isCount()) {
-            page.setTotal(-1);
-        } else if ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0) {
+        //调整判断顺序，如果查全部，total就是size，如果只排序，也是全部，其他情况下如果不查询count就是-1
+        if ((page.getPageSizeZero() != null && page.getPageSizeZero()) && page.getPageSize() == 0) {
             page.setTotal(pageList.size());
         } else if (page.isOrderByOnly()) {
             page.setTotal(pageList.size());
+        } else if (!page.isCount()) {
+            page.setTotal(-1);
         }
         return page;
     }

@@ -185,6 +185,9 @@ public abstract class PageMethod {
         Page<?> page = getLocalPage();
         if (page != null) {
             page.setOrderBy(orderBy);
+            if (page.getPageSizeZero() != null && page.getPageSizeZero() && page.getPageSize() == 0) {
+                page.setOrderByOnly(true);
+            }
         } else {
             page = new Page();
             page.setOrderBy(orderBy);
