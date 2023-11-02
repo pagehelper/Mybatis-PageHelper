@@ -62,4 +62,15 @@ public class CountColumnTest {
             sqlSession.close();
         }
     }
+
+    @Test(expected = Exception.class)
+    public void testCountColumnInject() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        try {
+            //获取第1页，10条内容，默认查询总数count
+            PageHelper.startPage(1, 10).countColumn("delete from user");
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

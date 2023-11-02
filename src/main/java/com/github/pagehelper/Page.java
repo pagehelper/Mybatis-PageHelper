@@ -277,7 +277,8 @@ public class Page<E> extends ArrayList<E> implements Closeable {
      */
     public <E> Page<E> setOrderBy(String orderBy) {
         if (SqlSafeUtil.check(orderBy)) {
-            throw new PageException("order by [" + orderBy + "] 存在 SQL 注入风险, 如想避免 SQL 注入校验，可以调用 Page.setUnsafeOrderBy");
+            throw new PageException("order by [" + orderBy + "] has a risk of SQL injection, " +
+                    "if you want to avoid SQL injection verification, you can call Page.setUnsafeOrderBy");
         }
         this.orderBy = orderBy;
         return (Page<E>) this;
@@ -431,7 +432,7 @@ public class Page<E> extends ArrayList<E> implements Closeable {
      * @return
      */
     public Page<E> countColumn(String columnName) {
-        this.countColumn = columnName;
+        setCountColumn(columnName);
         return this;
     }
 
@@ -540,6 +541,9 @@ public class Page<E> extends ArrayList<E> implements Closeable {
     }
 
     public void setCountColumn(String countColumn) {
+        if (!"0".equals(countColumn) && !"*".equals(countColumn) && SqlSafeUtil.check(countColumn)) {
+            throw new PageException("count(" + countColumn + ") has a risk of SQL injection");
+        }
         this.countColumn = countColumn;
     }
 
