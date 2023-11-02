@@ -118,7 +118,7 @@ public class UsingDialectClassTest {
             assertEquals(183, page.getTotal());
 
 
-            PageHelper.startPage(2, 10);
+            PageHelper.startPage(3, 10);
             list = userMapper.selectAll();
             page = new PageInfo<User>(list);
 
