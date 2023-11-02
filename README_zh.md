@@ -77,6 +77,10 @@ static {
 >
 >```xml
 ><property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+><!-- 支持下面的引用方式，引用 Oracle9iDialect.class 的实现 -->
+><property name="dialectAlias" value="oracle=oracle9i"/>
+><!-- 支持下面的引用方式，达梦使用oracle语法分页，简化类全名写法 -->
+><property name="dialectAlias" value="dm=oracle"/>
 >```
 
 ## 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java)

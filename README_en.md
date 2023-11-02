@@ -89,6 +89,10 @@ static {
 >
 >```xml
 ><property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
+><!-- The following reference is supported, referencing the implementation of Oracle9iDialect.class -->
+><property name="dialectAlias" value="oracle=oracle9i"/>
+><!-- To support the following citation methods, DM uses oracle syntax for pagination to simplify the writing of the full name of the class -->
+><property name="dialectAlias" value="dm=oracle"/>
 >```
 
 ## Use [QueryInterceptor spec](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java)

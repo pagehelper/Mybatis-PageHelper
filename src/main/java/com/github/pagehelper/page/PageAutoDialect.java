@@ -300,9 +300,14 @@ public class PageAutoDialect {
                 }
                 for (int j = 0; j < kv.length; j++) {
                     try {
-                        Class<? extends Dialect> diallectClass = (Class<? extends Dialect>) Class.forName(kv[1]);
-                        //允许覆盖已有的实现
-                        registerDialectAlias(kv[0], diallectClass);
+                        //允许配置如 dm=oracle, 直接引用oracle实现
+                        if (dialectAliasMap.containsKey(kv[1])) {
+                            registerDialectAlias(kv[0], dialectAliasMap.get(kv[1]));
+                        } else {
+                            Class<? extends Dialect> diallectClass = (Class<? extends Dialect>) Class.forName(kv[1]);
+                            //允许覆盖已有的实现
+                            registerDialectAlias(kv[0], diallectClass);
+                        }
                     } catch (ClassNotFoundException e) {
                         throw new IllegalArgumentException("请确保 dialectAlias 配置的 Dialect 实现类存在!", e);
                     }
