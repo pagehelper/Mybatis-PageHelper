@@ -212,13 +212,14 @@ public class PageInterceptor implements Interceptor {
         if (StringUtil.isEmpty(dialectClass)) {
             dialectClass = default_dialect_class;
         }
+        Dialect tempDialect = null;
         try {
             Class<?> aClass = Class.forName(dialectClass);
-            dialect = (Dialect) aClass.newInstance();
+            tempDialect = (Dialect) aClass.newInstance();
+            tempDialect.setProperties(properties);
         } catch (Exception e) {
             throw new PageException(e);
         }
-        dialect.setProperties(properties);
 
         String countSuffix = properties.getProperty("countSuffix");
         if (StringUtil.isNotEmpty(countSuffix)) {
@@ -241,6 +242,8 @@ public class PageInterceptor implements Interceptor {
                 throw new PageException(e);
             }
         }
+        // 初始化完成后再设置值，保证 dialect 完成初始化
+        dialect = tempDialect;
     }
 
 }
