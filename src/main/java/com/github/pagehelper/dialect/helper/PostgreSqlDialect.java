@@ -41,7 +41,7 @@ import java.util.Map;
  * PostgreSQL 方言.
  *
  * @author liym
- * @since 2021-02-06 19:27 新建
+ * @since 2021-02-06
  */
 public class PostgreSqlDialect extends AbstractHelperDialect {
 

@@ -129,8 +129,8 @@ public class SqlServerDialect extends AbstractHelperDialect {
                     ((PageProperties) this.replaceSql).setProperties(properties);
                 }
             } catch (Exception e) {
-                throw new RuntimeException("replaceSql 参数配置的值不符合要求，可选值为 simple 和 regex，或者是实现了 "
-                        + ReplaceSql.class.getCanonicalName() + " 接口的全限定类名", e);
+                throw new RuntimeException("The value of the replaceSql parameter configuration does not meet the requirements, and the optional values are simple and regex, or the "
+                        + ReplaceSql.class.getCanonicalName() + " fully qualified class name of the interface", e);
             }
         }
         String sqlCacheClass = properties.getProperty("sqlCacheClass");

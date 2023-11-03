@@ -71,7 +71,7 @@ public class DefaultAutoDialect implements AutoDialect<String> {
     public AbstractHelperDialect extractDialect(String dialectKey, MappedStatement ms, DataSource dataSource, Properties properties) {
         String dialectStr = PageAutoDialect.fromJdbcUrl(dialectKey);
         if (dialectStr == null) {
-            throw new PageException("无法自动获取数据库类型，请通过 helperDialect 参数指定!");
+            throw new PageException("The database type cannot be obtained automatically, please specify it via the helperDialect parameter!");
         }
         return PageAutoDialect.instanceDialect(dialectStr, properties);
     }

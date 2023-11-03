@@ -61,12 +61,12 @@ public class OrderByParser {
             List<OrderByElement> orderByElements = extraOrderBy(selectBody);
             String defaultOrderBy = PlainSelect.orderByToString(orderByElements);
             if (defaultOrderBy.indexOf('?') != -1) {
-                throw new PageException("原SQL[" + sql + "]中的order by包含参数，因此不能使用OrderBy插件进行修改!");
+                throw new PageException("The order by in the original SQL[" + sql + "] contains parameters, so it cannot be modified using the OrderBy plugin!");
             }
             //新的sql
             sql = select.toString();
         } catch (Throwable e) {
-            log.warn("处理排序失败: " + e + "，降级为直接拼接 order by 参数");
+            log.warn("Failed to handle sorting: " + e + ", downgraded to a direct splice of the order by parameter");
         }
         return sql + " order by " + orderBy;
     }

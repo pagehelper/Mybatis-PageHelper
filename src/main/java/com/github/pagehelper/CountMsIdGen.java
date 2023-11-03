@@ -41,12 +41,7 @@ public interface CountMsIdGen {
     /**
      * 默认实现
      */
-    CountMsIdGen DEFAULT = new CountMsIdGen() {
-        @Override
-        public String genCountMsId(MappedStatement ms, Object parameter, BoundSql boundSql, String countSuffix) {
-            return ms.getId() + countSuffix;
-        }
-    };
+    CountMsIdGen DEFAULT = (ms, parameter, boundSql, countSuffix) -> ms.getId() + countSuffix;
 
     /**
      * 构建当前查询对应的 count 方法 id

@@ -63,12 +63,7 @@ public interface BoundSqlInterceptor {
      */
     interface Chain {
 
-        Chain DO_NOTHING = new Chain() {
-            @Override
-            public BoundSql doBoundSql(Type type, BoundSql boundSql, CacheKey cacheKey) {
-                return boundSql;
-            }
-        };
+        Chain DO_NOTHING = (type, boundSql, cacheKey) -> boundSql;
 
         BoundSql doBoundSql(Type type, BoundSql boundSql, CacheKey cacheKey);
 

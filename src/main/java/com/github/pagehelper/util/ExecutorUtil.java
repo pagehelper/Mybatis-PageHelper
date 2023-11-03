@@ -55,7 +55,7 @@ public abstract class ExecutorUtil {
             additionalParametersField = BoundSql.class.getDeclaredField("additionalParameters");
             additionalParametersField.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw new PageException("获取 BoundSql 属性 additionalParameters 失败: " + e, e);
+            throw new PageException("Failed to get the BoundSql property additionalParameters: " + e, e);
         }
         try {
             //兼容低版本
@@ -75,7 +75,7 @@ public abstract class ExecutorUtil {
         try {
             return (Map<String, Object>) additionalParametersField.get(boundSql);
         } catch (IllegalAccessException e) {
-            throw new PageException("获取 BoundSql 属性值 additionalParameters 失败: " + e, e);
+            throw new PageException("Failed to get the BoundSql property additionalParameters: " + e, e);
         }
     }
 
@@ -89,7 +89,7 @@ public abstract class ExecutorUtil {
         try {
             return providerMethodArgumentNamesField != null ? (String[]) providerMethodArgumentNamesField.get(providerSqlSource) : null;
         } catch (IllegalAccessException e) {
-            throw new PageException("获取 ProviderSqlSource 属性值 providerMethodArgumentNames: " + e, e);
+            throw new PageException("Get the ProviderSqlSource property value of providerMethodArgumentNames: " + e, e);
         }
     }
 

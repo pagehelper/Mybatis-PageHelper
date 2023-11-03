@@ -48,12 +48,7 @@ public interface JSqlParser {
     /**
      * 默认实现
      */
-    JSqlParser DEFAULT = new JSqlParser() {
-        @Override
-        public Statement parse(String statementReader) throws JSQLParserException {
-            return CCJSqlParserUtil.parse(statementReader, parser -> parser.withSquareBracketQuotation(true));
-        }
-    };
+    JSqlParser DEFAULT = statementReader -> CCJSqlParserUtil.parse(statementReader, parser -> parser.withSquareBracketQuotation(true));
 
     /**
      * 解析 SQL

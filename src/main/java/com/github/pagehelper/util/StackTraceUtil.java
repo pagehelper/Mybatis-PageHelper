@@ -33,7 +33,7 @@ public class StackTraceUtil {
      * 当前方法堆栈信息
      */
     public static String current() {
-        Exception exception = new Exception("设置分页参数时的堆栈信息");
+        Exception exception = new Exception("Stack information when setting pagination parameters");
         StringWriter writer = new StringWriter();
         exception.printStackTrace(new PrintWriter(writer));
         return writer.toString();
