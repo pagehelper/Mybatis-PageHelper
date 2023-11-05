@@ -25,7 +25,6 @@
 package com.github.pagehelper.dialect.helper;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
@@ -34,6 +33,7 @@ import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.dialect.replace.SimpleWithNolockReplaceSql;
 import com.github.pagehelper.parser.OrderByParser;
 import com.github.pagehelper.parser.SqlServerParser;
+import com.github.pagehelper.util.ClassUtil;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
@@ -123,15 +123,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
         } else if ("simple".equalsIgnoreCase(replaceSql)) {
             this.replaceSql = new SimpleWithNolockReplaceSql();
         } else {
-            try {
-                this.replaceSql = (ReplaceSql) Class.forName(replaceSql).newInstance();
-                if (this.replaceSql instanceof PageProperties) {
-                    ((PageProperties) this.replaceSql).setProperties(properties);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("The value of the replaceSql parameter configuration does not meet the requirements, and the optional values are simple and regex, or the "
-                        + ReplaceSql.class.getCanonicalName() + " fully qualified class name of the interface", e);
-            }
+            this.replaceSql = ClassUtil.newInstance(replaceSql, properties);
         }
         String sqlCacheClass = properties.getProperty("sqlCacheClass");
         if (StringUtil.isNotEmpty(sqlCacheClass) && !sqlCacheClass.equalsIgnoreCase("false")) {

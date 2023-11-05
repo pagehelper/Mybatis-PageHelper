@@ -60,7 +60,7 @@
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
                 <property name="url" value="jdbc:mysql://localhost:3306/pagehelper"/>
                 <property name="username" value="root"/>
-                <property name="password" value=""/>
+                <property name="password" value="root"/>
             </dataSource>
         </environment>
     </environments>

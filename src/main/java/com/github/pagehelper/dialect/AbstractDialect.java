@@ -30,6 +30,7 @@ import com.github.pagehelper.PageException;
 import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.DefaultCountSqlParser;
+import com.github.pagehelper.util.ClassUtil;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
@@ -59,15 +60,7 @@ public abstract class AbstractDialect implements Dialect {
         // 自定义 jsqlparser 的 sql 解析器
         String sqlParser = properties.getProperty("sqlParser");
         if (StringUtil.isNotEmpty(sqlParser)) {
-            try {
-                Class<?> aClass = Class.forName(sqlParser);
-                jSqlParser = (JSqlParser) aClass.newInstance();
-                if (jSqlParser instanceof PageProperties) {
-                    ((PageProperties) jSqlParser).setProperties(properties);
-                }
-            } catch (Exception e) {
-                throw new PageException(e);
-            }
+            jSqlParser = ClassUtil.newInstance(sqlParser, properties);
         } else {
             jSqlParser = JSqlParser.DEFAULT;
         }

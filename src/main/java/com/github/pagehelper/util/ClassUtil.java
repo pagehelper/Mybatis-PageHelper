@@ -22,37 +22,34 @@
  * THE SOFTWARE.
  */
 
-package com.github.pagehelper.page;
+package com.github.pagehelper.util;
 
-import com.github.pagehelper.BoundSqlInterceptor;
-import com.github.pagehelper.BoundSqlInterceptorChain;
-import com.github.pagehelper.util.ClassUtil;
-import com.github.pagehelper.util.StringUtil;
+import com.github.pagehelper.PageException;
+import com.github.pagehelper.PageProperties;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-public class PageBoundSqlInterceptors {
+public class ClassUtil {
 
-    private BoundSqlInterceptor.Chain chain;
-
-    public void setProperties(Properties properties) {
-        //初始化 boundSqlInterceptorChain
-        String boundSqlInterceptorStr = properties.getProperty("boundSqlInterceptors");
-        if (StringUtil.isNotEmpty(boundSqlInterceptorStr)) {
-            String[] boundSqlInterceptors = boundSqlInterceptorStr.split("[;|,]");
-            List<BoundSqlInterceptor> list = new ArrayList<BoundSqlInterceptor>();
-            for (int i = 0; i < boundSqlInterceptors.length; i++) {
-                list.add(ClassUtil.newInstance(boundSqlInterceptors[i], properties));
-            }
-            if (list.size() > 0) {
-                chain = new BoundSqlInterceptorChain(null, list);
-            }
+    public static <T> T newInstance(String classStr, Properties properties) {
+        try {
+            Class<?> cls = Class.forName(classStr);
+            return (T) newInstance(cls, properties);
+        } catch (Exception e) {
+            throw new PageException(e);
         }
     }
 
-    public BoundSqlInterceptor.Chain getChain() {
-        return chain;
+    public static <T> T newInstance(Class<T> cls, Properties properties) {
+        try {
+            T instance = cls.newInstance();
+            if (instance instanceof PageProperties) {
+                ((PageProperties) instance).setProperties(properties);
+            }
+            return instance;
+        } catch (Exception e) {
+            throw new PageException(e);
+        }
     }
+
 }

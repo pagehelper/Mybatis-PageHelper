@@ -28,7 +28,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.github.pagehelper.mapper.UserMapper">
-    <cache/>
+    <!--    <cache/>-->
     <select id="selectAll" resultType="User">
         select * from user order by id -- comment
     </select>
@@ -551,5 +551,22 @@
     </select>
     <select id="selectByCode_TESTCOUNT" resultType="Long">
         select count(distinct id) from user where py = #{code, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+    </select>
+    <!-- 数据来源：https://github.com/datacharmer/test_db -->
+    <select id="selectEmployees" resultType="map">
+        select d.dept_name , e.emp_no ,e.first_name ,e.last_name ,e.gender , e.hire_date , s.from_date ,s.to_date
+        ,s.salary
+        from employees e
+        inner join dept_emp de on e.emp_no = de.emp_no
+        inner join departments d on de.dept_no = d.dept_no
+        left join salaries s on e.emp_no = s.emp_no
+        order by d.dept_name , e.emp_no, s.from_date
+    </select>
+    <select id="selectEmployees2" resultType="map">
+        select e.emp_no ,e.first_name ,e.last_name ,e.gender , e.hire_date , s.from_date ,s.to_date ,s.salary
+        from employees e
+        inner join dept_emp de on e.emp_no = de.emp_no
+        left join salaries s on e.emp_no = s.emp_no
+        order by e.emp_no, s.from_date
     </select>
 </mapper>

@@ -40,22 +40,42 @@ import java.util.Properties;
  * @author liuzh
  */
 public class PageParams {
-    //RowBounds参数offset作为PageNum使用 - 默认不使用
+    /**
+     * RowBounds参数offset作为PageNum使用 - 默认不使用
+     */
     protected boolean offsetAsPageNum         = false;
-    //RowBounds是否进行count查询 - 默认不查询
+    /**
+     * RowBounds是否进行count查询 - 默认不查询
+     */
     protected boolean rowBoundsWithCount      = false;
-    //当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+    /**
+     * 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+     */
     protected boolean pageSizeZero            = false;
-    //分页合理化
+    /**
+     * 分页合理化
+     */
     protected boolean reasonable              = false;
-    //是否支持接口参数来传递分页参数，默认false
+    /**
+     * 是否支持接口参数来传递分页参数，默认false
+     */
     protected boolean supportMethodsArguments = false;
-    //默认count(0)
+    /**
+     * 默认count(0)
+     */
     protected String  countColumn             = "0";
-    //转换count查询时保留 order by 排序
+    /**
+     * 转换count查询时保留 order by 排序
+     */
     private   boolean keepOrderBy             = false;
-    //转换count查询时保留子查询的 order by 排序
+    /**
+     * 转换count查询时保留子查询的 order by 排序
+     */
     private   boolean keepSubSelectOrderBy    = false;
+    /**
+     * 异步count查询
+     */
+    private   boolean asyncCount              = false;
 
     /**
      * 获取分页参数
@@ -136,6 +156,8 @@ public class PageParams {
         keepOrderBy = Boolean.parseBoolean(properties.getProperty("keepOrderBy"));
         // count查询时，是否保留子查询中的 order by
         keepSubSelectOrderBy = Boolean.parseBoolean(properties.getProperty("keepSubSelectOrderBy"));
+        // 异步count查询
+        asyncCount = Boolean.parseBoolean(properties.getProperty("asyncCount"));
     }
 
     public boolean isOffsetAsPageNum() {
@@ -160,5 +182,9 @@ public class PageParams {
 
     public String getCountColumn() {
         return countColumn;
+    }
+
+    public boolean isAsyncCount() {
+        return asyncCount;
     }
 }

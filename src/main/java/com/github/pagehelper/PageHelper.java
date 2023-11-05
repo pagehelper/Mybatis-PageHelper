@@ -39,6 +39,11 @@ import org.apache.ibatis.session.RowBounds;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
+import java.util.concurrent.Future;
 
 /**
  * Mybatis - 通用分页拦截器<br/>
@@ -48,9 +53,10 @@ import java.util.Properties;
  * @version 5.0.0
  */
 public class PageHelper extends PageMethod implements Dialect, BoundSqlInterceptor.Chain {
-    private PageParams pageParams;
-    private PageAutoDialect autoDialect;
+    private PageParams               pageParams;
+    private PageAutoDialect          autoDialect;
     private PageBoundSqlInterceptors pageBoundSqlInterceptors;
+    private ForkJoinPool             asyncCountService;
 
     @Override
     public boolean skip(MappedStatement ms, Object parameterObject, RowBounds rowBounds) {
@@ -62,9 +68,37 @@ public class PageHelper extends PageMethod implements Dialect, BoundSqlIntercept
             if (StringUtil.isEmpty(page.getCountColumn())) {
                 page.setCountColumn(pageParams.getCountColumn());
             }
+            //设置默认的异步 count 设置
+            if (page.getAsyncCount() == null) {
+                page.setAsyncCount(pageParams.isAsyncCount());
+            }
             autoDialect.initDelegateDialect(ms, page.getDialectClass());
             return false;
         }
+    }
+
+    @Override
+    public boolean isAsyncCount() {
+        return getLocalPage().asyncCount();
+    }
+
+    @Override
+    public <T> Future<T> asyncCountTask(Callable<T> task) {
+        //异步执行时需要将ThreadLocal值传递，否则会找不到
+        AbstractHelperDialect dialectThreadLocal = autoDialect.getDialectThreadLocal();
+        Page<Object> localPage = getLocalPage();
+        String countId = UUID.randomUUID().toString();
+        return asyncCountService.submit(() -> {
+            try {
+                //设置 ThreadLocal
+                autoDialect.setDialectThreadLocal(dialectThreadLocal);
+                setLocalPage(localPage);
+                return task.call();
+            } finally {
+                autoDialect.clearDelegate();
+                clearPage();
+            }
+        });
     }
 
     @Override
@@ -155,5 +189,14 @@ public class PageHelper extends PageMethod implements Dialect, BoundSqlIntercept
         pageBoundSqlInterceptors.setProperties(properties);
         //20180902新增 aggregateFunctions, 允许手动添加聚合函数（影响行数）
         CountSqlParser.addAggregateFunctions(properties.getProperty("aggregateFunctions"));
+        // 异步 asyncCountService 并发度设置，这里默认为应用可用的处理器核心数 * 2，更合理的值应该综合考虑数据库服务器的处理能力
+        int asyncCountParallelism = Integer.parseInt(properties.getProperty("asyncCountParallelism",
+                "" + (Runtime.getRuntime().availableProcessors() * 2)));
+        asyncCountService = new ForkJoinPool(asyncCountParallelism,
+                pool -> {
+                    final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+                    worker.setName("pagehelper-async-count-" + worker.getPoolIndex());
+                    return worker;
+                }, null, true);
     }
 }

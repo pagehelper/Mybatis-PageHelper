@@ -36,8 +36,8 @@ import java.util.Properties;
  * @author liuzh
  */
 public abstract class PageMethod {
-    protected static final ThreadLocal<Page> LOCAL_PAGE = new ThreadLocal<Page>();
-    protected static boolean DEFAULT_COUNT = true;
+    protected static final ThreadLocal<Page> LOCAL_PAGE    = new ThreadLocal<Page>();
+    protected static       boolean           DEFAULT_COUNT = true;
 
     /**
      * 设置 Page 参数
@@ -71,7 +71,8 @@ public abstract class PageMethod {
      * @return
      */
     public static long count(ISelect select) {
-        Page<?> page = startPage(1, -1, true);
+        //单纯count查询时禁用异步count
+        Page<?> page = startPage(1, -1, true).disableAsyncCount();
         select.doSelect();
         return page.getTotal();
     }
@@ -201,9 +202,9 @@ public abstract class PageMethod {
      *
      * @param properties 插件属性
      */
-    protected static void setStaticProperties(Properties properties){
+    protected static void setStaticProperties(Properties properties) {
         //defaultCount，这是一个全局生效的参数，多数据源时也是统一的行为
-        if(properties != null){
+        if (properties != null) {
             DEFAULT_COUNT = Boolean.valueOf(properties.getProperty("defaultCount", "true"));
         }
     }

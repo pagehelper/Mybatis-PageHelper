@@ -27,23 +27,32 @@ package com.github.pagehelper;
 import com.github.pagehelper.cache.Cache;
 import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.page.PageMethod;
+import com.github.pagehelper.util.ClassUtil;
 import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MSUtils;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.executor.CachingExecutor;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.SimpleExecutor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.transaction.Transaction;
+import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
 /**
  * Mybatis - 通用分页拦截器
@@ -134,18 +143,27 @@ public class PageInterceptor implements Interceptor {
                 //开启debug时，输出触发当前分页执行时的PageHelper调用堆栈
                 // 如果和当前调用堆栈不一致，说明在启用分页后没有消费，当前线程再次执行时消费，调用堆栈显示的方法使用不安全
                 debugStackTraceLog();
+                Future<Long> countFuture = null;
                 //判断是否需要进行 count 查询
                 if (dialect.beforeCount(ms, parameter, rowBounds)) {
-                    //查询总数
-                    Long count = count(executor, ms, parameter, rowBounds, null, boundSql);
-                    //处理查询总数，返回 true 时继续分页查询，false 时直接返回
-                    if (!dialect.afterCount(count, parameter, rowBounds)) {
-                        //当查询总数为 0 时，直接返回空的结果
-                        return dialect.afterPage(new ArrayList(), parameter, rowBounds);
+                    if (dialect.isAsyncCount()) {
+                        countFuture = asyncCount(ms, boundSql, parameter, rowBounds);
+                    } else {
+                        //查询总数
+                        Long count = count(executor, ms, parameter, rowBounds, null, boundSql);
+                        //处理查询总数，返回 true 时继续分页查询，false 时直接返回
+                        if (!dialect.afterCount(count, parameter, rowBounds)) {
+                            //当查询总数为 0 时，直接返回空的结果
+                            return dialect.afterPage(new ArrayList(), parameter, rowBounds);
+                        }
                     }
                 }
                 resultList = ExecutorUtil.pageQuery(dialect, executor,
                         ms, parameter, rowBounds, resultHandler, boundSql, cacheKey);
+                if (countFuture != null) {
+                    Long count = countFuture.get();
+                    dialect.afterCount(count, parameter, rowBounds);
+                }
             } else {
                 //rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
                 resultList = executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
@@ -156,6 +174,35 @@ public class PageInterceptor implements Interceptor {
                 dialect.afterAll();
             }
         }
+    }
+
+    /**
+     * 异步查询总数
+     */
+    private Future<Long> asyncCount(MappedStatement ms, BoundSql boundSql, Object parameter, RowBounds rowBounds) {
+        Configuration configuration = ms.getConfiguration();
+        //异步不能复用 BoundSql，因为分页使用时会添加分页参数，这里需要复制一个新的
+        BoundSql countBoundSql = new BoundSql(configuration, boundSql.getSql(), new ArrayList<>(boundSql.getParameterMappings()), parameter);
+        //异步想要起作用需要新的数据库连接，需要独立的事务，创建新的Executor，因此异步查询只适合在独立查询中使用，如果混合增删改操作，不能开启异步
+        Environment environment = configuration.getEnvironment();
+        TransactionFactory transactionFactory = null;
+        if (environment == null || environment.getTransactionFactory() == null) {
+            transactionFactory = new ManagedTransactionFactory();
+        } else {
+            transactionFactory = environment.getTransactionFactory();
+        }
+        //创建新的事务
+        Transaction tx = transactionFactory.newTransaction(environment.getDataSource(), null, false);
+        //使用新的 Executor 执行 count 查询，这里没有加载拦截器，避免递归死循环
+        Executor countExecutor = new CachingExecutor(new SimpleExecutor(configuration, tx));
+
+        return dialect.asyncCountTask(() -> {
+            try {
+                return count(countExecutor, ms, parameter, rowBounds, null, countBoundSql);
+            } finally {
+                tx.close();
+            }
+        });
     }
 
     /**
@@ -212,14 +259,8 @@ public class PageInterceptor implements Interceptor {
         if (StringUtil.isEmpty(dialectClass)) {
             dialectClass = default_dialect_class;
         }
-        Dialect tempDialect = null;
-        try {
-            Class<?> aClass = Class.forName(dialectClass);
-            tempDialect = (Dialect) aClass.newInstance();
-            tempDialect.setProperties(properties);
-        } catch (Exception e) {
-            throw new PageException(e);
-        }
+        Dialect tempDialect = ClassUtil.newInstance(dialectClass, properties);
+        tempDialect.setProperties(properties);
 
         String countSuffix = properties.getProperty("countSuffix");
         if (StringUtil.isNotEmpty(countSuffix)) {
@@ -232,15 +273,7 @@ public class PageInterceptor implements Interceptor {
         // 通过 countMsId 配置自定义类
         String countMsIdGenClass = properties.getProperty("countMsIdGen");
         if (StringUtil.isNotEmpty(countMsIdGenClass)) {
-            try {
-                Class<?> aClass = Class.forName(countMsIdGenClass);
-                countMsIdGen = (CountMsIdGen) aClass.newInstance();
-                if (countMsIdGen instanceof PageProperties) {
-                    ((PageProperties) countMsIdGen).setProperties(properties);
-                }
-            } catch (Exception e) {
-                throw new PageException(e);
-            }
+            countMsIdGen = ClassUtil.newInstance(countMsIdGenClass, properties);
         }
         // 初始化完成后再设置值，保证 dialect 完成初始化
         dialect = tempDialect;

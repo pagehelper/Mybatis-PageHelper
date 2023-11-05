@@ -27,10 +27,10 @@ package com.github.pagehelper.page;
 import com.github.pagehelper.AutoDialect;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.PageException;
-import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.dialect.auto.*;
 import com.github.pagehelper.dialect.helper.*;
+import com.github.pagehelper.util.ClassUtil;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.mapping.MappedStatement;
 
@@ -160,6 +160,14 @@ public class PageAutoDialect {
         dialectThreadLocal.remove();
     }
 
+    public AbstractHelperDialect getDialectThreadLocal() {
+        return dialectThreadLocal.get();
+    }
+
+    public void setDialectThreadLocal(AbstractHelperDialect delegate) {
+        this.dialectThreadLocal.set(delegate);
+    }
+
     /**
      * 反射类
      *
@@ -269,10 +277,7 @@ public class PageAutoDialect {
                 } else {
                     autoDialectClass = (Class<AutoDialect>) Class.forName(autoDialectClassStr);
                 }
-                this.autoDialectDelegate = autoDialectClass.getConstructor().newInstance();
-                if (this.autoDialectDelegate instanceof PageProperties) {
-                    ((PageProperties) this.autoDialectDelegate).setProperties(properties);
-                }
+                this.autoDialectDelegate = ClassUtil.newInstance(autoDialectClass, properties);
             } catch (ClassNotFoundException e) {
                 throw new IllegalArgumentException("Make sure that the AutoDialect implementation class ("
                         + autoDialectClassStr + ") for the autoDialectClass configuration exists!", e);
@@ -318,6 +323,8 @@ public class PageAutoDialect {
     }
 
     public void setProperties(Properties properties) {
+
+        this.properties = properties;
         //初始化自定义AutoDialect
         initAutoDialectClass(properties);
         //使用 sqlserver2012 作为默认分页方式，这种情况在动态数据源时方便使用
@@ -334,12 +341,10 @@ public class PageAutoDialect {
         //1.动态多数据源
         if (StringUtil.isNotEmpty(runtimeDialect) && "TRUE".equalsIgnoreCase(runtimeDialect)) {
             this.autoDialect = false;
-            this.properties = properties;
         }
         //2.动态获取方言
         else if (StringUtil.isEmpty(dialect)) {
             autoDialect = true;
-            this.properties = properties;
         }
         //3.指定方言
         else {

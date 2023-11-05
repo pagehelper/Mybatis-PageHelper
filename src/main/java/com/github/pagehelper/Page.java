@@ -114,6 +114,10 @@ public class Page<E> extends ArrayList<E> implements Closeable {
      * 转换count查询时保留子查询的 order by 排序
      */
     private              Boolean                   keepSubSelectOrderBy;
+    /**
+     * 异步count查询
+     */
+    private              Boolean                   asyncCount;
 
     public Page() {
         super();
@@ -329,6 +333,14 @@ public class Page<E> extends ArrayList<E> implements Closeable {
         this.keepSubSelectOrderBy = keepSubSelectOrderBy;
     }
 
+    public Boolean getAsyncCount() {
+        return asyncCount;
+    }
+
+    public void setAsyncCount(Boolean asyncCount) {
+        this.asyncCount = asyncCount;
+    }
+
     /**
      * 指定使用的分页实现，如果自己使用的很频繁，建议自己增加一层封装再使用
      *
@@ -464,6 +476,40 @@ public class Page<E> extends ArrayList<E> implements Closeable {
 
     public boolean keepSubSelectOrderBy() {
         return this.keepSubSelectOrderBy != null && this.keepSubSelectOrderBy;
+    }
+
+    /**
+     * 异步count查询
+     *
+     * @param asyncCount
+     * @return
+     */
+    public Page<E> asyncCount(boolean asyncCount) {
+        this.asyncCount = asyncCount;
+        return this;
+    }
+
+    /**
+     * 使用异步count查询
+     *
+     * @return
+     */
+    public Page<E> enableAsyncCount() {
+        return asyncCount(true);
+    }
+
+    /**
+     * 不使用异步count查询
+     *
+     * @return
+     */
+    public Page<E> disableAsyncCount() {
+        return asyncCount(false);
+    }
+
+
+    public boolean asyncCount() {
+        return this.asyncCount != null && this.asyncCount;
     }
 
     public PageInfo<E> toPageInfo() {

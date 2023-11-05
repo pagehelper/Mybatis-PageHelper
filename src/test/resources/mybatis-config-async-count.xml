@@ -40,9 +40,17 @@
 
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
-            <property name="helperDialect" value="mysql"/>
-            <property name="offsetAsPageNum" value="true"/>
+            <property name="debug" value="true"/>
+            <property name="supportMethodsArguments" value="true"/>
+            <!-- 运行时自动判断数据库类型，支持多数据源DataSource分页 -->
+            <property name="autoRuntimeDialect" value="true"/>
+            <property name="closeConn" value="true"/>
             <property name="rowBoundsWithCount" value="true"/>
+            <!-- 该参数可选，可以设置sql缓存实现类，默认为SimpleCache，当项目包含guava时，使用GuavaCache，
+                 也可以通过参数 sqlCacheClass 指定自己的实现类 -->
+            <property name="sqlCacheClass" value="com.github.pagehelper.cache.SimpleCache"/>
+            <property name="countColumn" value="1"/>
+            <property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
         </plugin>
     </plugins>
 
@@ -53,7 +61,8 @@
             </transactionManager>
             <dataSource type="UNPOOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/pagehelper"/>
+                <!-- 数据来源：https://github.com/datacharmer/test_db -->
+                <property name="url" value="jdbc:mysql://localhost:3306/employees"/>
                 <property name="username" value="root"/>
                 <property name="password" value="root"/>
             </dataSource>
