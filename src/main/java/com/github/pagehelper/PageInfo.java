@@ -259,7 +259,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      * @param <E>      目标类型
      * @return 转换了对象类型的包装结果
      */
-    private <E> PageInfo<E> convert(Page.Function<T, E> function) {
+    public <E> PageInfo<E> convert(Page.Function<T, E> function) {
         List<E> list = new ArrayList<E>(this.list.size());
         for (T t : this.list) {
             list.add(function.apply(t));

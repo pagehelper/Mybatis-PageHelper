@@ -1,5 +1,33 @@
 ## Changelog
 
+### 6.0.0 - 2023-11-05
+
+- Based on JDK 8 adaptation, JDK 6 and 7 are not supported from 6.0 onwards, and 5.x versions can be used if necessary
+- Added asynchronous count support, configure `asyncCount` globally, default `false`，single activation
+  by `PageHelper.startPage(1, 10).enableAsyncCount()`;
+  Asynchronous queries are performed using independent connections (transactions),
+  and it is not suitable to enable asynchronous queries when the query is affected by addition, deletion, and
+  modification operations. closed #334
+- JSqlParser opens `parser.withSquareBracketQuotation(true)` by default and supports SqlServer `[]`
+- feat: A new method for data object conversion has been added to the `PageInfo`,
+  method: ` <E> PageInfo<E> convert(Page.Function<T, E> function)` **by codeke**
+- `CountSqlParser` is changed to an interface, allowing the `countSqlParser` parameter to be replaced with your own
+  implementation, which is supported #772
+- `dialectAlias` supports simplified configurations, e.g. `dm=oracle;oracle=oracle9i`, a direct reference to the current
+  abbreviation, without writing the full name of the class
+- `countColumn`add injection detection, fixed #686
+- Add the `PageParam` class, which does not embed objects (will affect the use), if you want to use, you can inherit the
+  object,closed #562
+- All exception messages have been changed to English
+- open `setLocalPage` method, support #771
+- Solve the problem of handling order by error when `sqlserver` with union sql parsing,fixed #768
+- Optimized the total logic to solve the problem that the query is not pagination and the order by is invalid. fixed
+  #641
+- Modify the dialect instantiation logic to ensure that the class is used after the configuration is completed. fixed
+  #742
+- `dialectAliasMap` change to `LinkedHashMap` type, support matching in configuration order, fixed #758
+- fixed the pagination bug of xingyun database **by maimaitiyaer_bonc**
+-
 ### 5.3.3 - 2023-06-03
 
 - Ignoring unnecessarily generated surefire-report **by java-codehunger**

@@ -1,5 +1,25 @@
 ## 更新日志
 
+### 6.0.0 - 2023-11-05
+
+- 基于jdk8适配，6.0开始不支持jdk6和7，如果有需要可以使用5.x版本
+- 增加异步count支持，全局配置`asyncCount`，默认`false`，单次设置：`PageHelper.startPage(1, 10).enableAsyncCount()`;
+  异步使用独立连接（事务）查询，有增删改操作影响查询时不适合开启异步查询。closed #334
+- JSqlParser默认开启 `parser.withSquareBracketQuotation(true)`，支持 SqlServer `[]`
+- feat: 在`PageInfo`类中新增了用以进行数据对象转换的方法 ` <E> PageInfo<E> convert(Page.Function<T, E> function)` **by
+  codeke**
+- `CountSqlParser`改为接口，允许通过`countSqlParser`参数替换为自己的实现，支持 #772
+- `dialectAlias`支持简化配置，例如`dm=oracle;oracle=oracle9i`，直接引用现在的缩写，不用写类全名
+- `countColumn`添加注入检测，fixed #686
+- 增加`PageParam`类，不内嵌对象（会影响使用），如果想用可以继承该对象，closed #562
+- 所有异常信息改为英文提示
+- 放开 `setLocalPage`，支持 #771
+- 解决`sqlserver`带union sql解析时处理order by错误的问题，fixed #768
+- 优化total逻辑，解决指定不分页查询，同时指定order by时无效的问题，fixed #641
+- 修改 dialect 实例化逻辑，保证类完成配置后使用，fixed #742
+- `dialectAliasMap`改为`LinkedHashMap`，可以按配置顺序进行匹配，fixed #758
+- 行云数据库分页BUG修复 **by maimaitiyaer_bonc**
+
 ### 5.3.3 - 2023-06-03
 
 - Ignoring unnecessarily generated surefire-report **by java-codehunger**

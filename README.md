@@ -12,12 +12,6 @@
 
 想要使用分页插件？请看[如何使用分页插件](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md)。
 
-## 新增 JavaDoc 文档
-
-文档地址：https://apidoc.gitee.com/free/Mybatis_PageHelper
-
-Method API: https://apidoc.gitee.com/free/Mybatis_PageHelper/com/github/pagehelper/page/PageMethod.html
-
 ## 《MyBatis 从入门到精通》
 
 ![MyBatis 从入门到精通](https://github.com/mybatis-book/book/raw/master/book.png)
@@ -31,6 +25,10 @@ GitHub项目：https://github.com/mybatis-book/book
 
 ## 支持 [MyBatis 3.1.0+](https://github.com/mybatis/mybatis-3)
 
+## PageHelper 6 支持 jdk8+
+
+## PageHelper 5 支持 jdk6+
+
 ## 物理分页
 
 该插件目前支持以下数据库的<b>物理分页</b> [PageAutoDialect](src/main/java/com/github/pagehelper/page/PageAutoDialect.java):
@@ -41,19 +39,26 @@ static {
         registerDialectAlias("hsqldb",HsqldbDialect.class);
         registerDialectAlias("h2",HsqldbDialect.class);
         registerDialectAlias("phoenix",HsqldbDialect.class);
+
         registerDialectAlias("postgresql",PostgreSqlDialect.class);
+
         registerDialectAlias("mysql",MySqlDialect.class);
         registerDialectAlias("mariadb",MySqlDialect.class);
         registerDialectAlias("sqlite",MySqlDialect.class);
+
         registerDialectAlias("herddb",HerdDBDialect.class);
+
         registerDialectAlias("oracle",OracleDialect.class);
         registerDialectAlias("oracle9i",Oracle9iDialect.class);
         registerDialectAlias("db2",Db2Dialect.class);
+        registerDialectAlias("as400",AS400Dialect.class);
         registerDialectAlias("informix",InformixDialect.class);
         //解决 informix-sqli #129，仍然保留上面的
         registerDialectAlias("informix-sqli",InformixDialect.class);
+
         registerDialectAlias("sqlserver",SqlServerDialect.class);
         registerDialectAlias("sqlserver2012",SqlServer2012Dialect.class);
+
         registerDialectAlias("derby",SqlServer2012Dialect.class);
         //达梦数据库,https://github.com/mybatis-book/book/issues/43
         registerDialectAlias("dm",OracleDialect.class);
@@ -66,8 +71,28 @@ static {
         registerDialectAlias("highgo",HsqldbDialect.class);
         //虚谷数据库
         registerDialectAlias("xugu",HsqldbDialect.class);
+        registerDialectAlias("impala",HsqldbDialect.class);
+        registerDialectAlias("firebirdsql",FirebirdDialect.class);
         //人大金仓数据库
         registerDialectAlias("kingbase",PostgreSqlDialect.class);
+        // 人大金仓新版本kingbase8
+        registerDialectAlias("kingbase8",PostgreSqlDialect.class);
+        //行云数据库
+        registerDialectAlias("xcloud",CirroDataDialect.class);
+
+        //openGauss数据库
+        registerDialectAlias("opengauss",PostgreSqlDialect.class);
+
+        //注册 AutoDialect
+        //想要实现和以前版本相同的效果时，可以配置 autoDialectClass=old
+        registerAutoDialectAlias("old",DefaultAutoDialect.class);
+        registerAutoDialectAlias("hikari",HikariAutoDialect.class);
+        registerAutoDialectAlias("druid",DruidAutoDialect.class);
+        registerAutoDialectAlias("tomcat-jdbc",TomcatAutoDialect.class);
+        registerAutoDialectAlias("dbcp",DbcpAutoDialect.class);
+        registerAutoDialectAlias("c3p0",C3P0AutoDialect.class);
+        //不配置时，默认使用 DataSourceNegotiationAutoDialect
+        registerAutoDialectAlias("default",DataSourceNegotiationAutoDialect.class);
         }
 ```
 
@@ -77,19 +102,15 @@ static {
 >
 >```xml
 ><property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
-><!-- 支持下面的引用方式，引用 Oracle9iDialect.class 的实现 -->
+><!-- 6.0支持下面的引用方式，引用 Oracle9iDialect.class 的实现 -->
 ><property name="dialectAlias" value="oracle=oracle9i"/>
-><!-- 支持下面的引用方式，达梦使用oracle语法分页，简化类全名写法 -->
+><!-- 6.0支持下面的引用方式，达梦使用oracle语法分页，简化类全名写法 -->
 ><property name="dialectAlias" value="dm=oracle"/>
 >```
 
 ## 使用 [QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/src/main/java/com/github/pagehelper/QueryInterceptor.java)
 
 [Executor 拦截器高级教程 - QueryInterceptor 规范](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md)
-
-## 分页插件 5.0
-
-由于分页插件 5.0 版本和 4.2.x 实现完全不同，所以 master 分支为 5.x 版本，4.2 作为一个分支存在，如果有针对 4.2 的 PR，请注意提交到分支版本。
 
 ## 集成
 
@@ -128,8 +149,7 @@ static {
 
 ## 提交 BUG
 
-- [提交到 github](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
-- [提交到 gitosc](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
+https://github.com/pagehelper/Mybatis-PageHelper/issues/new
 
 ## 项目的发展离不开你的支持
 

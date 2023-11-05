@@ -37,6 +37,10 @@ GitHub：https://github.com/mybatis-book/book
 
 ## Support [MyBatis 3.1.0+](https://github.com/mybatis/mybatis-3)
 
+## PageHelper 6 Support jdk8+
+
+## PageHelper 5 Support jdk6+
+
 ## Physical Paging
 
 PageHelper supports the following
@@ -44,23 +48,30 @@ databases [PageAutoDialect](src/main/java/com/github/pagehelper/page/PageAutoDia
 
 ```java
 static {
-        //register aliass
+        //register alias
         registerDialectAlias("hsqldb",HsqldbDialect.class);
         registerDialectAlias("h2",HsqldbDialect.class);
         registerDialectAlias("phoenix",HsqldbDialect.class);
+
         registerDialectAlias("postgresql",PostgreSqlDialect.class);
+
         registerDialectAlias("mysql",MySqlDialect.class);
         registerDialectAlias("mariadb",MySqlDialect.class);
         registerDialectAlias("sqlite",MySqlDialect.class);
+
         registerDialectAlias("herddb",HerdDBDialect.class);
+
         registerDialectAlias("oracle",OracleDialect.class);
         registerDialectAlias("oracle9i",Oracle9iDialect.class);
         registerDialectAlias("db2",Db2Dialect.class);
+        registerDialectAlias("as400",AS400Dialect.class);
         registerDialectAlias("informix",InformixDialect.class);
-        //解决 informix-sqli #129，仍然保留上面的
+        //Solve informix-sqli #129, still keep the above
         registerDialectAlias("informix-sqli",InformixDialect.class);
+
         registerDialectAlias("sqlserver",SqlServerDialect.class);
         registerDialectAlias("sqlserver2012",SqlServer2012Dialect.class);
+
         registerDialectAlias("derby",SqlServer2012Dialect.class);
         //达梦数据库,https://github.com/mybatis-book/book/issues/43
         registerDialectAlias("dm",OracleDialect.class);
@@ -73,10 +84,28 @@ static {
         registerDialectAlias("highgo",HsqldbDialect.class);
         //虚谷数据库
         registerDialectAlias("xugu",HsqldbDialect.class);
+        registerDialectAlias("impala",HsqldbDialect.class);
+        registerDialectAlias("firebirdsql",FirebirdDialect.class);
         //人大金仓数据库
         registerDialectAlias("kingbase",PostgreSqlDialect.class);
-        //华为openGauss数据库
+        // 人大金仓新版本kingbase8
+        registerDialectAlias("kingbase8",PostgreSqlDialect.class);
+        //行云数据库
+        registerDialectAlias("xcloud",CirroDataDialect.class);
+
+        //openGauss数据库
         registerDialectAlias("opengauss",PostgreSqlDialect.class);
+
+        //注册 AutoDialect
+        //If you want to achieve the same effect as the previous version, you can configure it autoDialectClass=old
+        registerAutoDialectAlias("old",DefaultAutoDialect.class);
+        registerAutoDialectAlias("hikari",HikariAutoDialect.class);
+        registerAutoDialectAlias("druid",DruidAutoDialect.class);
+        registerAutoDialectAlias("tomcat-jdbc",TomcatAutoDialect.class);
+        registerAutoDialectAlias("dbcp",DbcpAutoDialect.class);
+        registerAutoDialectAlias("c3p0",C3P0AutoDialect.class);
+        //If not configured, it is used by default DataSourceNegotiationAutoDialect
+        registerAutoDialectAlias("default",DataSourceNegotiationAutoDialect.class);
         }
 ```
 
@@ -89,9 +118,9 @@ static {
 >
 >```xml
 ><property name="dialectAlias" value="oracle=com.github.pagehelper.dialect.helper.OracleDialect"/>
-><!-- The following reference is supported, referencing the implementation of Oracle9iDialect.class -->
+><!-- 6.0 The following reference is supported, referencing the implementation of Oracle9iDialect.class -->
 ><property name="dialectAlias" value="oracle=oracle9i"/>
-><!-- To support the following citation methods, DM uses oracle syntax for pagination to simplify the writing of the full name of the class -->
+><!-- 6.0 To support the following citation methods, DM uses oracle syntax for pagination to simplify the writing of the full name of the class -->
 ><property name="dialectAlias" value="dm=oracle"/>
 >```
 
@@ -135,8 +164,7 @@ the [pagehelper-spring-boot-starter](https://github.com/pagehelper/pagehelper-sp
 
 ## Submit BUG
 
-- [Submit to github](https://github.com/pagehelper/Mybatis-PageHelper/issues/new)
-- [Submit to gitosc](http://git.oschina.net/free/Mybatis_PageHelper/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=)
+https://github.com/pagehelper/Mybatis-PageHelper/issues/new
 
 ## Thank you for your support
 
@@ -157,3 +185,13 @@ Email: abel533@gmail.com
 PageHelper on github:https://github.com/pagehelper/Mybatis-PageHelper
 
 PageHelper on gitosc:http://git.oschina.net/free/Mybatis_PageHelper
+
+## MyBatis-3
+
+- Project：https://github.com/mybatis/mybatis-3
+- Document：https://mybatis.org/mybatis-3/index.html
+
+MyBatis 专栏：
+
+- [MyBatis Sample](http://blog.csdn.net/column/details/mybatis-sample.html)
+- [MyBatis QA](http://blog.csdn.net/column/details/mybatisqa.html)
