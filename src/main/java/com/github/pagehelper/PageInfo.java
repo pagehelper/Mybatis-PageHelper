@@ -41,7 +41,7 @@ import java.util.List;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PageInfo<T> extends PageSerializable<T> {
     public static final int DEFAULT_NAVIGATE_PAGES = 8;
-    public static final PageInfo EMPTY = new PageInfo(Collections.emptyList(), 0);
+    //private PageInfo EMPTY = new PageInfo(Collections.emptyList(), 0);
     /**
      * 当前页
      */
@@ -176,7 +176,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      * @return
      */
     public static <T> PageInfo<T> emptyPageInfo() {
-        return EMPTY;
+        return new PageInfo(Collections.emptyList(), 0);
     }
 
     public void calcByNavigatePages(int navigatePages) {
