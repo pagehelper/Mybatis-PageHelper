@@ -48,65 +48,65 @@ databases [PageAutoDialect](src/main/java/com/github/pagehelper/page/PageAutoDia
 
 ```java
 static {
-        //register alias
-        registerDialectAlias("hsqldb",HsqldbDialect.class);
-        registerDialectAlias("h2",HsqldbDialect.class);
-        registerDialectAlias("phoenix",HsqldbDialect.class);
+    //register alias
+    registerDialectAlias("hsqldb",HsqldbDialect.class);
+    registerDialectAlias("h2",HsqldbDialect.class);
+    registerDialectAlias("phoenix",HsqldbDialect.class);
 
-        registerDialectAlias("postgresql",PostgreSqlDialect.class);
+    registerDialectAlias("postgresql",PostgreSqlDialect.class);
 
-        registerDialectAlias("mysql",MySqlDialect.class);
-        registerDialectAlias("mariadb",MySqlDialect.class);
-        registerDialectAlias("sqlite",MySqlDialect.class);
+    registerDialectAlias("mysql",MySqlDialect.class);
+    registerDialectAlias("mariadb",MySqlDialect.class);
+    registerDialectAlias("sqlite",MySqlDialect.class);
 
-        registerDialectAlias("herddb",HerdDBDialect.class);
+    registerDialectAlias("herddb",HerdDBDialect.class);
 
-        registerDialectAlias("oracle",OracleDialect.class);
-        registerDialectAlias("oracle9i",Oracle9iDialect.class);
-        registerDialectAlias("db2",Db2Dialect.class);
-        registerDialectAlias("as400",AS400Dialect.class);
-        registerDialectAlias("informix",InformixDialect.class);
-        //Solve informix-sqli #129, still keep the above
-        registerDialectAlias("informix-sqli",InformixDialect.class);
+    registerDialectAlias("oracle",OracleDialect.class);
+    registerDialectAlias("oracle9i",Oracle9iDialect.class);
+    registerDialectAlias("db2",Db2Dialect.class);
+    registerDialectAlias("as400",AS400Dialect.class);
+    registerDialectAlias("informix",InformixDialect.class);
+    //Solve informix-sqli #129, still keep the above
+    registerDialectAlias("informix-sqli",InformixDialect.class);
 
-        registerDialectAlias("sqlserver",SqlServerDialect.class);
-        registerDialectAlias("sqlserver2012",SqlServer2012Dialect.class);
+    registerDialectAlias("sqlserver",SqlServerDialect.class);
+    registerDialectAlias("sqlserver2012",SqlServer2012Dialect.class);
 
-        registerDialectAlias("derby",SqlServer2012Dialect.class);
-        //达梦数据库,https://github.com/mybatis-book/book/issues/43
-        registerDialectAlias("dm",OracleDialect.class);
-        //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281
-        registerDialectAlias("edb",OracleDialect.class);
-        //神通数据库
-        registerDialectAlias("oscar",OscarDialect.class);
-        registerDialectAlias("clickhouse",MySqlDialect.class);
-        //瀚高数据库
-        registerDialectAlias("highgo",HsqldbDialect.class);
-        //虚谷数据库
-        registerDialectAlias("xugu",HsqldbDialect.class);
-        registerDialectAlias("impala",HsqldbDialect.class);
-        registerDialectAlias("firebirdsql",FirebirdDialect.class);
-        //人大金仓数据库
-        registerDialectAlias("kingbase",PostgreSqlDialect.class);
-        // 人大金仓新版本kingbase8
-        registerDialectAlias("kingbase8",PostgreSqlDialect.class);
-        //行云数据库
-        registerDialectAlias("xcloud",CirroDataDialect.class);
+    registerDialectAlias("derby",SqlServer2012Dialect.class);
+    //达梦数据库,https://github.com/mybatis-book/book/issues/43
+    registerDialectAlias("dm",OracleDialect.class);
+    //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281
+    registerDialectAlias("edb",OracleDialect.class);
+    //神通数据库
+    registerDialectAlias("oscar",OscarDialect.class);
+    registerDialectAlias("clickhouse",MySqlDialect.class);
+    //瀚高数据库
+    registerDialectAlias("highgo",HsqldbDialect.class);
+    //虚谷数据库
+    registerDialectAlias("xugu",HsqldbDialect.class);
+    registerDialectAlias("impala",HsqldbDialect.class);
+    registerDialectAlias("firebirdsql",FirebirdDialect.class);
+    //人大金仓数据库
+    registerDialectAlias("kingbase",PostgreSqlDialect.class);
+    // 人大金仓新版本kingbase8
+    registerDialectAlias("kingbase8",PostgreSqlDialect.class);
+    //行云数据库
+    registerDialectAlias("xcloud",CirroDataDialect.class);
 
-        //openGauss数据库
-        registerDialectAlias("opengauss",PostgreSqlDialect.class);
+    //openGauss数据库
+    registerDialectAlias("opengauss",PostgreSqlDialect.class);
 
-        //注册 AutoDialect
-        //If you want to achieve the same effect as the previous version, you can configure it autoDialectClass=old
-        registerAutoDialectAlias("old",DefaultAutoDialect.class);
-        registerAutoDialectAlias("hikari",HikariAutoDialect.class);
-        registerAutoDialectAlias("druid",DruidAutoDialect.class);
-        registerAutoDialectAlias("tomcat-jdbc",TomcatAutoDialect.class);
-        registerAutoDialectAlias("dbcp",DbcpAutoDialect.class);
-        registerAutoDialectAlias("c3p0",C3P0AutoDialect.class);
-        //If not configured, it is used by default DataSourceNegotiationAutoDialect
-        registerAutoDialectAlias("default",DataSourceNegotiationAutoDialect.class);
-        }
+    //注册 AutoDialect
+    //If you want to achieve the same effect as the previous version, you can configure it autoDialectClass=old
+    registerAutoDialectAlias("old",DefaultAutoDialect.class);
+    registerAutoDialectAlias("hikari",HikariAutoDialect.class);
+    registerAutoDialectAlias("druid",DruidAutoDialect.class);
+    registerAutoDialectAlias("tomcat-jdbc",TomcatAutoDialect.class);
+    registerAutoDialectAlias("dbcp",DbcpAutoDialect.class);
+    registerAutoDialectAlias("c3p0",C3P0AutoDialect.class);
+    //If not configured, it is used by default DataSourceNegotiationAutoDialect
+    registerAutoDialectAlias("default",DataSourceNegotiationAutoDialect.class);
+}
 ```
 
 > If the database you are using is not in this list, you can configure the `dialectAlias` parameter.
@@ -166,9 +166,15 @@ the [pagehelper-spring-boot-starter](https://github.com/pagehelper/pagehelper-sp
 
 https://github.com/pagehelper/Mybatis-PageHelper/issues/new
 
+## 微信公众号
+
+<img src="wx_mybatis.jpg" height="300"/>
+
 ## Thank you for your support
 
+
 ### Buy the author a cup of coffee!
+
 
 <img src="ali_pay.png" height="300"/>
 
@@ -195,3 +201,9 @@ MyBatis 专栏：
 
 - [MyBatis Sample](http://blog.csdn.net/column/details/mybatis-sample.html)
 - [MyBatis QA](http://blog.csdn.net/column/details/mybatisqa.html)
+
+## Thanks to all the people who already contributed!
+
+<a href="https://github.com/pagehelper/Mybatis-PageHelper/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=pagehelper/Mybatis-PageHelper" />
+</a>
