@@ -24,10 +24,15 @@
 
 package com.github.pagehelper.dialect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.pagehelper.Constant;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageRowBounds;
+import com.github.pagehelper.cache.Cache;
+import com.github.pagehelper.cache.CacheFactory;
 import com.github.pagehelper.parser.OrderByParser;
 import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MetaObjectUtil;
@@ -49,7 +54,16 @@ import java.util.*;
  * @since 2016-12-04 14:32
  */
 public abstract class AbstractHelperDialect extends AbstractDialect implements Constant {
+    /**
+    * Logger for this class.
+    */
+    private static final Logger logger = LoggerFactory.getLogger(AbstractHelperDialect.class);
 
+    protected Cache<String, String> CACHE_COUNTSQL;
+    protected Cache<String, String> CACHE_PAGESQL;
+
+    public static boolean cacheOnFlag = true;//临时性开关，为了方便切换，以验证缓存前后对比.
+    public static boolean tracingOn = false;//临时性开关
     /**
      * 获取分页参数
      *
@@ -74,12 +88,45 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
 
     @Override
     public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
+        final long startTime = tracingOn || logger.isDebugEnabled() ? System.nanoTime() : 0;
+        if (startTime > 0) {
+            logger.info("getCountSql start ...");
+        }
         Page<Object> page = getLocalPage();
         String countColumn = page.getCountColumn();
+        final String sql = boundSql.getSql();
+        final String countSqlKey;
+        String cachedSql;
+        final boolean cacheOn = cacheOnFlag && CACHE_COUNTSQL != null;
         if (StringUtil.isNotEmpty(countColumn)) {
-            return countSqlParser.getSmartCountSql(boundSql.getSql(), countColumn);
+            countSqlKey = sql + countColumn;
+            cachedSql = cacheOn ? CACHE_COUNTSQL.get(countSqlKey) : null;
+            if (cachedSql != null) {
+                logCountSqlEnd(startTime);
+                return cachedSql;
+            }
+            cachedSql = countSqlParser.getSmartCountSql(sql, countColumn);
+        } else {
+            countSqlKey = sql;
+            cachedSql = cacheOn ? CACHE_COUNTSQL.get(countSqlKey) : null;
+            if (cachedSql != null) {
+                logCountSqlEnd(startTime);
+                return cachedSql;
+            }
+            cachedSql = countSqlParser.getSmartCountSql(sql);
         }
-        return countSqlParser.getSmartCountSql(boundSql.getSql());
+        if (cacheOn) {
+            CACHE_COUNTSQL.put(countSqlKey, cachedSql);
+        }
+        logCountSqlEnd(startTime);
+        return cachedSql;
+    }
+
+    private void logCountSqlEnd(final long startTime) {
+        if (startTime > 0) {
+            final long time = System.nanoTime() - startTime;
+            logger.info("getCountSql(cacheOn={}) end: {}", cacheOnFlag, Double.toString(time == 0 ? 0 : time/1000000d));
+        }
     }
 
     @Override
@@ -186,14 +233,44 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         Page page = getLocalPage();
         //支持 order by
         String orderBy = page.getOrderBy();
+        String cacheSqlKey = getPageCacheSqlKey(page, sql);
+        final boolean cacheOn = cacheOnFlag && CACHE_PAGESQL != null;
+        final boolean orderByOnly = page.isOrderByOnly();
         if (StringUtil.isNotEmpty(orderBy)) {
+            if (cacheOn) {
+                cacheSqlKey += orderBy;
+                if (orderByOnly) {
+                    cacheSqlKey += "-orderByOnly";
+                }
+            }
             pageKey.update(orderBy);
-            sql = OrderByParser.converToOrderBySql(sql, orderBy, jSqlParser);
+            String cachedSql = cacheOn ? CACHE_PAGESQL.get(cacheSqlKey) : null;
+            if (cachedSql == null) {
+                cachedSql = OrderByParser.converToOrderBySql(sql, orderBy, jSqlParser);
+                if (cacheOn && orderByOnly) {
+                    CACHE_PAGESQL.put(cacheSqlKey, cachedSql);
+                }
+            }
+            sql = cachedSql;
         }
-        if (page.isOrderByOnly()) {
+        if (orderByOnly) {
             return sql;
         }
-        return getPageSql(sql, page, pageKey);
+        String pageSql = cacheOn ? CACHE_PAGESQL.get(cacheSqlKey) : null;
+        if (pageSql == null) {
+            pageSql = getPageSql(sql, page, pageKey);
+            if (cacheOn) {
+                CACHE_PAGESQL.put(cacheSqlKey, pageSql);
+            }
+        }
+        return pageSql;
+    }
+
+    protected String getPageCacheSqlKey(final Page page, final String sql) {
+        if (page.getStartRow() == 0) {
+            return sql;
+        }
+        return sql + "-1";
     }
 
     /**
@@ -232,6 +309,14 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
+        final String sqlCacheClass = properties.getProperty("sqlCacheClass");
+        if (StringUtil.isNotEmpty(sqlCacheClass) && !sqlCacheClass.equalsIgnoreCase("false")) {
+            CACHE_COUNTSQL = CacheFactory.createCache(sqlCacheClass, "count", properties);
+            CACHE_PAGESQL = CacheFactory.createCache(sqlCacheClass, "page", properties);
+        } else if (!"false".equalsIgnoreCase(sqlCacheClass)){
+            CACHE_COUNTSQL = CacheFactory.createCache(null, "count", properties);
+            CACHE_PAGESQL = CacheFactory.createCache(null, "page", properties);
+        }
     }
 
     /**
