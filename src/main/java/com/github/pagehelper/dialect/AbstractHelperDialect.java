@@ -187,7 +187,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         String orderBy = page.getOrderBy();
         if (StringUtil.isNotEmpty(orderBy)) {
             pageKey.update(orderBy);
-            sql = orderByParser.converToOrderBySql(sql, orderBy);
+            sql = orderBySqlParser.converToOrderBySql(sql, orderBy);
         }
         if (page.isOrderByOnly()) {
             return sql;

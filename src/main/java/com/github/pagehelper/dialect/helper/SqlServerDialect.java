@@ -105,7 +105,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
         if (StringUtil.isNotEmpty(orderBy)) {
             pageKey.update(orderBy);
             sql = this.replaceSql.replace(sql);
-            sql = orderByParser.converToOrderBySql(sql, orderBy);
+            sql = orderBySqlParser.converToOrderBySql(sql, orderBy);
             sql = this.replaceSql.restore(sql);
         }
 

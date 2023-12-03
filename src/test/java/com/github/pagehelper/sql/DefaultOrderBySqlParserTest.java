@@ -24,16 +24,16 @@
 
 package com.github.pagehelper.sql;
 
-import com.github.pagehelper.parser.OrderByParser;
+import com.github.pagehelper.parser.DefaultOrderBySqlParser;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class OrderByParserTest {
-    private OrderByParser orderByParser = new OrderByParser();
+public class DefaultOrderBySqlParserTest {
+    private DefaultOrderBySqlParser defaultOrderBySqlParser = new DefaultOrderBySqlParser();
 
     @Test
     public void testOrderBy() {
-        String sql = orderByParser.converToOrderBySql("select * from user where length(name) > 0 order by id desc", "name desc");
+        String sql = defaultOrderBySqlParser.converToOrderBySql("select * from user where length(name) > 0 order by id desc", "name desc");
         Assert.assertEquals("SELECT * FROM user WHERE length(name) > 0 order by name desc", sql);
     }
 }

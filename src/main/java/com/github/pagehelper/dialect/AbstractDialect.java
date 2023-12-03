@@ -27,7 +27,8 @@ package com.github.pagehelper.dialect;
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.DefaultCountSqlParser;
-import com.github.pagehelper.parser.OrderByParser;
+import com.github.pagehelper.parser.DefaultOrderBySqlParser;
+import com.github.pagehelper.parser.OrderBySqlParser;
 import com.github.pagehelper.util.ClassUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
@@ -43,8 +44,8 @@ import java.util.Properties;
  */
 public abstract class AbstractDialect implements Dialect {
     //处理SQL
-    protected CountSqlParser countSqlParser;
-    protected OrderByParser  orderByParser;
+    protected CountSqlParser   countSqlParser;
+    protected OrderBySqlParser orderBySqlParser;
 
     @Override
     public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
@@ -53,8 +54,7 @@ public abstract class AbstractDialect implements Dialect {
 
     @Override
     public void setProperties(Properties properties) {
-        // 自定义 countSqlParser 的 sql 解析器
         this.countSqlParser = ClassUtil.newInstance(properties.getProperty("countSqlParser"), properties, () -> new DefaultCountSqlParser());
-        this.orderByParser = ClassUtil.newInstance(properties.getProperty("orderByParser"), properties, () -> new OrderByParser());
+        this.orderBySqlParser = ClassUtil.newInstance(properties.getProperty("orderBySqlParser"), properties, () -> new DefaultOrderBySqlParser());
     }
 }

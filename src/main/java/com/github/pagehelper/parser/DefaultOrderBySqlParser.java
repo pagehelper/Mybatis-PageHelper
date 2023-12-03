@@ -39,8 +39,8 @@ import java.util.List;
  * @author liuzh
  * @since 2015-06-27
  */
-public class OrderByParser {
-    private static final Log log = LogFactory.getLog(OrderByParser.class);
+public class DefaultOrderBySqlParser implements OrderBySqlParser {
+    private static final Log log = LogFactory.getLog(DefaultOrderBySqlParser.class);
 
     /**
      * convert to order by sql
@@ -49,9 +49,10 @@ public class OrderByParser {
      * @param orderBy
      * @return
      */
+    @Override
     public String converToOrderBySql(String sql, String orderBy) {
         //解析SQL
-        Statement stmt = null;
+        Statement stmt;
         try {
             stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
             Select select = (Select) stmt;
