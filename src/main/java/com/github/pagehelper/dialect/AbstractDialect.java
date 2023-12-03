@@ -25,19 +25,15 @@
 package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.Dialect;
-import com.github.pagehelper.JSqlParser;
-import com.github.pagehelper.PageException;
-import com.github.pagehelper.PageProperties;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.DefaultCountSqlParser;
+import com.github.pagehelper.parser.OrderByParser;
 import com.github.pagehelper.util.ClassUtil;
-import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.RowBounds;
 
-import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 /**
@@ -48,7 +44,7 @@ import java.util.Properties;
 public abstract class AbstractDialect implements Dialect {
     //处理SQL
     protected CountSqlParser countSqlParser;
-    protected JSqlParser     jSqlParser;
+    protected OrderByParser  orderByParser;
 
     @Override
     public String getCountSql(MappedStatement ms, BoundSql boundSql, Object parameterObject, RowBounds rowBounds, CacheKey countKey) {
@@ -57,33 +53,8 @@ public abstract class AbstractDialect implements Dialect {
 
     @Override
     public void setProperties(Properties properties) {
-        // 自定义 jsqlparser 的 sql 解析器
-        String sqlParser = properties.getProperty("sqlParser");
-        if (StringUtil.isNotEmpty(sqlParser)) {
-            jSqlParser = ClassUtil.newInstance(sqlParser, properties);
-        } else {
-            jSqlParser = JSqlParser.DEFAULT;
-        }
         // 自定义 countSqlParser 的 sql 解析器
-        String countSqlParserStr = properties.getProperty("countSqlParser");
-        if (StringUtil.isNotEmpty(countSqlParserStr)) {
-            try {
-                Class<?> aClass = Class.forName(countSqlParserStr);
-                Constructor<?> constructor = null;
-                try {
-                    constructor = aClass.getConstructor(JSqlParser.class);
-                    countSqlParser = (CountSqlParser) constructor.newInstance(jSqlParser);
-                } catch (NoSuchMethodException e) {
-                    countSqlParser = (CountSqlParser) aClass.newInstance();
-                }
-                if (countSqlParser instanceof PageProperties) {
-                    ((PageProperties) countSqlParser).setProperties(properties);
-                }
-            } catch (Exception e) {
-                throw new PageException(e);
-            }
-        } else {
-            this.countSqlParser = new DefaultCountSqlParser(jSqlParser);
-        }
+        this.countSqlParser = ClassUtil.newInstance(properties.getProperty("countSqlParser"), properties, () -> new DefaultCountSqlParser());
+        this.orderByParser = ClassUtil.newInstance(properties.getProperty("orderByParser"), properties, () -> new OrderByParser());
     }
 }

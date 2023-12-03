@@ -257,7 +257,8 @@ DEBUG [main] -
 
 20. `keepSubSelectOrderBy`：转换count查询时保留子查询的 order by 排序。可以避免给所有子查询添加 `/*keep orderby*/`，除全局配置外，可以针对单次操作进行设置。
 
-21. `sqlParser`：配置 JSqlParser 解析器，注意是 `com.github.pagehelper.JSqlParser` 接口，用于支持 sqlserver 等需要额外配置的情况。
+21. `sqlParser`：配置 JSqlParser 解析器，注意是 `com.github.pagehelper.JSqlParser` 接口，用于支持 sqlserver
+    等需要额外配置的情况(**6.1.0 移除该参数**)。
 
 **重要提示：**
 

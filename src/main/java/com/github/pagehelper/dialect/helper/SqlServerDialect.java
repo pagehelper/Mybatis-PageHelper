@@ -106,7 +106,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
         if (StringUtil.isNotEmpty(orderBy)) {
             pageKey.update(orderBy);
             sql = this.replaceSql.replace(sql);
-            sql = OrderByParser.converToOrderBySql(sql, orderBy, jSqlParser);
+            sql = OrderByParser.converToOrderBySql(sql, orderBy);
             sql = this.replaceSql.restore(sql);
         }
 
@@ -116,7 +116,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        this.pageSql = new SqlServerParser(jSqlParser);
+        this.pageSql = new SqlServerParser();
         String replaceSql = properties.getProperty("replaceSql");
         if (StringUtil.isEmpty(replaceSql) || "regex".equalsIgnoreCase(replaceSql)) {
             this.replaceSql = new RegexWithNolockReplaceSql();

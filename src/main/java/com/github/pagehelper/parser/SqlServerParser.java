@@ -24,12 +24,12 @@
 
 package com.github.pagehelper.parser;
 
-import com.github.pagehelper.JSqlParser;
 import com.github.pagehelper.PageException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
@@ -79,16 +79,6 @@ public class SqlServerParser {
         TOP100_PERCENT.setPercentage(true);
     }
 
-    private final JSqlParser jSqlParser;
-
-    public SqlServerParser() {
-        this.jSqlParser = JSqlParser.DEFAULT;
-    }
-
-    public SqlServerParser(JSqlParser jSqlParser) {
-        this.jSqlParser = jSqlParser;
-    }
-
     /**
      * 转换为分页语句
      *
@@ -111,7 +101,7 @@ public class SqlServerParser {
         //解析SQL
         Statement stmt;
         try {
-            stmt = jSqlParser.parse(sql);
+            stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
         } catch (Throwable e) {
             throw new PageException("The SQL statement cannot be converted to a pagination query!", e);
         }

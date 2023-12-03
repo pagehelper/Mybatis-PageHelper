@@ -24,8 +24,8 @@
 
 package com.github.pagehelper.parser;
 
-import com.github.pagehelper.JSqlParser;
 import com.github.pagehelper.PageException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.logging.Log;
@@ -47,14 +47,13 @@ public class OrderByParser {
      *
      * @param sql
      * @param orderBy
-     * @param jSqlParser
      * @return
      */
-    public static String converToOrderBySql(String sql, String orderBy, JSqlParser jSqlParser) {
+    public static String converToOrderBySql(String sql, String orderBy) {
         //解析SQL
         Statement stmt = null;
         try {
-            stmt = jSqlParser.parse(sql);
+            stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
             Select select = (Select) stmt;
             SelectBody selectBody = select.getSelectBody();
             //处理body-去最外层order by
@@ -69,17 +68,6 @@ public class OrderByParser {
             log.warn("Failed to handle sorting: " + e + ", downgraded to a direct splice of the order by parameter");
         }
         return sql + " order by " + orderBy;
-    }
-
-    /**
-     * convert to order by sql
-     *
-     * @param sql
-     * @param orderBy
-     * @return
-     */
-    public static String converToOrderBySql(String sql, String orderBy) {
-        return converToOrderBySql(sql, orderBy, JSqlParser.DEFAULT);
     }
 
     /**

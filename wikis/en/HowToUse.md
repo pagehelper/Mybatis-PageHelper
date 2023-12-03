@@ -300,7 +300,7 @@ When this parameter is set to `true`, the` offset` parameter in `RowBounds` is u
     configuration.
 
 21. `sqlParser`: configure JSqlParser parser, attention is `com.github.pagehelper.JSqlParser` interface, used to support
-    such as essentially a need for additional configuration.
+    such as essentially a need for additional configuration.(**6.1.0 remove this parameter**)
 
 #### 6. How to choose Configure these parameters
 

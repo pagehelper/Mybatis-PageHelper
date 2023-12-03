@@ -8,7 +8,8 @@
   Asynchronous queries are performed using independent connections (transactions),
   and it is not suitable to enable asynchronous queries when the query is affected by addition, deletion, and
   modification operations. closed #334
-- JSqlParser opens `parser.withSquareBracketQuotation(true)` by default and supports SqlServer `[]`
+- JSqlParser opens `parser.withSquareBracketQuotation(true)` by default and supports SqlServer `[]`(**6.1.0 remove this
+  parameter**)
 - feat: A new method for data object conversion has been added to the `PageInfo`,
   method: ` <E> PageInfo<E> convert(Page.Function<T, E> function)` **by codeke**
 - `CountSqlParser` is changed to an interface, allowing the `countSqlParser` parameter to be replaced with your own
@@ -50,7 +51,7 @@
   , with extensions like 'selectByExample' mapped to the corresponding 'selectCountByExample' method.
 - Added `keepOrderBy` and `keepSubSelectOrderBy` configurations.
 - Add the `sqlParser` configuration and add the `JSqlParser` interface to solve the problem that JSqlParser and JDK
-  compatibility cause no additional configuration.
+  compatibility cause no additional configuration.(**6.1.0 remove this parameter**)
 - The test uses the Logback logging framework and removes log4j.
 - Resolve that 'dialectKey' is empty resulting in NPE，fixed #656
 

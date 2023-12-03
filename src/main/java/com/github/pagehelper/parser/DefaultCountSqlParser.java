@@ -24,12 +24,12 @@
 
 package com.github.pagehelper.parser;
 
-import com.github.pagehelper.JSqlParser;
 import com.github.pagehelper.page.PageMethod;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.parser.Token;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -46,21 +46,12 @@ public class DefaultCountSqlParser implements CountSqlParser {
     public static final    String KEEP_ORDERBY = "/*keep orderby*/";
     protected static final Alias  TABLE_ALIAS;
 
-    protected final Set<String> skipFunctions  = Collections.synchronizedSet(new HashSet<String>());
-    protected final Set<String> falseFunctions = Collections.synchronizedSet(new HashSet<String>());
-    protected final JSqlParser  jSqlParser;
+    protected final Set<String> skipFunctions  = Collections.synchronizedSet(new HashSet<>());
+    protected final Set<String> falseFunctions = Collections.synchronizedSet(new HashSet<>());
 
     static {
         TABLE_ALIAS = new Alias("table_count");
         TABLE_ALIAS.setUseAs(false);
-    }
-
-    public DefaultCountSqlParser() {
-        this.jSqlParser = JSqlParser.DEFAULT;
-    }
-
-    public DefaultCountSqlParser(JSqlParser jSqlParser) {
-        this.jSqlParser = jSqlParser;
     }
 
     /**
@@ -79,7 +70,7 @@ public class DefaultCountSqlParser implements CountSqlParser {
             return getSimpleCountSql(sql, countColumn);
         }
         try {
-            stmt = jSqlParser.parse(sql);
+            stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
         } catch (Throwable e) {
             //无法解析的用一般方法返回count语句
             return getSimpleCountSql(sql, countColumn);

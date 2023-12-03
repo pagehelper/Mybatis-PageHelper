@@ -39,7 +39,8 @@
   配置自定义实现类，该类用于生成查询对应COUNT查询的msId。默认实现还是使用`countSuffix`
   ，通过扩展可以实现如 `selectByExample` 映射到对应的 `selectCountByExample` 方法。
 - 增加 `keepOrderBy` 和 `keepSubSelectOrderBy` 配置。
-- 增加 `sqlParser` 配置，增加 `JSqlParser` 接口，解决 jsqlparser 和 jdk 兼容性导致无法额外配置的问题。
+- 增加 `sqlParser` 配置，增加 `JSqlParser` 接口，解决 jsqlparser 和 jdk 兼容性导致无法额外配置的问题(**6.1.0 移除该参数
+  **)。
 - 测试使用 logback 日志框架，去掉log4j。
 - 解决 `dialectKey` 为空导致NPE，fixed #656
 

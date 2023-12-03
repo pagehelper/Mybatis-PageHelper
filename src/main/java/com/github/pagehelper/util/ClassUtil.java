@@ -28,6 +28,7 @@ import com.github.pagehelper.PageException;
 import com.github.pagehelper.PageProperties;
 
 import java.util.Properties;
+import java.util.function.Supplier;
 
 public class ClassUtil {
 
@@ -40,6 +41,15 @@ public class ClassUtil {
         }
     }
 
+    public static <T> T newInstance(String classStr, Properties properties, Supplier<T> defaultSupplier) {
+        try {
+            Class<?> cls = Class.forName(classStr);
+            return (T) newInstance(cls, properties);
+        } catch (Exception e) {
+            return defaultSupplier.get();
+        }
+    }
+
     public static <T> T newInstance(Class<T> cls, Properties properties) {
         try {
             T instance = cls.newInstance();
@@ -49,6 +59,18 @@ public class ClassUtil {
             return instance;
         } catch (Exception e) {
             throw new PageException(e);
+        }
+    }
+
+    public static <T> T newInstance(Class<T> cls, Properties properties, Supplier<T> defaultSupplier) {
+        try {
+            T instance = cls.newInstance();
+            if (instance instanceof PageProperties) {
+                ((PageProperties) instance).setProperties(properties);
+            }
+            return instance;
+        } catch (Exception e) {
+            return defaultSupplier.get();
         }
     }
 
