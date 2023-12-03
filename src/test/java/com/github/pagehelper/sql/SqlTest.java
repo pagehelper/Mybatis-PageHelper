@@ -30,7 +30,6 @@ import com.github.pagehelper.parser.DefaultCountSqlParser;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -158,8 +157,7 @@ public class SqlTest {
             return;
         }
         Select select = (Select) stmt;
-        SelectBody selectBody = select.getSelectBody();
-        sql = selectBody.toString();
+        sql = select.toString();
 
         sql = sql.replaceAll("\\s*(\\w*?)_PAGEWITHNOLOCK", " $1 WITH(NOLOCK)");
         Assert.assertEquals("SELECT * FROM A WITH(NOLOCK) INNER JOIN B WITH(NOLOCK) ON A.TypeId = B.Id", sql);

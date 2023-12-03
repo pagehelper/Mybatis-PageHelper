@@ -31,7 +31,6 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import org.junit.Test;
 
@@ -57,17 +56,13 @@ public class FunctionCountTest {
     @Test
     public void test() {
         Select select = select("select max(name),code,min(aa),nvl(ab,0),heh from user where a > 100");
-        List<SelectItem> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
+        List<SelectItem<?>> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
         for (SelectItem item : selectItems) {
-            if (item instanceof SelectExpressionItem) {
-                Expression exp = ((SelectExpressionItem) item).getExpression();
-                if (exp instanceof Function) {
-                    System.out.println("Function:" + item.toString());
-                } else {
-                    System.out.println("Not a function:" + exp.toString());
-                }
+            Expression exp = item.getExpression();
+            if (exp instanceof Function) {
+                System.out.println("Function:" + item.toString());
             } else {
-                System.out.println("Not a function:" + item.toString());
+                System.out.println("Not a function:" + exp.toString());
             }
         }
     }
@@ -75,9 +70,9 @@ public class FunctionCountTest {
     @Test
     public void test2() {
         Select select = select("select distinct(name) from user where a > 100");
-        List<SelectItem> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
+        List<SelectItem<?>> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
         for (SelectItem item : selectItems) {
-            if (item instanceof Function) {
+            if (item.getExpression() instanceof Function) {
                 System.out.println("Function:" + item.toString());
             } else {
                 System.out.println("Not a function:" + item.toString());

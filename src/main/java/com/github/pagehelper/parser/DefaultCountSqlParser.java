@@ -85,10 +85,9 @@ public class DefaultCountSqlParser implements CountSqlParser {
             return getSimpleCountSql(sql, countColumn);
         }
         Select select = (Select) stmt;
-        SelectBody selectBody = select.getSelectBody();
         try {
             //处理body-去order by
-            processSelectBody(selectBody);
+            processSelect(select);
         } catch (Exception e) {
             //当 sql 包含 group by 时，不去除 order by
             return getSimpleCountSql(sql, countColumn);
@@ -96,10 +95,10 @@ public class DefaultCountSqlParser implements CountSqlParser {
         //处理with-去order by
         processWithItemsList(select.getWithItemsList());
         //处理为count查询
-        sqlToCount(select, countColumn);
-        String result = select.toString();
-        if (selectBody instanceof PlainSelect) {
-            Token token = ((PlainSelect) selectBody).getASTNode().jjtGetFirstToken().specialToken;
+        Select countSelect = sqlToCount(select, countColumn);
+        String result = countSelect.toString();
+        if (select instanceof PlainSelect) {
+            Token token = select.getASTNode().jjtGetFirstToken().specialToken;
             if (token != null) {
                 String hints = token.toString().trim();
                 // 这里判断是否存在hint, 且result是不包含hint的
@@ -142,21 +141,25 @@ public class DefaultCountSqlParser implements CountSqlParser {
      *
      * @param select
      */
-    public void sqlToCount(Select select, String name) {
-        SelectBody selectBody = select.getSelectBody();
+    public Select sqlToCount(Select select, String name) {
         // 是否能简化count查询
-        List<SelectItem> COUNT_ITEM = new ArrayList<SelectItem>();
-        COUNT_ITEM.add(new SelectExpressionItem(new Column("count(" + name + ")")));
-        if (selectBody instanceof PlainSelect && isSimpleCount((PlainSelect) selectBody)) {
-            ((PlainSelect) selectBody).setSelectItems(COUNT_ITEM);
+        List<SelectItem<?>> COUNT_ITEM = new ArrayList<>();
+        COUNT_ITEM.add(new SelectItem(new Column("count(" + name + ")")));
+        if (select instanceof PlainSelect && isSimpleCount((PlainSelect) select)) {
+            ((PlainSelect) select).setSelectItems(COUNT_ITEM);
+            return select;
         } else {
             PlainSelect plainSelect = new PlainSelect();
-            SubSelect subSelect = new SubSelect();
-            subSelect.setSelectBody(selectBody);
+            ParenthesedSelect subSelect = new ParenthesedSelect();
+            subSelect.setSelect(select);
             subSelect.setAlias(TABLE_ALIAS);
             plainSelect.setFromItem(subSelect);
             plainSelect.setSelectItems(COUNT_ITEM);
-            select.setSelectBody(plainSelect);
+            if (select.getWithItemsList() != null) {
+                plainSelect.setWithItemsList(select.getWithItemsList());
+                select.setWithItemsList(null);
+            }
+            return plainSelect;
         }
     }
 
@@ -179,37 +182,35 @@ public class DefaultCountSqlParser implements CountSqlParser {
         if (select.getHaving() != null) {
             return false;
         }
-        for (SelectItem item : select.getSelectItems()) {
+        for (SelectItem<?> item : select.getSelectItems()) {
             //select列中包含参数的时候不可以，否则会引起参数个数错误
             if (item.toString().contains("?")) {
                 return false;
             }
             //如果查询列中包含函数，也不可以，函数可能会聚合列
-            if (item instanceof SelectExpressionItem) {
-                Expression expression = ((SelectExpressionItem) item).getExpression();
-                if (expression instanceof Function) {
-                    String name = ((Function) expression).getName();
-                    if (name != null) {
-                        String NAME = name.toUpperCase();
-                        if (skipFunctions.contains(NAME)) {
-                            //go on
-                        } else if (falseFunctions.contains(NAME)) {
-                            return false;
-                        } else {
-                            for (String aggregateFunction : AGGREGATE_FUNCTIONS) {
-                                if (NAME.startsWith(aggregateFunction)) {
-                                    falseFunctions.add(NAME);
-                                    return false;
-                                }
+            Expression expression = item.getExpression();
+            if (expression instanceof Function) {
+                String name = ((Function) expression).getName();
+                if (name != null) {
+                    String NAME = name.toUpperCase();
+                    if (skipFunctions.contains(NAME)) {
+                        //go on
+                    } else if (falseFunctions.contains(NAME)) {
+                        return false;
+                    } else {
+                        for (String aggregateFunction : AGGREGATE_FUNCTIONS) {
+                            if (NAME.startsWith(aggregateFunction)) {
+                                falseFunctions.add(NAME);
+                                return false;
                             }
-                            skipFunctions.add(NAME);
                         }
+                        skipFunctions.add(NAME);
                     }
-                } else if (expression instanceof Parenthesis && ((SelectExpressionItem) item).getAlias() != null) {
-                    //#555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
-                    // 这里想要更智能，需要在整个SQL中查找别名出现的位置，暂时不考虑，直接排除
-                    return false;
                 }
+            } else if (expression instanceof Parenthesis && item.getAlias() != null) {
+                //#555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
+                // 这里想要更智能，需要在整个SQL中查找别名出现的位置，暂时不考虑，直接排除
+                return false;
             }
         }
         return true;
@@ -218,29 +219,31 @@ public class DefaultCountSqlParser implements CountSqlParser {
     /**
      * 处理selectBody去除Order by
      *
-     * @param selectBody
+     * @param select
      */
-    public void processSelectBody(SelectBody selectBody) {
-        if (selectBody != null) {
-            if (selectBody instanceof PlainSelect) {
-                processPlainSelect((PlainSelect) selectBody);
-            } else if (selectBody instanceof WithItem) {
+    public void processSelect(Select select) {
+        if (select != null) {
+            if (select instanceof PlainSelect) {
+                processPlainSelect((PlainSelect) select);
+            } else if (select instanceof ParenthesedSelect) {
+                processSelect(((ParenthesedSelect) select).getSelect());
+            } else if (select instanceof SetOperationList) {
+                List<Select> selects = ((SetOperationList) select).getSelects();
+                for (Select sel : selects) {
+                    processSelect(sel);
+                }
+                if (!orderByHashParameters(select.getOrderByElements())) {
+                    select.setOrderByElements(null);
+                }
+            }
+            /*
+            if (select instanceof WithItem) {
                 WithItem withItem = (WithItem) selectBody;
                 if (withItem.getSubSelect() != null && !keepSubSelectOrderBy()) {
                     processSelectBody(withItem.getSubSelect().getSelectBody());
                 }
-            } else {
-                SetOperationList operationList = (SetOperationList) selectBody;
-                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
-                    List<SelectBody> plainSelects = operationList.getSelects();
-                    for (SelectBody plainSelect : plainSelects) {
-                        processSelectBody(plainSelect);
-                    }
-                }
-                if (!orderByHashParameters(operationList.getOrderByElements())) {
-                    operationList.setOrderByElements(null);
-                }
             }
+             */
         }
     }
 
@@ -272,10 +275,10 @@ public class DefaultCountSqlParser implements CountSqlParser {
      * @param withItemsList
      */
     public void processWithItemsList(List<WithItem> withItemsList) {
-        if (withItemsList != null && withItemsList.size() > 0) {
+        if (withItemsList != null && !withItemsList.isEmpty()) {
             for (WithItem item : withItemsList) {
-                if (item.getSubSelect() != null && !keepSubSelectOrderBy()) {
-                    processSelectBody(item.getSubSelect().getSelectBody());
+                if (item.getSelect() != null && !keepSubSelectOrderBy()) {
+                    processSelect(item.getSelect());
                 }
             }
         }
@@ -287,33 +290,16 @@ public class DefaultCountSqlParser implements CountSqlParser {
      * @param fromItem
      */
     public void processFromItem(FromItem fromItem) {
-        if (fromItem instanceof SubJoin) {
-            SubJoin subJoin = (SubJoin) fromItem;
-            if (subJoin.getJoinList() != null && subJoin.getJoinList().size() > 0) {
-                for (Join join : subJoin.getJoinList()) {
-                    if (join.getRightItem() != null) {
-                        processFromItem(join.getRightItem());
-                    }
-                }
+        if (fromItem instanceof ParenthesedSelect) {
+            ParenthesedSelect parenthesedSelect = (ParenthesedSelect) fromItem;
+            if (parenthesedSelect.getSelect() != null && !keepSubSelectOrderBy()) {
+                processSelect(parenthesedSelect.getSelect());
             }
-            if (subJoin.getLeft() != null) {
-                processFromItem(subJoin.getLeft());
-            }
-        } else if (fromItem instanceof SubSelect) {
-            SubSelect subSelect = (SubSelect) fromItem;
-            if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
-                processSelectBody(subSelect.getSelectBody());
-            }
-        } else if (fromItem instanceof ValuesList) {
-
-        } else if (fromItem instanceof LateralSubSelect) {
-            LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
-            if (lateralSubSelect.getSubSelect() != null) {
-                SubSelect subSelect = lateralSubSelect.getSubSelect();
-                if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
-                    processSelectBody(subSelect.getSelectBody());
-                }
-            }
+        } else if (fromItem instanceof Select) {
+            processSelect((Select) fromItem);
+        } else if (fromItem instanceof ParenthesedFromItem) {
+            ParenthesedFromItem parenthesedFromItem = (ParenthesedFromItem) fromItem;
+            processFromItem(parenthesedFromItem.getFromItem());
         }
         //Table时不用处理
     }

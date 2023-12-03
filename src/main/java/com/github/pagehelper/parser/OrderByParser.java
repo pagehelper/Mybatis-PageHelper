@@ -56,9 +56,8 @@ public class OrderByParser {
         try {
             stmt = jSqlParser.parse(sql);
             Select select = (Select) stmt;
-            SelectBody selectBody = select.getSelectBody();
             //处理body-去最外层order by
-            List<OrderByElement> orderByElements = extraOrderBy(selectBody);
+            List<OrderByElement> orderByElements = extraOrderBy(select);
             String defaultOrderBy = PlainSelect.orderByToString(orderByElements);
             if (defaultOrderBy.indexOf('?') != -1) {
                 throw new PageException("The order by in the original SQL[" + sql + "] contains parameters, so it cannot be modified using the OrderBy plugin!");
@@ -85,25 +84,16 @@ public class OrderByParser {
     /**
      * extra order by and set default orderby to null
      *
-     * @param selectBody
+     * @param select
      */
-    public static List<OrderByElement> extraOrderBy(SelectBody selectBody) {
-        if (selectBody != null) {
-            if (selectBody instanceof PlainSelect) {
-                List<OrderByElement> orderByElements = ((PlainSelect) selectBody).getOrderByElements();
-                ((PlainSelect) selectBody).setOrderByElements(null);
+    public static List<OrderByElement> extraOrderBy(Select select) {
+        if (select != null) {
+            if (select instanceof PlainSelect || select instanceof SetOperationList) {
+                List<OrderByElement> orderByElements = select.getOrderByElements();
+                select.setOrderByElements(null);
                 return orderByElements;
-            } else if (selectBody instanceof WithItem) {
-                WithItem withItem = (WithItem) selectBody;
-                if (withItem.getSubSelect() != null) {
-                    return extraOrderBy(withItem.getSubSelect().getSelectBody());
-                }
-            } else {
-                SetOperationList operationList = (SetOperationList) selectBody;
-                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
-                    List<SelectBody> plainSelects = operationList.getSelects();
-                    return extraOrderBy(plainSelects.get(plainSelects.size() - 1));
-                }
+            } else if (select instanceof ParenthesedSelect) {
+                extraOrderBy(((ParenthesedSelect) select).getSelect());
             }
         }
         return null;
