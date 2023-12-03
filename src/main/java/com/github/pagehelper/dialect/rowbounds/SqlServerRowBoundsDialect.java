@@ -73,7 +73,7 @@ public class SqlServerRowBoundsDialect extends AbstractRowBoundsDialect {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        this.sqlServerSqlParser = ClassUtil.newInstance(properties.getProperty("sqlServerSqlParser"), properties, DefaultSqlServerSqlParser::new);
+        this.sqlServerSqlParser = ClassUtil.newInstance(properties.getProperty("sqlServerSqlParser"), SqlServerSqlParser.class, properties, DefaultSqlServerSqlParser::new);
         String replaceSql = properties.getProperty("replaceSql");
         if (StringUtil.isEmpty(replaceSql) || "simple".equalsIgnoreCase(replaceSql)) {
             this.replaceSql = new SimpleWithNolockReplaceSql();

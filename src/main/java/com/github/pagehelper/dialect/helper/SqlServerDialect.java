@@ -116,7 +116,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        this.sqlServerSqlParser = ClassUtil.newInstance(properties.getProperty("sqlServerSqlParser"), properties, () -> new DefaultSqlServerSqlParser());
+        this.sqlServerSqlParser = ClassUtil.newInstance(properties.getProperty("sqlServerSqlParser"), SqlServerSqlParser.class, properties, DefaultSqlServerSqlParser::new);
         String replaceSql = properties.getProperty("replaceSql");
         if (StringUtil.isEmpty(replaceSql) || "regex".equalsIgnoreCase(replaceSql)) {
             this.replaceSql = new RegexWithNolockReplaceSql();

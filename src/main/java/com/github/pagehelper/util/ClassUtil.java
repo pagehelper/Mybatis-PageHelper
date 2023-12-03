@@ -28,25 +28,44 @@ import com.github.pagehelper.PageException;
 import com.github.pagehelper.PageProperties;
 
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
 public class ClassUtil {
 
+    /**
+     * 支持配置和SPI，优先级：配置类 > SPI > 默认值
+     *
+     * @param classStr        配置串，可空
+     * @param spi             SPI 接口
+     * @param properties      配置属性
+     * @param defaultSupplier 默认值
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T newInstance(String classStr, Class<T> spi, Properties properties, Supplier<T> defaultSupplier) {
+        if (StringUtil.isNotEmpty(classStr)) {
+            try {
+                Class<?> cls = Class.forName(classStr);
+                return (T) newInstance(cls, properties);
+            } catch (Exception ignored) {
+            }
+        }
+        if (spi != null) {
+            ServiceLoader<T> loader = ServiceLoader.load(spi);
+            for (T t : loader) {
+                return t;
+            }
+        }
+        return defaultSupplier.get();
+    }
+
+    @SuppressWarnings("unchecked")
     public static <T> T newInstance(String classStr, Properties properties) {
         try {
             Class<?> cls = Class.forName(classStr);
             return (T) newInstance(cls, properties);
         } catch (Exception e) {
             throw new PageException(e);
-        }
-    }
-
-    public static <T> T newInstance(String classStr, Properties properties, Supplier<T> defaultSupplier) {
-        try {
-            Class<?> cls = Class.forName(classStr);
-            return (T) newInstance(cls, properties);
-        } catch (Exception e) {
-            return defaultSupplier.get();
         }
     }
 
@@ -59,18 +78,6 @@ public class ClassUtil {
             return instance;
         } catch (Exception e) {
             throw new PageException(e);
-        }
-    }
-
-    public static <T> T newInstance(Class<T> cls, Properties properties, Supplier<T> defaultSupplier) {
-        try {
-            T instance = cls.newInstance();
-            if (instance instanceof PageProperties) {
-                ((PageProperties) instance).setProperties(properties);
-            }
-            return instance;
-        } catch (Exception e) {
-            return defaultSupplier.get();
         }
     }
 
