@@ -31,7 +31,8 @@ import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.dialect.replace.SimpleWithNolockReplaceSql;
-import com.github.pagehelper.parser.SqlServerParser;
+import com.github.pagehelper.parser.DefaultSqlServerSqlParser;
+import com.github.pagehelper.parser.SqlServerSqlParser;
 import com.github.pagehelper.util.ClassUtil;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.ibatis.cache.CacheKey;
@@ -46,7 +47,7 @@ import java.util.Properties;
  * @author liuzh
  */
 public class SqlServerDialect extends AbstractHelperDialect {
-    protected SqlServerParser       pageSql;
+    protected SqlServerSqlParser sqlServerSqlParser;
     protected Cache<String, String> CACHE_COUNTSQL;
     protected Cache<String, String> CACHE_PAGESQL;
     protected ReplaceSql            replaceSql;
@@ -81,7 +82,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
         if (cacheSql == null) {
             cacheSql = sql;
             cacheSql = replaceSql.replace(cacheSql);
-            cacheSql = pageSql.convertToPageSql(cacheSql, null, null);
+            cacheSql = sqlServerSqlParser.convertToPageSql(cacheSql, null, null);
             cacheSql = replaceSql.restore(cacheSql);
             CACHE_PAGESQL.put(sql, cacheSql);
         }
@@ -115,7 +116,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        this.pageSql = new SqlServerParser();
+        this.sqlServerSqlParser = ClassUtil.newInstance(properties.getProperty("sqlServerSqlParser"), properties, () -> new DefaultSqlServerSqlParser());
         String replaceSql = properties.getProperty("replaceSql");
         if (StringUtil.isEmpty(replaceSql) || "regex".equalsIgnoreCase(replaceSql)) {
             this.replaceSql = new RegexWithNolockReplaceSql();

@@ -28,7 +28,8 @@ import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.DefaultCountSqlParser;
-import com.github.pagehelper.parser.SqlServerParser;
+import com.github.pagehelper.parser.DefaultSqlServerSqlParser;
+import com.github.pagehelper.parser.SqlServerSqlParser;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ import org.junit.Test;
  * @author liuzh
  */
 public class SqlServerTest {
-    public static final SqlServerParser sqlServer = new SqlServerParser();
+    public static final SqlServerSqlParser sqlServer = new DefaultSqlServerSqlParser();
 
     @Test
     public void testSqlTestWithlock() {

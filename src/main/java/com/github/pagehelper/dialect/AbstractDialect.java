@@ -54,7 +54,7 @@ public abstract class AbstractDialect implements Dialect {
 
     @Override
     public void setProperties(Properties properties) {
-        this.countSqlParser = ClassUtil.newInstance(properties.getProperty("countSqlParser"), properties, () -> new DefaultCountSqlParser());
-        this.orderBySqlParser = ClassUtil.newInstance(properties.getProperty("orderBySqlParser"), properties, () -> new DefaultOrderBySqlParser());
+        this.countSqlParser = ClassUtil.newInstance(properties.getProperty("countSqlParser"), properties, DefaultCountSqlParser::new);
+        this.orderBySqlParser = ClassUtil.newInstance(properties.getProperty("orderBySqlParser"), properties, DefaultOrderBySqlParser::new);
     }
 }

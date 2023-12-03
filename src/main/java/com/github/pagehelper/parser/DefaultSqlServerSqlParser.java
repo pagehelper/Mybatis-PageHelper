@@ -52,7 +52,7 @@ import java.util.*;
  *
  * @author liuzh
  */
-public class SqlServerParser {
+public class DefaultSqlServerSqlParser implements SqlServerSqlParser {
     //开始行号
     public static final    String     START_ROW                = String.valueOf(Long.MIN_VALUE);
     //结束行号
@@ -83,20 +83,11 @@ public class SqlServerParser {
      * 转换为分页语句
      *
      * @param sql
-     * @return
-     */
-    public String convertToPageSql(String sql) {
-        return convertToPageSql(sql, null, null);
-    }
-
-    /**
-     * 转换为分页语句
-     *
-     * @param sql
      * @param offset
      * @param limit
      * @return
      */
+    @Override
     public String convertToPageSql(String sql, Integer offset, Integer limit) {
         //解析SQL
         Statement stmt;
