@@ -31,7 +31,6 @@ import com.github.pagehelper.dialect.AbstractHelperDialect;
 import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.dialect.replace.SimpleWithNolockReplaceSql;
-import com.github.pagehelper.parser.OrderByParser;
 import com.github.pagehelper.parser.SqlServerParser;
 import com.github.pagehelper.util.ClassUtil;
 import com.github.pagehelper.util.StringUtil;
@@ -106,7 +105,7 @@ public class SqlServerDialect extends AbstractHelperDialect {
         if (StringUtil.isNotEmpty(orderBy)) {
             pageKey.update(orderBy);
             sql = this.replaceSql.replace(sql);
-            sql = OrderByParser.converToOrderBySql(sql, orderBy);
+            sql = orderByParser.converToOrderBySql(sql, orderBy);
             sql = this.replaceSql.restore(sql);
         }
 

@@ -49,7 +49,7 @@ public class OrderByParser {
      * @param orderBy
      * @return
      */
-    public static String converToOrderBySql(String sql, String orderBy) {
+    public String converToOrderBySql(String sql, String orderBy) {
         //解析SQL
         Statement stmt = null;
         try {
@@ -75,7 +75,7 @@ public class OrderByParser {
      *
      * @param selectBody
      */
-    public static List<OrderByElement> extraOrderBy(SelectBody selectBody) {
+    protected List<OrderByElement> extraOrderBy(SelectBody selectBody) {
         if (selectBody != null) {
             if (selectBody instanceof PlainSelect) {
                 List<OrderByElement> orderByElements = ((PlainSelect) selectBody).getOrderByElements();

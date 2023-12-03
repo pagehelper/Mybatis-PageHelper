@@ -28,7 +28,6 @@ import com.github.pagehelper.Constant;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageRowBounds;
-import com.github.pagehelper.parser.OrderByParser;
 import com.github.pagehelper.util.ExecutorUtil;
 import com.github.pagehelper.util.MetaObjectUtil;
 import com.github.pagehelper.util.StringUtil;
@@ -188,7 +187,7 @@ public abstract class AbstractHelperDialect extends AbstractDialect implements C
         String orderBy = page.getOrderBy();
         if (StringUtil.isNotEmpty(orderBy)) {
             pageKey.update(orderBy);
-            sql = OrderByParser.converToOrderBySql(sql, orderBy);
+            sql = orderByParser.converToOrderBySql(sql, orderBy);
         }
         if (page.isOrderByOnly()) {
             return sql;
