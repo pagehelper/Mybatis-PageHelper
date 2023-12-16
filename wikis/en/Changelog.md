@@ -1,5 +1,80 @@
 ## Changelog
 
+- Released version 6.1.0, PageHelper provides direct dependency on jsqlparser as intermediate interfaces, allowing
+  default implementation replacement through SPI.
+- Upgraded jsqlparser version to 4.7, re-implemented order by, pagination, and count queries.
+- Simplified pom.xml configuration, removed shade-embedded jsqlparser approach, and switched to selecting different
+  jsqlparser versions through external dependencies, allowing self-SPI extension.
+- jsqlparser parsing no longer uses a thread pool, supporting SPI extension to override SqlParser implementation.
+- Changed SqlServer pagination to SqlServerSqlParser interface, added parameter sqlServerSqlParser to override the
+  default value.
+- Extracted OrderByParser to OrderBySqlParser interface, added orderBySqlParser parameter to override the default
+  implementation.
+- Changed static methods of OrderByParser to regular methods, preparing for future interface changes.
+- JSqlParser interface is no longer needed after JDK 8+, removed the interface, and marked the parameter in the
+  documentation (_This parameter was used in the early stages to support special configuration for SQL Server_).
+  Compatible with jsqlparser 4.7 version. Rui 2023/12/3 15:15.
+- Fixed maven-compiler-plugin version to remove warnings and improve build stability. qxo
+- Added .vscode to .gitignore for vscode IDE. qxo
+- Fixed bug https://github.com/pagehelper/Mybatis-PageHelper/issues/779. chenyuehui
+
+To ensure compatibility with jsqlparser 4.5, 4.7, and possible future versions,
+a new project called pagehelper-sqlparser has been created.
+Currently, it provides two implementations: 4.5 and 4.7.
+To use it, exclude jsqlparser from pagehelper and select one jsqlparser implementation.
+The current version defaults to using the code from version 4.7.
+If you want to switch to the 4.5 implementation, follow the configuration steps below:
+
+```xml
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+    <version>6.1.0</version>
+    <exclusions>
+        <exclusion>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>sqlparser4.5</artifactId>
+    <version>6.1.0</version>
+</dependency>
+```
+
+The priority of replacing default values with SPI is lower than the implementations specified by the sqlServerSqlParser,
+orderBySqlParser, and countSqlParser parameters.
+If no specific implementation is specified, the SPI implementation will take effect if available.
+You can refer to the code in the pagehelper-sqlsource module for SPI implementation examples.
+
+By default, JSqlParser uses a temporarily created `Executors.newSingleThreadExecutor()` for parsing SQL.
+Here, the thread pool is bypassed through the API:
+
+```java
+CCJSqlParser parser = CCJSqlParserUtil.newParser(statementReader);
+parser.
+
+withSquareBracketQuotation(true);
+return parser.
+
+Statement();
+```
+
+The purpose of using a thread pool in JSqlParser is to prevent parsing timeouts. Therefore, if you have encountered
+timeout situations,
+you can introduce the following dependency (which overrides the default implementation through SPI with a timeout of 10
+seconds):
+
+```xml
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>sqlparser-timeout</artifactId>
+    <version>6.1.0</version>
+</dependency>
+```
+
 ### 6.0.0 - 2023-11-05
 
 - Based on JDK 8 adaptation, JDK 6 and 7 are not supported from 6.0 onwards, and 5.x versions can be used if necessary

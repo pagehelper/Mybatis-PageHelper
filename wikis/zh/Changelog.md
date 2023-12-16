@@ -1,5 +1,71 @@
 ## 更新日志
 
+### 6.1.0 - 2023-12-16
+
+- 发布6.1.0，PageHelper 提供 jsqlparser直接依赖都是中间接口，可以通过SPI替换默认实现
+- 升级jsqlparser版本4.7，重新实现order by，分页，count查询
+- 简化pom.xml配置，去掉shade内嵌jsqlparser方式，改为通过外部依赖选择不同的jsqlparser版本，允许自己SPI扩展
+- jsqlparser解析不使用线程池，支持SPI扩展覆盖SqlParser实现
+- SqlServer分页改为SqlServerSqlParser接口，添加参数 sqlServerSqlParser 覆盖默认值
+- OrderByParser提取OrderBySqlParser接口，增加 orderBySqlParser 参数，可以覆盖默认实现
+- OrderByParser静态方法改为普通方法，为后续改接口做准备
+- jdk8+后不再需要JSqlParser接口，移除该接口，文档标记该参数（_该参数早期用于支持sqlserver特殊配置_）
+  兼容jsqlparser4.7版本 Rui 2023/12/3 15:15
+- maven-compiler-plugin固定版本以去除警告，并增加构建稳定性 qxo
+- gitignore .vscode for vscode ide qxo
+- 修改bug https://github.com/pagehelper/Mybatis-PageHelper/issues/779 chenyuehui
+
+为了兼容 jsqlparser 4.5 和 4.7，以及后续可能存在的其他版本，新建了一个 pagehelper-sqlparser 项目，目前提供了 4.5 和 4.7
+两个实现，
+使用时从 pagehelper 排除 jsqlparser，然后选择一个 jsqlparser 实现即可，当前版本默认使用的 4.7 版本的代码，
+因此如果想换 4.5 的实现，可以按照下面方式进行配置：
+
+```xml
+
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+    <version>6.1.0</version>
+    <exclusions>
+        <exclusion>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+<groupId>com.github.pagehelper</groupId>
+<artifactId>sqlparser4.5</artifactId>
+<version>6.1.0</version>
+</dependency>
+```
+
+SPI 替换默认值的优先级低于 `sqlServerSqlParser`,`orderBySqlParser`,`countSqlParser` 参数指定的实现，不指定时如果存在SPI实现，即可生效，
+SPI 可以参考 pagehelper-sqlsource 模块代码。
+
+JSqlParser 默认解析 SQL 会使用临时创建的 `Executors.newSingleThreadExecutor()`，这里通过 API 跳过了线程池：
+
+```java
+CCJSqlParser parser = CCJSqlParserUtil.newParser(statementReader);
+parser.
+
+withSquareBracketQuotation(true);
+return parser.
+
+Statement();
+```
+
+JSqlParser 使用线程池的目的是为了防止解析超时，因此如果你遇到过超时的情况，可以引入下面的依赖（通过SPI覆盖了默认实现，超时时间10秒）：
+
+```xml
+
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>sqlparser-timeout</artifactId>
+    <version>6.1.0</version>
+</dependency>
+```
+
 ### 6.0.0 - 2023-11-05
 
 - 基于jdk8适配，6.0开始不支持jdk6和7，如果有需要可以使用5.x版本
