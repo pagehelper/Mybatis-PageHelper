@@ -28,7 +28,7 @@
 
     <groupId>com.github.pagehelper</groupId>
     <artifactId>pagehelper</artifactId>
-    <version>${pagehelper-version}${version-suffix}-SNAPSHOT</version>
+    <version>6.1.0</version>
     <packaging>jar</packaging>
 
     <name>pagehelper 6</name>
@@ -56,12 +56,9 @@
     </scm>
 
     <properties>
-        <pagehelper-version>6.0.1</pagehelper-version>
-        <version-suffix></version-suffix>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <argLine>-Dfile.encoding=UTF-8</argLine>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
