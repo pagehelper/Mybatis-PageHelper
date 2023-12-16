@@ -26,9 +26,9 @@ package com.github.pagehelper.dialect;
 
 import com.github.pagehelper.Dialect;
 import com.github.pagehelper.parser.CountSqlParser;
-import com.github.pagehelper.parser.DefaultCountSqlParser;
-import com.github.pagehelper.parser.DefaultOrderBySqlParser;
 import com.github.pagehelper.parser.OrderBySqlParser;
+import com.github.pagehelper.parser.defaults.DefaultCountSqlParser;
+import com.github.pagehelper.parser.defaults.DefaultOrderBySqlParser;
 import com.github.pagehelper.util.ClassUtil;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;

@@ -26,11 +26,10 @@ package com.github.pagehelper.sql;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.parser.CountSqlParser;
-import com.github.pagehelper.parser.DefaultCountSqlParser;
 import com.github.pagehelper.parser.SqlParserUtil;
+import com.github.pagehelper.parser.defaults.DefaultCountSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,9 +38,9 @@ import org.junit.Test;
  */
 public class SqlTest {
 
+    CountSqlParser countSqlParser = new DefaultCountSqlParser();
     @Test
     public void testSqlParser() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
 
         Assert.assertEquals("WITH AA AS (SELECT 1 FROM A1), BB AS (SELECT 1 FROM B2), AB AS (SELECT * FROM AA UNION ALL SELECT * FROM BB) SELECT count(0) FROM AB",
                 countSqlParser.getSmartCountSql("WITH AA AS (SELECT 1 FROM A1), BB AS (SELECT 1 FROM B2), AB AS (SELECT * FROM AA UNION ALL SELECT * FROM BB) SELECT * FROM AB"));
@@ -89,7 +88,6 @@ public class SqlTest {
 
     @Test
     public void testSqlParser11() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM (SELECT so.id, so.address, so.area_code, so.area_id, so.del_flag, so.email, so.fax, so.grade, so.icon, so.master, so.name, so.parent_id, so.parent_ids, so.phone, so.remarks, so.type, so.zip_code FROM sys_organization so LEFT JOIN sys_user_organization suo ON (suo.org_id = so.id OR FIND_IN_SET(suo.org_id, so.parent_ids)) WHERE suo.user_id = ? GROUP BY so.id LIMIT ?) table_count",
                 countSqlParser.getSmartCountSql(
                         "select so.id,so.address,so.area_code,so.area_id,so.del_flag,so.email," +
@@ -111,7 +109,6 @@ public class SqlTest {
 
     @Test
     public void testSqlParser2() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM (SELECT name, count(id) FROM user GROUP BY name) table_count",
                 countSqlParser.getSmartCountSql("select name,count(id) from user group by name"));
     }
@@ -119,7 +116,6 @@ public class SqlTest {
 
     @Test
     public void testSqlParser3() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("select count(0) from ( \n" +
                         "SELECT *\n" +
                         "    FROM vwdatasearch\n" +
@@ -139,7 +135,6 @@ public class SqlTest {
 
     @Test
     public void testSqlParser4() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         String sql = countSqlParser.getSmartCountSql("/* test */select name,count(id) from user group by name");
         Assert.assertEquals("/* test */SELECT count(0) FROM (SELECT name, count(id) FROM user GROUP BY name) table_count",
                 sql);
@@ -152,8 +147,7 @@ public class SqlTest {
         //解析SQL
         Statement stmt = SqlParserUtil.parse(sql);
         Select select = (Select) stmt;
-        SelectBody selectBody = select.getSelectBody();
-        sql = selectBody.toString();
+        sql = select.toString();
 
         sql = sql.replaceAll("\\s*(\\w*?)_PAGEWITHNOLOCK", " $1 WITH(NOLOCK)");
         Assert.assertEquals("SELECT * FROM A WITH(NOLOCK) INNER JOIN B WITH(NOLOCK) ON A.TypeId = B.Id", sql);
@@ -161,13 +155,11 @@ public class SqlTest {
 
     @Test
     public void testSql375() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM tbl", countSqlParser.getSmartCountSql("SELECT IF(score >= 60, 'pass', 'failed') FROM tbl"));
     }
 
     @Test
     public void testSql350() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("select count(0) from ( \n" +
                 "select a,b,c from tb_test having a not null\n" +
                 " ) tmp_count", countSqlParser.getSmartCountSql("select a,b,c from tb_test having a not null"));
@@ -175,14 +167,12 @@ public class SqlTest {
 
     @Test
     public void testSql555() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM (SELECT (a.column1 + a.column2) AS popCount FROM peaf_staff AS a ORDER BY FIELD(a.`store_id`, ?, ?), popCount DESC) table_count",
                 countSqlParser.getSmartCountSql("SELECT (a.column1+a.column2) as popCount  FROM peaf_staff AS a ORDER BY FIELD(a.`store_id`, ?, ?), popCount DESC\n"));
     }
 
     @Test
     public void testSql606() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM (SELECT (SELECT COUNT(1) FROM test1 WHERE test1.id = test.test1_id) AS successCount, (SELECT COUNT(1) FROM test1) AS Total FROM test HAVING successCount = Total) table_count",
                 countSqlParser.getSmartCountSql("select\n" +
                         "(SELECT COUNT(1) FROM test1 WHERE test1.id = test.test1_id )as successCount ,\n" +
@@ -193,7 +183,6 @@ public class SqlTest {
 
     @Test
     public void testSql201() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM BASE_PARENT bp LEFT JOIN (BASE_STUDENT bs, BASE_PARENT_STUDENT bst) ON (bp.ID = bst.PARENT_ID AND bs.ID = bst.STUDENT_ID) WHERE 1 = 1",
                 countSqlParser.getSmartCountSql("SELECT bp.ID, bp.NAME, bp.PHONE, bp.IDCODE, bp.CREDENTIALS_PIC, bp.ROLE, bs.ID child_id, bs.NAME child_name " +
                         "FROM BASE_PARENT bp " +
@@ -203,14 +192,12 @@ public class SqlTest {
 
     @Test
     public void testSql545() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         Assert.assertEquals("SELECT count(0) FROM user_info",
                 countSqlParser.getSmartCountSql(" select * from user_info order by [ ]"));
     }
 
     @Test
     public void testKeepOrderBy() {
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         try {
             PageHelper.startPage(1, 10).keepOrderBy(true);
             Assert.assertEquals("select count(0) from ( \n" +

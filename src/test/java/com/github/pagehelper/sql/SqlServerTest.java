@@ -27,9 +27,9 @@ package com.github.pagehelper.sql;
 import com.github.pagehelper.dialect.ReplaceSql;
 import com.github.pagehelper.dialect.replace.RegexWithNolockReplaceSql;
 import com.github.pagehelper.parser.CountSqlParser;
-import com.github.pagehelper.parser.DefaultCountSqlParser;
-import com.github.pagehelper.parser.DefaultSqlServerSqlParser;
 import com.github.pagehelper.parser.SqlServerSqlParser;
+import com.github.pagehelper.parser.defaults.DefaultCountSqlParser;
+import com.github.pagehelper.parser.defaults.DefaultSqlServerSqlParser;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,6 +38,7 @@ import org.junit.Test;
  */
 public class SqlServerTest {
     public static final SqlServerSqlParser sqlServer = new DefaultSqlServerSqlParser();
+    CountSqlParser countSqlParser = new DefaultCountSqlParser();
 
     @Test
     public void testSqlTestWithlock() {
@@ -283,7 +284,6 @@ public class SqlServerTest {
         String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
 
 
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         String smartCountSql = countSqlParser.getSmartCountSql(replace);
         smartCountSql = replaceSql.restore(smartCountSql);
         Assert.assertEquals("SELECT count(0) FROM forum_post_info a WITH(NOLOCK) LEFT JOIN forum_carcase_tags AS b WITH(NOLOCK) ON a.id = b.carcase_id WHERE b.tag_id = 127",
@@ -314,8 +314,6 @@ public class SqlServerTest {
         String replace = replaceSql.replace(originalSql);
         String pageSql = sqlServer.convertToPageSql(replace, 1, 10);
 
-
-        CountSqlParser countSqlParser = new DefaultCountSqlParser();
         String smartCountSql = countSqlParser.getSmartCountSql(replace);
         smartCountSql = replaceSql.restore(smartCountSql);
         Assert.assertEquals("SELECT count(0) FROM ACM_User_Schedule AUS WITH(NOLOCK) LEFT JOIN Client_Register CR WITH(NOLOCK) ON AUS.BookBy = CR.ClientID AND CR.SourceType = 'F' AND AUS.ClientRegisterNum = CR.ClientRegisterNum INNER JOIN ACM_User AU WITH(NOLOCK) ON AU.UserID = AUS.DoctorID INNER JOIN Code_Clinic CC WITH(NOLOCK) ON AUS.ClinicID = CC.CodeID INNER JOIN Clinic_Detail CD WITH(NOLOCK) ON CC.CodeID = CD.ClinicID INNER JOIN Code_Area A1 WITH(NOLOCK) ON CD.AreaLevel1ID = A1.CodeID INNER JOIN Code_Area A2 WITH(NOLOCK) ON CD.AreaLevel2ID = A2.CodeID INNER JOIN Company_Master CM WITH(NOLOCK) ON CC.SystemID = CM.SystemID WHERE BookBy = 1",
