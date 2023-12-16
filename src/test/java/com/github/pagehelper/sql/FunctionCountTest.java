@@ -24,10 +24,9 @@
 
 package com.github.pagehelper.sql;
 
-import net.sf.jsqlparser.JSQLParserException;
+import com.github.pagehelper.parser.SqlParserUtil;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -42,12 +41,7 @@ import java.util.List;
  */
 public class FunctionCountTest {
     public static Select select(String sql) {
-        Statement stmt = null;
-        try {
-            stmt = CCJSqlParserUtil.parse(sql);
-        } catch (JSQLParserException e) {
-            throw new RuntimeException(e);
-        }
+        Statement stmt = SqlParserUtil.parse(sql);
         if (stmt instanceof Select) {
             return (Select) stmt;
         }

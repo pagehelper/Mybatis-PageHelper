@@ -27,7 +27,7 @@ package com.github.pagehelper.sql;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.parser.CountSqlParser;
 import com.github.pagehelper.parser.DefaultCountSqlParser;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import com.github.pagehelper.parser.SqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
@@ -150,13 +150,7 @@ public class SqlTest {
         String sql = "SELECT * FROM A WITH(NOLOCK) INNER JOIN B WITH(NOLOCK) ON A.TypeId = B.Id";
         sql = sql.replaceAll("((?i)\\s*(\\w?)\\s*with\\s*\\(nolock\\))", " $2_PAGEWITHNOLOCK");
         //解析SQL
-        Statement stmt = null;
-        try {
-            stmt = CCJSqlParserUtil.parse(sql);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return;
-        }
+        Statement stmt = SqlParserUtil.parse(sql);
         Select select = (Select) stmt;
         SelectBody selectBody = select.getSelectBody();
         sql = selectBody.toString();

@@ -50,13 +50,21 @@ public class ClassUtil {
             } catch (Exception ignored) {
             }
         }
+        T result = null;
         if (spi != null) {
             ServiceLoader<T> loader = ServiceLoader.load(spi);
             for (T t : loader) {
-                return t;
+                result = t;
+                break;
             }
         }
-        return defaultSupplier.get();
+        if (result == null) {
+            result = defaultSupplier.get();
+        }
+        if (result instanceof PageProperties) {
+            ((PageProperties) result).setProperties(properties);
+        }
+        return result;
     }
 
     @SuppressWarnings("unchecked")

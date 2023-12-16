@@ -29,7 +29,6 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.parser.Token;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -70,7 +69,7 @@ public class DefaultCountSqlParser implements CountSqlParser {
             return getSimpleCountSql(sql, countColumn);
         }
         try {
-            stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
+            stmt = SqlParserUtil.parse(sql);
         } catch (Throwable e) {
             //无法解析的用一般方法返回count语句
             return getSimpleCountSql(sql, countColumn);

@@ -25,7 +25,6 @@
 package com.github.pagehelper.parser;
 
 import com.github.pagehelper.PageException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.logging.Log;
@@ -54,7 +53,7 @@ public class DefaultOrderBySqlParser implements OrderBySqlParser {
         //解析SQL
         Statement stmt;
         try {
-            stmt = CCJSqlParserUtil.parse(sql, parser -> parser.withSquareBracketQuotation(true));
+            stmt = SqlParserUtil.parse(sql);
             Select select = (Select) stmt;
             SelectBody selectBody = select.getSelectBody();
             //处理body-去最外层order by
