@@ -1,5 +1,7 @@
 ## Changelog
 
+### 6.1.0 - 2023-12-16
+
 - Released version 6.1.0, PageHelper provides direct dependency on jsqlparser as intermediate interfaces, allowing
   default implementation replacement through SPI.
 - Upgraded jsqlparser version to 4.7, re-implemented order by, pagination, and count queries.
@@ -13,7 +15,7 @@
 - Changed static methods of OrderByParser to regular methods, preparing for future interface changes.
 - JSqlParser interface is no longer needed after JDK 8+, removed the interface, and marked the parameter in the
   documentation (_This parameter was used in the early stages to support special configuration for SQL Server_).
-  Compatible with jsqlparser 4.7 version. Rui 2023/12/3 15:15.
+  Compatible with jsqlparser 4.7 version.
 - Fixed maven-compiler-plugin version to remove warnings and improve build stability. qxo
 - Added .vscode to .gitignore for vscode IDE. qxo
 - Fixed bug https://github.com/pagehelper/Mybatis-PageHelper/issues/779. chenyuehui
@@ -54,12 +56,8 @@ Here, the thread pool is bypassed through the API:
 
 ```java
 CCJSqlParser parser = CCJSqlParserUtil.newParser(statementReader);
-parser.
-
-withSquareBracketQuotation(true);
-return parser.
-
-Statement();
+parser.withSquareBracketQuotation(true);
+return parser.Statement();
 ```
 
 The purpose of using a thread pool in JSqlParser is to prevent parsing timeouts. Therefore, if you have encountered

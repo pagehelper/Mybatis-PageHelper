@@ -10,7 +10,7 @@
 - OrderByParser提取OrderBySqlParser接口，增加 orderBySqlParser 参数，可以覆盖默认实现
 - OrderByParser静态方法改为普通方法，为后续改接口做准备
 - jdk8+后不再需要JSqlParser接口，移除该接口，文档标记该参数（_该参数早期用于支持sqlserver特殊配置_）
-  兼容jsqlparser4.7版本 Rui 2023/12/3 15:15
+  兼容jsqlparser4.7版本
 - maven-compiler-plugin固定版本以去除警告，并增加构建稳定性 qxo
 - gitignore .vscode for vscode ide qxo
 - 修改bug https://github.com/pagehelper/Mybatis-PageHelper/issues/779 chenyuehui
@@ -34,9 +34,9 @@
     </exclusions>
 </dependency>
 <dependency>
-<groupId>com.github.pagehelper</groupId>
-<artifactId>sqlparser4.5</artifactId>
-<version>6.1.0</version>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>sqlparser4.5</artifactId>
+    <version>6.1.0</version>
 </dependency>
 ```
 
@@ -47,12 +47,8 @@ JSqlParser 默认解析 SQL 会使用临时创建的 `Executors.newSingleThreadE
 
 ```java
 CCJSqlParser parser = CCJSqlParserUtil.newParser(statementReader);
-parser.
-
-withSquareBracketQuotation(true);
-return parser.
-
-Statement();
+parser.withSquareBracketQuotation(true);
+return parser.Statement();
 ```
 
 JSqlParser 使用线程池的目的是为了防止解析超时，因此如果你遇到过超时的情况，可以引入下面的依赖（通过SPI覆盖了默认实现，超时时间10秒）：
