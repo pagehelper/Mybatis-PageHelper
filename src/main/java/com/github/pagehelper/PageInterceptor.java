@@ -248,7 +248,9 @@ public class PageInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
+        Object wrapObjet = Plugin.wrap(target, this);
+        PageMethod.isAddToInterceptors = true;
+        return wrapObjet;
     }
 
     @Override

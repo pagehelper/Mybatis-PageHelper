@@ -26,6 +26,7 @@ package com.github.pagehelper.page;
 
 import com.github.pagehelper.ISelect;
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageException;
 import com.github.pagehelper.util.PageObjectUtil;
 
 import java.util.Properties;
@@ -36,6 +37,7 @@ import java.util.Properties;
  * @author liuzh
  */
 public abstract class PageMethod {
+    public static volatile boolean           isAddToInterceptors = false;
     protected static final ThreadLocal<Page> LOCAL_PAGE    = new ThreadLocal<Page>();
     protected static       boolean           DEFAULT_COUNT = true;
 
@@ -45,6 +47,9 @@ public abstract class PageMethod {
      * @param page
      */
     public static void setLocalPage(Page page) {
+        if(!isAddToInterceptors){
+            throw new PageException("page helper not added to interceptors!");
+        }
         LOCAL_PAGE.set(page);
     }
 
