@@ -81,7 +81,7 @@ public class UsingDialectClassTest {
             PageHelper.startPage(1, 10).using("test1");
             list = userMapper.selectAll();
             page = new PageInfo<User>(list);
-            assertEquals(183, list.size());
+            assertEquals(10, list.size());
             assertEquals(183, page.getTotal());
 
             serializable = PageSerializable.of(list);
@@ -114,7 +114,7 @@ public class UsingDialectClassTest {
             list = userMapper.selectAll();
             page = new PageInfo<User>(list);
 
-            assertEquals(100, list.size());
+            assertEquals(10, list.size());
             assertEquals(183, page.getTotal());
 
 
