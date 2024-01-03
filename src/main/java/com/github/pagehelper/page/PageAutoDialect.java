@@ -229,11 +229,11 @@ public class PageAutoDialect {
                 }
             }
             dialectThreadLocal.set(dialect);
-        } else if (delegate == null) {
+        } else {
             if (autoDialect) {
-                this.delegate = autoGetDialect(ms);
-            } else {
                 dialectThreadLocal.set(autoGetDialect(ms));
+            } else if (delegate == null) {
+                throw new PageException("place config helperDialect property");
             }
         }
     }
