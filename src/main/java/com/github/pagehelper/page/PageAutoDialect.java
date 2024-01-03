@@ -149,10 +149,11 @@ public class PageAutoDialect {
 
     //获取当前的代理对象
     public AbstractHelperDialect getDelegate() {
-        if (delegate != null) {
+        if (autoDialect) {
+            return dialectThreadLocal.get();
+        } else {
             return delegate;
         }
-        return dialectThreadLocal.get();
     }
 
     //移除代理对象
@@ -229,11 +230,11 @@ public class PageAutoDialect {
                 }
             }
             dialectThreadLocal.set(dialect);
-        } else if (delegate == null) {
+        } else {
             if (autoDialect) {
-                this.delegate = autoGetDialect(ms);
-            } else {
                 dialectThreadLocal.set(autoGetDialect(ms));
+            } else if (delegate == null) {
+                delegate = autoGetDialect(ms);
             }
         }
     }
