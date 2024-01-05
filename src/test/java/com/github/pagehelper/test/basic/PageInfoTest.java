@@ -224,7 +224,7 @@ public class PageInfoTest {
 
 
     /**
-     * 手动指定
+     * 手动指定记录总数，返回分页信息
      */
     @Test
     public void testPageInfoOfTotal() {
