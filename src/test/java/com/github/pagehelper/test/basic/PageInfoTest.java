@@ -221,4 +221,97 @@ public class PageInfoTest {
             sqlSession.close();
         }
     }
+
+
+    /**
+     * 手动指定
+     */
+    @Test
+    public void testPageInfoOfTotal() {
+        SqlSession sqlSession = MybatisHelper.getSqlSession();
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        try {
+            //获取第1页，10条内容，关闭查询总数
+            PageHelper.startPage(1, 10, false);
+            List<User> list = userMapper.selectAll();
+            System.out.println(list);
+
+            //手动指定总数
+            PageInfo<User> page = PageInfo.of(183L, list);
+
+            assertEquals(1, page.getPageNum());
+            assertEquals(10, page.getPageSize());
+            assertEquals(1, page.getStartRow());
+            assertEquals(10, page.getEndRow());
+            assertEquals(183, page.getTotal());
+            assertEquals(19, page.getPages());
+            assertEquals(true, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
+            assertEquals(false, page.isHasPreviousPage());
+            assertEquals(true, page.isHasNextPage());
+
+            PageSerializable<User> serializable = PageSerializable.of(list);
+            assertEquals(183, serializable.getTotal());
+
+
+            //获取第2页，10条内容，关闭查询总数
+            PageHelper.startPage(2, 10, false);
+            list = userMapper.selectAll();
+
+            //手动指定总数
+            page = PageInfo.of(183L, list);
+
+            assertEquals(2, page.getPageNum());
+            assertEquals(10, page.getPageSize());
+            assertEquals(11, page.getStartRow());
+            assertEquals(20, page.getEndRow());
+            assertEquals(183, page.getTotal());
+            assertEquals(19, page.getPages());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(false, page.isIsLastPage());
+            assertEquals(true, page.isHasPreviousPage());
+            assertEquals(true, page.isHasNextPage());
+
+
+            //获取第19页，10条内容，关闭查询总数
+            PageHelper.startPage(19, 10, false);
+            list = userMapper.selectAll();
+
+            //手动指定总数
+            page = PageInfo.of(183L, list);
+
+            assertEquals(19, page.getPageNum());
+            assertEquals(10, page.getPageSize());
+            assertEquals(181, page.getStartRow());
+            assertEquals(183, page.getEndRow());
+            assertEquals(183, page.getTotal());
+            assertEquals(19, page.getPages());
+            assertEquals(false, page.isIsFirstPage());
+            assertEquals(true, page.isIsLastPage());
+            assertEquals(true, page.isHasPreviousPage());
+            assertEquals(false, page.isHasNextPage());
+
+
+            //不使用PageHelper.startPage
+            list = userMapper.selectAll();
+
+            //手动指定总数
+            page = PageInfo.of(183L, list);
+
+            assertEquals(1, page.getPageNum());
+            assertEquals(183, page.getPageSize());
+            assertEquals(0, page.getStartRow());
+            assertEquals(182, page.getEndRow());
+            assertEquals(183, page.getTotal());
+            assertEquals(1, page.getPages());
+            assertEquals(true, page.isIsFirstPage());
+            assertEquals(true, page.isIsLastPage());
+            assertEquals(false, page.isHasPreviousPage());
+            assertEquals(false, page.isHasNextPage());
+
+
+        } finally {
+            sqlSession.close();
+        }
+    }
 }
