@@ -167,6 +167,21 @@ public class PageInfo<T> extends PageSerializable<T> {
         return new PageInfo<T>(list);
     }
 
+
+    /**
+     * 手动指定总记录数获取分页信息
+     *
+     * @param total 总记录数
+     * @param list  page结果
+     */
+    public static <T> PageInfo<T> of(long total, List<? extends T> list) {
+        if (list instanceof Page) {
+            Page page = (Page) list;
+            page.setTotal(total);
+        }
+        return new PageInfo<T>(list);
+    }
+
     public static <T> PageInfo<T> of(List<? extends T> list, int navigatePages) {
         return new PageInfo<T>(list, navigatePages);
     }
