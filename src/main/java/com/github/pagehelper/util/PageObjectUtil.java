@@ -47,7 +47,7 @@ public abstract class PageObjectUtil {
 
     static {
         try {
-            requestClass = Class.forName("javax.servlet.ServletRequest");
+            requestClass = ClassUtil.getServletRequestClass();
             getParameterMap = requestClass.getMethod("getParameterMap", new Class[]{});
             hasRequest = true;
         } catch (Throwable e) {
