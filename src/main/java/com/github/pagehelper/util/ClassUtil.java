@@ -89,4 +89,15 @@ public class ClassUtil {
         }
     }
 
+    public static Class<?> getServletRequestClass() throws ClassNotFoundException {
+        Class<?> requestClass = null;
+        try {
+            requestClass = Class.forName("javax.servlet.ServletRequest");
+        }catch (ClassNotFoundException exception){
+        }
+        if (requestClass != null){
+            return requestClass;
+        }
+        return Class.forName("jakarta.servlet.ServletRequest");
+    }
 }
