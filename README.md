@@ -35,65 +35,65 @@ GitHub项目：https://github.com/mybatis-book/book
 
 ```java
 static {
-    //注册别名
-    registerDialectAlias("hsqldb",HsqldbDialect.class);
-    registerDialectAlias("h2",HsqldbDialect.class);
-    registerDialectAlias("phoenix",HsqldbDialect.class);
+        //注册别名
+        registerDialectAlias("hsqldb", HsqldbDialect.class);
+        registerDialectAlias("h2", HsqldbDialect.class);
+        registerDialectAlias("phoenix", HsqldbDialect.class);
 
-    registerDialectAlias("postgresql",PostgreSqlDialect.class);
+        registerDialectAlias("postgresql", PostgreSqlDialect.class);
 
-    registerDialectAlias("mysql",MySqlDialect.class);
-    registerDialectAlias("mariadb",MySqlDialect.class);
-    registerDialectAlias("sqlite",MySqlDialect.class);
+        registerDialectAlias("mysql", MySqlDialect.class);
+        registerDialectAlias("mariadb", MySqlDialect.class);
+        registerDialectAlias("sqlite", MySqlDialect.class);
 
-    registerDialectAlias("herddb",HerdDBDialect.class);
+        registerDialectAlias("herddb", HerdDBDialect.class);
 
-    registerDialectAlias("oracle",OracleDialect.class);
-    registerDialectAlias("oracle9i",Oracle9iDialect.class);
-    registerDialectAlias("db2",Db2Dialect.class);
-    registerDialectAlias("as400",AS400Dialect.class);
-    registerDialectAlias("informix",InformixDialect.class);
-    //解决 informix-sqli #129，仍然保留上面的
-    registerDialectAlias("informix-sqli",InformixDialect.class);
+        registerDialectAlias("oracle", OracleDialect.class);
+        registerDialectAlias("oracle9i", Oracle9iDialect.class);
+        registerDialectAlias("db2", Db2Dialect.class);
+        registerDialectAlias("as400", AS400Dialect.class);
+        registerDialectAlias("informix", InformixDialect.class);
+        //解决 informix-sqli #129，仍然保留上面的
+        registerDialectAlias("informix-sqli", InformixDialect.class);
 
-    registerDialectAlias("sqlserver",SqlServerDialect.class);
-    registerDialectAlias("sqlserver2012",SqlServer2012Dialect.class);
+        registerDialectAlias("sqlserver", SqlServerDialect.class);
+        registerDialectAlias("sqlserver2012", SqlServer2012Dialect.class);
 
-    registerDialectAlias("derby",SqlServer2012Dialect.class);
-    //达梦数据库,https://github.com/mybatis-book/book/issues/43
-    registerDialectAlias("dm",OracleDialect.class);
-    //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281
-    registerDialectAlias("edb",OracleDialect.class);
-    //神通数据库
-    registerDialectAlias("oscar",OscarDialect.class);
-    registerDialectAlias("clickhouse",MySqlDialect.class);
-    //瀚高数据库
-    registerDialectAlias("highgo",HsqldbDialect.class);
-    //虚谷数据库
-    registerDialectAlias("xugu",HsqldbDialect.class);
-    registerDialectAlias("impala",HsqldbDialect.class);
-    registerDialectAlias("firebirdsql",FirebirdDialect.class);
-    //人大金仓数据库
-    registerDialectAlias("kingbase",PostgreSqlDialect.class);
-    // 人大金仓新版本kingbase8
-    registerDialectAlias("kingbase8",PostgreSqlDialect.class);
-    //行云数据库
-    registerDialectAlias("xcloud",CirroDataDialect.class);
+        registerDialectAlias("derby", SqlServer2012Dialect.class);
+        //达梦数据库,https://github.com/mybatis-book/book/issues/43
+        registerDialectAlias("dm", OracleDialect.class);
+        //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281
+        registerDialectAlias("edb", OracleDialect.class);
+        //神通数据库
+        registerDialectAlias("oscar", OscarDialect.class);
+        registerDialectAlias("clickhouse", MySqlDialect.class);
+        //瀚高数据库
+        registerDialectAlias("highgo", HsqldbDialect.class);
+        //虚谷数据库
+        registerDialectAlias("xugu", HsqldbDialect.class);
+        registerDialectAlias("impala", HsqldbDialect.class);
+        registerDialectAlias("firebirdsql", FirebirdDialect.class);
+        //人大金仓数据库
+        registerDialectAlias("kingbase", PostgreSqlDialect.class);
+        // 人大金仓新版本kingbase8
+        registerDialectAlias("kingbase8", PostgreSqlDialect.class);
+        //行云数据库
+        registerDialectAlias("xcloud", CirroDataDialect.class);
 
-    //openGauss数据库
-    registerDialectAlias("opengauss",PostgreSqlDialect.class);
+        //openGauss数据库
+        registerDialectAlias("opengauss", PostgreSqlDialect.class);
 
-    //注册 AutoDialect
-    //想要实现和以前版本相同的效果时，可以配置 autoDialectClass=old
-    registerAutoDialectAlias("old",DefaultAutoDialect.class);
-    registerAutoDialectAlias("hikari",HikariAutoDialect.class);
-    registerAutoDialectAlias("druid",DruidAutoDialect.class);
-    registerAutoDialectAlias("tomcat-jdbc",TomcatAutoDialect.class);
-    registerAutoDialectAlias("dbcp",DbcpAutoDialect.class);
-    registerAutoDialectAlias("c3p0",C3P0AutoDialect.class);
-    //不配置时，默认使用 DataSourceNegotiationAutoDialect
-    registerAutoDialectAlias("default",DataSourceNegotiationAutoDialect.class);
-}
+        //注册 AutoDialect
+        //想要实现和以前版本相同的效果时，可以配置 autoDialectClass=old
+        registerAutoDialectAlias("old", DefaultAutoDialect.class);
+        registerAutoDialectAlias("hikari", HikariAutoDialect.class);
+        registerAutoDialectAlias("druid", DruidAutoDialect.class);
+        registerAutoDialectAlias("tomcat-jdbc", TomcatAutoDialect.class);
+        registerAutoDialectAlias("dbcp", DbcpAutoDialect.class);
+        registerAutoDialectAlias("c3p0", C3P0AutoDialect.class);
+        //不配置时，默认使用 DataSourceNegotiationAutoDialect
+        registerAutoDialectAlias("default", DataSourceNegotiationAutoDialect.class);
+        }
 ```
 
 > 如果你使用的数据库不在这个列表时，你可以配置 `dialectAlias` 参数。
