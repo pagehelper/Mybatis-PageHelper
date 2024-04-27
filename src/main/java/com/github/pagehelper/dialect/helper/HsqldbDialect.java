@@ -76,4 +76,16 @@ public class HsqldbDialect extends AbstractHelperDialect {
         }
         return sqlBuilder.toString();
     }
+
+    @Override
+    protected String getPageCacheSqlKey(final Page page, final String sql) {
+        String cacheKey = sql;
+        if (page.getPageSize() > 0) {
+            cacheKey += "-p";
+        }
+        if (page.getStartRow() > 0) {
+            cacheKey += "-s";
+        }
+        return cacheKey;
+    }   
 }

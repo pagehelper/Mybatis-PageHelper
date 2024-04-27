@@ -53,4 +53,9 @@ public class AS400Dialect extends AbstractHelperDialect {
 	public String getPageSql(String sql, Page page, CacheKey pageKey) {
 		return sql + " OFFSET ? ROWS FETCH FIRST ? ROWS ONLY";
 	}
+
+	@Override
+	protected String getPageCacheSqlKey(final Page page, final String sql) {
+		return sql;
+	}
 }

@@ -60,4 +60,8 @@ public class OracleDialect extends AbstractHelperDialect {
         return sqlBuilder.toString();
     }
 
+    @Override
+    protected String getPageCacheSqlKey(final Page page, final String sql) {
+        return sql;
+    }
 }
