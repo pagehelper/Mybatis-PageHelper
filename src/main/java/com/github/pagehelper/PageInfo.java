@@ -42,6 +42,7 @@ import java.util.List;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PageInfo<T> extends PageSerializable<T> {
     public static final int DEFAULT_NAVIGATE_PAGES = 8;
+    private static final long serialVersionUID = 8444495984368556617L;
     //private PageInfo EMPTY = new PageInfo(Collections.emptyList(), 0);
     /**
      * 当前页
@@ -262,7 +263,7 @@ public class PageInfo<T> extends PageSerializable<T> {
      */
     private void judgePageBoudary() {
         isFirstPage = pageNum == 1;
-        isLastPage = pageNum == pages || pages == 0;
+        isLastPage = pageNum == pages || pages == 0 || this.size == 0;
         hasPreviousPage = pageNum > 1;
         hasNextPage = pageNum < pages;
     }
