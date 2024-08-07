@@ -352,7 +352,7 @@ but also according to the characteristics of the data source to choose whether t
 ### 3. How to use in your code
 
 Please note before
-reading [Important Notice](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Important.md)
+reading [Important Notice](https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/Important.md)
 
 PageHelper supports the following usage:
 
