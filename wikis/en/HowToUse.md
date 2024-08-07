@@ -559,7 +559,7 @@ When both `pageNumKey` and `pageSizeKey` arguments are found from User, the meth
 Note: The presence of both `pageNum` and `pageSize` will trigger the paging operation. In this case, the other paging
 parameters will take effect.
 
-#### 3). `PageHelper` Safty call
+#### 3). `PageHelper` Safety call
 
 ##### 1. Using the RowBounds and PageRowBounds arguments is extremely safe
 
