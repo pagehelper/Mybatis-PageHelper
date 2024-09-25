@@ -103,6 +103,7 @@ public class PageAutoDialect {
 
         //openGauss数据库
         registerDialectAlias("opengauss", PostgreSqlDialect.class);
+        registerDialectAlias("sundb", OracleDialect.class);
 
         //注册 AutoDialect
         //想要实现和以前版本相同的效果时，可以配置 autoDialectClass=old
@@ -112,6 +113,7 @@ public class PageAutoDialect {
         registerAutoDialectAlias("tomcat-jdbc", TomcatAutoDialect.class);
         registerAutoDialectAlias("dbcp", DbcpAutoDialect.class);
         registerAutoDialectAlias("c3p0", C3P0AutoDialect.class);
+
         //不配置时，默认使用 DataSourceNegotiationAutoDialect
         registerAutoDialectAlias("default", DataSourceNegotiationAutoDialect.class);
     }
