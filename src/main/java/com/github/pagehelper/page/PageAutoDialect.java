@@ -112,6 +112,8 @@ public class PageAutoDialect {
         registerAutoDialectAlias("tomcat-jdbc", TomcatAutoDialect.class);
         registerAutoDialectAlias("dbcp", DbcpAutoDialect.class);
         registerAutoDialectAlias("c3p0", C3P0AutoDialect.class);
+        registerDialectAlias("sundb", OracleDialect.class);
+
         //不配置时，默认使用 DataSourceNegotiationAutoDialect
         registerAutoDialectAlias("default", DataSourceNegotiationAutoDialect.class);
     }
