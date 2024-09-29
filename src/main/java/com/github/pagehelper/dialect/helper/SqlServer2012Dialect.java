@@ -57,4 +57,8 @@ public class SqlServer2012Dialect extends SqlServerDialect {
         return sqlBuilder.toString();
     }
 
+    @Override
+    protected String getPageCacheSqlKey(final Page page, final String sql) {
+        return sql;
+    }
 }
