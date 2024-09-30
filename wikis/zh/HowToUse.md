@@ -316,7 +316,7 @@ PageHelper.startPage(1, 10);
 List<User> list = userMapper.selectIf(1);
 
 //第三种，Mapper接口方式的调用，推荐这种使用方式。
-PageHelper.offsetPage(1, 10);
+PageHelper.offsetPage(0, 10);
 List<User> list = userMapper.selectIf(1);
 
 //第四种，参数方法调用

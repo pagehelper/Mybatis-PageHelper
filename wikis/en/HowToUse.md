@@ -371,7 +371,7 @@ PageHelper.startPage(1, 10);
 List<User> list = userMapper.selectIf(1);
 
 //3. use static method offsetPage
-PageHelper.offsetPage(1, 10);
+PageHelper.offsetPage(0, 10);
 List<User> list = userMapper.selectIf(1);
 
 //4. method parameters
