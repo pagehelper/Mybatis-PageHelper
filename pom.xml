@@ -195,6 +195,7 @@
             <groupId>com.xugudb</groupId>
             <artifactId>xugu-jdbc</artifactId>
             <version>12.2.0</version>
+            <scope>test</scope>
         </dependency>
         -->
     </dependencies>
