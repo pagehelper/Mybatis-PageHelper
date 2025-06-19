@@ -1,5 +1,31 @@
 ## Changelog
 
+### 6.1.1 - 2025-06-20
+
+- Add pagination support for SunDB database **by wangsl**
+- Add adapter support for Xugu (虚谷数据库) database **by 吴启洋**
+- Fix issue where `additionalParameter` was not properly copied when copying `countBoundSql` **by yefeng**
+- Fix `offsetPage` example code error **by S00ahKim**
+- Fix Jakarta/Javax ServletRequest compatibility issue, support Spring Boot 3.x **by PING**
+- Add `PageInfo.of()` overloaded method to support manually specifying total record count for pagination info **by yesAnd**
+- Upgrade MyBatis version to 3.5.19 (from 3.5.10)
+- Upgrade Guava version to 33.4.8-jre (from 32.0.0-jre)
+- Upgrade Logback Classic version to 1.2.13 (from 1.2.11)
+- Optimize Xugu JDBC dependency configuration, add `<scope>test</scope>`
+- Fix typos and link references in English documentation **by Coco Liliace**
+- Add relevant comments to improve code readability **by yesAnd**
+- Resolve dependency security vulnerabilities, update related component versions
+
+#### Compatibility Notes
+- This version maintains backward compatibility with previous versions
+- New database support: SunDB, Xugu (虚谷数据库)
+- Fixed Spring Boot 3.x compatibility issues, recommended for users using Jakarta EE
+
+#### Upgrade Recommendations
+- All users are recommended to upgrade, especially those using Spring Boot 3.x or requiring new database support
+- Users of SunDB or Xugu databases can directly use pagination features
+- Please ensure dependency version compatibility before
+
 ### 6.1.0 - 2023-12-16
 
 - Released version 6.1.0, PageHelper provides direct dependency on jsqlparser as intermediate interfaces, allowing

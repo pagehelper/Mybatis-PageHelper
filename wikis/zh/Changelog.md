@@ -1,5 +1,32 @@
 ## 更新日志
 
+
+### 6.1.1 - 2025-06-20
+
+- 新增对 SunDB 数据库的分页功能支持 **by wangsl**
+- 新增对 Xugu（虚谷数据库）的适配支持 **by 吴启洋**
+- 修复在复制 `countBoundSql` 时未正确复制 `additionalParameter` 的问题 **by yefeng**
+- 修复 `offsetPage` 示例代码错误 **by S00ahKim**
+- 修复 Jakarta/Javax ServletRequest 兼容性问题，支持 Spring Boot 3.x **by PING**
+- 新增 `PageInfo.of()` 重载方法，支持手动指定查询记录总数返回分页信息 **by yesAnd**
+- 升级 MyBatis 版本至 3.5.19（从 3.5.10）
+- 升级 Guava 版本至 33.4.8-jre（从 32.0.0-jre）
+- 升级 Logback Classic 版本至 1.2.13（从 1.2.11）
+- 优化 Xugu JDBC 依赖配置，添加 `<scope>test</scope>`
+- 修复英文文档中的拼写错误和链接引用 **by Coco Liliace**
+- 补充相关注释信息，提高代码可读性 **by yesAnd**
+- 解决依赖安全漏洞，更新相关组件版本
+
+#### 兼容性说明
+- 本版本与之前版本保持向后兼容
+- 新增数据库支持：SunDB、Xugu（虚谷数据库）
+- 修复了 Spring Boot 3.x 兼容性问题，建议使用 Jakarta EE 的用户升级
+
+#### 升级建议
+- 所有用户建议升级，特别是使用 Spring Boot 3.x 或需要新数据库支持的用户
+- 使用 SunDB 或虚谷数据库的用户可以直接使用分页功能
+- 升级前请确保相关依赖版本兼容性
+
 ### 6.1.0 - 2023-12-16
 
 - 发布6.1.0，PageHelper 提供 jsqlparser直接依赖都是中间接口，可以通过SPI替换默认实现
