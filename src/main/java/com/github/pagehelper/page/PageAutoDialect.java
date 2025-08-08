@@ -103,6 +103,7 @@ public class PageAutoDialect {
 
         //openGauss数据库
         registerDialectAlias("opengauss", PostgreSqlDialect.class);
+        registerDialectAlias("gaussdb", GaussDBDialect.class);
         registerDialectAlias("sundb", OracleDialect.class);
 
         //注册 AutoDialect
