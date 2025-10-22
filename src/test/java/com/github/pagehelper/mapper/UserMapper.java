@@ -135,4 +135,8 @@ public interface UserMapper {
     List<Map<String, Object>> execute(@Param("sql") String sql);
 
     List<UserCode> selectByCode(Code code);
+
+    List<User> selectOrderByBool(@Param("py") String py);
+
+    List<User> selectOrderByCase(@Param("py") String py);
 }

@@ -569,4 +569,17 @@
         left join salaries s on e.emp_no = s.emp_no
         order by e.emp_no, s.from_date
     </select>
+
+    <select id="selectOrderByBool" resultType="com.github.pagehelper.model.User">
+        select *
+        from public."user"
+        order by py = #{py} desc nulls last
+    </select>
+
+    <select id="selectOrderByCase" resultType="com.github.pagehelper.model.User">
+        select *
+        from public."user"
+        order by CASE WHEN py = #{py} THEN 0 ELSE 1 END,
+            py DESC NULLS LAST
+    </select>
 </mapper>
