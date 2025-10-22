@@ -162,7 +162,7 @@ public class DefaultCountSqlParser implements CountSqlParser {
      * @return
      */
     public boolean isSimpleCount(PlainSelect select) {
-        //包含order by的时候不可以
+        //#868 Cannot use simple count when ORDER BY is present
         if (select.getOrderByElements() != null) {
             return false;
         }
