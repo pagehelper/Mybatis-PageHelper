@@ -1,9 +1,7 @@
 package com.github.pagehelper.test.basic.count;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.mapper.UserMapper;
-import com.github.pagehelper.model.User;
 import com.github.pagehelper.util.MybatisHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -16,12 +14,11 @@ import org.junit.Test;
 public class TestOrderBy {
 
     @Test
-    public void testOrderByBool() throws ClassNotFoundException {
-        Class.forName("org.postgresql.Driver");
+    public void testOrderByBool() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
-            Page<User> page = PageHelper.startPage(1, 10);
+            PageHelper.startPage(1, 10);
             userMapper.selectOrderByBool("ZSJ");
         } finally {
             sqlSession.close();
@@ -30,12 +27,11 @@ public class TestOrderBy {
 
 
     @Test
-    public void testOrderByCase() throws ClassNotFoundException {
-        Class.forName("org.postgresql.Driver");
+    public void testOrderByCase() {
         SqlSession sqlSession = MybatisHelper.getSqlSession();
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
         try {
-            Page<User> page = PageHelper.startPage(1, 10);
+            PageHelper.startPage(1, 10);
             userMapper.selectOrderByCase("CNZ");
         } finally {
             sqlSession.close();
