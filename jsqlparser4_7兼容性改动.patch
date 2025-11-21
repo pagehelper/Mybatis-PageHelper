@@ -1,0 +1,756 @@
+Subject: [PATCH] jsqlparser4.7兼容性改动
+---
+Index: src/main/java/com/github/pagehelper/parser/OrderByParser.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/github/pagehelper/parser/OrderByParser.java b/src/main/java/com/github/pagehelper/parser/OrderByParser.java
+--- a/src/main/java/com/github/pagehelper/parser/OrderByParser.java	(revision 1ae113e493b480452c69af931124ebd5c1ce09f6)
++++ b/src/main/java/com/github/pagehelper/parser/OrderByParser.java	(date 1700463025360)
+@@ -56,9 +56,8 @@
+         try {
+             stmt = jSqlParser.parse(sql);
+             Select select = (Select) stmt;
+-            SelectBody selectBody = select.getSelectBody();
+             //处理body-去最外层order by
+-            List<OrderByElement> orderByElements = extraOrderBy(selectBody);
++            List<OrderByElement> orderByElements = extraOrderBy(select);
+             String defaultOrderBy = PlainSelect.orderByToString(orderByElements);
+             if (defaultOrderBy.indexOf('?') != -1) {
+                 throw new PageException("The order by in the original SQL[" + sql + "] contains parameters, so it cannot be modified using the OrderBy plugin!");
+@@ -85,25 +84,16 @@
+     /**
+      * extra order by and set default orderby to null
+      *
+-     * @param selectBody
++     * @param select
+      */
+-    public static List<OrderByElement> extraOrderBy(SelectBody selectBody) {
+-        if (selectBody != null) {
+-            if (selectBody instanceof PlainSelect) {
+-                List<OrderByElement> orderByElements = ((PlainSelect) selectBody).getOrderByElements();
+-                ((PlainSelect) selectBody).setOrderByElements(null);
++    public static List<OrderByElement> extraOrderBy(Select select) {
++        if (select != null) {
++            if (select instanceof PlainSelect || select instanceof SetOperationList) {
++                List<OrderByElement> orderByElements = select.getOrderByElements();
++                select.setOrderByElements(null);
+                 return orderByElements;
+-            } else if (selectBody instanceof WithItem) {
+-                WithItem withItem = (WithItem) selectBody;
+-                if (withItem.getSubSelect() != null) {
+-                    return extraOrderBy(withItem.getSubSelect().getSelectBody());
+-                }
+-            } else {
+-                SetOperationList operationList = (SetOperationList) selectBody;
+-                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+-                    List<SelectBody> plainSelects = operationList.getSelects();
+-                    return extraOrderBy(plainSelects.get(plainSelects.size() - 1));
+-                }
++            } else if (select instanceof ParenthesedSelect) {
++                extraOrderBy(((ParenthesedSelect) select).getSelect());
+             }
+         }
+         return null;
+Index: src/main/java/com/github/pagehelper/parser/SqlServerParser.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/github/pagehelper/parser/SqlServerParser.java b/src/main/java/com/github/pagehelper/parser/SqlServerParser.java
+--- a/src/main/java/com/github/pagehelper/parser/SqlServerParser.java	(revision 1ae113e493b480452c69af931124ebd5c1ce09f6)
++++ b/src/main/java/com/github/pagehelper/parser/SqlServerParser.java	(date 1700466304213)
+@@ -138,64 +138,62 @@
+      * @return
+      */
+     protected Select getPageSelect(Select select) {
+-        SelectBody selectBody = select.getSelectBody();
+-        if (selectBody instanceof SetOperationList) {
+-            selectBody = wrapSetOperationList((SetOperationList) selectBody);
++        if (select instanceof SetOperationList) {
++            select = wrapSetOperationList((SetOperationList) select);
+         }
+         //这里的selectBody一定是PlainSelect
+-        if (((PlainSelect) selectBody).getTop() != null) {
++        if (((PlainSelect) select).getTop() != null) {
+             throw new PageException("The pagination statement already contains the top, and can no longer be used to query the pagination plugin!");
+         }
+         //获取查询列
+-        List<SelectItem> selectItems = getSelectItems((PlainSelect) selectBody);
++        List<SelectItem<?>> selectItems = getSelectItems((PlainSelect) select);
+         //对一层的SQL增加ROW_NUMBER()
+-        List<SelectItem> autoItems = new ArrayList<SelectItem>();
+-        SelectItem orderByColumn = addRowNumber((PlainSelect) selectBody, autoItems);
++        List<SelectItem<?>> autoItems = new ArrayList<>();
++        SelectItem<?> orderByColumn = addRowNumber((PlainSelect) select, autoItems);
+         //加入自动生成列
+-        ((PlainSelect) selectBody).addSelectItems(autoItems.toArray(new SelectItem[autoItems.size()]));
++        ((PlainSelect) select).addSelectItems(autoItems.toArray(new SelectItem[0]));
+         //处理子语句中的order by
+-        processSelectBody(selectBody, 0);
++        processSelectBody(select, 0);
+ 
+         //中层子查询
+         PlainSelect innerSelectBody = new PlainSelect();
+         //PAGE_ROW_NUMBER
+         innerSelectBody.addSelectItems(orderByColumn);
+-        innerSelectBody.addSelectItems(selectItems.toArray(new SelectItem[selectItems.size()]));
++        innerSelectBody.addSelectItems(selectItems.toArray(new SelectItem[0]));
+         //将原始查询作为内层子查询
+-        SubSelect fromInnerItem = new SubSelect();
+-        fromInnerItem.setSelectBody(selectBody);
++        ParenthesedSelect fromInnerItem = new ParenthesedSelect();
++        fromInnerItem.setSelect(select);
+         fromInnerItem.setAlias(PAGE_TABLE_ALIAS);
+         innerSelectBody.setFromItem(fromInnerItem);
+ 
+         //新建一个select
+-        Select newSelect = new Select();
+-        PlainSelect newSelectBody = new PlainSelect();
++        PlainSelect newSelect = new PlainSelect();
+         //设置top
+         Top top = new Top();
+         top.setExpression(new LongValue(Long.MAX_VALUE));
+-        newSelectBody.setTop(top);
++        newSelect.setTop(top);
+         //设置order by
+         List<OrderByElement> orderByElements = new ArrayList<OrderByElement>();
+         OrderByElement orderByElement = new OrderByElement();
+         orderByElement.setExpression(PAGE_ROW_NUMBER_COLUMN);
+         orderByElements.add(orderByElement);
+-        newSelectBody.setOrderByElements(orderByElements);
++        newSelect.setOrderByElements(orderByElements);
+         //设置where
+         GreaterThan greaterThan = new GreaterThan();
+         greaterThan.setLeftExpression(PAGE_ROW_NUMBER_COLUMN);
+         greaterThan.setRightExpression(new LongValue(Long.MIN_VALUE));
+-        newSelectBody.setWhere(greaterThan);
++        newSelect.setWhere(greaterThan);
+         //设置selectItems
+-        newSelectBody.setSelectItems(selectItems);
++        newSelect.setSelectItems(selectItems);
+         //设置fromIterm
+-        SubSelect fromItem = new SubSelect();
+-        fromItem.setSelectBody(innerSelectBody); //中层子查询
++        ParenthesedSelect fromItem = new ParenthesedSelect();
++        fromItem.setSelect(innerSelectBody); //中层子查询
+         fromItem.setAlias(PAGE_TABLE_ALIAS);
+-        newSelectBody.setFromItem(fromItem);
++        newSelect.setFromItem(fromItem);
+ 
+-        newSelect.setSelectBody(newSelectBody);
+         if (isNotEmptyList(select.getWithItemsList())) {
+             newSelect.setWithItemsList(select.getWithItemsList());
++            select.setWithItemsList(null);
+         }
+         return newSelect;
+     }
+@@ -206,20 +204,20 @@
+      * @param setOperationList
+      * @return
+      */
+-    protected SelectBody wrapSetOperationList(SetOperationList setOperationList) {
++    protected Select wrapSetOperationList(SetOperationList setOperationList) {
+         //获取最后一个plainSelect
+-        SelectBody setSelectBody = setOperationList.getSelects().get(setOperationList.getSelects().size() - 1);
++        Select setSelectBody = setOperationList.getSelects().get(setOperationList.getSelects().size() - 1);
+         if (!(setSelectBody instanceof PlainSelect)) {
+             throw new PageException("Unable to process the SQL, you can submit issues in GitHub for help.!");
+         }
+         PlainSelect plainSelect = (PlainSelect) setSelectBody;
+         PlainSelect selectBody = new PlainSelect();
+-        List<SelectItem> selectItems = getSelectItems(plainSelect);
++        List<SelectItem<?>> selectItems = getSelectItems(plainSelect);
+         selectBody.setSelectItems(selectItems);
+ 
+         //设置fromIterm
+-        SubSelect fromItem = new SubSelect();
+-        fromItem.setSelectBody(setOperationList);
++        ParenthesedSelect fromItem = new ParenthesedSelect();
++        fromItem.setSelect(setOperationList);
+         fromItem.setAlias(new Alias(WRAP_TABLE));
+         selectBody.setFromItem(fromItem);
+         //order by
+@@ -236,33 +234,27 @@
+      * @param plainSelect
+      * @return
+      */
+-    protected List<SelectItem> getSelectItems(PlainSelect plainSelect) {
++    protected List<SelectItem<?>> getSelectItems(PlainSelect plainSelect) {
+         //设置selectItems
+-        List<SelectItem> selectItems = new ArrayList<SelectItem>();
+-        for (SelectItem selectItem : plainSelect.getSelectItems()) {
+-            //别名需要特殊处理
+-            if (selectItem instanceof SelectExpressionItem) {
+-                SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
+-                if (selectExpressionItem.getAlias() != null) {
+-                    //直接使用别名
+-                    Column column = new Column(selectExpressionItem.getAlias().getName());
+-                    SelectExpressionItem expressionItem = new SelectExpressionItem(column);
+-                    selectItems.add(expressionItem);
+-                } else if (selectExpressionItem.getExpression() instanceof Column) {
+-                    Column column = (Column) selectExpressionItem.getExpression();
+-                    SelectExpressionItem item = null;
+-                    if (column.getTable() != null) {
+-                        Column newColumn = new Column(column.getColumnName());
+-                        item = new SelectExpressionItem(newColumn);
+-                        selectItems.add(item);
+-                    } else {
+-                        selectItems.add(selectItem);
+-                    }
++        List<SelectItem<?>> selectItems = new ArrayList<>();
++        for (SelectItem<?> selectItem : plainSelect.getSelectItems()) {
++            if (selectItem.getExpression() instanceof AllTableColumns) {
++                selectItems.add(new SelectItem<>(new AllColumns()));
++            } else if (selectItem.getAlias() != null) {
++                //直接使用别名
++                Column column = new Column(selectItem.getAlias().getName());
++                SelectItem<?> expressionItem = new SelectItem<>(column);
++                selectItems.add(expressionItem);
++            } else if (selectItem.getExpression() instanceof Column) {
++                Column column = (Column) selectItem.getExpression();
++                SelectItem<?> item = null;
++                if (column.getTable() != null) {
++                    Column newColumn = new Column(column.getColumnName());
++                    item = new SelectItem<>(newColumn);
++                    selectItems.add(item);
+                 } else {
+                     selectItems.add(selectItem);
+                 }
+-            } else if (selectItem instanceof AllTableColumns) {
+-                selectItems.add(new AllColumns());
+             } else {
+                 selectItems.add(selectItem);
+             }
+@@ -272,8 +264,8 @@
+         // SELECT * FROM (SELECT *, 1 AS alias FROM TEST)
+         // 不应该为
+         // SELECT *, alias FROM (SELECT *, 1 AS alias FROM TEST)
+-        for (SelectItem selectItem : selectItems) {
+-            if (selectItem instanceof AllColumns) {
++        for (SelectItem<?> selectItem : selectItems) {
++            if (selectItem.getExpression() instanceof AllColumns) {
+                 return Collections.singletonList(selectItem);
+             }
+         }
+@@ -287,7 +279,7 @@
+      * @param autoItems   自动生成的查询列
+      * @return ROW_NUMBER() 列
+      */
+-    protected SelectItem addRowNumber(PlainSelect plainSelect, List<SelectItem> autoItems) {
++    protected SelectItem<?> addRowNumber(PlainSelect plainSelect, List<SelectItem<?>> autoItems) {
+         //增加ROW_NUMBER()
+         StringBuilder orderByBuilder = new StringBuilder();
+         orderByBuilder.append("ROW_NUMBER() OVER (");
+@@ -301,28 +293,28 @@
+         }
+         orderByBuilder.append(") ");
+         orderByBuilder.append(PAGE_ROW_NUMBER);
+-        return new SelectExpressionItem(new Column(orderByBuilder.toString()));
++        return new SelectItem<>(new Column(orderByBuilder.toString()));
+     }
+ 
+     /**
+      * 处理selectBody去除Order by
+      *
+-     * @param selectBody
++     * @param select
+      */
+-    protected void processSelectBody(SelectBody selectBody, int level) {
+-        if (selectBody != null) {
+-            if (selectBody instanceof PlainSelect) {
+-                processPlainSelect((PlainSelect) selectBody, level + 1);
+-            } else if (selectBody instanceof WithItem) {
+-                WithItem withItem = (WithItem) selectBody;
+-                if (withItem.getSubSelect() != null) {
+-                    processSelectBody(withItem.getSubSelect().getSelectBody(), level + 1);
++    protected void processSelectBody(Select select, int level) {
++        if (select != null) {
++            if (select instanceof PlainSelect) {
++                processPlainSelect((PlainSelect) select, level + 1);
++            } else if (select instanceof WithItem) {
++                WithItem withItem = (WithItem) select;
++                if (withItem.getSelect() != null) {
++                    processSelectBody(withItem.getSelect(), level + 1);
+                 }
+             } else {
+-                SetOperationList operationList = (SetOperationList) selectBody;
+-                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+-                    List<SelectBody> plainSelects = operationList.getSelects();
+-                    for (SelectBody plainSelect : plainSelects) {
++                SetOperationList operationList = (SetOperationList) select;
++                if (operationList.getSelects() != null && !operationList.getSelects().isEmpty()) {
++                    List<Select> plainSelects = operationList.getSelects();
++                    for (Select plainSelect : plainSelects) {
+                         processSelectBody(plainSelect, level + 1);
+                     }
+                 }
+@@ -346,7 +338,7 @@
+         if (plainSelect.getFromItem() != null) {
+             processFromItem(plainSelect.getFromItem(), level + 1);
+         }
+-        if (plainSelect.getJoins() != null && plainSelect.getJoins().size() > 0) {
++        if (plainSelect.getJoins() != null && !plainSelect.getJoins().isEmpty()) {
+             List<Join> joins = plainSelect.getJoins();
+             for (Join join : joins) {
+                 if (join.getRightItem() != null) {
+@@ -362,33 +354,14 @@
+      * @param fromItem
+      */
+     protected void processFromItem(FromItem fromItem, int level) {
+-        if (fromItem instanceof SubJoin) {
+-            SubJoin subJoin = (SubJoin) fromItem;
+-            if (subJoin.getJoinList() != null && subJoin.getJoinList().size() > 0) {
+-                for (Join join : subJoin.getJoinList()) {
+-                    if (join.getRightItem() != null) {
+-                        processFromItem(join.getRightItem(), level + 1);
+-                    }
+-                }
+-            }
+-            if (subJoin.getLeft() != null) {
+-                processFromItem(subJoin.getLeft(), level + 1);
+-            }
+-        } else if (fromItem instanceof SubSelect) {
+-            SubSelect subSelect = (SubSelect) fromItem;
+-            if (subSelect.getSelectBody() != null) {
+-                processSelectBody(subSelect.getSelectBody(), level + 1);
+-            }
+-        } else if (fromItem instanceof ValuesList) {
+-
+-        } else if (fromItem instanceof LateralSubSelect) {
+-            LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
+-            if (lateralSubSelect.getSubSelect() != null) {
+-                SubSelect subSelect = lateralSubSelect.getSubSelect();
+-                if (subSelect.getSelectBody() != null) {
+-                    processSelectBody(subSelect.getSelectBody(), level + 1);
+-                }
+-            }
++        if (fromItem instanceof LateralSubSelect) {
++            processSelectBody(((LateralSubSelect) fromItem).getSelect(), level + 1);
++        } else if (fromItem instanceof ParenthesedSelect) {
++            processSelectBody(((ParenthesedSelect) fromItem).getSelect(), level + 1);
++        } else if (fromItem instanceof Select) {
++            processSelectBody((Select) fromItem, level + 1);
++        }  else if (fromItem instanceof ParenthesedFromItem) {
++            processFromItem(((ParenthesedFromItem) fromItem).getFromItem(), level + 1);
+         }
+         //Table时不用处理
+     }
+@@ -400,7 +373,7 @@
+      * @return
+      */
+     public boolean isNotEmptyList(List<?> list) {
+-        if (list == null || list.size() == 0) {
++        if (list == null || list.isEmpty()) {
+             return false;
+         }
+         return true;
+@@ -441,13 +414,13 @@
+      * @return 新的排序列表
+      */
+     protected List<OrderByElement> getOrderByElements(PlainSelect plainSelect,
+-                                                      List<SelectItem> autoItems) {
++                                                      List<SelectItem<?>> autoItems) {
+         List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
+         ListIterator<OrderByElement> iterator = orderByElements.listIterator();
+         OrderByElement orderByElement;
+ 
+         // 非 `*` 且 非 `t.*` 查询列集合
+-        Map<String, SelectExpressionItem> selectMap = new HashMap<String, SelectExpressionItem>();
++        Map<String, SelectItem<?>> selectMap = new HashMap<>();
+         // 别名集合
+         Set<String> aliases = new HashSet<String>();
+         // 是否包含 `*` 查询列
+@@ -455,21 +428,18 @@
+         // `t.*` 查询列的表名集合
+         Set<String> allColumnsTables = new HashSet<String>();
+ 
+-        for (SelectItem item : plainSelect.getSelectItems()) {
+-            if (item instanceof SelectExpressionItem) {
+-                SelectExpressionItem expItem = (SelectExpressionItem) item;
+-                selectMap.put(expItem.getExpression().toString(), expItem);
+-
+-                Alias alias = expItem.getAlias();
++        for (SelectItem<?> item : plainSelect.getSelectItems()) {
++            Expression expression = item.getExpression();
++            if (expression instanceof AllTableColumns) {
++                allColumnsTables.add(((AllTableColumns) expression).getTable().getName());
++            } else if (expression instanceof AllColumns) {
++                allColumns = true;
++            } else {
++                selectMap.put(expression.toString(), item);
++                Alias alias = item.getAlias();
+                 if (alias != null) {
+                     aliases.add(alias.getName());
+                 }
+-
+-            } else if (item instanceof AllColumns) {
+-                allColumns = true;
+-
+-            } else if (item instanceof AllTableColumns) {
+-                allColumnsTables.add(((AllTableColumns) item).getTable().getName());
+             }
+         }
+ 
+@@ -478,7 +448,7 @@
+         while (iterator.hasNext()) {
+             orderByElement = iterator.next();
+             Expression expression = orderByElement.getExpression();
+-            SelectExpressionItem selectExpressionItem = selectMap.get(expression.toString());
++            SelectItem<?> selectExpressionItem = selectMap.get(expression.toString());
+             if (selectExpressionItem != null) { // OrderByElement 在查询列表中
+                 Alias alias = selectExpressionItem.getAlias();
+                 if (alias != null) { // 查询列含有别名时用查询列别名
+@@ -527,8 +497,7 @@
+                 // 将排序列加入查询列中
+                 String aliasName = PAGE_COLUMN_ALIAS_PREFIX + aliasNo++;
+ 
+-                SelectExpressionItem item = new SelectExpressionItem();
+-                item.setExpression(expression);
++                SelectItem<?> item = new SelectItem<>(expression);
+                 item.setAlias(new Alias(aliasName));
+                 autoItems.add(item);
+ 
+Index: src/test/java/com/github/pagehelper/sql/FunctionCountTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/github/pagehelper/sql/FunctionCountTest.java b/src/test/java/com/github/pagehelper/sql/FunctionCountTest.java
+--- a/src/test/java/com/github/pagehelper/sql/FunctionCountTest.java	(revision 1ae113e493b480452c69af931124ebd5c1ce09f6)
++++ b/src/test/java/com/github/pagehelper/sql/FunctionCountTest.java	(date 1700464930289)
+@@ -31,7 +31,6 @@
+ import net.sf.jsqlparser.statement.Statement;
+ import net.sf.jsqlparser.statement.select.PlainSelect;
+ import net.sf.jsqlparser.statement.select.Select;
+-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+ import net.sf.jsqlparser.statement.select.SelectItem;
+ import org.junit.Test;
+ 
+@@ -57,17 +56,13 @@
+     @Test
+     public void test() {
+         Select select = select("select max(name),code,min(aa),nvl(ab,0),heh from user where a > 100");
+-        List<SelectItem> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
++        List<SelectItem<?>> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
+         for (SelectItem item : selectItems) {
+-            if (item instanceof SelectExpressionItem) {
+-                Expression exp = ((SelectExpressionItem) item).getExpression();
+-                if (exp instanceof Function) {
+-                    System.out.println("Function:" + item.toString());
+-                } else {
+-                    System.out.println("Not a function:" + exp.toString());
+-                }
+-            } else {
+-                System.out.println("Not a function:" + item.toString());
++            Expression exp = item.getExpression();
++            if (exp instanceof Function) {
++                System.out.println("Function:" + item.toString());
++            } else {
++                System.out.println("Not a function:" + exp.toString());
+             }
+         }
+     }
+@@ -75,9 +70,9 @@
+     @Test
+     public void test2() {
+         Select select = select("select distinct(name) from user where a > 100");
+-        List<SelectItem> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
++        List<SelectItem<?>> selectItems = ((PlainSelect) select.getSelectBody()).getSelectItems();
+         for (SelectItem item : selectItems) {
+-            if (item instanceof Function) {
++            if (item.getExpression() instanceof Function) {
+                 System.out.println("Function:" + item.toString());
+             } else {
+                 System.out.println("Not a function:" + item.toString());
+Index: src/test/java/com/github/pagehelper/sql/SqlTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/github/pagehelper/sql/SqlTest.java b/src/test/java/com/github/pagehelper/sql/SqlTest.java
+--- a/src/test/java/com/github/pagehelper/sql/SqlTest.java	(revision 1ae113e493b480452c69af931124ebd5c1ce09f6)
++++ b/src/test/java/com/github/pagehelper/sql/SqlTest.java	(date 1700463025400)
+@@ -30,7 +30,6 @@
+ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+ import net.sf.jsqlparser.statement.Statement;
+ import net.sf.jsqlparser.statement.select.Select;
+-import net.sf.jsqlparser.statement.select.SelectBody;
+ import org.junit.Assert;
+ import org.junit.Test;
+ 
+@@ -158,8 +157,7 @@
+             return;
+         }
+         Select select = (Select) stmt;
+-        SelectBody selectBody = select.getSelectBody();
+-        sql = selectBody.toString();
++        sql = select.toString();
+ 
+         sql = sql.replaceAll("\\s*(\\w*?)_PAGEWITHNOLOCK", " $1 WITH(NOLOCK)");
+         Assert.assertEquals("SELECT * FROM A WITH(NOLOCK) INNER JOIN B WITH(NOLOCK) ON A.TypeId = B.Id", sql);
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision 1ae113e493b480452c69af931124ebd5c1ce09f6)
++++ b/pom.xml	(date 1700442371317)
+@@ -56,7 +56,7 @@
+     </scm>
+ 
+     <properties>
+-        <pagehelper-version>6.0.1-SNAPSHOT</pagehelper-version>
++        <pagehelper-version>6.0.1</pagehelper-version>
+         <version-suffix></version-suffix>
+ 
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+@@ -68,7 +68,7 @@
+         <dependency>
+             <groupId>com.github.jsqlparser</groupId>
+             <artifactId>jsqlparser</artifactId>
+-            <version>4.5</version>
++            <version>4.7</version>
+         </dependency>
+         <dependency>
+             <groupId>org.mybatis</groupId>
+Index: src/main/java/com/github/pagehelper/parser/DefaultCountSqlParser.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/github/pagehelper/parser/DefaultCountSqlParser.java b/src/main/java/com/github/pagehelper/parser/DefaultCountSqlParser.java
+--- a/src/main/java/com/github/pagehelper/parser/DefaultCountSqlParser.java	(revision 1ae113e493b480452c69af931124ebd5c1ce09f6)
++++ b/src/main/java/com/github/pagehelper/parser/DefaultCountSqlParser.java	(date 1700465554724)
+@@ -85,10 +85,9 @@
+             return getSimpleCountSql(sql, countColumn);
+         }
+         Select select = (Select) stmt;
+-        SelectBody selectBody = select.getSelectBody();
+         try {
+             //处理body-去order by
+-            processSelectBody(selectBody);
++            processSelect(select);
+         } catch (Exception e) {
+             //当 sql 包含 group by 时，不去除 order by
+             return getSimpleCountSql(sql, countColumn);
+@@ -96,10 +95,10 @@
+         //处理with-去order by
+         processWithItemsList(select.getWithItemsList());
+         //处理为count查询
+-        sqlToCount(select, countColumn);
+-        String result = select.toString();
+-        if (selectBody instanceof PlainSelect) {
+-            Token token = ((PlainSelect) selectBody).getASTNode().jjtGetFirstToken().specialToken;
++        Select countSelect = sqlToCount(select, countColumn);
++        String result = countSelect.toString();
++        if (select instanceof PlainSelect) {
++            Token token = select.getASTNode().jjtGetFirstToken().specialToken;
+             if (token != null) {
+                 String hints = token.toString().trim();
+                 // 这里判断是否存在hint, 且result是不包含hint的
+@@ -142,21 +141,25 @@
+      *
+      * @param select
+      */
+-    public void sqlToCount(Select select, String name) {
+-        SelectBody selectBody = select.getSelectBody();
++    public Select sqlToCount(Select select, String name) {
+         // 是否能简化count查询
+-        List<SelectItem> COUNT_ITEM = new ArrayList<SelectItem>();
+-        COUNT_ITEM.add(new SelectExpressionItem(new Column("count(" + name + ")")));
+-        if (selectBody instanceof PlainSelect && isSimpleCount((PlainSelect) selectBody)) {
+-            ((PlainSelect) selectBody).setSelectItems(COUNT_ITEM);
++        List<SelectItem<?>> COUNT_ITEM = new ArrayList<>();
++        COUNT_ITEM.add(new SelectItem(new Column("count(" + name + ")")));
++        if (select instanceof PlainSelect && isSimpleCount((PlainSelect) select)) {
++            ((PlainSelect) select).setSelectItems(COUNT_ITEM);
++            return select;
+         } else {
+             PlainSelect plainSelect = new PlainSelect();
+-            SubSelect subSelect = new SubSelect();
+-            subSelect.setSelectBody(selectBody);
++            ParenthesedSelect subSelect = new ParenthesedSelect();
++            subSelect.setSelect(select);
+             subSelect.setAlias(TABLE_ALIAS);
+             plainSelect.setFromItem(subSelect);
+             plainSelect.setSelectItems(COUNT_ITEM);
+-            select.setSelectBody(plainSelect);
++            if(select.getWithItemsList() != null) {
++                plainSelect.setWithItemsList(select.getWithItemsList());
++                select.setWithItemsList(null);
++            }
++            return plainSelect;
+         }
+     }
+ 
+@@ -179,37 +182,35 @@
+         if (select.getHaving() != null) {
+             return false;
+         }
+-        for (SelectItem item : select.getSelectItems()) {
++        for (SelectItem<?> item : select.getSelectItems()) {
+             //select列中包含参数的时候不可以，否则会引起参数个数错误
+             if (item.toString().contains("?")) {
+                 return false;
+             }
+             //如果查询列中包含函数，也不可以，函数可能会聚合列
+-            if (item instanceof SelectExpressionItem) {
+-                Expression expression = ((SelectExpressionItem) item).getExpression();
+-                if (expression instanceof Function) {
+-                    String name = ((Function) expression).getName();
+-                    if (name != null) {
+-                        String NAME = name.toUpperCase();
+-                        if (skipFunctions.contains(NAME)) {
+-                            //go on
+-                        } else if (falseFunctions.contains(NAME)) {
+-                            return false;
+-                        } else {
+-                            for (String aggregateFunction : AGGREGATE_FUNCTIONS) {
+-                                if (NAME.startsWith(aggregateFunction)) {
+-                                    falseFunctions.add(NAME);
+-                                    return false;
+-                                }
+-                            }
+-                            skipFunctions.add(NAME);
+-                        }
+-                    }
+-                } else if (expression instanceof Parenthesis && ((SelectExpressionItem) item).getAlias() != null) {
+-                    //#555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
+-                    // 这里想要更智能，需要在整个SQL中查找别名出现的位置，暂时不考虑，直接排除
+-                    return false;
+-                }
++            Expression expression = item.getExpression();
++            if (expression instanceof Function) {
++                String name = ((Function) expression).getName();
++                if (name != null) {
++                    String NAME = name.toUpperCase();
++                    if (skipFunctions.contains(NAME)) {
++                        //go on
++                    } else if (falseFunctions.contains(NAME)) {
++                        return false;
++                    } else {
++                        for (String aggregateFunction : AGGREGATE_FUNCTIONS) {
++                            if (NAME.startsWith(aggregateFunction)) {
++                                falseFunctions.add(NAME);
++                                return false;
++                            }
++                        }
++                        skipFunctions.add(NAME);
++                    }
++                }
++            } else if (expression instanceof Parenthesis && item.getAlias() != null) {
++                //#555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
++                // 这里想要更智能，需要在整个SQL中查找别名出现的位置，暂时不考虑，直接排除
++                return false;
+             }
+         }
+         return true;
+@@ -218,29 +219,31 @@
+     /**
+      * 处理selectBody去除Order by
+      *
+-     * @param selectBody
++     * @param select
+      */
+-    public void processSelectBody(SelectBody selectBody) {
+-        if (selectBody != null) {
+-            if (selectBody instanceof PlainSelect) {
+-                processPlainSelect((PlainSelect) selectBody);
+-            } else if (selectBody instanceof WithItem) {
++    public void processSelect(Select select) {
++        if (select != null) {
++            if (select instanceof PlainSelect) {
++                processPlainSelect((PlainSelect) select);
++            } else if (select instanceof ParenthesedSelect) {
++                processSelect(((ParenthesedSelect) select).getSelect());
++            } else if (select instanceof SetOperationList) {
++                List<Select> selects = ((SetOperationList) select).getSelects();
++                for (Select sel : selects) {
++                    processSelect(sel);
++                }
++                if (!orderByHashParameters(select.getOrderByElements())) {
++                    select.setOrderByElements(null);
++                }
++            }
++            /*
++            if (select instanceof WithItem) {
+                 WithItem withItem = (WithItem) selectBody;
+                 if (withItem.getSubSelect() != null && !keepSubSelectOrderBy()) {
+                     processSelectBody(withItem.getSubSelect().getSelectBody());
+                 }
+-            } else {
+-                SetOperationList operationList = (SetOperationList) selectBody;
+-                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+-                    List<SelectBody> plainSelects = operationList.getSelects();
+-                    for (SelectBody plainSelect : plainSelects) {
+-                        processSelectBody(plainSelect);
+-                    }
+-                }
+-                if (!orderByHashParameters(operationList.getOrderByElements())) {
+-                    operationList.setOrderByElements(null);
+-                }
+             }
++             */
+         }
+     }
+ 
+@@ -272,10 +275,10 @@
+      * @param withItemsList
+      */
+     public void processWithItemsList(List<WithItem> withItemsList) {
+-        if (withItemsList != null && withItemsList.size() > 0) {
++        if (withItemsList != null && !withItemsList.isEmpty()) {
+             for (WithItem item : withItemsList) {
+-                if (item.getSubSelect() != null && !keepSubSelectOrderBy()) {
+-                    processSelectBody(item.getSubSelect().getSelectBody());
++                if (item.getSelect() != null && !keepSubSelectOrderBy()) {
++                    processSelect(item.getSelect());
+                 }
+             }
+         }
+@@ -287,33 +290,16 @@
+      * @param fromItem
+      */
+     public void processFromItem(FromItem fromItem) {
+-        if (fromItem instanceof SubJoin) {
+-            SubJoin subJoin = (SubJoin) fromItem;
+-            if (subJoin.getJoinList() != null && subJoin.getJoinList().size() > 0) {
+-                for (Join join : subJoin.getJoinList()) {
+-                    if (join.getRightItem() != null) {
+-                        processFromItem(join.getRightItem());
+-                    }
+-                }
+-            }
+-            if (subJoin.getLeft() != null) {
+-                processFromItem(subJoin.getLeft());
+-            }
+-        } else if (fromItem instanceof SubSelect) {
+-            SubSelect subSelect = (SubSelect) fromItem;
+-            if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
+-                processSelectBody(subSelect.getSelectBody());
++        if (fromItem instanceof ParenthesedSelect) {
++            ParenthesedSelect parenthesedSelect = (ParenthesedSelect) fromItem;
++            if (parenthesedSelect.getSelect() != null && !keepSubSelectOrderBy()) {
++                processSelect(parenthesedSelect.getSelect());
+             }
+-        } else if (fromItem instanceof ValuesList) {
+-
+-        } else if (fromItem instanceof LateralSubSelect) {
+-            LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
+-            if (lateralSubSelect.getSubSelect() != null) {
+-                SubSelect subSelect = lateralSubSelect.getSubSelect();
+-                if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
+-                    processSelectBody(subSelect.getSelectBody());
+-                }
+-            }
++        } else if (fromItem instanceof Select) {
++            processSelect((Select) fromItem);
++        } else if (fromItem instanceof ParenthesedFromItem) {
++            ParenthesedFromItem parenthesedFromItem = (ParenthesedFromItem) fromItem;
++            processFromItem(parenthesedFromItem.getFromItem());
+         }
+         //Table时不用处理
+     }

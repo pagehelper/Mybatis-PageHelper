@@ -570,16 +570,10 @@
         order by e.emp_no, s.from_date
     </select>
 
-    <select id="selectOrderByBool" resultType="com.github.pagehelper.model.User">
+    <!-- Test for issue #868: ORDER BY with parameter binding -->
+    <select id="selectOrderByWithParam" resultType="com.github.pagehelper.model.User">
         select *
-        from public."user"
-        order by py = #{py} desc nulls last
-    </select>
-
-    <select id="selectOrderByCase" resultType="com.github.pagehelper.model.User">
-        select *
-        from public."user"
-        order by CASE WHEN py = #{py} THEN 0 ELSE 1 END,
-            py DESC NULLS LAST
+        from user
+        order by CASE WHEN py = #{py} THEN 0 ELSE 1 END, id
     </select>
 </mapper>
