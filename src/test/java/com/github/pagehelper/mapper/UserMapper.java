@@ -38,105 +38,107 @@ import java.util.Map;
 @SuppressWarnings("rawtypes")
 public interface UserMapper {
 
-    @Select("select * from user order by ${order}")
-    List<User> selectByOrder(@Param("order") String order);
+        @Select("select * from user order by ${order}")
+        List<User> selectByOrder(@Param("order") String order);
 
-    //增加Provider测试
-    @SelectProvider(type = ProviderMethod.class, method = "selectSimple")
-    Page<User> selectSimple(String str);
+        // 增加Provider测试
+        @SelectProvider(type = ProviderMethod.class, method = "selectSimple")
+        Page<User> selectSimple(String str);
 
-    //增加Provider测试
-    @SelectProvider(type = ProviderMethod.class, method = "select")
-    List<User> selectByProvider(@Param("param") Map map);
+        // 增加Provider测试
+        @SelectProvider(type = ProviderMethod.class, method = "select")
+        List<User> selectByProvider(@Param("param") Map map);
 
-    @SelectProvider(type = ProviderMethod.class, method = "selectUser")
-    List<User> selectByUserProvider(User user);
+        @SelectProvider(type = ProviderMethod.class, method = "selectUser")
+        List<User> selectByUserProvider(User user);
 
-    @Select("Select * from user")
-    List<Map<String, Object>> selectBySelect();
+        @Select("Select * from user")
+        List<Map<String, Object>> selectBySelect();
 
-    List<User> selectByOrder2(@Param("order") String order);
+        List<User> selectByOrder2(@Param("order") String order);
 
-    List<User> selectAll();
+        List<User> selectAll();
 
-    //嵌套查询
-    List<User> selectCollectionMap();
+        // 嵌套查询
+        List<User> selectCollectionMap();
 
-    List<User> selectGreterThanId(int id);
+        List<User> selectGreterThanId(int id);
 
-    List<User> selectGreterThanIdAndNotEquelName(@Param("id") int id, @Param("name") String name);
+        List<User> selectGreterThanIdAndNotEquelName(@Param("id") int id, @Param("name") String name);
 
-    List<User> selectAll(RowBounds rowBounds);
+        List<User> selectAll(RowBounds rowBounds);
 
-    List<User> selectAllOrderby();
+        List<User> selectAllOrderby();
 
-    List<User> selectAllOrderByParams(@Param("order1") String order1, @Param("order2") String order2);
+        List<User> selectAllOrderByParams(@Param("order1") String order1, @Param("order2") String order2);
 
+        // 下面是三种参数类型的测试方法
+        List<User> selectAllOrderByMap(Map orders);
 
-    //下面是三种参数类型的测试方法
-    List<User> selectAllOrderByMap(Map orders);
+        List<User> selectAllOrderByList(List<Integer> params);
 
-    List<User> selectAllOrderByList(List<Integer> params);
+        List<User> selectAllOrderByArray(Integer[] params);
 
-    List<User> selectAllOrderByArray(Integer[] params);
+        // 测试动态sql,where/if
+        List<User> selectIf(@Param("id") Integer id);
 
-    //测试动态sql,where/if
-    List<User> selectIf(@Param("id") Integer id);
+        List<User> selectIf3(User user);
 
-    List<User> selectIf3(User user);
+        List<User> selectIf2(@Param("id1") Integer id1, @Param("id2") Integer id2);
 
-    List<User> selectIf2(@Param("id1") Integer id1, @Param("id2") Integer id2);
+        List<User> selectIf2List(@Param("id1") List<Integer> id1, @Param("id2") List<Integer> id2);
 
-    List<User> selectIf2List(@Param("id1") List<Integer> id1, @Param("id2") List<Integer> id2);
+        List<User> selectIf2ListAndOrder(@Param("id1") List<Integer> id1, @Param("id2") List<Integer> id2,
+                        @Param("order") String order);
 
-    List<User> selectIf2ListAndOrder(@Param("id1") List<Integer> id1, @Param("id2") List<Integer> id2, @Param("order") String order);
+        List<User> selectChoose(@Param("id1") Integer id1, @Param("id2") Integer id2);
 
-    List<User> selectChoose(@Param("id1") Integer id1, @Param("id2") Integer id2);
+        List<User> selectLike(User user);
 
-    List<User> selectLike(User user);
+        // 特殊sql语句的测试 - 主要测试count查询
+        List<User> selectUnion();
 
-    //特殊sql语句的测试 - 主要测试count查询
-    List<User> selectUnion();
+        List<User> selectLeftjoin();
 
-    List<User> selectLeftjoin();
+        List<User> selectWith();
 
-    List<User> selectWith();
+        // select column中包含参数时
+        List<User> selectColumns(@Param("columns") String... columns);
 
-    //select column中包含参数时
-    List<User> selectColumns(@Param("columns") String... columns);
+        List<User> selectMULId(int mul);
 
-    List<User> selectMULId(int mul);
+        // group by时
+        List<User> selectGroupBy();
 
-    //group by时
-    List<User> selectGroupBy();
+        // select Map
+        List<User> selectByWhereMap(Where where);
 
-    //select Map
-    List<User> selectByWhereMap(Where where);
+        // Example
+        List<User> selectByExample(UserExample example);
 
-    //Example
-    List<User> selectByExample(UserExample example);
+        List<User> selectDistinct();
 
-    List<User> selectDistinct();
+        List<User> selectExists();
 
-    List<User> selectExists();
+        List<User> selectByPageNumSize(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
-    List<User> selectByPageNumSize(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
+        List<User> selectByPageNumSizeOrderBy(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize,
+                        @Param("orderBy") String orderBy);
 
-    List<User> selectByPageNumSizeOrderBy(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("orderBy") String orderBy);
+        List<User> selectByOrderBy(@Param("orderBy") String orderBy);
 
-    List<User> selectByOrderBy(@Param("orderBy") String orderBy);
+        List<User> selectByQueryModel(UserQueryModel queryModel);
 
-    List<User> selectByQueryModel(UserQueryModel queryModel);
+        List<User> selectByIdList(@Param("idList") List<Long> idList);
 
-    List<User> selectByIdList(@Param("idList") List<Long> idList);
+        List<User> selectByIdList2(@Param("idList") List<Long> idList);
 
-    List<User> selectByIdList2(@Param("idList") List<Long> idList);
+        List<Map<String, Object>> execute(@Param("sql") String sql);
 
-    List<Map<String, Object>> execute(@Param("sql") String sql);
+        List<UserCode> selectByCode(Code code);
 
-    List<UserCode> selectByCode(Code code);
-
-    List<User> selectOrderByBool(@Param("py") String py);
-
-    List<User> selectOrderByCase(@Param("py") String py);
+        /**
+         * Test for issue #868: ORDER BY with parameter binding
+         */
+        List<User> selectOrderByWithParam(@Param("py") String py);
 }

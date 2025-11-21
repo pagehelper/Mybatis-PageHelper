@@ -44,10 +44,10 @@ import java.util.*;
  * @author liuzh
  */
 public class DefaultCountSqlParser implements CountSqlParser {
-    public static final    String KEEP_ORDERBY = "/*keep orderby*/";
-    protected static final Alias  TABLE_ALIAS;
+    public static final String KEEP_ORDERBY = "/*keep orderby*/";
+    protected static final Alias TABLE_ALIAS;
 
-    protected final Set<String> skipFunctions  = Collections.synchronizedSet(new HashSet<>());
+    protected final Set<String> skipFunctions = Collections.synchronizedSet(new HashSet<>());
     protected final Set<String> falseFunctions = Collections.synchronizedSet(new HashSet<>());
 
     static {
@@ -64,29 +64,29 @@ public class DefaultCountSqlParser implements CountSqlParser {
      */
     @Override
     public String getSmartCountSql(String sql, String countColumn) {
-        //解析SQL
+        // 解析SQL
         Statement stmt = null;
-        //特殊sql不需要去掉order by时，使用注释前缀
+        // 特殊sql不需要去掉order by时，使用注释前缀
         if (sql.indexOf(KEEP_ORDERBY) >= 0 || keepOrderBy()) {
             return getSimpleCountSql(sql, countColumn);
         }
         try {
             stmt = SqlParserUtil.parse(sql);
         } catch (Throwable e) {
-            //无法解析的用一般方法返回count语句
+            // 无法解析的用一般方法返回count语句
             return getSimpleCountSql(sql, countColumn);
         }
         Select select = (Select) stmt;
         try {
-            //处理body-去order by
+            // 处理body-去order by
             processSelect(select);
         } catch (Exception e) {
-            //当 sql 包含 group by 时，不去除 order by
+            // 当 sql 包含 group by 时，不去除 order by
             return getSimpleCountSql(sql, countColumn);
         }
-        //处理with-去order by
+        // 处理with-去order by
         processWithItemsList(select.getWithItemsList());
-        //处理为count查询
+        // 处理为count查询
         Select countSelect = sqlToCount(select, countColumn);
         String result = countSelect.toString();
         if (select instanceof PlainSelect) {
@@ -162,35 +162,39 @@ public class DefaultCountSqlParser implements CountSqlParser {
      * @return
      */
     public boolean isSimpleCount(PlainSelect select) {
-        //#868 Cannot use simple count when ORDER BY is present
-        if (select.getOrderByElements() != null) {
+        // #868 Cannot use simple count when ORDER BY contains parameters
+        // If ORDER BY contains parameters, removing it will cause JDBC parameter
+        // mismatch
+        // Fixed by @pwdLight -
+        // https://github.com/pagehelper/Mybatis-PageHelper/pull/869
+        if (orderByHashParameters(select.getOrderByElements())) {
             return false;
         }
-        //包含group by的时候不可以
+        // 包含group by的时候不可以
         if (select.getGroupBy() != null) {
             return false;
         }
-        //包含distinct的时候不可以
+        // 包含distinct的时候不可以
         if (select.getDistinct() != null) {
             return false;
         }
-        //#606,包含having时不可以
+        // #606,包含having时不可以
         if (select.getHaving() != null) {
             return false;
         }
         for (SelectItem<?> item : select.getSelectItems()) {
-            //select列中包含参数的时候不可以，否则会引起参数个数错误
+            // select列中包含参数的时候不可以，否则会引起参数个数错误
             if (item.toString().contains("?")) {
                 return false;
             }
-            //如果查询列中包含函数，也不可以，函数可能会聚合列
+            // 如果查询列中包含函数，也不可以，函数可能会聚合列
             Expression expression = item.getExpression();
             if (expression instanceof Function) {
                 String name = ((Function) expression).getName();
                 if (name != null) {
                     String NAME = name.toUpperCase();
                     if (skipFunctions.contains(NAME)) {
-                        //go on
+                        // go on
                     } else if (falseFunctions.contains(NAME)) {
                         return false;
                     } else {
@@ -204,7 +208,7 @@ public class DefaultCountSqlParser implements CountSqlParser {
                     }
                 }
             } else if (expression instanceof Parenthesis && item.getAlias() != null) {
-                //#555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
+                // #555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
                 // 这里想要更智能，需要在整个SQL中查找别名出现的位置，暂时不考虑，直接排除
                 return false;
             }
@@ -233,12 +237,12 @@ public class DefaultCountSqlParser implements CountSqlParser {
                 }
             }
             /*
-            if (select instanceof WithItem) {
-                WithItem withItem = (WithItem) selectBody;
-                if (withItem.getSubSelect() != null && !keepSubSelectOrderBy()) {
-                    processSelectBody(withItem.getSubSelect().getSelectBody());
-                }
-            }
+             * if (select instanceof WithItem) {
+             * WithItem withItem = (WithItem) selectBody;
+             * if (withItem.getSubSelect() != null && !keepSubSelectOrderBy()) {
+             * processSelectBody(withItem.getSubSelect().getSelectBody());
+             * }
+             * }
              */
         }
     }
@@ -297,7 +301,7 @@ public class DefaultCountSqlParser implements CountSqlParser {
             ParenthesedFromItem parenthesedFromItem = (ParenthesedFromItem) fromItem;
             processFromItem(parenthesedFromItem.getFromItem());
         }
-        //Table时不用处理
+        // Table时不用处理
     }
 
     /**
